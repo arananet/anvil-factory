@@ -28,6 +28,8 @@ h2 { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-
 .run { background:#1E1E1E; border:1px solid #2A2A2A; border-radius:8px; padding:18px 20px; margin:0 0 22px; }
 .meta { display:flex; flex-wrap:wrap; gap:8px 22px; font-size:13px; color:#C9C9C9; margin:8px 0 14px; }
 .meta b { color:#FFFFFF; font-weight:600; }
+.decision { border-left:3px solid #3A3A3A; padding:8px 12px; margin:0 0 14px; font-size:13.5px; }
+.decision div { margin:2px 0; }
 table { width:100%; border-collapse:collapse; font-size:13px; }
 th { text-align:left; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight:600; color:#9A9A9A; border-bottom:1px solid #3A3A3A; padding:6px 8px; }
 td { border-bottom:1px solid #2A2A2A; padding:6px 8px; vertical-align:top; }
@@ -57,6 +59,49 @@ def _dash(value):
 def _status_span(value):
     cls = STATUS_CLASS.get(str(value), "st-idle")
     return f'<span class="status {cls}">{_esc(value)}</span>'
+
+
+def _derived_decision(report):
+    """Minimal explanation for a report that predates decision recording.
+
+    Derived only from fields the old record actually carries (verdict,
+    human_required, executed reviewer steps) and labeled as derived on the
+    page, so nobody mistakes it for the runner's own words.
+    """
+    verdict = report.get("verdict", "-")
+    steps = report.get("steps", []) or []
+    executed_reviewers = [s for s in steps
+                          if str(s.get("station", "")).startswith("reviewer")
+                          and s.get("status") == "executed"]
+    if verdict == "no_reviews":
+        approver = "Approver: no reviewer step produced a counted review in this run, so the verdict is no_reviews."
+    elif executed_reviewers:
+        approver = f"Approver: verdict {verdict} from the reviews produced by the executed reviewer steps in this run."
+    else:
+        approver = f"Approver: verdict {verdict} is on record, but this report does not itemize the reviews behind it."
+    if report.get("human_required"):
+        human = f"Human gate: a human was required for this run (verdict {verdict})."
+    else:
+        human = f"Human gate: no human was required for this run (verdict {verdict})."
+    return approver, human
+
+
+def _decision_block(report):
+    decision = report.get("decision")
+    if isinstance(decision, dict):
+        approver = decision.get("approver") or {}
+        human_gate = decision.get("human_gate") or {}
+        if approver.get("rule"):
+            return ('<div class="decision">'
+                    f"<div><span class='mono muted'>approver:</span> {_esc(approver['rule'])}</div>"
+                    f"<div><span class='mono muted'>human gate:</span> {_esc(human_gate.get('rule', '-'))}</div>"
+                    "</div>")
+    approver_text, human_text = _derived_decision(report)
+    return ('<div class="decision">'
+            "<div class='mono muted'>decision, derived from the run record:</div>"
+            f"<div>{_esc(approver_text)}</div>"
+            f"<div>{_esc(human_text)}</div>"
+            "</div>")
 
 
 def collect_runs(project):
@@ -116,6 +161,7 @@ def render_status_page(project, generated_at=None):
             ("loopbacks", _esc(report.get("loopbacks", "-"))),
         ]
         parts.append('<div class="meta">' + "".join(f"<span>{k}: <b>{v}</b></span>" for k, v in meta) + "</div>")
+        parts.append(_decision_block(report))
         parts.append("<table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>")
         for step in report.get("steps", []):
             artifacts = ", ".join(str(a) for a in step.get("artifacts", [])) or "-"

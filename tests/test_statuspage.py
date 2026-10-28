@@ -14,6 +14,20 @@ APPROVED_RUN = {
     "title": "Add the export feature", "kind": "feature",
     "verdict": "approved", "human_required": False, "loopbacks": 0,
     "deployment_status": "deployed_verified",
+    "risk_hints": [],
+    "decision": {
+        "approver": {
+            "reviews_counted": [{"station": "reviewer-spec", "verdict": "pass"}],
+            "reviews_expected": ["reviewer-spec", "reviewer-security"],
+            "rule": "All counted reviews passed.",
+        },
+        "human_gate": {
+            "required": False,
+            "rule": ("Verdict approved and no risk hints matched (scanned: auth, payments, "
+                     "data-deletion, production-deploy, secrets, publishing), so no human is required."),
+            "hints_matched": [],
+        },
+    },
     "verify_results": [{"command": "run the tests", "status": "pass", "exit_code": 0, "output": ""}],
     "steps": [
         {"station": "intake", "status": "completed", "duration_ms": 1.5, "cost": None, "artifacts": ["runs/wo-alpha-001/report.json"]},
@@ -90,6 +104,30 @@ class TestStatusPage(unittest.TestCase):
             self.assertNotIn("http://", page.replace("http://www.w3.org", ""))
             self.assertNotIn("<link", page)
             self.assertNotIn("<script", page)
+
+    def test_recorded_decision_sentences_render_s6(self):
+        """status-page S6: a report with a decision object shows the runner's own rule sentences"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp) / "proj"
+            (proj / "runs").mkdir(parents=True)
+            write_report(proj, "wo-alpha-001", APPROVED_RUN)
+            page, summary = render_status_page(proj, generated_at="2026-10-28 00:00:00 UTC")
+            self.assertEqual(summary["runs"], 1)
+            self.assertIn("All counted reviews passed.", page)
+            self.assertIn("so no human is required.", page)
+            self.assertNotIn("derived from the run record", page)
+
+    def test_derived_decision_for_older_report_s6(self):
+        """status-page S6: a report without a decision object gets a labeled derived explanation"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp) / "proj"
+            (proj / "runs").mkdir(parents=True)
+            write_report(proj, "wo-beta-002", FAILED_RUN)
+            page, summary = render_status_page(proj, generated_at="2026-10-28 00:00:00 UTC")
+            self.assertEqual(summary["runs"], 1)
+            self.assertIn("derived from the run record", page)
+            self.assertIn("verdict rejected is on record, but this report does not itemize the reviews behind it.", page)
+            self.assertIn("a human was required for this run (verdict rejected)", page)
 
 if __name__ == "__main__":
     unittest.main()

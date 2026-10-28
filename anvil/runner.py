@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from .model import WorkOrder, Review
 from .gates import human_gate
-from .approver import aggregate, needs_human
+from .approver import aggregate, needs_human, aggregate_explained, needs_human_explained, matched_risk_hints, RISK_SCAN_ORDER
 from .executor import ExecutorError
 
 @dataclass
@@ -20,12 +20,15 @@ class RunReport:
     loopbacks: int = 0
     deployment_status: str = None
     verify_results: list = field(default_factory=list)
+    risk_hints: list = field(default_factory=list)
+    decision: dict = field(default_factory=dict)
     def to_dict(self):
         return {"work_order_id": self.work_order_id, "pipeline": self.pipeline,
                 "title": self.title, "kind": self.kind,
                 "steps": self.steps, "verdict": self.verdict, "human_required": self.human_required,
                 "max_loopbacks": self.max_loopbacks, "loopbacks": self.loopbacks,
-                "deployment_status": self.deployment_status, "verify_results": self.verify_results}
+                "deployment_status": self.deployment_status, "verify_results": self.verify_results,
+                "risk_hints": self.risk_hints, "decision": self.decision}
 
 def parse_review(text, station_id):
     """Find a review JSON object in executor output and build a Review.
@@ -94,6 +97,12 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     deployment_status = None
     verify_results = []
     human_blocked = None  # decided at the triage step
+    # Decision record: the approver entry is filled at the approver step from
+    # the reviews counted there; the human gate entry is filled at the end
+    # from the final verdict. Both rule sentences are generated from the
+    # same values the code acted on.
+    reviews_expected = [sid for sid in order if sid.startswith("reviewer")]
+    decision_approver = None
 
     def write_envelope(station_id, next_station, artifact, status, extra=None):
         envelope = {"schema": "anvil/envelope@1", "from_station": station_id, "to_station": next_station,
@@ -127,9 +136,15 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             artifact = str(run_dir / "report.json")
         elif station_id == "approver":
             if run_reviews:
-                verdict = aggregate(run_reviews)
+                verdict, verdict_rule, counted = aggregate_explained(run_reviews)
             else:
                 verdict = "no_reviews"
+                verdict_rule = ("No reviews were produced in this run, so the verdict is no_reviews; "
+                                "standing project reviews are never counted.")
+                counted = []
+            decision_approver = {"reviews_counted": counted,
+                                 "reviews_expected": list(reviews_expected),
+                                 "rule": verdict_rule}
             detail = f"Approver verdict: {verdict}"
             artifact = str(run_dir / "report.json")
         elif station_id == "triage-human":
@@ -266,11 +281,35 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                           "duration_ms": 0.0, "cost": None, "artifacts": []})
     if not verdict:
         verdict = "packet_ready"
-    human_required = needs_human(work_order, verdict) if verdict in {"approved", "rejected", "changes_requested", "no_reviews"} else (human_gate(work_order) == "required")
+    if decision_approver is None:
+        # A pipeline without an approver step aggregates nothing; say so
+        # instead of inventing a verdict explanation.
+        decision_approver = {"reviews_counted": [{"station": r.station, "verdict": r.verdict} for r in run_reviews],
+                             "reviews_expected": list(reviews_expected),
+                             "rule": "The pipeline has no approver step, so no reviews were aggregated into a verdict."}
+    if verdict in {"approved", "rejected", "changes_requested", "no_reviews"}:
+        human_required, human_rule, hints_matched = needs_human_explained(work_order, verdict)
+    else:
+        # No approver verdict exists, so the gate looks at risk hints only,
+        # exactly as human_gate does.
+        hints_matched = matched_risk_hints(work_order)
+        human_required = bool(hints_matched)
+        if hints_matched:
+            quoted = ", ".join(f"'{h}'" for h in hints_matched)
+            noun = "risk hint" if len(hints_matched) == 1 else "risk hints"
+            human_rule = (f"No approver verdict was produced by this pipeline, and the work order carries "
+                          f"the {noun} {quoted}, so a human is required.")
+        else:
+            scanned = ", ".join(RISK_SCAN_ORDER)
+            human_rule = (f"No approver verdict was produced by this pipeline and no risk hints matched "
+                          f"(scanned: {scanned}), so no human is required.")
+    decision = {"approver": decision_approver,
+                "human_gate": {"required": human_required, "rule": human_rule, "hints_matched": hints_matched}}
     report = RunReport(work_order_id=work_order.id, pipeline=pipeline.name, steps=steps, verdict=verdict,
                        title=work_order.title, kind=work_order.kind,
                        human_required=human_required, max_loopbacks=max_loopbacks, loopbacks=loopbacks,
-                       deployment_status=deployment_status, verify_results=verify_results)
+                       deployment_status=deployment_status, verify_results=verify_results,
+                       risk_hints=list(work_order.risk_hints or []), decision=decision)
     (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
     # Swimlane
     lines = ["# Swimlane", "", "Cost is reported as null here. Model runtimes report cost when they run a station; ANVIL never invents a number.", "",
@@ -279,6 +318,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         arts = ", ".join(s.get("artifacts", [])) or "-"
         cost = s.get("cost")
         lines.append(f"| {s['station']} | {s['status']} | {s.get('duration_ms', 0)} | {arts} | {cost if cost is not None else 'null'} |")
+    lines.append("")
+    lines.append("## Decision")
+    lines.append("")
+    lines.append(f"- Approver: {decision['approver']['rule']}")
+    lines.append(f"- Human gate: {decision['human_gate']['rule']}")
     if deployment_status is not None:
         lines.append("")
         lines.append(f"Deployment: {deployment_status}")
