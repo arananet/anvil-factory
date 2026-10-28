@@ -1,6 +1,6 @@
 # ANVIL
 
-![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue) ![License MIT](https://img.shields.io/badge/license-MIT-green) ![OpenSpec](https://img.shields.io/badge/OpenSpec-specs-orange) TDD: tests before implementation
+![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue) ![License Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-green) ![OpenSpec](https://img.shields.io/badge/OpenSpec-specs-orange) TDD: tests before implementation
 
 > "ANVIL is a composable software factory: spec first, tests first, and no station approves its own work."
 
@@ -118,7 +118,7 @@ Every change starts with a spec under .openspec/specs/ (OpenSpec). Write the spe
 
 ## License
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 
