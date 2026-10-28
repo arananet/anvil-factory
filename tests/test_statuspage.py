@@ -31,8 +31,10 @@ APPROVED_RUN = {
     "verify_results": [{"command": "run the tests", "status": "pass", "exit_code": 0, "output": ""}],
     "steps": [
         {"station": "intake", "status": "completed", "duration_ms": 1.5, "cost": None, "artifacts": ["runs/wo-alpha-001/report.json"]},
-        {"station": "builder", "status": "executed", "duration_ms": 42.0, "cost": None, "artifacts": ["runs/wo-alpha-001/builder.output.md"]},
-        {"station": "reviewer-spec", "status": "packet_ready", "duration_ms": 0.5, "cost": None, "artifacts": ["runs/wo-alpha-001/reviewer-spec.packet.md"]},
+        {"station": "builder", "status": "executed", "duration_ms": 42.0, "cost": None, "artifacts": ["runs/wo-alpha-001/builder.output.md"],
+         "configured_model": "fast-builder", "executed_model": "stub-model-x", "executor": {"kind": "http", "detail": "models.example"}},
+        {"station": "reviewer-spec", "status": "packet_ready", "duration_ms": 0.5, "cost": None, "artifacts": ["runs/wo-alpha-001/reviewer-spec.packet.md"],
+         "configured_model": "review-balanced", "executed_model": None, "executor": None},
         {"station": "deployer", "status": "executed", "duration_ms": 900.0, "cost": None, "artifacts": ["runs/wo-alpha-001/deployer.output.md"]},
     ],
 }
@@ -128,6 +130,14 @@ class TestStatusPage(unittest.TestCase):
             self.assertIn("derived from the run record", page)
             self.assertIn("verdict rejected is on record, but this report does not itemize the reviews behind it.", page)
             self.assertIn("a human was required for this run (verdict rejected)", page)
+
+    def test_step_rows_show_model_provenance(self):
+        """agent-execution S8 (status page): executed model shown as model, configured as configured"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = self.make_project(tmp)
+            page, _ = render_status_page(proj, generated_at="2026-10-28 00:00:00 UTC")
+            self.assertIn("model: stub-model-x", page)
+            self.assertIn("configured: review-balanced", page)
 
 if __name__ == "__main__":
     unittest.main()

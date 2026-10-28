@@ -27,7 +27,8 @@ prompt, work order, upstream step summary) and sent to the executor:
 
 - The executor output is written to `runs/<id>/<station>.output.md`.
 - The step status becomes `executed`, and the envelope records status
-  `executed` plus the executor name.
+  `executed` plus the executor object `{kind, detail}` (see Model
+  provenance below).
 - If the executor fails or the kind is unknown, the step status is `failed`
   with the error recorded in the step and the envelope. A failed step is never
   quietly reported as `packet_ready`.
@@ -116,6 +117,33 @@ in the Taskline demonstration, `wrangler deploy` or a release script in real
 use. ANVIL runs the command and the verification; it does not invent a
 hosting target, and it does not hold credentials. Secrets for deploy and
 verify commands stay in the operator environment, never in the config file.
+
+## Model provenance
+
+Every step in `report.json`, and every envelope, records `configured_model`:
+the station's model label resolved through the Core Four (the project
+`anvil.yaml` override when present, else the station manifest, else the
+built in default). It is recorded in packet mode too, because configuration
+is a fact about the run, not a result of it. Spine generated steps that are
+not catalog stations (the verifier, a loopback marker) record null.
+
+Executed steps additionally record `executed_model` and an `executor`
+object `{kind, detail}`:
+
+- For the http executor, the model that ran is the model named in its
+  config, so `executed_model` is that model and `detail` is the endpoint
+  host.
+- For the command executor, the runtime is an opaque local process. The
+  detail is the command template's first token, and `executed_model`
+  stays null unless the runtime's own output reports a model (a `model`
+  field in its JSON output). ANVIL never guesses which model a command
+  runtime used: a packet that says `claude` might have run any model the
+  operator's CLI is configured with, and the record refuses to pretend
+  otherwise.
+
+In packet mode `executed_model` and `executor` stay null. The status page
+shows the provenance under each station name: `model: X` when a model
+actually ran, otherwise `configured: X`.
 
 ## The honest boundary
 

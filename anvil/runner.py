@@ -1,8 +1,11 @@
-import json, os, subprocess, time
+import json, os, shlex, subprocess, time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlparse
 from .model import WorkOrder, Review
+from .config import default_model
+from .brain import packet_learnings_section
 from .gates import human_gate
 from .approver import aggregate, needs_human, aggregate_explained, needs_human_explained, matched_risk_hints, RISK_SCAN_ORDER
 from .executor import ExecutorError
@@ -57,6 +60,50 @@ def parse_review(text, station_id):
             return None
     return None
 
+def _reported_model(text):
+    """A model name counts only when the runtime output itself reports one.
+
+    Scans the output for a JSON object with a string "model" field. Anything
+    else returns None: ANVIL never guesses which model a runtime used.
+    """
+    if not text:
+        return None
+    decoder = json.JSONDecoder()
+    for idx, ch in enumerate(text):
+        if ch != "{":
+            continue
+        try:
+            obj, _ = decoder.raw_decode(text[idx:])
+        except json.JSONDecodeError:
+            continue
+        if isinstance(obj, dict) and isinstance(obj.get("model"), str) and obj["model"]:
+            return obj["model"]
+    return None
+
+def _executor_provenance(executor, output_text=""):
+    """Return (executor_object, executed_model) for an attempted execution.
+
+    The http executor runs the model named in its config, so that model is
+    the executed model and the detail is the endpoint host. A command
+    executor is an opaque local process: the detail is the template's first
+    token and the executed model is known only when the runtime output
+    reports one itself.
+    """
+    kind = getattr(executor, "kind", "unknown")
+    if kind == "http":
+        endpoint = getattr(executor, "endpoint", "")
+        detail = urlparse(endpoint).hostname or endpoint
+        return {"kind": "http", "detail": detail}, (getattr(executor, "model", "") or None)
+    if kind == "command":
+        template = getattr(executor, "template", "")
+        try:
+            tokens = shlex.split(template)
+        except ValueError:
+            tokens = template.split()
+        detail = tokens[0] if tokens else ""
+        return {"kind": "command", "detail": detail}, _reported_model(output_text)
+    return {"kind": str(kind), "detail": getattr(executor, "name", str(kind))}, None
+
 def _run_shell(command, cwd, work_order_id, timeout):
     env = dict(os.environ)
     env["ANVIL_WORK_ORDER_ID"] = work_order_id
@@ -67,13 +114,16 @@ def _run_shell(command, cwd, work_order_id, timeout):
     except subprocess.TimeoutExpired:
         return None, f"Timed out after {timeout}s"
 
-def _packet_text(station_id, prompt, work_order, steps):
+def _packet_text(station_id, prompt, work_order, steps, learnings_section=""):
     upstream = "\n".join(f"- {s['station']}: {s['status']}" for s in steps) or "- (none)"
-    return (f"# Task packet: {station_id}\n\n## Station prompt\n\n{prompt}\n\n## Work order\n\n"
+    text = (f"# Task packet: {station_id}\n\n## Station prompt\n\n{prompt}\n\n## Work order\n\n"
             f"- id: {work_order.id}\n- kind: {work_order.kind}\n- title: {work_order.title}\n"
             f"- source: {work_order.source}\n- description: {work_order.description}\n"
             f"- risk_hints: {', '.join(work_order.risk_hints)}\n- status: {work_order.status}\n\n"
             f"## Upstream steps\n\n{upstream}\n")
+    if learnings_section:
+        text += f"\n{learnings_section}\n"
+    return text
 
 def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks=2,
                  executor=None, deploy_cfg=None):
@@ -103,6 +153,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     # same values the code acted on.
     reviews_expected = [sid for sid in order if sid.startswith("reviewer")]
     decision_approver = None
+    # Verified learnings are computed once per run: only non demoted entries
+    # from brain/learnings.md, never inbox proposals (see anvil/brain.py).
+    learnings_section = packet_learnings_section(project)
 
     def write_envelope(station_id, next_station, artifact, status, extra=None):
         envelope = {"schema": "anvil/envelope@1", "from_station": station_id, "to_station": next_station,
@@ -115,7 +168,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     def packet_step(station, station_id):
         prompt = station.prompt if station and station.prompt else f"Station {station_id}: carry out your role for this work order."
         packet = run_dir / f"{station_id}.packet.md"
-        packet.write_text(_packet_text(station_id, prompt, work_order, steps), encoding="utf-8")
+        packet.write_text(_packet_text(station_id, prompt, work_order, steps, learnings_section), encoding="utf-8")
         return packet
 
     for idx, station_id in enumerate(order):
@@ -124,6 +177,12 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         if registry is not None and station_id in registry:
             station = registry.get(station_id)
         kind = station.kind if station else ("deterministic" if station_id in {"intake", "approver", "triage-human"} else "agent")
+        # Model provenance: the configured label is a fact of configuration,
+        # recorded in every mode. Executed fields stay null until a runtime
+        # actually runs the station (agent-execution S8).
+        configured_model = station.model if station is not None and station.model else default_model(station_id)
+        step_executor = None
+        step_executed_model = None
         status = "completed"
         detail = ""
         artifact = ""
@@ -197,6 +256,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                                         else f"Verification failed: {', '.join(v_failed)}"),
                              "duration_ms": round((time.perf_counter() - vstarted) * 1000, 3),
                              "cost": None,
+                             "configured_model": None, "executed_model": None, "executor": None,
                              "artifacts": [str(run_dir / "verify-findings.md")] if v_failed else []}
                     deferred_verifier = vstep
                 else:
@@ -230,7 +290,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 status = "executed"
                 detail = f"Executed by {executor.name}; output written to {output_file}"
                 artifact = str(output_file)
-                extra_envelope = {"executor": executor.name}
+                step_executor, step_executed_model = _executor_provenance(executor, output_text)
+                extra_envelope = {}
                 if isinstance(usage, dict):
                     step_usage = usage
                     extra_envelope["usage"] = usage
@@ -250,7 +311,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 status = "failed"
                 detail = f"Executor failed: {exc}"
                 artifact = str(packet)
-                extra_envelope = {"executor": getattr(executor, "name", "unknown"), "error": str(exc)}
+                step_executor, step_executed_model = _executor_provenance(executor)
+                extra_envelope = {"error": str(exc)}
         else:
             packet = packet_step(station, station_id)
             status = "packet_ready"
@@ -258,18 +320,25 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             artifact = str(packet)
         duration_ms = round((time.perf_counter() - started) * 1000, 3)
         step = {"station": station_id, "status": status, "detail": detail, "duration_ms": duration_ms,
-                "cost": None, "artifacts": [artifact] if artifact else []}
+                "cost": None, "artifacts": [artifact] if artifact else [],
+                "configured_model": configured_model, "executed_model": step_executed_model,
+                "executor": step_executor}
         if step_usage is not None:
             step["usage"] = step_usage
             if isinstance(step_usage.get("cost"), (int, float)):
                 step["cost"] = step_usage["cost"]
         steps.append(step)
-        write_envelope(station_id, next_station, artifact or str(run_dir / "report.json"), status, extra_envelope)
+        env_extra = dict(extra_envelope)
+        env_extra["configured_model"] = configured_model
+        if step_executor is not None:
+            env_extra["executor"] = step_executor
+            env_extra["executed_model"] = step_executed_model
+        write_envelope(station_id, next_station, artifact or str(run_dir / "report.json"), status, env_extra)
         if deferred_verifier is not None:
             steps.append(deferred_verifier)
             write_envelope("verifier", next_station,
                            deferred_verifier["artifacts"][0] if deferred_verifier["artifacts"] else str(run_dir / "report.json"),
-                           deferred_verifier["status"])
+                           deferred_verifier["status"], {"configured_model": None})
         # Loopback right after approver when aggregation fails
         if station_id == "approver" and verdict in {"rejected", "changes_requested"} and loopbacks < max_loopbacks:
             loopbacks += 1
@@ -278,7 +347,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             reason = "; ".join(run_findings) if run_findings else f"Approver verdict: {verdict}"
             steps.append({"station": station_id, "status": "loopback", "return_to": return_to,
                           "detail": f"Loopback to {return_to}: {reason}", "reason": reason,
-                          "duration_ms": 0.0, "cost": None, "artifacts": []})
+                          "duration_ms": 0.0, "cost": None, "artifacts": [],
+                          "configured_model": None, "executed_model": None, "executor": None})
     if not verdict:
         verdict = "packet_ready"
     if decision_approver is None:

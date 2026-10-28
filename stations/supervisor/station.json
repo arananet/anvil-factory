@@ -1,0 +1,1 @@
+{"context":["brain/project.md","runs/"],"description":"Between runs: watch the run record for stalls and propose one bounded pipeline recomposition from the station catalog.","id":"supervisor","inputs":["run reports","stall signals"],"kind":"agent","model":"reasoning-strong","name":"Supervisor","outputs":["pipeline proposal"],"prompt":"stations/supervisor/PROMPT.md","tools":[]}

@@ -63,13 +63,14 @@ class TestPipeline(unittest.TestCase):
 
 class TestRegistry(unittest.TestCase):
     def test_registry_s6(self):
-        """factory-pipeline-engine S6: 23 stations including scout, blueprint and content"""
+        """factory-pipeline-engine S6: 24 stations including scout, blueprint, content and supervisor"""
         reg = load_registry(ROOT / "stations")
-        self.assertEqual(len(reg), 23)
+        self.assertEqual(len(reg), 24)
         self.assertIn("scout", reg)
         self.assertIn("blueprint", reg)
         self.assertIn("writer", reg)
         self.assertIn("publisher", reg)
+        self.assertIn("supervisor", reg)
         for pipe_file in (ROOT / "pipelines").glob("*.json"):
             load_pipeline(pipe_file, known_stations=set(reg.ids()))
 

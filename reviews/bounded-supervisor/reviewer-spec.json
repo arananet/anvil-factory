@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "pass",
+  "findings": [
+    "Scenarios S1 to S6 map one to one to anvil/supervisor.py, the supervisor station and the supervise CLI: the four deterministic stall signals with evidence run ids, no signals meaning no writes, packet mode with a task work order naming the first signal, executed proposals validated and filed under pipelines/proposals/ without applying, constitution rejections with each failed check named, and the bounds stated in the station prompt."
+  ]
+}

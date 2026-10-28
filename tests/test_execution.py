@@ -97,7 +97,7 @@ class TestCommandExecution(unittest.TestCase):
             self.assertIn("Executed builder", out.read_text())
             env = json.loads((run_dir / "envelopes" / "builder.envelope.json").read_text())
             self.assertEqual(env["status"], "executed")
-            self.assertEqual(env["executor"], "command")
+            self.assertEqual(env["executor"], {"kind": "command", "detail": sys.executable})
             self.assertIsNone(report.steps[0].get("cost"))
 
     def test_garbage_review_output_records_parse_failure_s3(self):
@@ -188,7 +188,8 @@ class TestHttpExecution(unittest.TestCase):
                 self.assertIsNone(reviewer["cost"])
                 env = json.loads((proj / "runs" / "wo-exec-005" / "envelopes" / "reviewer-spec.envelope.json").read_text())
                 self.assertEqual(env["tokens"]["total_tokens"], 18)
-                self.assertEqual(env["executor"], "http:stub-model")
+                self.assertEqual(env["executor"], {"kind": "http", "detail": "127.0.0.1"})
+                self.assertEqual(env["executed_model"], "stub-model")
         finally:
             server.shutdown()
             import os
@@ -298,6 +299,112 @@ class TestDeployVerify(unittest.TestCase):
             statuses = {s["station"]: s["status"] for s in report.steps}
             self.assertEqual(statuses["deployer"], "packet_ready")
             self.assertFalse((proj / "deployed-target").exists())
+
+MODEL_REPORTING_EXECUTOR = '''
+import json, sys
+packet_path = sys.argv[1]
+station = ""
+for line in open(packet_path, encoding="utf-8"):
+    if line.startswith("# Task packet:"):
+        station = line.split(":", 1)[1].strip()
+        break
+if station.startswith("reviewer"):
+    print(json.dumps({"station": station, "verdict": "pass", "findings": ["ok"]}))
+else:
+    print(json.dumps({"model": "self-reported-1", "note": "done by " + station}))
+'''
+
+class TestModelProvenance(unittest.TestCase):
+    def test_packet_mode_records_configured_model_only_s8(self):
+        """agent-execution S8: packet mode records configured_model; executed fields stay null"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-prov-001", kind="bug", title="Packet provenance")
+            report = run_pipeline(proj, hotfix_pipe(reg), wo, registry=reg)
+            steps = {s["station"]: s for s in report.steps}
+            self.assertEqual(steps["builder"]["configured_model"], "fast-builder")
+            self.assertEqual(steps["reviewer-spec"]["configured_model"], "review-balanced")
+            self.assertIsNone(steps["builder"]["executed_model"])
+            self.assertIsNone(steps["builder"]["executor"])
+            env = json.loads((proj / "runs" / "wo-prov-001" / "envelopes" / "builder.envelope.json").read_text())
+            self.assertEqual(env["configured_model"], "fast-builder")
+            self.assertIsNone(env.get("executed_model"))
+            self.assertIsNone(env.get("executor"))
+
+    def test_http_executor_records_executed_model_s8(self):
+        """agent-execution S8: the http executor's executed model is its configured endpoint model"""
+        class Handler(BaseHTTPRequestHandler):
+            def do_POST(self):
+                length = int(self.headers.get("Content-Length", 0))
+                self.rfile.read(length)
+                payload = {"choices": [{"message": {"content": json.dumps(
+                    {"station": "reviewer-spec", "verdict": "pass", "findings": ["stub review"]})}}],
+                    "usage": {"prompt_tokens": 3, "completion_tokens": 2, "total_tokens": 5}}
+                raw = json.dumps(payload).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+            def log_message(self, *args):
+                pass
+
+        server = HTTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            import os
+            os.environ["ANVIL_TEST_STUB_KEY"] = "stub-key-value"
+            with tempfile.TemporaryDirectory() as tmp:
+                proj = make_project(tmp)
+                reg = load_registry(ROOT / "stations")
+                executor = create_executor({"kind": "http",
+                                            "endpoint": f"http://127.0.0.1:{server.server_port}/v1/chat/completions",
+                                            "model": "stub-model", "api_key_env": "ANVIL_TEST_STUB_KEY",
+                                            "timeout_seconds": 30})
+                wo = WorkOrder(id="wo-prov-002", kind="bug", title="HTTP provenance")
+                report = run_pipeline(proj, hotfix_pipe(reg), wo, registry=reg, executor=executor)
+                builder = [s for s in report.steps if s["station"] == "builder"][0]
+                self.assertEqual(builder["executed_model"], "stub-model")
+                self.assertEqual(builder["executor"], {"kind": "http", "detail": "127.0.0.1"})
+                self.assertEqual(builder["configured_model"], "fast-builder")
+        finally:
+            server.shutdown()
+            import os
+            os.environ.pop("ANVIL_TEST_STUB_KEY", None)
+
+    def test_command_executor_never_guesses_a_model_s8(self):
+        """agent-execution S8: a command runtime's executed model is null unless the runtime reports one"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-prov-003", kind="bug", title="Command provenance")
+            report = run_pipeline(proj, hotfix_pipe(reg), wo, registry=reg,
+                                  executor=command_executor(tmp, "pass"))
+            builder = [s for s in report.steps if s["station"] == "builder"][0]
+            self.assertIsNone(builder["executed_model"])
+            self.assertEqual(builder["executor"], {"kind": "command", "detail": sys.executable})
+            env = json.loads((proj / "runs" / "wo-prov-003" / "envelopes" / "builder.envelope.json").read_text())
+            self.assertIsNone(env["executed_model"])
+            self.assertEqual(env["executor"]["kind"], "command")
+
+    def test_command_executor_records_a_self_reported_model_s8(self):
+        """agent-execution S8: when command output reports a model field, that model is recorded"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            script = Path(tmp) / "reporting_executor.py"
+            script.write_text(MODEL_REPORTING_EXECUTOR)
+            executor = create_executor({"kind": "command",
+                                        "command": f"{sys.executable} {script} {{packet}}",
+                                        "timeout_seconds": 60})
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-prov-004", kind="bug", title="Self reported model")
+            report = run_pipeline(proj, hotfix_pipe(reg), wo, registry=reg, executor=executor)
+            builder = [s for s in report.steps if s["station"] == "builder"][0]
+            self.assertEqual(builder["executed_model"], "self-reported-1")
+            reviewer = [s for s in report.steps if s["station"] == "reviewer-spec"][0]
+            self.assertIsNone(reviewer["executed_model"])
 
 if __name__ == "__main__":
     unittest.main()

@@ -15,6 +15,7 @@ DEFAULT_MODELS = {
     "researcher": "fast-reader",
     "writer": "writing-strong",
     "media-producer": "media-gen",
+    "supervisor": "reasoning-strong",
 }
 
 def default_model(station_id):

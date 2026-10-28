@@ -1,8 +1,9 @@
 import json
 from pathlib import Path
+from .brain import ensure_brain_memory
 from .config import render_anvil_yaml
 
-STATION_IDS = ["intake","spec-writer","test-writer","builder","reviewer-spec","reviewer-security","reviewer-tests","reviewer-architecture","approver","triage-human","deployer","observer","scout","blueprint","brief-writer","researcher","writer","media-producer","reviewer-facts","reviewer-voice","reviewer-platform","reviewer-brand","publisher"]
+STATION_IDS = ["intake","spec-writer","test-writer","builder","reviewer-spec","reviewer-security","reviewer-tests","reviewer-architecture","approver","triage-human","deployer","observer","scout","blueprint","brief-writer","researcher","writer","media-producer","reviewer-facts","reviewer-voice","reviewer-platform","reviewer-brand","publisher","supervisor"]
 TEMPLATE = """# {title}
 
 Status: draft
@@ -35,6 +36,7 @@ def init_project(path, name):
     (root / "brain" / "project.md").write_text(f"# {name}\n\nProject brain for {name}. Principles, context and decisions live here.\n", encoding="utf-8")
     (root / "brain" / "glossary.md").write_text("# Glossary\n\n- Work order: a single unit of work moving down the line.\n", encoding="utf-8")
     (root / "brain" / "worklog.md").write_text("# Worklog\n\n", encoding="utf-8")
+    ensure_brain_memory(root)
     (root / "tests").mkdir(exist_ok=True)
     (root / "reviews").mkdir(exist_ok=True)
     (root / "anvil.json").write_text(json.dumps({"pipeline": "sdlc-default", "project": name}, indent=2) + "\n", encoding="utf-8")

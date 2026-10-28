@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-tests",
+  "verdict": "pass",
+  "findings": [
+    "tests/test_brain.py covers every scenario: promotion success for verdict and verify pass evidence, the three refusal cases with their exact reasons, check-brain flagging a provenance stripped entry and the CLI exit code 1, quarantine listing with exit code 0, a packet that contains the verified claim and not the inbox claim, demotion marking and packet exclusion, scaffolding and onboarding creation without overwrite, and the CLI refusal path."
+  ]
+}

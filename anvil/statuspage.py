@@ -166,8 +166,16 @@ def render_status_page(project, generated_at=None):
         for step in report.get("steps", []):
             artifacts = ", ".join(str(a) for a in step.get("artifacts", [])) or "-"
             cost = step.get("cost")
+            executed_model = step.get("executed_model")
+            configured_model = step.get("configured_model")
+            if executed_model:
+                model_html = f"<div class='muted'>model: {_esc(executed_model)}</div>"
+            elif configured_model:
+                model_html = f"<div class='muted'>configured: {_esc(configured_model)}</div>"
+            else:
+                model_html = ""
             parts.append(
-                f"<tr><td class='mono'>{_esc(step.get('station', '-'))}</td>"
+                f"<tr><td class='mono'>{_esc(step.get('station', '-'))}{model_html}</td>"
                 f"<td>{_status_span(step.get('status', '-'))}</td>"
                 f"<td>{_esc(step.get('duration_ms', '-'))}</td>"
                 f"<td>{'null' if cost is None else _esc(cost)}</td>"

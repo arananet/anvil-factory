@@ -37,7 +37,7 @@ Load, validate and order composable pipelines, load station manifests, and run a
 - S5: Given a parallel group with one station, when it validates, then ValueError says a parallel group needs at least 2 stations.
 
 ### Scenario: Registry loads all stations
-- S6: Given the factory stations directory, when the registry loads, then it contains 23 stations including scout, blueprint and the content stations.
+- S6: Given the factory stations directory, when the registry loads, then it contains 24 stations including scout, blueprint, the content stations and the supervisor.
 
 ### Scenario: Dry run writes packets, envelopes and a swimlane
 - S7: Given a work order, when the runner runs in dry run mode, then agent stations get packet files, every finished step gets an envelope, and a swimlane is written.

@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-security",
+  "verdict": "pass",
+  "findings": [
+    "The gate fails closed: a learning reaches station context only through promote_learning after validate_provenance confirms the run report, the artifact and the evidence against the record on disk. Inbox content is never read into a packet, check-brain never treats inbox items as trusted, and demotion is an explicit recorded act rather than an edit. No credentials or external calls are involved; all checks are local file reads."
+  ]
+}

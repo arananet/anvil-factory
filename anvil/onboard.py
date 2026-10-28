@@ -2,6 +2,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
+from .brain import LEARNINGS_HEADER
 from .config import render_anvil_yaml
 from .scaffold import STATION_IDS
 
@@ -86,7 +87,9 @@ def onboard_project(path, name=None):
     _write_if_missing(root, "brain/project.md", brain, created, kept)
     _write_if_missing(root, "brain/glossary.md", "# Glossary\n\n- Baseline spec: the draft spec written at onboarding that describes the project as found.\n", created, kept)
     _write_if_missing(root, "brain/worklog.md", "# Worklog\n\n", created, kept)
+    _write_if_missing(root, "brain/learnings.md", LEARNINGS_HEADER, created, kept)
     (root / "brain" / "decisions").mkdir(parents=True, exist_ok=True)
+    (root / "brain" / "inbox").mkdir(parents=True, exist_ok=True)
     _write_if_missing(root, ".openspec/config.yaml", f"project: {name}\nversion: 1\nspecs_dir: .openspec/specs\n", created, kept)
 
     baseline = (

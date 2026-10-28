@@ -1,0 +1,8 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "pass",
+  "reviewer": "spec amendment review",
+  "findings": [
+    "Amendment reviewed 2026-10-28: scenario S6 now states 24 stations, adding the supervisor station defined by the bounded-supervisor spec. The registry loads 24 stations, the registry test asserts 24 and names the supervisor, and no shipped pipeline includes the supervisor because it runs between runs, not inside one."
+  ]
+}

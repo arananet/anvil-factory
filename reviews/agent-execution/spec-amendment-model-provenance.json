@@ -1,0 +1,8 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "pass",
+  "reviewer": "spec amendment review",
+  "findings": [
+    "Amendment reviewed 2026-10-28: the new scenario S8 states that every step and envelope records configured_model in all modes, that executed steps additionally record executed_model and an executor object {kind, detail}, and that a command runtime's model is recorded only when its own output reports one. The runner implements exactly that; the envelope executor field changed from a name string to the {kind, detail} object, and the two envelope assertions in tests/test_execution.py were updated to the amended shape. The status page renders the executed model as 'model: X' and otherwise the configured label as 'configured: X'."
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-tests",
+  "verdict": "pass",
+  "findings": [
+    "tests/test_supervisor.py covers every scenario on synthetic run records: each of the four signals plus the single failure noise case, the no runs no writes case including the CLI message, packet mode artifacts, an accepted proposal with scout added and anvil.json proven unchanged, a reviewer reorder accepted, the three constitution rejections (triage-human dropped, reviewer dropped, unknown station) with REJECTED.md naming the failed check, validate_proposal returning every failed check, and the supervisor absent from every shipped pipeline."
+  ]
+}

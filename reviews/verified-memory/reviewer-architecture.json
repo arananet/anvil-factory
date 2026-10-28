@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-architecture",
+  "verdict": "pass",
+  "findings": [
+    "The design mirrors the factory's own discipline: memory writes are gated by deterministic code the way code changes are gated by reviewers, provenance is data on disk rather than a model claim, and the verified store stays a plain markdown file the brain already understands. brain.py depends only on the model helpers; scaffold and onboard reuse ensure_brain_memory and the shared header, so the layout has one definition."
+  ]
+}

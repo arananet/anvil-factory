@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-security",
+  "verdict": "pass",
+  "findings": [
+    "The supervisor holds no privilege the gates do not already grant: it cannot edit gates, risk hints or triage rules (they are code, and no proposal field reaches them), it cannot weaken review coverage (the constitution requires the base pipeline's reviewer set or a superset), it cannot invent stations (catalog validation), and it cannot apply anything (proposals are files until a human points the project at one). A malicious or confused runtime output degrades to a rejected proposal file, never to a changed line."
+  ]
+}

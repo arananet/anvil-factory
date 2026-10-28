@@ -57,6 +57,7 @@ The modes are a starting point, not a wall: a greenfield project becomes brownfi
 | reviewer-platform | agent | Content: check format and fit for the target channel |
 | reviewer-brand | agent | Content: check brand and policy risks |
 | publisher | agent | Content: publish only after approval and the human gate, and record where it went live |
+| supervisor | agent | Between runs: watch the run record for stalls and propose one bounded pipeline recomposition |
 
 ## Composing a pipeline
 A pipeline is a small JSON file. Order stations, or group them in parallel. Stations are reused across pipelines, never redefined.
@@ -83,15 +84,21 @@ python3 -m anvil.cli validate-pipeline pipelines/sdlc-default.json
 python3 -m anvil.cli run ../my-project --pipeline pipelines/sdlc-default.json --work-order work-order.json
 python3 -m anvil.cli check ../my-project --slug my-feature
 python3 -m anvil.cli check-content ../my-channel --slug my-post
+python3 -m anvil.cli check-brain ../my-project
+python3 -m anvil.cli supervise ../my-project
 ```
-Installed as a package, the same commands are available as `anvil new-project`, `anvil onboard`, `anvil init`, `anvil new-spec`, `anvil validate-pipeline`, `anvil run` and `anvil check`.
+Installed as a package, the same commands are available as `anvil new-project`, `anvil onboard`, `anvil init`, `anvil new-spec`, `anvil validate-pipeline`, `anvil run`, `anvil check`, `anvil check-brain` and `anvil supervise`.
 
 Project station settings live in `anvil.yaml` at the project root: context, model, prompt and tools per station. See docs/ARCHITECTURE.md for the Core Four.
 
-Agent runtimes are pluggable: add a `runtime` object to anvil.yaml and run with `--execute` to have a command or HTTP executor run the station packets, with reviewer output feeding the approver of the same run. A `deploy` object in the same file lets an approved, unblocked run deploy automatically and pass a deterministic verification gate. See docs/EXECUTION.md.
+Agent runtimes are pluggable: add a `runtime` object to anvil.yaml and run with `--execute` to have a command or HTTP executor run the station packets, with reviewer output feeding the approver of the same run. A `deploy` object in the same file lets an approved, unblocked run deploy automatically and pass a deterministic verification gate. Every step records which model was configured and, for executed steps, which model actually ran. See docs/EXECUTION.md.
+
+Memory is gated like code: agent written learnings wait in a quarantined inbox and reach the verified store only when deterministic code verifies their provenance against the run record. See docs/MEMORY-GATE.md.
+
+The supervisor watches run reports between runs and proposes pipeline recompositions built only from the station catalog, under a constitution it cannot amend, and nothing it proposes applies itself. See docs/SUPERVISOR.md.
 
 ## The brain
-The brain/ folder holds project.md (what the project is and its principles), glossary.md, decisions/ (numbered decision records) and worklog.md. Stations read the brain as context, so decisions survive beyond a single run.
+The brain/ folder holds project.md (what the project is and its principles), glossary.md, decisions/ (numbered decision records) and worklog.md. Stations read the brain as context, so decisions survive beyond a single run. Verified learnings live in brain/learnings.md behind the memory gate, with proposals quarantined in brain/inbox/ until their provenance verifies (docs/MEMORY-GATE.md).
 
 ## Pipelines included
 - sdlc-default: the full SDLC line, intake to observer with four parallel reviewers.
@@ -119,6 +126,8 @@ Every change starts with a spec under .openspec/specs/ (OpenSpec). Write the spe
 | [docs/SDLC.md](docs/SDLC.md) | How the default pipeline maps to SDLC phases |
 | [docs/EXECUTION.md](docs/EXECUTION.md) | Agent runtime executors, the runtime contract, automatic deploy and post deploy verification |
 | [docs/STATUS-PAGE.md](docs/STATUS-PAGE.md) | The run status page: generation, publishing to Cloudflare Pages or GitHub Pages, and the snapshot note |
+| [docs/MEMORY-GATE.md](docs/MEMORY-GATE.md) | Verified learnings: the inbox flow, the provenance format, and why memory writes are gated |
+| [docs/SUPERVISOR.md](docs/SUPERVISOR.md) | The bounded supervisor: stall signals, the constitution, the proposal lifecycle, and what it can never do |
 | [brain/project.md](brain/project.md) | Principles and project context |
 | [templates/spec.md](templates/spec.md) | The spec template every spec starts from |
 

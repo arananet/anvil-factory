@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-architecture",
+  "verdict": "pass",
+  "findings": [
+    "Reorganization happens inside the existing architecture instead of beside it: stall detection reads the same report.json files the status page renders, proposals are ordinary pipeline JSON validated by the existing validator, the base pipeline resolves through anvil.json with the sdlc-default fallback, and the supervisor is a normal catalog station with a Core Four entry. The one new concept, the constitution, is a short list in one function, which keeps the bound auditable."
+  ]
+}

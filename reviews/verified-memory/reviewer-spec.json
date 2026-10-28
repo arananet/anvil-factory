@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "pass",
+  "findings": [
+    "Scenarios S1 to S7 map one to one to anvil/brain.py and its call sites: promotion with verified provenance, refusal with the specific reason for a missing run, a missing artifact and a contradicting verdict, check-brain re-verification, inbox quarantine, packets sourced only from verified non demoted entries, demotion with a decision record, and scaffolding that creates brain/learnings.md and brain/inbox/ without overwriting."
+  ]
+}
