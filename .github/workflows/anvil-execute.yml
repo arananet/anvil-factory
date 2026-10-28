@@ -40,7 +40,7 @@ jobs:
     timeout-minutes: 120
     env:
       ANTHROPIC_BASE_URL: https://gateway.ai.cloudflare.com/v1/693ae9c587f1f2c34328bb47447366b0/arananet-ai-gateway/anthropic
-ANTHROPIC_API_KEY: <redacted>
+      ANTHROPIC_API_KEY: ${{ secrets.CF_AIG_TOKEN }}
       ANTHROPIC_CUSTOM_HEADERS: "cf-aig-authorization: Bearer ${{ secrets.CF_AIG_TOKEN }}"
       CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
     steps:
@@ -103,7 +103,7 @@ ANTHROPIC_API_KEY: <redacted>
       - name: Comment the run report on issue 1
         if: always() && steps.smoke.outcome == 'success'
         env:
-GH_TOKEN: <redacted>
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           BRANCH: ${{ github.ref_name }}
         run: |
