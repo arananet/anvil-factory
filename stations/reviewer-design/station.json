@@ -1,0 +1,20 @@
+{
+  "id": "reviewer-design",
+  "name": "Reviewer Design",
+  "kind": "agent",
+  "inputs": [
+    "design system (tokens, rules, quality bars)",
+    "interface output"
+  ],
+  "outputs": [
+    "review"
+  ],
+  "description": "Judge interface output against the project's own design system.",
+  "context": [
+    "brain/project.md",
+    "design/"
+  ],
+  "model": "review-balanced",
+  "prompt": "stations/reviewer-design/PROMPT.md",
+  "tools": []
+}

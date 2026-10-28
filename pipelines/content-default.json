@@ -6,7 +6,7 @@
     { "station": "researcher" },
     { "station": "writer" },
     { "station": "media-producer" },
-    { "parallel": ["reviewer-facts", "reviewer-voice", "reviewer-platform", "reviewer-brand"] },
+    { "parallel": ["reviewer-facts", "reviewer-voice", "reviewer-platform", "reviewer-brand", "reviewer-design"] },
     { "station": "approver" },
     { "station": "triage-human" },
     { "station": "publisher" },
