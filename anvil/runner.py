@@ -11,6 +11,8 @@ from .executor import ExecutorError
 class RunReport:
     work_order_id: str
     pipeline: str
+    title: str = ""
+    kind: str = ""
     steps: list = field(default_factory=list)
     verdict: str = ""
     human_required: bool = False
@@ -20,6 +22,7 @@ class RunReport:
     verify_results: list = field(default_factory=list)
     def to_dict(self):
         return {"work_order_id": self.work_order_id, "pipeline": self.pipeline,
+                "title": self.title, "kind": self.kind,
                 "steps": self.steps, "verdict": self.verdict, "human_required": self.human_required,
                 "max_loopbacks": self.max_loopbacks, "loopbacks": self.loopbacks,
                 "deployment_status": self.deployment_status, "verify_results": self.verify_results}
@@ -265,6 +268,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         verdict = "packet_ready"
     human_required = needs_human(work_order, verdict) if verdict in {"approved", "rejected", "changes_requested", "no_reviews"} else (human_gate(work_order) == "required")
     report = RunReport(work_order_id=work_order.id, pipeline=pipeline.name, steps=steps, verdict=verdict,
+                       title=work_order.title, kind=work_order.kind,
                        human_required=human_required, max_loopbacks=max_loopbacks, loopbacks=loopbacks,
                        deployment_status=deployment_status, verify_results=verify_results)
     (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")

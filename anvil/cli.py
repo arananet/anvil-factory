@@ -10,6 +10,7 @@ from .model import WorkOrder
 from .runner import run_pipeline
 from .config import load_anvil_config, apply_overrides, runtime_config, deploy_config
 from .executor import create_executor
+from .statuspage import generate_status_page
 
 def _factory_root():
     return Path(__file__).resolve().parent.parent
@@ -42,6 +43,7 @@ def main(argv=None):
     p = sub.add_parser("check"); p.add_argument("project"); p.add_argument("--slug", required=True)
     p = sub.add_parser("check-content"); p.add_argument("project"); p.add_argument("--slug", required=True)
     p = sub.add_parser("run"); p.add_argument("project"); p.add_argument("--pipeline", required=True); p.add_argument("--work-order", required=True); p.add_argument("--execute", action="store_true")
+    p = sub.add_parser("status-page"); p.add_argument("project"); p.add_argument("--out", default=None)
     args = parser.parse_args(argv)
     if args.cmd == "init":
         init_project(args.path, args.name); print(f"Created project at {args.path}"); return 0
@@ -95,6 +97,10 @@ def main(argv=None):
         report = run_pipeline(args.project, pipe, wo, registry=reg, executor=executor, deploy_cfg=deploy_cfg)
         print(json.dumps(report.to_dict(), indent=2))
         print(f"Report: {Path(args.project) / 'runs' / wo.id / 'report.json'}")
+        return 0
+    if args.cmd == "status-page":
+        summary = generate_status_page(args.project, args.out)
+        print(f"Status page: {summary['path']} ({summary['runs']} runs, skipped: {', '.join(summary['skipped']) or 'none'})")
         return 0
     return 2
 

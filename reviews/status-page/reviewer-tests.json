@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-tests",
+  "verdict": "pass",
+  "findings": [
+    "tests/test_statuspage.py builds a temp project with an approved run, a failed run, a corrupt report and a missing report, and asserts ids, titles, verdicts, statuses, the snapshot note and the skip note."
+  ]
+}

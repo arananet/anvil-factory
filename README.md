@@ -118,6 +118,7 @@ Every change starts with a spec under .openspec/specs/ (OpenSpec). Write the spe
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Layers, artifact flow, gates, risk triage, Core Four, model stack, loopback, envelopes, observability |
 | [docs/SDLC.md](docs/SDLC.md) | How the default pipeline maps to SDLC phases |
 | [docs/EXECUTION.md](docs/EXECUTION.md) | Agent runtime executors, the runtime contract, automatic deploy and post deploy verification |
+| [docs/STATUS-PAGE.md](docs/STATUS-PAGE.md) | The run status page: generation, publishing to Cloudflare Pages or GitHub Pages, and the snapshot note |
 | [brain/project.md](brain/project.md) | Principles and project context |
 | [templates/spec.md](templates/spec.md) | The spec template every spec starts from |
 

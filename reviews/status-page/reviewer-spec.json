@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "pass",
+  "findings": [
+    "Status page scenarios S1 to S5 map to anvil/statuspage.py: every readable run renders, run facts and per station tables come straight from report.json, the snapshot note is on the page, and unreadable runs are skipped and named in the footer."
+  ]
+}

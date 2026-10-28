@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-security",
+  "verdict": "pass",
+  "findings": [
+    "All report values are HTML escaped before rendering, the page loads no external assets, and the generator only reads files under the project's runs directory."
+  ]
+}

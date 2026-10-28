@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-architecture",
+  "verdict": "pass",
+  "findings": [
+    "The generator is one module behind one CLI command, output is a single static file with no build step, and the runner now records the work order title and kind in report.json so pages do not have to guess them."
+  ]
+}

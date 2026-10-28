@@ -20,6 +20,7 @@ jobs:
         run: |
           python -m anvil.cli check . --slug factory-pipeline-engine
           python -m anvil.cli check . --slug agent-execution
+          python -m anvil.cli check . --slug status-page
           python -m anvil.cli check . --slug greenfield-projects
           python -m anvil.cli check . --slug content-factory
           python -m anvil.cli check . --slug existing-project-onboarding
