@@ -1,0 +1,1 @@
+{"station": "reviewer-security", "verdict": "pass", "findings": ["Blueprint catalog files are plain JSON data read from the repo, with no code execution and no secrets.", "new-project writes only inside the target path the user names."]}

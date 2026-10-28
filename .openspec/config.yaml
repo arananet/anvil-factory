@@ -1,0 +1,3 @@
+project: anvil-factory
+version: 1
+specs_dir: .openspec/specs

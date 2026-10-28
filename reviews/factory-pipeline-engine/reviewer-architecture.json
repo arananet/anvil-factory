@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-architecture",
+  "verdict": "pass",
+  "findings": [
+    "Engine, gates, approver and runner are separate modules with no circular imports; stations stay data, not code."
+  ]
+}

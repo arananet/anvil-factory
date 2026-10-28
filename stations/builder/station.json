@@ -1,0 +1,20 @@
+{
+  "id": "builder",
+  "name": "Builder",
+  "kind": "agent",
+  "inputs": [
+    "spec",
+    "tests"
+  ],
+  "outputs": [
+    "code change"
+  ],
+  "description": "Implement the spec so the scenario tests pass.",
+  "context": [
+    "brain/project.md",
+    ".openspec/specs/"
+  ],
+  "model": "fast-builder",
+  "prompt": "stations/builder/PROMPT.md",
+  "tools": []
+}

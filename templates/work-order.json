@@ -1,0 +1,9 @@
+{
+  "id": "wo-example-001",
+  "kind": "feature",
+  "title": "Example work order",
+  "source": "manual",
+  "description": "Describe the work.",
+  "risk_hints": [],
+  "status": "new"
+}

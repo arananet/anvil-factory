@@ -1,0 +1,20 @@
+{
+  "id": "reviewer-architecture",
+  "name": "Reviewer Architecture",
+  "kind": "agent",
+  "inputs": [
+    "code change",
+    "brain/decisions"
+  ],
+  "outputs": [
+    "review"
+  ],
+  "description": "Check fit with the project structure and decisions.",
+  "context": [
+    "brain/project.md",
+    ".openspec/specs/"
+  ],
+  "model": "review-balanced",
+  "prompt": "stations/reviewer-architecture/PROMPT.md",
+  "tools": []
+}

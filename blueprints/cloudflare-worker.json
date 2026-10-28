@@ -1,0 +1,8 @@
+{
+  "id": "cloudflare-worker",
+  "name": "Cloudflare Worker app",
+  "stack": ["Cloudflare Workers", "plain JavaScript or TypeScript", "node:test"],
+  "structure": ["worker entry at src/index", "wrangler.toml with no secrets in code", ".openspec/specs/ with one spec per route or capability", "brain/ seeded from the idea brief"],
+  "first_specs": ["core-worker"],
+  "notes": "Default for web apps and APIs at the edge. Secrets live in Worker secrets, never in the repo."
+}

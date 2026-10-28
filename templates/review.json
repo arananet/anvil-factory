@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "pass",
+  "findings": [
+    "Spec coverage checked against the implementation."
+  ]
+}

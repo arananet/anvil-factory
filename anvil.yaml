@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "stations": {
+    "intake": {
+      "context": [
+        "brain/project.md",
+        ".openspec/specs/"
+      ],
+      "model": "default",
+      "prompt": "stations/intake/PROMPT.md",
+      "tools": []
+    },
+    "spec-writer": {
+      "context": [
+        "brain/project.md",
+        ".openspec/specs/"
+      ],
+      "model": "reasoning-strong",
+      "prompt": "stations/spec-writer/PROMPT.md",
+      "tools": []
+    },
+    "test-writer": {
+      "context": [
+        "brain/project.md",
+        ".openspec/specs/"
+      ],
+      "model": "reasoning-strong",
+      "prompt": "stations/test-writer/PROMPT.md",
+      "tools": []
+    },
+    "builder": {
+      "context": [
+        "brain/project.md",
+        ".openspec/specs/"
+      ],
+      "model": "fast-builder",
+      "prompt": "stations/builder/PROMPT.md",
+      "tools": []
+    },
+    "reviewer-spec": {
+      "context": [
+        "brain/project.md",
+        ".openspec/specs/"
+      ],
+      "model": "review-balanced",
+      "prompt": "stations/reviewer-spec/PROMPT.md",
+      "tools": []
+    },
+    "reviewer-security": {
+      "context": [
+        "brain/project.md",
+        ".openspec/specs/"
+      ],
+      "model": "review-balanced",
+      "prompt": "stations/reviewer-security/PROMPT.md",
+      "tools": []
+    },
+    "reviewer-tests": {
+      "context": [
+        "brain/project.md",
+        ".openspec/specs/"
+      ],
+      "model": "review-balanced",
+      "prompt": "stations/reviewer-tests/PROMPT.md",
+      "tools": []
+    },
+    "reviewer-architecture": {
+      "context": [
+        "brain/project.md",
+        ".openspec/specs/"
+      ],
+      "model": "review-balanced",
+      "prompt": "stations/reviewer-architecture/PROMPT.md",
+      "tools": []
+    },
+    "approver": {
+      "context": [
+        "brain/project.md",
+        ".openspec/specs/"
+      ],
+      "model": "default",
+      "prompt": "stations/approver/PROMPT.md",
+      "tools": []
+    },
+    "triage-human": {
+      "context": [
+        "brain/project.md",
+        ".openspec/specs/"
+      ],
+      "model": "default",
+      "prompt": "stations/triage-human/PROMPT.md",
+      "tools": []
+    },
+    "deployer": {
+      "context": [
+        "brain/project.md",
+        ".openspec/specs/"
+      ],
+      "model": "review-balanced",
+      "prompt": "stations/deployer/PROMPT.md",
+      "tools": []
+    },
+    "observer": {
+      "context": [
+        "brain/project.md",
+        ".openspec/specs/"
+      ],
+      "model": "review-balanced",
+      "prompt": "stations/observer/PROMPT.md",
+      "tools": []
+    },
+    "scout": {
+      "context": [
+        "brain/project.md",
+        ".openspec/specs/"
+      ],
+      "model": "fast-reader",
+      "prompt": "stations/scout/PROMPT.md",
+      "tools": []
+    }
+  }
+}

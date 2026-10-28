@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-security",
+  "verdict": "pass",
+  "findings": [
+    "No network calls, no secrets and no dynamic code execution in the engine; file access stays inside the project path given by the caller."
+  ]
+}

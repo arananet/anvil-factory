@@ -1,0 +1,8 @@
+{
+  "id": "static-site",
+  "name": "Static site",
+  "stack": ["HTML, CSS and vanilla JavaScript", "Cloudflare Pages"],
+  "structure": ["public/ with the site files", "no build step until a spec needs one", ".openspec/specs/ with one spec per section or feature", "brain/ seeded from the idea brief"],
+  "first_specs": ["site-shell"],
+  "notes": "Default for sites and landing pages. Keep it build free as long as possible."
+}

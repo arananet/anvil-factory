@@ -1,0 +1,26 @@
+{
+  "name": "hotfix",
+  "stages": [
+    {
+      "station": "intake"
+    },
+    {
+      "station": "builder"
+    },
+    {
+      "parallel": [
+        "reviewer-spec",
+        "reviewer-security"
+      ]
+    },
+    {
+      "station": "approver"
+    },
+    {
+      "station": "triage-human"
+    },
+    {
+      "station": "deployer"
+    }
+  ]
+}

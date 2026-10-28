@@ -1,0 +1,19 @@
+{
+  "id": "reviewer-security",
+  "name": "Reviewer Security",
+  "kind": "agent",
+  "inputs": [
+    "code change"
+  ],
+  "outputs": [
+    "review"
+  ],
+  "description": "Check the change for security risks and unsafe defaults.",
+  "context": [
+    "brain/project.md",
+    ".openspec/specs/"
+  ],
+  "model": "review-balanced",
+  "prompt": "stations/reviewer-security/PROMPT.md",
+  "tools": []
+}

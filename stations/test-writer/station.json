@@ -1,0 +1,19 @@
+{
+  "id": "test-writer",
+  "name": "Test Writer",
+  "kind": "agent",
+  "inputs": [
+    "spec"
+  ],
+  "outputs": [
+    "tests"
+  ],
+  "description": "Write tests that map to spec scenarios before implementation.",
+  "context": [
+    "brain/project.md",
+    ".openspec/specs/"
+  ],
+  "model": "reasoning-strong",
+  "prompt": "stations/test-writer/PROMPT.md",
+  "tools": []
+}

@@ -1,0 +1,19 @@
+{
+  "id": "observer",
+  "name": "Observer",
+  "kind": "agent",
+  "inputs": [
+    "release record"
+  ],
+  "outputs": [
+    "observation report"
+  ],
+  "description": "Watch the released change and report what actually happened.",
+  "context": [
+    "brain/project.md",
+    ".openspec/specs/"
+  ],
+  "model": "review-balanced",
+  "prompt": "stations/observer/PROMPT.md",
+  "tools": []
+}

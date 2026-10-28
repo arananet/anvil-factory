@@ -1,0 +1,23 @@
+{
+  "name": "plan-build-test",
+  "stages": [
+    {
+      "station": "intake"
+    },
+    {
+      "station": "spec-writer"
+    },
+    {
+      "station": "test-writer"
+    },
+    {
+      "station": "builder"
+    },
+    {
+      "station": "reviewer-tests"
+    },
+    {
+      "station": "approver"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "python-service",
+  "name": "Python service",
+  "stack": ["Python 3.11+", "standard library first", "unittest or pytest"],
+  "structure": ["src package with one module per responsibility", "tests/ mirroring the package", ".openspec/specs/ with one spec per capability", "brain/ seeded from the idea brief"],
+  "first_specs": ["core-service"],
+  "notes": "Default for small APIs, CLIs and automation. Add a framework only when a spec needs it."
+}

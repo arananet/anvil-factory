@@ -1,0 +1,19 @@
+{
+  "id": "intake",
+  "name": "Intake",
+  "kind": "deterministic",
+  "inputs": [
+    "raw request"
+  ],
+  "outputs": [
+    "work order"
+  ],
+  "description": "Normalize an incoming work order into the shared shape.",
+  "context": [
+    "brain/project.md",
+    ".openspec/specs/"
+  ],
+  "model": "default",
+  "prompt": "stations/intake/PROMPT.md",
+  "tools": []
+}

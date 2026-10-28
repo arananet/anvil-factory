@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "anvil-factory"
+version = "0.1.0"
+description = "ANVIL: Agentic Network for Verified Implementation Lifecycle"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = []
+
+[project.scripts]
+anvil = "anvil.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["anvil*"]

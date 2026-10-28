@@ -1,0 +1,1 @@
+{"station": "reviewer-tests", "verdict": "pass", "findings": ["tests/test_greenfield.py covers S1 to S4 with one named test per scenario, including the unknown blueprint error path.", "The full factory suite passes with these tests included."]}

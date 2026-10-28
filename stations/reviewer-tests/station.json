@@ -1,0 +1,20 @@
+{
+  "id": "reviewer-tests",
+  "name": "Reviewer Tests",
+  "kind": "agent",
+  "inputs": [
+    "spec",
+    "tests"
+  ],
+  "outputs": [
+    "review"
+  ],
+  "description": "Check that tests are real, mapped, and passing.",
+  "context": [
+    "brain/project.md",
+    ".openspec/specs/"
+  ],
+  "model": "review-balanced",
+  "prompt": "stations/reviewer-tests/PROMPT.md",
+  "tools": []
+}

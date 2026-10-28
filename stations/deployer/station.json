@@ -1,0 +1,19 @@
+{
+  "id": "deployer",
+  "name": "Deployer",
+  "kind": "agent",
+  "inputs": [
+    "approved change"
+  ],
+  "outputs": [
+    "release record"
+  ],
+  "description": "Prepare and carry out the release step described by the project.",
+  "context": [
+    "brain/project.md",
+    ".openspec/specs/"
+  ],
+  "model": "review-balanced",
+  "prompt": "stations/deployer/PROMPT.md",
+  "tools": []
+}

@@ -1,0 +1,20 @@
+{
+  "id": "blueprint",
+  "name": "Blueprint",
+  "kind": "agent",
+  "inputs": [
+    "idea brief",
+    "blueprint catalog"
+  ],
+  "outputs": [
+    "project blueprint"
+  ],
+  "description": "Turn an idea into a project blueprint: stack, structure, first specs and first milestones, before any code exists.",
+  "context": [
+    "brain/project.md",
+    "blueprints/"
+  ],
+  "model": "reasoning-strong",
+  "prompt": "stations/blueprint/PROMPT.md",
+  "tools": []
+}

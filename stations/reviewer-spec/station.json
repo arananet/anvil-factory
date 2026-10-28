@@ -1,0 +1,20 @@
+{
+  "id": "reviewer-spec",
+  "name": "Reviewer Spec",
+  "kind": "agent",
+  "inputs": [
+    "spec",
+    "code change"
+  ],
+  "outputs": [
+    "review"
+  ],
+  "description": "Check the implementation against the spec, nothing else.",
+  "context": [
+    "brain/project.md",
+    ".openspec/specs/"
+  ],
+  "model": "review-balanced",
+  "prompt": "stations/reviewer-spec/PROMPT.md",
+  "tools": []
+}

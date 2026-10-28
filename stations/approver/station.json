@@ -1,0 +1,19 @@
+{
+  "id": "approver",
+  "name": "Approver",
+  "kind": "deterministic",
+  "inputs": [
+    "reviews"
+  ],
+  "outputs": [
+    "verdict"
+  ],
+  "description": "Aggregate the four reviews into one verdict.",
+  "context": [
+    "brain/project.md",
+    ".openspec/specs/"
+  ],
+  "model": "default",
+  "prompt": "stations/approver/PROMPT.md",
+  "tools": []
+}

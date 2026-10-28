@@ -1,0 +1,20 @@
+{
+  "id": "triage-human",
+  "name": "Human Triage",
+  "kind": "deterministic",
+  "inputs": [
+    "work order",
+    "verdict"
+  ],
+  "outputs": [
+    "triage decision"
+  ],
+  "description": "Decide whether a human must review before the work moves on.",
+  "context": [
+    "brain/project.md",
+    ".openspec/specs/"
+  ],
+  "model": "default",
+  "prompt": "stations/triage-human/PROMPT.md",
+  "tools": []
+}

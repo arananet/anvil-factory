@@ -1,0 +1,11 @@
+# Changelog
+
+## 0.1.0 - 2026-10-28
+- First release: deterministic pipeline engine, gates, approver and runner.
+- 14 stations and 6 pipelines: sdlc-default, hotfix, docs-only, scout, plan-build-test and greenfield.
+- Greenfield mode: idea work orders, a blueprint station, a blueprint catalog (python-service, cloudflare-worker, static-site) and the anvil new-project command that scaffolds a project from zero.
+- Core Four project config in anvil.yaml with per station overrides.
+- Runner packets, typed envelopes, gate loopback and swimlane observability.
+- Project scaffolding, spec templates and brain structure.
+- Cloudflare intake worker with node tests.
+- Taskline example built on the line, in its own repo.

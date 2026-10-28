@@ -1,0 +1,20 @@
+{
+  "id": "spec-writer",
+  "name": "Spec Writer",
+  "kind": "agent",
+  "inputs": [
+    "work order",
+    "brain"
+  ],
+  "outputs": [
+    "spec"
+  ],
+  "description": "Write or revise an OpenSpec spec from a work order.",
+  "context": [
+    "brain/project.md",
+    ".openspec/specs/"
+  ],
+  "model": "reasoning-strong",
+  "prompt": "stations/spec-writer/PROMPT.md",
+  "tools": []
+}

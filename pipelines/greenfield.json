@@ -1,0 +1,15 @@
+{
+  "name": "greenfield",
+  "stages": [
+    { "station": "intake" },
+    { "station": "blueprint" },
+    { "station": "spec-writer" },
+    { "station": "test-writer" },
+    { "station": "builder" },
+    { "parallel": ["reviewer-spec", "reviewer-security", "reviewer-tests", "reviewer-architecture"] },
+    { "station": "approver" },
+    { "station": "triage-human" },
+    { "station": "deployer" },
+    { "station": "observer" }
+  ]
+}

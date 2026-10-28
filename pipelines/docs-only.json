@@ -1,0 +1,17 @@
+{
+  "name": "docs-only",
+  "stages": [
+    {
+      "station": "intake"
+    },
+    {
+      "station": "builder"
+    },
+    {
+      "station": "reviewer-spec"
+    },
+    {
+      "station": "approver"
+    }
+  ]
+}

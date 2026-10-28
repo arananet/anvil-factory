@@ -1,0 +1,20 @@
+{
+  "id": "scout",
+  "name": "Scout",
+  "kind": "agent",
+  "inputs": [
+    "work order",
+    "codebase"
+  ],
+  "outputs": [
+    "recon report"
+  ],
+  "description": "Read only recon: map the area and report, changing no code.",
+  "context": [
+    "brain/project.md",
+    ".openspec/specs/"
+  ],
+  "model": "fast-reader",
+  "prompt": "stations/scout/PROMPT.md",
+  "tools": []
+}
