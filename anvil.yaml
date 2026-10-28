@@ -1,5 +1,10 @@
 {
   "version": 1,
+  "runtime": {
+    "command": "python3 tools/claude_station.py {packet} {output}",
+    "kind": "command",
+    "timeout_seconds": 1800
+  },
   "stations": {
     "intake": {
       "context": [
@@ -15,7 +20,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "reasoning-strong",
+      "model": "claude-sonnet-4-5",
       "prompt": "stations/spec-writer/PROMPT.md",
       "tools": []
     },
@@ -24,7 +29,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "reasoning-strong",
+      "model": "claude-sonnet-4-5",
       "prompt": "stations/test-writer/PROMPT.md",
       "tools": []
     },
@@ -33,7 +38,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "fast-builder",
+      "model": "claude-sonnet-4-5",
       "prompt": "stations/builder/PROMPT.md",
       "tools": []
     },
@@ -42,7 +47,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "review-balanced",
+      "model": "claude-sonnet-4-5",
       "prompt": "stations/reviewer-spec/PROMPT.md",
       "tools": []
     },
@@ -51,7 +56,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "review-balanced",
+      "model": "claude-sonnet-4-5",
       "prompt": "stations/reviewer-security/PROMPT.md",
       "tools": []
     },
@@ -60,7 +65,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "review-balanced",
+      "model": "claude-sonnet-4-5",
       "prompt": "stations/reviewer-tests/PROMPT.md",
       "tools": []
     },
@@ -69,7 +74,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "review-balanced",
+      "model": "claude-sonnet-4-5",
       "prompt": "stations/reviewer-architecture/PROMPT.md",
       "tools": []
     },
@@ -96,7 +101,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "review-balanced",
+      "model": "claude-sonnet-4-5",
       "prompt": "stations/deployer/PROMPT.md",
       "tools": []
     },
@@ -105,7 +110,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "review-balanced",
+      "model": "claude-sonnet-4-5",
       "prompt": "stations/observer/PROMPT.md",
       "tools": []
     },
@@ -114,7 +119,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "fast-reader",
+      "model": "claude-sonnet-4-5",
       "prompt": "stations/scout/PROMPT.md",
       "tools": []
     },
@@ -123,7 +128,7 @@
         "brain/project.md",
         "runs/"
       ],
-      "model": "reasoning-strong",
+      "model": "claude-sonnet-4-5",
       "prompt": "stations/supervisor/PROMPT.md",
       "tools": []
     }

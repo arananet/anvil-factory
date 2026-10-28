@@ -1,0 +1,179 @@
+name: anvil-execute
+
+# Execute mode run of the ANVIL line against the factory repository itself,
+# for one known work order (issue 1, per project design systems). It mirrors
+# anvil-execute.yml in arananet/anvil-example-taskline, with three honest
+# differences that come from this repo being both the line and the project:
+#
+# - No second checkout: the factory is the project under change, so the CLI
+#   runs from this checkout (PYTHONPATH=.) with the project's own pipeline,
+#   pipelines/sdlc-default.json from anvil.json.
+# - There is no deploy config in anvil.yaml, so the deployer station stays
+#   a packet in this run and the report carries no deployment status. The
+#   factory has nothing to deploy; pretending otherwise would be a lie in
+#   the run record.
+# - This repo's .gitignore ignores runs/ (the factory treats its own run
+#   output as local), so the commit back step force adds the run evidence
+#   for this work order. The evidence belongs on the branch for this run.
+#
+# Trigger: the vault PAT cannot dispatch workflows or apply labels, so for
+# this run the trigger is a push to the anvil/run-design-system branch. The
+# commit this workflow pushes back uses GITHUB_TOKEN, which does not
+# retrigger workflows, so the run cannot loop on its own push.
+on:
+  push:
+    branches: [anvil/run-design-system]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: anvil-execute-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  anvil-execute:
+    name: Run the ANVIL line with Claude Code executing the stations
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      ANTHROPIC_BASE_URL: https://gateway.ai.cloudflare.com/v1/693ae9c587f1f2c34328bb47447366b0/arananet-ai-gateway/anthropic
+ANTHROPIC_API_KEY: <redacted>
+      ANTHROPIC_CUSTOM_HEADERS: "cf-aig-authorization: Bearer ${{ secrets.CF_AIG_TOKEN }}"
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+    steps:
+      - name: Check out this repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Claude Code
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude --version
+
+      - name: Gateway smoke test
+        id: smoke
+        run: |
+          REPLY=$(claude -p "Reply with exactly: GATEWAY_OK" --model claude-sonnet-4-5 --output-format text)
+          echo "Gateway reply: ${REPLY}"
+          CLEAN=$(printf '%s' "${REPLY}" | tr -d '[:space:]')
+          if [ "${CLEAN}" != "GATEWAY_OK" ]; then
+            echo "Gateway smoke failed: expected GATEWAY_OK and got the reply above. Stopping before the line runs."
+            exit 1
+          fi
+          echo "Gateway smoke passed: the gateway answered through the Anthropic endpoint."
+
+      - name: Run the ANVIL sdlc-default line in execute mode
+        id: line
+        run: |
+          PYTHONPATH=. python3 -m anvil.cli run . \
+            --pipeline pipelines/sdlc-default.json \
+            --work-order work-orders/issue-1.json \
+            --execute
+
+      - name: Commit the run evidence and the station change back to the branch
+        if: always() && steps.smoke.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git add -f runs/ 2>/dev/null || true
+          git diff --cached --stat > run-diff.txt || true
+          if git diff --cached --quiet; then
+            echo "The run produced no file changes to commit."
+            exit 0
+          fi
+          VERDICT=$(python3 -c "import json; print(json.load(open('runs/wo-gh-1/report.json'))['verdict'])" 2>/dev/null || echo "no-report")
+          git commit -m "ANVIL execute run wo-gh-1 (issue 1): verdict ${VERDICT}" -m "Stations executed by Claude Code (claude-sonnet-4-5) through the Cloudflare AI Gateway. Builder change and run evidence included; see runs/wo-gh-1/."
+          git fetch origin "${GITHUB_REF_NAME}"
+          git rebase "origin/${GITHUB_REF_NAME}" || { git rebase --abort; echo "Rebase onto the branch tip failed; pushing as is not attempted."; exit 1; }
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Comment the run report on issue 1
+        if: always() && steps.smoke.outcome == 'success'
+        env:
+GH_TOKEN: <redacted>
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          python3 - <<'PYEOF'
+          import json, os
+          from pathlib import Path
+          run_url = os.environ["RUN_URL"]
+          branch = os.environ["BRANCH"]
+          report_path = Path("runs/wo-gh-1/report.json")
+          if not report_path.exists():
+              lines = [
+                  "## ANVIL execute run report",
+                  "",
+                  "The executed run did not produce a report.json, so there is no verdict to report. "
+                  f"See the workflow run for the failure: {run_url}",
+              ]
+              Path("comment.md").write_text("\n".join(lines) + "\n")
+              raise SystemExit(0)
+          report = json.loads(report_path.read_text())
+          decision = report.get("decision", {})
+          lines = [
+              "## ANVIL execute run report",
+              "",
+              f"Work order: {report['work_order_id']}",
+              f"Pipeline: {report['pipeline']}",
+              f"Approver verdict: {report['verdict']}",
+              f"Human review required: {report['human_required']}",
+              f"Deployment status: {report.get('deployment_status')}",
+              "",
+              "Decision record:",
+              f"- Approver: {decision.get('approver', {}).get('rule', '')}",
+              f"- Human gate: {decision.get('human_gate', {}).get('rule', '')}",
+              "",
+              "| Station | Status | Configured model | Executed model |",
+              "|---|---|---|---|",
+          ]
+          for step in report.get("steps", []):
+              lines.append(
+                  f"| {step['station']} | {step['status']} | "
+                  f"{step.get('configured_model')} | {step.get('executed_model')} |"
+              )
+          warnings = report.get("warnings") or []
+          if warnings:
+              lines += ["", "Warnings recorded by the run:"] + [f"- {w}" for w in warnings]
+          diff_path = Path("run-diff.txt")
+          if diff_path.exists() and diff_path.read_text().strip():
+              lines += ["", "Files changed by the run (committed to "
+                        f"`{branch}`):", "", "```", diff_path.read_text().strip(), "```"]
+          lines += [
+              "",
+              "Honest note: this run EXECUTED its agent stations. Claude Code "
+              "(claude-sonnet-4-5), routed through the Cloudflare AI Gateway, "
+              "received each station packet via tools/claude_station.py: the "
+              "builder edited the working tree, the reviewers answered with "
+              "review JSON that the approver aggregated for this run only. "
+              "One limit is structural and worth naming here: reviewer-design "
+              "ships inside this very change, and the pipeline and station "
+              "registry are loaded when the run starts, so this change could "
+              "not be judged by the station it creates. The next run can be.",
+              f"Workflow run: {run_url}",
+          ]
+          Path("comment.md").write_text("\n".join(lines) + "\n")
+          print(f"Verdict: {report['verdict']}")
+          PYEOF
+          gh issue comment 1 --body-file comment.md
+
+      - name: Upload the run directory
+        if: always() && steps.smoke.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: anvil-execute-run-wo-gh-1
+          path: runs/
+          if-no-files-found: ignore
