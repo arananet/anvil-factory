@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 from .model import WorkOrder, Review
 from .config import default_model
 from .brain import packet_learnings_section
+from .design import packet_design_section, load_design_system
 from .gates import human_gate
 from .approver import aggregate, needs_human, aggregate_explained, needs_human_explained, matched_risk_hints, RISK_SCAN_ORDER
 from .executor import ExecutorError
@@ -25,13 +26,14 @@ class RunReport:
     verify_results: list = field(default_factory=list)
     risk_hints: list = field(default_factory=list)
     decision: dict = field(default_factory=dict)
+    warnings: list = field(default_factory=list)
     def to_dict(self):
         return {"work_order_id": self.work_order_id, "pipeline": self.pipeline,
                 "title": self.title, "kind": self.kind,
                 "steps": self.steps, "verdict": self.verdict, "human_required": self.human_required,
                 "max_loopbacks": self.max_loopbacks, "loopbacks": self.loopbacks,
                 "deployment_status": self.deployment_status, "verify_results": self.verify_results,
-                "risk_hints": self.risk_hints, "decision": self.decision}
+                "risk_hints": self.risk_hints, "decision": self.decision, "warnings": self.warnings}
 
 def parse_review(text, station_id):
     """Find a review JSON object in executor output and build a Review.
@@ -114,7 +116,7 @@ def _run_shell(command, cwd, work_order_id, timeout):
     except subprocess.TimeoutExpired:
         return None, f"Timed out after {timeout}s"
 
-def _packet_text(station_id, prompt, work_order, steps, learnings_section=""):
+def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section=""):
     upstream = "\n".join(f"- {s['station']}: {s['status']}" for s in steps) or "- (none)"
     text = (f"# Task packet: {station_id}\n\n## Station prompt\n\n{prompt}\n\n## Work order\n\n"
             f"- id: {work_order.id}\n- kind: {work_order.kind}\n- title: {work_order.title}\n"
@@ -123,6 +125,8 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section=""):
             f"## Upstream steps\n\n{upstream}\n")
     if learnings_section:
         text += f"\n{learnings_section}\n"
+    if design_section:
+        text += f"\n{design_section}\n"
     return text
 
 def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks=2,
@@ -157,6 +161,17 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     # from brain/learnings.md, never inbox proposals (see anvil/brain.py).
     learnings_section = packet_learnings_section(project)
 
+    # Check for design system and prepare warnings
+    warnings = []
+    has_design_system = load_design_system(project) is not None
+    interface_stations = {"builder", "writer", "media-producer", "brief-writer", "reviewer-design"}
+    pipeline_has_interface_stations = any(sid in interface_stations for sid in order)
+
+    if pipeline_has_interface_stations and not has_design_system:
+        warnings.append("Missing design system: This pipeline includes interface-producing stations, "
+                       "but the project has no design/DESIGN.md. Define the design system to enable "
+                       "design review.")
+
     def write_envelope(station_id, next_station, artifact, status, extra=None):
         envelope = {"schema": "anvil/envelope@1", "from_station": station_id, "to_station": next_station,
                     "work_order_id": work_order.id, "artifact_path": artifact,
@@ -167,8 +182,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
 
     def packet_step(station, station_id):
         prompt = station.prompt if station and station.prompt else f"Station {station_id}: carry out your role for this work order."
+        design_section = packet_design_section(project, station_id)
         packet = run_dir / f"{station_id}.packet.md"
-        packet.write_text(_packet_text(station_id, prompt, work_order, steps, learnings_section), encoding="utf-8")
+        packet.write_text(_packet_text(station_id, prompt, work_order, steps, learnings_section, design_section), encoding="utf-8")
         return packet
 
     for idx, station_id in enumerate(order):
@@ -300,6 +316,16 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                         extra_envelope["tokens"] = tokens
                 if station_id.startswith("reviewer"):
                     review = parse_review(output_text, station_id)
+                    # Special handling for reviewer-design when no design system exists
+                    if station_id == "reviewer-design" and not has_design_system:
+                        # Force a changes_requested verdict with a finding about missing design system
+                        review = Review(
+                            station="reviewer-design",
+                            verdict="changes_requested",
+                            findings=["No design system exists for this project. The project must define "
+                                     "design/DESIGN.md and design/tokens.json before interface output can be "
+                                     "reviewed against design standards."]
+                        )
                     if review is not None:
                         run_reviews.append(review)
                         run_findings.extend(review.findings)
@@ -379,7 +405,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                        title=work_order.title, kind=work_order.kind,
                        human_required=human_required, max_loopbacks=max_loopbacks, loopbacks=loopbacks,
                        deployment_status=deployment_status, verify_results=verify_results,
-                       risk_hints=list(work_order.risk_hints or []), decision=decision)
+                       risk_hints=list(work_order.risk_hints or []), decision=decision, warnings=warnings)
     (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
     # Swimlane
     lines = ["# Swimlane", "", "Cost is reported as null here. Model runtimes report cost when they run a station; ANVIL never invents a number.", "",

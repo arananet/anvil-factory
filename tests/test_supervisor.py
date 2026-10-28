@@ -53,7 +53,7 @@ def proposal_text(stages, name="rebalanced-line", addresses="reviewer_fail_repea
                        "rationale": rationale, "addresses": addresses})
 
 
-REVIEWERS = ["reviewer-spec", "reviewer-security", "reviewer-tests", "reviewer-architecture"]
+REVIEWERS = ["reviewer-spec", "reviewer-security", "reviewer-tests", "reviewer-architecture", "reviewer-design"]
 
 
 def stages_of(*items):

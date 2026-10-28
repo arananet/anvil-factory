@@ -18,7 +18,8 @@
         "reviewer-spec",
         "reviewer-security",
         "reviewer-tests",
-        "reviewer-architecture"
+        "reviewer-architecture",
+        "reviewer-design"
       ]
     },
     {

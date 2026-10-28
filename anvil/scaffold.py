@@ -2,8 +2,9 @@ import json
 from pathlib import Path
 from .brain import ensure_brain_memory
 from .config import render_anvil_yaml
+from .design import scaffold_design_system
 
-STATION_IDS = ["intake","spec-writer","test-writer","builder","reviewer-spec","reviewer-security","reviewer-tests","reviewer-architecture","approver","triage-human","deployer","observer","scout","blueprint","brief-writer","researcher","writer","media-producer","reviewer-facts","reviewer-voice","reviewer-platform","reviewer-brand","publisher","supervisor"]
+STATION_IDS = ["intake","spec-writer","test-writer","builder","reviewer-spec","reviewer-security","reviewer-tests","reviewer-architecture","reviewer-design","approver","triage-human","deployer","observer","scout","blueprint","brief-writer","researcher","writer","media-producer","reviewer-facts","reviewer-voice","reviewer-platform","reviewer-brand","publisher","supervisor"]
 TEMPLATE = """# {title}
 
 Status: draft
@@ -37,6 +38,7 @@ def init_project(path, name):
     (root / "brain" / "glossary.md").write_text("# Glossary\n\n- Work order: a single unit of work moving down the line.\n", encoding="utf-8")
     (root / "brain" / "worklog.md").write_text("# Worklog\n\n", encoding="utf-8")
     ensure_brain_memory(root)
+    scaffold_design_system(root)
     (root / "tests").mkdir(exist_ok=True)
     (root / "reviews").mkdir(exist_ok=True)
     (root / "anvil.json").write_text(json.dumps({"pipeline": "sdlc-default", "project": name}, indent=2) + "\n", encoding="utf-8")
@@ -84,6 +86,7 @@ def new_project(path, name, blueprint, idea=""):
         brain = root / "brain" / "project.md"
         brain.write_text(brain.read_text(encoding="utf-8") + f"\n## Idea\n{idea}\n", encoding="utf-8")
     (root / "anvil.json").write_text(json.dumps({"pipeline": "greenfield", "project": name, "blueprint": blueprint["id"]}, indent=2) + "\n", encoding="utf-8")
+    scaffold_design_system(root)
     for slug in blueprint["first_specs"]:
         scaffold_spec(root, slug, slug.replace("-", " ").title())
     return root

@@ -5,6 +5,7 @@ from pathlib import Path
 from .brain import LEARNINGS_HEADER
 from .config import render_anvil_yaml
 from .scaffold import STATION_IDS
+from .design import scaffold_design_system
 
 SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build"}
 
@@ -108,6 +109,9 @@ def onboard_project(path, name=None):
     _write_if_missing(root, ".openspec/specs/existing-baseline/spec.md", baseline, created, kept)
     _write_if_missing(root, "anvil.yaml", render_anvil_yaml(STATION_IDS), created, kept)
     _write_if_missing(root, "anvil.json", json.dumps({"pipeline": "sdlc-default", "project": name, "mode": "brownfield", "onboarded": True}, indent=2) + "\n", created, kept)
+    # Scaffold design system (never overwrites existing files)
+    for design_file in scaffold_design_system(root):
+        created.append(design_file)
     if (root / "README.md").exists():
         kept.append("README.md")
 
