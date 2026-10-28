@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-architecture",
+  "verdict": "pass",
+  "findings": [
+    "Executors sit behind one small interface returning output text and optional usage; the runner stays deterministic, the deployer never runs through a generic executor, and verification is a spine step recorded in the same report and swimlane."
+  ]
+}

@@ -19,6 +19,7 @@ jobs:
       - name: Check factory spec gates
         run: |
           python -m anvil.cli check . --slug factory-pipeline-engine
+          python -m anvil.cli check . --slug agent-execution
           python -m anvil.cli check . --slug greenfield-projects
           python -m anvil.cli check . --slug content-factory
           python -m anvil.cli check . --slug existing-project-onboarding

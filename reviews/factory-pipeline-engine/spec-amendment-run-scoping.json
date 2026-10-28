@@ -1,0 +1,8 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "pass",
+  "reviewer": "spec amendment review",
+  "findings": [
+    "Amendment reviewed 2026-10-28: the new run scoping scenario S10 states that the approver aggregates only reviews produced during the same run, and S9 now names a run produced review. The runner implements exactly that; standing reviews under reviews/<slug>/ remain the project record for anvil check and are no longer run inputs. A drill run that previously reported approved from standing reviews now reports no_reviews when its reviewers only produce packets, which is the honest verdict."
+  ]
+}

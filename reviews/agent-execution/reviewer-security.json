@@ -1,0 +1,7 @@
+{
+  "station": "reviewer-security",
+  "verdict": "pass",
+  "findings": [
+    "The http executor reads its key only from the environment variable named in config and never logs it; deploy and verify commands are operator configured shell, documented as operator trust, with secrets kept in the operator environment and ANVIL_WORK_ORDER_ID as the only injected value."
+  ]
+}

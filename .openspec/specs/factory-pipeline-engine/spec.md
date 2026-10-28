@@ -16,6 +16,7 @@ Load, validate and order composable pipelines, load station manifests, and run a
 - Pipelines are JSON with ordered stages, a stage is one station or a parallel group.
 - Unknown, duplicate, empty and undersized parallel groups are rejected.
 - Agent stations produce packets, never a claim that a model ran.
+- The approver aggregates only reviews produced during the same run. Standing project reviews under reviews/<slug>/ are the project record read by `anvil check`; they are never run inputs, so a run whose reviewer stations only produced packets ends with verdict no_reviews.
 
 ## Scenarios
 
@@ -44,4 +45,7 @@ Load, validate and order composable pipelines, load station manifests, and run a
 - S8: Given an anvil.yaml override for a station model, when the registry is loaded with that config, then the station carries the overridden model.
 
 ### Scenario: Failing review loops back instead of approving
-- S9: Given a review with verdict fail, when the runner aggregates it, then the report contains a loopback step returning work to builder and no approval.
+- S9: Given a review with verdict fail produced during the run, when the runner aggregates it, then the report contains a loopback step returning work to builder and no approval.
+
+### Scenario: Approver only aggregates reviews from the same run
+- S10: Given a project whose standing reviews under reviews/<slug>/ all pass, when a fresh run's reviewer stations only produce packets and no reviews are produced during the run, then the approver verdict is no_reviews, not approved.

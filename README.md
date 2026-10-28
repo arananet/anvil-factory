@@ -88,6 +88,8 @@ Installed as a package, the same commands are available as `anvil new-project`, 
 
 Project station settings live in `anvil.yaml` at the project root: context, model, prompt and tools per station. See docs/ARCHITECTURE.md for the Core Four.
 
+Agent runtimes are pluggable: add a `runtime` object to anvil.yaml and run with `--execute` to have a command or HTTP executor run the station packets, with reviewer output feeding the approver of the same run. A `deploy` object in the same file lets an approved, unblocked run deploy automatically and pass a deterministic verification gate. See docs/EXECUTION.md.
+
 ## The brain
 The brain/ folder holds project.md (what the project is and its principles), glossary.md, decisions/ (numbered decision records) and worklog.md. Stations read the brain as context, so decisions survive beyond a single run.
 
@@ -102,7 +104,7 @@ The brain/ folder holds project.md (what the project is and its principles), glo
 - content-short: a short content line for posts. Intake, brief, writing, facts and voice review, approver, human triage and publisher.
 
 ## Intake worker
-intake-worker/ is a Cloudflare Worker in plain JavaScript with no dependencies. POST /work-orders validates and normalizes a work order and returns 201. GET /health returns ok. Tests run with `node --test "intake-worker/*.test.js"`.
+intake-worker/ is a Cloudflare Worker in plain JavaScript with no dependencies. POST /work-orders validates and normalizes a work order and returns 201. GET /health returns ok. POST /github accepts GitHub webhook deliveries: set GITHUB_WEBHOOK_SECRET on the Worker to require a valid X-Hub-Signature-256 HMAC (invalid signature returns 401), and issues opened, or labeled with the label anvil, are mapped to a work order (kind task when the issue carries the task label) and returned with 202; other events are acknowledged and ignored. Tests run with `node --test "intake-worker/*.test.js"`.
 
 Optional GitHub dispatch: set GITHUB_REPO and GITHUB_TOKEN in the Worker environment to forward work orders to a repository dispatch event in your own deployment code. No secrets live in the repo.
 
@@ -115,6 +117,7 @@ Every change starts with a spec under .openspec/specs/ (OpenSpec). Write the spe
 |---|---|
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Layers, artifact flow, gates, risk triage, Core Four, model stack, loopback, envelopes, observability |
 | [docs/SDLC.md](docs/SDLC.md) | How the default pipeline maps to SDLC phases |
+| [docs/EXECUTION.md](docs/EXECUTION.md) | Agent runtime executors, the runtime contract, automatic deploy and post deploy verification |
 | [brain/project.md](brain/project.md) | Principles and project context |
 | [templates/spec.md](templates/spec.md) | The spec template every spec starts from |
 

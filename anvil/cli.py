@@ -8,7 +8,8 @@ from .onboard import onboard_project
 from .blueprints import get_blueprint
 from .model import WorkOrder
 from .runner import run_pipeline
-from .config import load_anvil_config, apply_overrides
+from .config import load_anvil_config, apply_overrides, runtime_config, deploy_config
+from .executor import create_executor
 
 def _factory_root():
     return Path(__file__).resolve().parent.parent
@@ -40,7 +41,7 @@ def main(argv=None):
     p = sub.add_parser("validate-pipeline"); p.add_argument("file")
     p = sub.add_parser("check"); p.add_argument("project"); p.add_argument("--slug", required=True)
     p = sub.add_parser("check-content"); p.add_argument("project"); p.add_argument("--slug", required=True)
-    p = sub.add_parser("run"); p.add_argument("project"); p.add_argument("--pipeline", required=True); p.add_argument("--work-order", required=True)
+    p = sub.add_parser("run"); p.add_argument("project"); p.add_argument("--pipeline", required=True); p.add_argument("--work-order", required=True); p.add_argument("--execute", action="store_true")
     args = parser.parse_args(argv)
     if args.cmd == "init":
         init_project(args.path, args.name); print(f"Created project at {args.path}"); return 0
@@ -81,7 +82,17 @@ def main(argv=None):
         pipe = load_pipeline(args.pipeline, known_stations=set(reg.ids()))
         data = json.loads(Path(args.work_order).read_text(encoding="utf-8"))
         wo = WorkOrder.from_dict(data)
-        report = run_pipeline(args.project, pipe, wo, registry=reg)
+        executor = None
+        deploy_cfg = None
+        if args.execute:
+            cfg = load_anvil_config(Path(args.project) / "anvil.yaml")
+            runtime = runtime_config(cfg)
+            if runtime is None:
+                print("--execute needs a runtime object in the project anvil.yaml", file=sys.stderr)
+                return 2
+            executor = create_executor(runtime)
+            deploy_cfg = deploy_config(cfg)
+        report = run_pipeline(args.project, pipe, wo, registry=reg, executor=executor, deploy_cfg=deploy_cfg)
         print(json.dumps(report.to_dict(), indent=2))
         print(f"Report: {Path(args.project) / 'runs' / wo.id / 'report.json'}")
         return 0

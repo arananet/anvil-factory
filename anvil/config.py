@@ -73,6 +73,18 @@ def apply_overrides(registry, config):
             station.tools = list(override["tools"])
     return registry
 
+def runtime_config(config):
+    if not isinstance(config, dict):
+        return None
+    runtime = config.get("runtime")
+    return runtime if isinstance(runtime, dict) else None
+
+def deploy_config(config):
+    if not isinstance(config, dict):
+        return None
+    deploy = config.get("deploy")
+    return deploy if isinstance(deploy, dict) else None
+
 def build_default_config(station_ids):
     stations = {}
     for sid in station_ids:

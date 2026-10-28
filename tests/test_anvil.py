@@ -178,20 +178,28 @@ class TestRunner(unittest.TestCase):
             swim = (run_dir / "swimlane.md").read_text()
             self.assertIn("null", swim); self.assertIn("spec-writer", swim)
     def test_loopback_s9(self):
-        """factory-pipeline-engine S9: failing review loops back to builder"""
+        """factory-pipeline-engine S9: a fail review produced during the run loops back to builder"""
         with tempfile.TemporaryDirectory() as tmp:
             proj = make_project(tmp)
-            base = proj / "reviews" / "demo-feature"; base.mkdir(parents=True)
-            (base / "reviewer-spec.json").write_text(json.dumps({"station":"reviewer-spec","verdict":"fail","findings":["Implementation misses the required behaviour."]}))
             reg = load_registry(ROOT / "stations")
             pipe = load_pipeline(ROOT / "pipelines" / "sdlc-default.json", known_stations=set(reg.ids()))
             wo = WorkOrder(id="wo-loop-001", kind="bug", title="Broken Thing")
-            report = run_pipeline(proj, pipe, wo, registry=reg)
+            report = run_pipeline(proj, pipe, wo, registry=reg, executor=FailReviewExecutor())
             self.assertNotEqual(report.verdict, "approved")
+            self.assertEqual(report.verdict, "rejected")
             loopbacks = [s for s in report.steps if s["status"] == "loopback"]
             self.assertEqual(len(loopbacks), 1)
             self.assertEqual(loopbacks[0]["return_to"], "builder")
             self.assertIn("misses", loopbacks[0]["detail"])
+
+class FailReviewExecutor:
+    """Test double: reviewers return a fail review JSON, others plain text."""
+    name = "command"
+    def execute(self, packet_text, station_id, packet_path=None, output_path=None, cwd=None):
+        if station_id.startswith("reviewer"):
+            return {"output": json.dumps({"station": station_id, "verdict": "fail",
+                    "findings": ["Implementation misses the required behaviour."]}), "usage": None}
+        return {"output": "done", "usage": None}
 
 if __name__ == "__main__":
     unittest.main()
