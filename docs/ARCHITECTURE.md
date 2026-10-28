@@ -67,3 +67,7 @@ The line metaphor holds for content because the failure modes rhyme. Software fa
 The shared stations are the point. Intake normalizes a topic the same way it normalizes a bug. The approver aggregates four reviews in both domains and approves nothing by itself. Triage treats publishing as a risk hint in the same set as payments or data deletion, because a published claim cannot be rolled back like a deploy. Observer closes the loop from published metrics the same way it closes it from production signals.
 
 A domain is therefore just a station set plus its gates. Adding a third domain (support replies, research reports, data pipelines) means writing those stations and gates against the same contracts, not forking the factory.
+
+## Onboarding existing projects
+
+Greenfield scaffolds a shape. Onboarding has to respect a shape that already exists, so it is split in two: analysis is read only and reports stack, tests, specs, CI and file types; the write phase then creates only the missing factory files and lists everything it kept untouched. The one speculative artifact is the baseline spec, and it is marked draft on purpose: it describes the project as found, and a human confirms or replaces it before it can act as a contract. Gaps are not hidden in a log, they leave as suggested work orders, which is the factory way of saying the first jobs on a legacy line are known: baseline tests, CI, and confirming the baseline.

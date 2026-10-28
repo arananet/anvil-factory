@@ -4,6 +4,7 @@ from .pipeline import load_pipeline
 from .stations import load_registry
 from .gates import spec_gate, tdd_gate, review_gate, brief_gate, disclosure_gate
 from .scaffold import init_project, scaffold_spec, new_project
+from .onboard import onboard_project
 from .blueprints import get_blueprint
 from .model import WorkOrder
 from .runner import run_pipeline
@@ -34,6 +35,7 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("init"); p.add_argument("path"); p.add_argument("--name", required=True)
     p = sub.add_parser("new-project"); p.add_argument("path"); p.add_argument("--name", required=True); p.add_argument("--blueprint", required=True); p.add_argument("--idea", default="")
+    p = sub.add_parser("onboard"); p.add_argument("path"); p.add_argument("--name", default=None)
     p = sub.add_parser("new-spec"); p.add_argument("project"); p.add_argument("slug"); p.add_argument("--title", required=True)
     p = sub.add_parser("validate-pipeline"); p.add_argument("file")
     p = sub.add_parser("check"); p.add_argument("project"); p.add_argument("--slug", required=True)
@@ -45,6 +47,15 @@ def main(argv=None):
     if args.cmd == "new-project":
         bp = get_blueprint(_factory_root() / "blueprints", args.blueprint)
         new_project(args.path, args.name, bp, idea=args.idea); print(f"Created greenfield project at {args.path} from blueprint {bp['id']}"); return 0
+    if args.cmd == "onboard":
+        try:
+            result = onboard_project(args.path, name=args.name)
+        except ValueError as exc:
+            print(f"Cannot onboard: {exc}"); return 1
+        print(f"Onboarded {args.path}: created {len(result['created'])} files, kept {len(result['kept'])}, gaps {len(result['gaps'])}")
+        for s in result["suggested_work_orders"]:
+            print(f"Suggested: {s}")
+        return 0
     if args.cmd == "new-spec":
         f = scaffold_spec(args.project, args.slug, args.title); print(f"Created spec at {f}"); return 0
     if args.cmd == "validate-pipeline":

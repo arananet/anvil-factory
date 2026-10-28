@@ -30,5 +30,10 @@
   "tests/test_greenfield.py::GreenfieldTests::test_s1_idea_work_order_accepted",
   "tests/test_greenfield.py::GreenfieldTests::test_s2_blueprint_catalog_loads",
   "tests/test_greenfield.py::GreenfieldTests::test_s3_new_project_scaffolds_from_blueprint",
-  "tests/test_greenfield.py::GreenfieldTests::test_s4_greenfield_pipeline_validates"
+  "tests/test_greenfield.py::GreenfieldTests::test_s4_greenfield_pipeline_validates",
+  "tests/test_onboard.py::OnboardTests::test_s1_analysis_detects_what_exists",
+  "tests/test_onboard.py::OnboardTests::test_s2_onboarding_adds_only_what_is_missing",
+  "tests/test_onboard.py::OnboardTests::test_s3_baseline_spec_drafted",
+  "tests/test_onboard.py::OnboardTests::test_s4_double_onboarding_refused",
+  "tests/test_onboard.py::OnboardTests::test_s5_gaps_become_suggested_work"
 ]

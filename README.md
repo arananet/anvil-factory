@@ -1,6 +1,6 @@
 # ANVIL
 
-![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue) ![License MIT](https://img.shields.io/badge/license-MIT-green) ![OpenSpec](https://img.shields.io/badge/OpenSpec-specs-orange) TDD: tests before implementation
+![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue) ![License Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-green) ![OpenSpec](https://img.shields.io/badge/OpenSpec-specs-orange) TDD: tests before implementation
 
 > "ANVIL is a composable software factory: spec first, tests first, and no station approves its own work."
 
@@ -25,6 +25,7 @@ A worked content example with a brief, a draft and a full run lives in examples/
 ANVIL is not only a line for issues on existing code. It has two modes that share the same stations:
 
 - **Greenfield, build from zero.** The entry is an idea, not an issue. `anvil new-project` scaffolds a brand new project from a catalog blueprint (python-service, cloudflare-worker, static-site): repo structure, a brain seeded with the idea, BLUEPRINT.md with the stack and the first specs, and anvil.json pointing at the greenfield pipeline. That pipeline adds one station at the front, blueprint, which turns the idea into a project shape before spec-writer takes over. Taskline, the example repo, is a build from zero: no code existed when its work order was written. Its recorded run used sdlc-default, and the greenfield pipeline formalizes that from zero path with scaffolding and the blueprint station in front.
+- **Onboarding an existing project.** `anvil onboard <path>` is the brownfield front door: it analyzes the codebase read only (stack, tests, specs, CI), adds only the factory pieces that are missing, never overwrites a file, drafts a baseline spec of the project as found, and writes ONBOARDING.md with the gaps turned into suggested first work orders. A project that already has anvil.json is refused, clearly.
 - **Brownfield, work on what exists.** The entry is a feature, a bug report, a production incident or a task, from a GitHub issue, the intake worker, or a file. The sdlc-default, hotfix, plan-build-test, docs-only and scout pipelines serve this mode.
 
 The modes are a starting point, not a wall: a greenfield project becomes brownfield the day its first version ships, and it keeps the same brain, specs and gates.
@@ -75,6 +76,7 @@ A pipeline is a small JSON file. Order stations, or group them in parallel. Stat
 ## Quick start
 ```bash
 python3 -m anvil.cli new-project ../my-new-app --name MyNewApp --blueprint cloudflare-worker --idea "What this app is for"
+python3 -m anvil.cli onboard ../my-existing-project
 python3 -m anvil.cli init ../my-project --name MyProject
 python3 -m anvil.cli new-spec ../my-project my-feature --title "My Feature"
 python3 -m anvil.cli validate-pipeline pipelines/sdlc-default.json
@@ -82,7 +84,7 @@ python3 -m anvil.cli run ../my-project --pipeline pipelines/sdlc-default.json --
 python3 -m anvil.cli check ../my-project --slug my-feature
 python3 -m anvil.cli check-content ../my-channel --slug my-post
 ```
-Installed as a package, the same commands are available as `anvil new-project`, `anvil init`, `anvil new-spec`, `anvil validate-pipeline`, `anvil run` and `anvil check`.
+Installed as a package, the same commands are available as `anvil new-project`, `anvil onboard`, `anvil init`, `anvil new-spec`, `anvil validate-pipeline`, `anvil run` and `anvil check`.
 
 Project station settings live in `anvil.yaml` at the project root: context, model, prompt and tools per station. See docs/ARCHITECTURE.md for the Core Four.
 
@@ -118,7 +120,7 @@ Every change starts with a spec under .openspec/specs/ (OpenSpec). Write the spe
 
 ## License
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 

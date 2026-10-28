@@ -1,0 +1,1 @@
+{"station": "reviewer-architecture", "verdict": "pass", "findings": ["Onboarding reuses the scaffold vocabulary (brain, OpenSpec structure, anvil.yaml from the shared Core Four renderer) instead of inventing a second project shape.", "Brownfield entry now has three honest states: analyzed, onboarded with gaps as work orders, or already onboarded and refused."]}

@@ -21,6 +21,7 @@ jobs:
           python -m anvil.cli check . --slug factory-pipeline-engine
           python -m anvil.cli check . --slug greenfield-projects
           python -m anvil.cli check . --slug content-factory
+          python -m anvil.cli check . --slug existing-project-onboarding
           python -m anvil.cli check-content examples/content/why-factories --slug content-demo
       - name: Worker tests
         run: node --test "intake-worker/*.test.js"
