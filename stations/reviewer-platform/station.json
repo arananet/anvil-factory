@@ -1,0 +1,20 @@
+{
+  "id": "reviewer-platform",
+  "name": "Platform Reviewer",
+  "kind": "agent",
+  "inputs": [
+    "draft",
+    "content brief"
+  ],
+  "outputs": [
+    "review"
+  ],
+  "description": "Check the piece fits its channel: format, length, plain text where the platform does not render markup, media order and hashtags.",
+  "context": [
+    "brain/project.md",
+    "content/"
+  ],
+  "model": "review-balanced",
+  "prompt": "stations/reviewer-platform/PROMPT.md",
+  "tools": []
+}

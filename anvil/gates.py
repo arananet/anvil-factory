@@ -2,7 +2,7 @@ import json, re
 from pathlib import Path
 
 REVIEWER_STATIONS = ["reviewer-spec", "reviewer-security", "reviewer-tests", "reviewer-architecture"]
-RISK_HINTS = {"auth", "payments", "data-deletion", "production-deploy", "secrets"}
+RISK_HINTS = {"auth", "payments", "data-deletion", "production-deploy", "secrets", "publishing"}
 
 def spec_gate(project_dir, slug):
     spec = Path(project_dir) / ".openspec" / "specs" / slug / "spec.md"
@@ -61,3 +61,23 @@ def human_gate(work_order):
     if isinstance(work_order, dict):
         hints = set(work_order.get("risk_hints", []))
     return "required" if hints & RISK_HINTS else "not_required"
+
+
+def brief_gate(project_dir, slug):
+    brief = Path(project_dir) / "content" / slug / "brief.md"
+    if not brief.exists():
+        return (False, f"Brief not found: {brief}")
+    text = brief.read_text(encoding="utf-8")
+    for field in ("Audience:", "Angle:", "Claims:"):
+        if field not in text:
+            return (False, f"Brief is missing {field}")
+    return (True, "Brief present with audience, angle and claims")
+
+def disclosure_gate(project_dir, slug):
+    draft = Path(project_dir) / "content" / slug / "draft.md"
+    if not draft.exists():
+        return (False, f"Draft not found: {draft}")
+    text = draft.read_text(encoding="utf-8").lower()
+    if "ai generated" not in text and "ai-generated" not in text:
+        return (False, "Draft has no AI generated disclosure")
+    return (True, "Draft carries an AI generated disclosure")

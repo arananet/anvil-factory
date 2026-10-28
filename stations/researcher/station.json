@@ -1,0 +1,19 @@
+{
+  "id": "researcher",
+  "name": "Researcher",
+  "kind": "agent",
+  "inputs": [
+    "content brief"
+  ],
+  "outputs": [
+    "source pack"
+  ],
+  "description": "Gather the source pack for a brief: primary sources for every claim, with links and the exact fact each source supports.",
+  "context": [
+    "brain/project.md",
+    "content/"
+  ],
+  "model": "fast-reader",
+  "prompt": "stations/researcher/PROMPT.md",
+  "tools": []
+}

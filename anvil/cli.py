@@ -2,7 +2,7 @@ import argparse, json, sys
 from pathlib import Path
 from .pipeline import load_pipeline
 from .stations import load_registry
-from .gates import spec_gate, tdd_gate, review_gate
+from .gates import spec_gate, tdd_gate, review_gate, brief_gate, disclosure_gate
 from .scaffold import init_project, scaffold_spec, new_project
 from .blueprints import get_blueprint
 from .model import WorkOrder
@@ -37,6 +37,7 @@ def main(argv=None):
     p = sub.add_parser("new-spec"); p.add_argument("project"); p.add_argument("slug"); p.add_argument("--title", required=True)
     p = sub.add_parser("validate-pipeline"); p.add_argument("file")
     p = sub.add_parser("check"); p.add_argument("project"); p.add_argument("--slug", required=True)
+    p = sub.add_parser("check-content"); p.add_argument("project"); p.add_argument("--slug", required=True)
     p = sub.add_parser("run"); p.add_argument("project"); p.add_argument("--pipeline", required=True); p.add_argument("--work-order", required=True)
     args = parser.parse_args(argv)
     if args.cmd == "init":
@@ -52,6 +53,13 @@ def main(argv=None):
         print(f"Pipeline {pipe.name} valid: {', '.join(pipe.topological_order())}"); return 0
     if args.cmd == "check":
         gates = [("spec", spec_gate(args.project, args.slug)), ("tdd", tdd_gate(args.project, args.slug)), ("review", review_gate(args.project, args.slug))]
+        ok = True
+        for name, (passed, detail) in gates:
+            print(f"{name}: {'PASS' if passed else 'FAIL'} - {detail}")
+            ok = ok and passed
+        return 0 if ok else 1
+    if args.cmd == "check-content":
+        gates = [("brief", brief_gate(args.project, args.slug)), ("disclosure", disclosure_gate(args.project, args.slug))]
         ok = True
         for name, (passed, detail) in gates:
             print(f"{name}: {'PASS' if passed else 'FAIL'} - {detail}")

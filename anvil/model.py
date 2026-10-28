@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass, field
 
-KINDS = {"idea", "feature", "bug", "incident", "task"}
+KINDS = {"idea", "feature", "bug", "incident", "task", "content"}
 VERDICTS = {"pass", "fail", "changes_requested"}
 
 def slugify(text):

@@ -1,0 +1,12 @@
+{
+  "name": "content-short",
+  "stages": [
+    { "station": "intake" },
+    { "station": "brief-writer" },
+    { "station": "writer" },
+    { "parallel": ["reviewer-facts", "reviewer-voice"] },
+    { "station": "approver" },
+    { "station": "triage-human" },
+    { "station": "publisher" }
+  ]
+}

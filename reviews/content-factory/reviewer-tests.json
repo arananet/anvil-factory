@@ -1,0 +1,1 @@
+{"station": "reviewer-tests", "verdict": "pass", "findings": ["tests/test_content.py maps one named test to each content-factory scenario, including the failing disclosure case.", "Pipeline validation covers both content pipelines against the real registry."]}

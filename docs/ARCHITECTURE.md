@@ -59,3 +59,11 @@ Brownfield work starts from an existing repo. Greenfield work starts from an ide
 - The blueprint station reads the idea brief and the blueprint catalog in blueprints/. Each catalog entry is data, not code: stack, structure and the first spec slugs for one starting shape. The station output is BLUEPRINT.md in the new project.
 - The deterministic half is anvil new-project: it scaffolds the project with init, writes BLUEPRINT.md, seeds brain/project.md with the idea, points anvil.json at the greenfield pipeline, and scaffolds the first spec from the blueprint, so spec-writer starts from a shape instead of a blank page.
 - From spec-writer on, greenfield and brownfield share every station, gate and review. Nothing about the build, review or approval path is special once the project exists.
+
+## Content domain
+
+The line metaphor holds for content because the failure modes rhyme. Software fails when code drifts from a spec, so ANVIL gates the spec and maps scenarios to tests. Content fails when a draft drifts from its sources, so the content line gates the brief (audience, angle, claims) and the disclosure on the draft, and its facts reviewer checks claims against a source pack the way the tests reviewer checks code against tests.
+
+The shared stations are the point. Intake normalizes a topic the same way it normalizes a bug. The approver aggregates four reviews in both domains and approves nothing by itself. Triage treats publishing as a risk hint in the same set as payments or data deletion, because a published claim cannot be rolled back like a deploy. Observer closes the loop from published metrics the same way it closes it from production signals.
+
+A domain is therefore just a station set plus its gates. Adding a third domain (support replies, research reports, data pipelines) means writing those stations and gates against the same contracts, not forking the factory.

@@ -11,6 +11,16 @@ ANVIL is a framework for running software work down a line of stations. Each sta
 
 A project keeps everything in its repo: specs, tests, reviews, run reports, envelopes and a brain folder with context and decisions.
 
+## One core, two domains: software and content
+The factory core (work orders, pipelines, gates, envelopes, approver, human triage, brain) does not care what the line produces. Domains are station sets that plug into the same core:
+
+- **Software** is the default domain in this repo: spec-writer, test-writer and builder produce code, and the four software reviewers check it. The spec is the contract and tests are the evidence.
+- **Content** ships in the same catalog: brief-writer, researcher, writer and media-producer produce a piece, and four different reviewers check it in parallel (facts against sources, voice, platform fit, brand risk). The brief replaces the spec, the source pack replaces the test base, and two deterministic gates check the brief and the AI generated disclosure on the draft.
+
+Publishing is a risk hint in ANVIL, so a content work order that will be published always stops at the human gate before the publisher station runs. That is deliberate: the factory prepares and checks, a human decides what goes out under their name.
+
+A worked content example with a brief, a draft and a full run lives in examples/content/why-factories. The same composition rule applies both ways: a content series can start greenfield from an idea, and a software team can borrow the researcher or the facts reviewer for a technical article line.
+
 ## Two modes: greenfield and brownfield
 ANVIL is not only a line for issues on existing code. It has two modes that share the same stations:
 
@@ -37,6 +47,15 @@ The modes are a starting point, not a wall: a greenfield project becomes brownfi
 | observer | agent | Watch the release and report what happened |
 | scout | agent | Read only recon, reports and changes no code |
 | blueprint | agent | Greenfield only: turn an idea into a project blueprint, stack, structure and first specs |
+| brief-writer | agent | Content: turn an idea or topic into a brief with audience, angle, claims and sources |
+| researcher | agent | Content: build the source pack, one primary source per claim |
+| writer | agent | Content: write the draft from the brief and the source pack only |
+| media-producer | agent | Content: produce images, audio or video and record how each was made |
+| reviewer-facts | agent | Content: check every claim against the source pack |
+| reviewer-voice | agent | Content: check voice, house rules and the AI generated disclosure |
+| reviewer-platform | agent | Content: check format and fit for the target channel |
+| reviewer-brand | agent | Content: check brand and policy risks |
+| publisher | agent | Content: publish only after approval and the human gate, and record where it went live |
 
 ## Composing a pipeline
 A pipeline is a small JSON file. Order stations, or group them in parallel. Stations are reused across pipelines, never redefined.
@@ -61,6 +80,7 @@ python3 -m anvil.cli new-spec ../my-project my-feature --title "My Feature"
 python3 -m anvil.cli validate-pipeline pipelines/sdlc-default.json
 python3 -m anvil.cli run ../my-project --pipeline pipelines/sdlc-default.json --work-order work-order.json
 python3 -m anvil.cli check ../my-project --slug my-feature
+python3 -m anvil.cli check-content ../my-channel --slug my-post
 ```
 Installed as a package, the same commands are available as `anvil new-project`, `anvil init`, `anvil new-spec`, `anvil validate-pipeline`, `anvil run` and `anvil check`.
 
@@ -76,6 +96,8 @@ The brain/ folder holds project.md (what the project is and its principles), glo
 - scout: a single read only recon station, no code changes.
 - plan-build-test: intake, spec, tests, build, test review and approver.
 - greenfield: the from zero line. Intake, blueprint, spec, tests, build, the four parallel reviewers, approver, human triage, deployer and observer.
+- content-default: the full content line. Intake, brief, research, writing, media, four parallel content reviewers, approver, human triage, publisher and observer.
+- content-short: a short content line for posts. Intake, brief, writing, facts and voice review, approver, human triage and publisher.
 
 ## Intake worker
 intake-worker/ is a Cloudflare Worker in plain JavaScript with no dependencies. POST /work-orders validates and normalizes a work order and returns 201. GET /health returns ok. Tests run with `node --test "intake-worker/*.test.js"`.
@@ -95,10 +117,15 @@ Every change starts with a spec under .openspec/specs/ (OpenSpec). Write the spe
 | [templates/spec.md](templates/spec.md) | The spec template every spec starts from |
 
 ## License
-MIT. See [LICENSE](LICENSE). Copyright (c) 2026 Eduardo Arana.
+
+[MIT](LICENSE)
+
+---
 
 ## Developer
+
 Eduardo Arana
 
-## Support this
-If ANVIL is useful to you, you can support the work here: [ko-fi.com/arananet](https://ko-fi.com/arananet)
+## Support this with a ko-fi
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/H2H51MPWG)

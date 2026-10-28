@@ -1,0 +1,1 @@
+{"station": "reviewer-security", "verdict": "pass", "findings": ["The new gates only read files inside the project content directory.", "No credentials or publishing tokens appear in any station manifest, prompt or template."]}

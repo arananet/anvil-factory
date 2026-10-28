@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from .config import render_anvil_yaml
 
-STATION_IDS = ["intake","spec-writer","test-writer","builder","reviewer-spec","reviewer-security","reviewer-tests","reviewer-architecture","approver","triage-human","deployer","observer","scout","blueprint"]
+STATION_IDS = ["intake","spec-writer","test-writer","builder","reviewer-spec","reviewer-security","reviewer-tests","reviewer-architecture","approver","triage-human","deployer","observer","scout","blueprint","brief-writer","researcher","writer","media-producer","reviewer-facts","reviewer-voice","reviewer-platform","reviewer-brand","publisher"]
 TEMPLATE = """# {title}
 
 Status: draft

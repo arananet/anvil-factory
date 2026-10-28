@@ -1,0 +1,20 @@
+{
+  "id": "reviewer-voice",
+  "name": "Voice Reviewer",
+  "kind": "agent",
+  "inputs": [
+    "draft",
+    "brain"
+  ],
+  "outputs": [
+    "review"
+  ],
+  "description": "Check the draft sounds like the author: natural grammar, no filler cadence, the house rules in the brain, and the AI generated disclosure present when the piece or its media is AI generated.",
+  "context": [
+    "brain/project.md",
+    "content/"
+  ],
+  "model": "review-balanced",
+  "prompt": "stations/reviewer-voice/PROMPT.md",
+  "tools": []
+}

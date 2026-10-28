@@ -1,0 +1,20 @@
+{
+  "id": "reviewer-facts",
+  "name": "Facts Reviewer",
+  "kind": "agent",
+  "inputs": [
+    "draft",
+    "source pack"
+  ],
+  "outputs": [
+    "review"
+  ],
+  "description": "Check every claim in the draft against the source pack. A claim with no source is a finding, not a detail.",
+  "context": [
+    "brain/project.md",
+    "content/"
+  ],
+  "model": "review-balanced",
+  "prompt": "stations/reviewer-facts/PROMPT.md",
+  "tools": []
+}

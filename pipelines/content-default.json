@@ -1,0 +1,15 @@
+{
+  "name": "content-default",
+  "stages": [
+    { "station": "intake" },
+    { "station": "brief-writer" },
+    { "station": "researcher" },
+    { "station": "writer" },
+    { "station": "media-producer" },
+    { "parallel": ["reviewer-facts", "reviewer-voice", "reviewer-platform", "reviewer-brand"] },
+    { "station": "approver" },
+    { "station": "triage-human" },
+    { "station": "publisher" },
+    { "station": "observer" }
+  ]
+}

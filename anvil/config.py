@@ -11,6 +11,10 @@ DEFAULT_MODELS = {
     "test-writer": "reasoning-strong",
     "builder": "fast-builder",
     "scout": "fast-reader",
+    "brief-writer": "reasoning-strong",
+    "researcher": "fast-reader",
+    "writer": "writing-strong",
+    "media-producer": "media-gen",
 }
 
 def default_model(station_id):
@@ -18,7 +22,7 @@ def default_model(station_id):
         return DEFAULT_MODELS[station_id]
     if station_id.startswith("reviewer-"):
         return "review-balanced"
-    if station_id in {"deployer", "observer"}:
+    if station_id in {"deployer", "observer", "publisher"}:
         return "review-balanced"
     return "default"
 

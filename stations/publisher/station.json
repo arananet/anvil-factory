@@ -1,0 +1,20 @@
+{
+  "id": "publisher",
+  "name": "Publisher",
+  "kind": "agent",
+  "inputs": [
+    "approved draft",
+    "human gate result"
+  ],
+  "outputs": [
+    "published piece record"
+  ],
+  "description": "Publish an approved piece and record where it went live. It runs only after the approver passes and the human gate clears. It never publishes on its own judgement.",
+  "context": [
+    "brain/project.md",
+    "content/"
+  ],
+  "model": "review-balanced",
+  "prompt": "stations/publisher/PROMPT.md",
+  "tools": []
+}

@@ -1,0 +1,19 @@
+{
+  "id": "reviewer-brand",
+  "name": "Brand Reviewer",
+  "kind": "agent",
+  "inputs": [
+    "draft"
+  ],
+  "outputs": [
+    "review"
+  ],
+  "description": "Check brand and policy risks: names that must not appear, promises the piece cannot keep, and anything that would embarrass the author if it ranked first on search.",
+  "context": [
+    "brain/project.md",
+    "content/"
+  ],
+  "model": "review-balanced",
+  "prompt": "stations/reviewer-brand/PROMPT.md",
+  "tools": []
+}

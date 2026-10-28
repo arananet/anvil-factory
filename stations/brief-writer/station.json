@@ -1,0 +1,20 @@
+{
+  "id": "brief-writer",
+  "name": "Brief Writer",
+  "kind": "agent",
+  "inputs": [
+    "idea or topic",
+    "brain"
+  ],
+  "outputs": [
+    "content brief"
+  ],
+  "description": "Turn an idea or topic into a content brief: audience, angle, the claims the piece will make, and the sources each claim needs.",
+  "context": [
+    "brain/project.md",
+    "content/"
+  ],
+  "model": "reasoning-strong",
+  "prompt": "stations/brief-writer/PROMPT.md",
+  "tools": []
+}

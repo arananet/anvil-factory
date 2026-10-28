@@ -1,0 +1,88 @@
+{
+  "work_order_id": "wo-content-001",
+  "pipeline": "content-short",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "completed",
+      "detail": "Work order normalized",
+      "duration_ms": 0.014,
+      "cost": null,
+      "artifacts": [
+        "examples/content/why-factories/runs/wo-content-001/report.json"
+      ]
+    },
+    {
+      "station": "brief-writer",
+      "status": "packet_ready",
+      "detail": "Packet written to examples/content/why-factories/runs/wo-content-001/brief-writer.packet.md",
+      "duration_ms": 0.063,
+      "cost": null,
+      "artifacts": [
+        "examples/content/why-factories/runs/wo-content-001/brief-writer.packet.md"
+      ]
+    },
+    {
+      "station": "writer",
+      "status": "packet_ready",
+      "detail": "Packet written to examples/content/why-factories/runs/wo-content-001/writer.packet.md",
+      "duration_ms": 0.058,
+      "cost": null,
+      "artifacts": [
+        "examples/content/why-factories/runs/wo-content-001/writer.packet.md"
+      ]
+    },
+    {
+      "station": "reviewer-facts",
+      "status": "packet_ready",
+      "detail": "Packet written to examples/content/why-factories/runs/wo-content-001/reviewer-facts.packet.md",
+      "duration_ms": 0.071,
+      "cost": null,
+      "artifacts": [
+        "examples/content/why-factories/runs/wo-content-001/reviewer-facts.packet.md"
+      ]
+    },
+    {
+      "station": "reviewer-voice",
+      "status": "packet_ready",
+      "detail": "Packet written to examples/content/why-factories/runs/wo-content-001/reviewer-voice.packet.md",
+      "duration_ms": 0.045,
+      "cost": null,
+      "artifacts": [
+        "examples/content/why-factories/runs/wo-content-001/reviewer-voice.packet.md"
+      ]
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: no_reviews",
+      "duration_ms": 0.012,
+      "cost": null,
+      "artifacts": [
+        "examples/content/why-factories/runs/wo-content-001/report.json"
+      ]
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: required",
+      "duration_ms": 0.003,
+      "cost": null,
+      "artifacts": []
+    },
+    {
+      "station": "publisher",
+      "status": "packet_ready",
+      "detail": "Packet written to examples/content/why-factories/runs/wo-content-001/publisher.packet.md",
+      "duration_ms": 0.093,
+      "cost": null,
+      "artifacts": [
+        "examples/content/why-factories/runs/wo-content-001/publisher.packet.md"
+      ]
+    }
+  ],
+  "verdict": "no_reviews",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 0
+}

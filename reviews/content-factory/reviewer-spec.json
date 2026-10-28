@@ -1,0 +1,1 @@
+{"station": "reviewer-spec", "verdict": "pass", "findings": ["The content line implements the spec: shared registry, two content pipelines, brief and disclosure gates, publishing as a human risk hint.", "Nothing in the content pack publishes anything by itself; the publisher station is a contract gated by the approver and the human gate."]}

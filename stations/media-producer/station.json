@@ -1,0 +1,20 @@
+{
+  "id": "media-producer",
+  "name": "Media Producer",
+  "kind": "agent",
+  "inputs": [
+    "draft",
+    "content brief"
+  ],
+  "outputs": [
+    "media assets"
+  ],
+  "description": "Produce the media the piece needs (images, audio or video) and record how each asset was made, so disclosure is a fact, not a guess.",
+  "context": [
+    "brain/project.md",
+    "content/"
+  ],
+  "model": "media-gen",
+  "prompt": "stations/media-producer/PROMPT.md",
+  "tools": []
+}
