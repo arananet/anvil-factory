@@ -1,0 +1,9 @@
+{
+  "description": "Implement the spec in .openspec/specs/cost-measurement/spec.md in the factory.\n\nBuild, per the spec scenarios:\n\nS1: each run step gains a cost record (measured flag, input and output token usage when reported, the model priced from, the amount when measured). For stations executed by a runtime that leaves session transcripts with token usage, the executor sums the usage attributable to the step's execution window; usage that cannot be attributed to a step is not spread across steps.\n\nS2: for HTTP gateway executions, the executor reads the usage object from the gateway response when present and attaches it the same way; a response with no usage object leaves the step unmeasured.\n\nS3: a step with no usage source, or an executed model with no price table entry, records measured false, a null amount, and the stated reason. Nothing is estimated.\n\nS4: the run report gains a cost section whose total is the sum of measured steps only, with measured and unmeasured step counts; the swimlane shows the total with its coverage counts.\n\nS5: prices live in configuration as a price table mapping model names to input and output prices per million tokens, every entry labelled with its source and the date recorded; the loader rejects an entry missing either label.\n\nCost measurement changes no verdict: the approver, the gates and the human gate read nothing from the cost section. Tests covering S1 to S5 in the factory suite style, docs updated, CHANGELOG Unreleased updated. Keep the whole suite green and every pipeline valid.\n\nGitHub issue: https://github.com/arananet/anvil-factory/issues/10",
+  "id": "wo-gh-10",
+  "kind": "feature",
+  "risk_hints": [],
+  "source": "github-issue",
+  "status": "new",
+  "title": "Per job cost measurement in run reports"
+}

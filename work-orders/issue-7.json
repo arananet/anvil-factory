@@ -1,0 +1,9 @@
+{
+  "description": "Implement the spec in .openspec/specs/intake-outcomes/spec.md in the factory.\n\nBuild, per the spec scenarios:\n\nS1: intake can REJECT a work order whose purpose is harmful, deceptive or unlawful, with reasons recorded on the work order; rejection is terminal, the runner spawns no further station, the work order status becomes rejected, and the report and swimlane show the rejection and its reasons.\n\nS2: intake can RESCOPE an oversized or vague work order: the description becomes the buildable scope, the outcome record states what was cut and why, and downstream packets carry the rescoped description.\n\nS3: intake can answer NEEDS-INFO: outcome waiting_info, questions recorded, work order status waiting_info, nothing further spawns, and the report records a waiting state rather than a pass or a failure. When answers are recorded and the work order returns to a runnable status, a later run proceeds from intake again.\n\nS4: accepted and rescoped work orders carry intake's risk rating (low, medium, high) and surfaces list from the spec's vocabulary; both appear in the run report.\n\nS5: rejected and waiting runs render honestly: no station beyond intake listed as executed, reasons and questions shown, neither rendered as approved.\n\nThe work order model gains the intake outcome record (outcome, reasons, questions, rescoped description, risk, surfaces). Intake's station prompt and contract describe all four outcomes, the refusal class, the rescope discipline and the risk and surface vocabulary. Tests covering S1 to S5 in the factory suite style, docs updated, CHANGELOG Unreleased updated. Keep the whole suite green and every pipeline valid.\n\nGitHub issue: https://github.com/arananet/anvil-factory/issues/7",
+  "id": "wo-gh-7",
+  "kind": "feature",
+  "risk_hints": [],
+  "source": "github-issue",
+  "status": "new",
+  "title": "Intake outcomes: reject, rescope, needs-info parking, risk and surfaces"
+}
