@@ -1,0 +1,264 @@
+{
+  "work_order_id": "wo-gh-5",
+  "pipeline": "content-default",
+  "title": "Final pass on the ANVIL LinkedIn article: history section, Sentia closing, voice fixes, reviewer count, promo",
+  "kind": "content",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "completed",
+      "detail": "Work order normalized",
+      "duration_ms": 0.02,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-5/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "brief-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-5/brief-writer.output.md",
+      "duration_ms": 83963.308,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-5/brief-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "researcher",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-5/researcher.output.md",
+      "duration_ms": 139241.664,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-5/researcher.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-5/writer.output.md",
+      "duration_ms": 418084.365,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-5/writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "media-producer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-5/media-producer.output.md",
+      "duration_ms": 124507.124,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-5/media-producer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-facts",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-5/reviewer-facts.output.md",
+      "duration_ms": 130199.358,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-5/reviewer-facts.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-voice",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-5/reviewer-voice.output.md",
+      "duration_ms": 177758.781,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-5/reviewer-voice.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-platform",
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-platform: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.57. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 58366.703,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-5/reviewer-platform.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-brand",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-5/reviewer-brand.output.md; review output did not parse as a review JSON",
+      "duration_ms": 80556.897,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-5/reviewer-brand.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-5/reviewer-design.output.md",
+      "duration_ms": 41126.617,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-5/reviewer-design.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.041,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-5/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: required",
+      "duration_ms": 0.015,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "publisher",
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station publisher: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.55. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 47117.159,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-5/publisher.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "observer",
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station observer: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.52. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 16638.689,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-5/observer.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    }
+  ],
+  "verdict": "approved",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 0,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [
+    "publishing"
+  ],
+  "decision": {
+    "approver": {
+      "reviews_counted": [
+        {
+          "station": "reviewer-facts",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-voice",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "pass"
+        }
+      ],
+      "reviews_expected": [
+        "reviewer-facts",
+        "reviewer-voice",
+        "reviewer-platform",
+        "reviewer-brand",
+        "reviewer-design"
+      ],
+      "rule": "All counted reviews passed."
+    },
+    "human_gate": {
+      "required": true,
+      "rule": "Verdict approved, but the work order carries the risk hint 'publishing', so a human is required.",
+      "hints_matched": [
+        "publishing"
+      ]
+    }
+  },
+  "warnings": []
+}

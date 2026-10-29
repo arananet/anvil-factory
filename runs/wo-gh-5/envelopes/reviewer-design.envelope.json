@@ -1,0 +1,22 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-design",
+  "to_station": "approver",
+  "work_order_id": "wo-gh-5",
+  "artifact_path": "runs/wo-gh-5/reviewer-design.output.md",
+  "status": "executed",
+  "created_at": "2026-10-29T11:40:21.410375+00:00",
+  "review": {
+    "station": "reviewer-design",
+    "verdict": "pass",
+    "findings": [
+      "This work order produces content output (a markdown article), not interface output. Design system review applies to HTML, CSS, React components, and user-facing interfaces with visual design implementation. The article contains no design tokens, layout implementation, or interactive elements to review against the project's design system. No design criteria violations found."
+    ]
+  },
+  "configured_model": "claude-sonnet-4-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
+}
