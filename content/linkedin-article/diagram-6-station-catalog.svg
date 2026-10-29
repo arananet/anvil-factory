@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" style="background:#fcfcfb">
+  <defs>
+    <style>
+      .station { fill: #2a78d6; stroke: #0b0b0b; stroke-width: 1.5; rx: 6; }
+      .label { font-family: system-ui, sans-serif; font-size: 13px; fill: #ffffff; font-weight: 500; text-anchor: middle; }
+      .title { font-family: system-ui, sans-serif; font-size: 28px; fill: #0b0b0b; font-weight: 600; }
+      .count { font-family: system-ui, sans-serif; font-size: 20px; fill: #52514e; font-weight: 500; }
+    </style>
+  </defs>
+  
+  <text x="600" y="50" text-anchor="middle" class="title">Station Catalog</text>
+  <text x="600" y="80" text-anchor="middle" class="count">25 composable stations</text>
+  
+  <!-- Grid of 25 stations (5x5) -->
+  <!-- Row 1 -->
+  <rect x="50" y="120" width="200" height="70" class="station"/>
+  <text x="150" y="160" class="label">intake</text>
+  
+  <rect x="280" y="120" width="200" height="70" class="station"/>
+  <text x="380" y="160" class="label">spec-writer</text>
+  
+  <rect x="510" y="120" width="200" height="70" class="station"/>
+  <text x="610" y="160" class="label">test-writer</text>
+  
+  <rect x="740" y="120" width="200" height="70" class="station"/>
+  <text x="840" y="160" class="label">builder</text>
+  
+  <rect x="970" y="120" width="200" height="70" class="station"/>
+  <text x="1070" y="160" class="label">reviewer-spec</text>
+  
+  <!-- Row 2 -->
+  <rect x="50" y="210" width="200" height="70" class="station"/>
+  <text x="150" y="250" class="label">reviewer-security</text>
+  
+  <rect x="280" y="210" width="200" height="70" class="station"/>
+  <text x="380" y="250" class="label">reviewer-tests</text>
+  
+  <rect x="510" y="210" width="200" height="70" class="station"/>
+  <text x="610" y="250" class="label">reviewer-architecture</text>
+  
+  <rect x="740" y="210" width="200" height="70" class="station"/>
+  <text x="840" y="250" class="label">reviewer-design</text>
+  
+  <rect x="970" y="210" width="200" height="70" class="station"/>
+  <text x="1070" y="250" class="label">approver</text>
+  
+  <!-- Row 3 -->
+  <rect x="50" y="300" width="200" height="70" class="station"/>
+  <text x="150" y="340" class="label">triage</text>
+  
+  <rect x="280" y="300" width="200" height="70" class="station"/>
+  <text x="380" y="340" class="label">deployer</text>
+  
+  <rect x="510" y="300" width="200" height="70" class="station"/>
+  <text x="610" y="340" class="label">observer</text>
+  
+  <rect x="740" y="300" width="200" height="70" class="station"/>
+  <text x="840" y="340" class="label">supervisor</text>
+  
+  <rect x="970" y="300" width="200" height="70" class="station"/>
+  <text x="1070" y="340" class="label">blueprint</text>
+  
+  <!-- Row 4 -->
+  <rect x="50" y="390" width="200" height="70" class="station"/>
+  <text x="150" y="430" class="label">scaffolder</text>
+  
+  <rect x="280" y="390" width="200" height="70" class="station"/>
+  <text x="380" y="430" class="label">onboard</text>
+  
+  <rect x="510" y="390" width="200" height="70" class="station"/>
+  <text x="610" y="430" class="label">brief-writer</text>
+  
+  <rect x="740" y="390" width="200" height="70" class="station"/>
+  <text x="840" y="430" class="label">researcher</text>
+  
+  <rect x="970" y="390" width="200" height="70" class="station"/>
+  <text x="1070" y="430" class="label">writer</text>
+  
+  <!-- Row 5 -->
+  <rect x="50" y="480" width="200" height="70" class="station"/>
+  <text x="150" y="520" class="label">media-producer</text>
+  
+  <rect x="280" y="480" width="200" height="70" class="station"/>
+  <text x="380" y="520" class="label">reviewer-facts</text>
+  
+  <rect x="510" y="480" width="200" height="70" class="station"/>
+  <text x="610" y="520" class="label">reviewer-voice</text>
+  
+  <rect x="740" y="480" width="200" height="70" class="station"/>
+  <text x="840" y="520" class="label">reviewer-platform</text>
+  
+  <rect x="970" y="480" width="200" height="70" class="station"/>
+  <text x="1070" y="520" class="label">reviewer-brand-risk</text>
+  
+  <!-- Note -->
+  <g transform="translate(100, 600)">
+    <text x="500" y="0" text-anchor="middle" style="font-family: system-ui, sans-serif; font-size: 18px; fill: #52514e; font-weight: 500;">Each station is a manifest, prompt, and contract</text>
+    <text x="500" y="30" text-anchor="middle" style="font-family: system-ui, sans-serif; font-size: 16px; fill: #898781;">Configured via anvil.yaml: context, model, prompt, tools</text>
+    <text x="500" y="80" text-anchor="middle" style="font-family: system-ui, sans-serif; font-size: 16px; fill: #898781;">Composed into pipelines: sdlc-default, sdlc-hotfix, content-article, content-video, and more</text>
+  </g>
+</svg>

@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" style="background:#fcfcfb">
+  <defs>
+    <style>
+      .core { fill: #2a78d6; stroke: #0b0b0b; stroke-width: 3; rx: 8; }
+      .software { fill: #1baf7a; stroke: #0b0b0b; stroke-width: 2; rx: 6; }
+      .content { fill: #e87ba4; stroke: #0b0b0b; stroke-width: 2; rx: 6; }
+      .label-white { font-family: system-ui, sans-serif; font-size: 16px; fill: #ffffff; font-weight: 500; }
+      .label-black { font-family: system-ui, sans-serif; font-size: 16px; fill: #0b0b0b; font-weight: 500; }
+      .title { font-family: system-ui, sans-serif; font-size: 28px; fill: #0b0b0b; font-weight: 600; }
+      .heading { font-family: system-ui, sans-serif; font-size: 20px; fill: #0b0b0b; font-weight: 600; }
+      .item { font-family: system-ui, sans-serif; font-size: 14px; fill: #0b0b0b; }
+      .arrow { fill: none; stroke: #52514e; stroke-width: 2; stroke-dasharray: 5,5; }
+    </style>
+  </defs>
+  
+  <text x="600" y="40" text-anchor="middle" class="title">One Core, Two Domains</text>
+  
+  <!-- Core (center) -->
+  <rect x="450" y="250" width="300" height="300" class="core"/>
+  <text x="600" y="290" text-anchor="middle" class="label-white" style="font-size: 22px;">ANVIL Core</text>
+  
+  <g transform="translate(480, 310)">
+    <text x="0" y="0" class="label-white">Shared Infrastructure:</text>
+    <text x="0" y="30" class="item" fill="#ffffff">• Work order intake</text>
+    <text x="0" y="50" class="item" fill="#ffffff">• Pipeline engine</text>
+    <text x="0" y="70" class="item" fill="#ffffff">• Station packets</text>
+    <text x="0" y="90" class="item" fill="#ffffff">• Approver aggregation</text>
+    <text x="0" y="110" class="item" fill="#ffffff">• Human triage gates</text>
+    <text x="0" y="130" class="item" fill="#ffffff">• Run reports</text>
+    <text x="0" y="150" class="item" fill="#ffffff">• Provenance tracking</text>
+    <text x="0" y="170" class="item" fill="#ffffff">• Model routing</text>
+    <text x="0" y="190" class="item" fill="#ffffff">• Observer station</text>
+  </g>
+  
+  <!-- Software Domain (left) -->
+  <g transform="translate(50, 80)">
+    <text x="150" y="0" text-anchor="middle" class="heading">Software Factory</text>
+    
+    <rect x="20" y="20" width="260" height="180" class="software"/>
+    <g transform="translate(40, 50)">
+      <text x="0" y="0" class="label-white">Stations:</text>
+      <text x="0" y="25" class="item" fill="#ffffff">• Spec writer (OpenSpec)</text>
+      <text x="0" y="45" class="item" fill="#ffffff">• Test writer</text>
+      <text x="0" y="65" class="item" fill="#ffffff">• Builder</text>
+      <text x="0" y="85" class="item" fill="#ffffff">• Reviewer: spec</text>
+      <text x="0" y="105" class="item" fill="#ffffff">• Reviewer: security</text>
+      <text x="0" y="125" class="item" fill="#ffffff">• Reviewer: tests</text>
+      <text x="0" y="145" class="item" fill="#ffffff">• Reviewer: architecture</text>
+    </g>
+    
+    <rect x="20" y="220" width="260" height="80" class="software" fill-opacity="0.3"/>
+    <g transform="translate(40, 245)">
+      <text x="0" y="0" class="label-black">Truth source:</text>
+      <text x="0" y="20" class="item">Spec defines correctness</text>
+      <text x="0" y="40" class="item">Code drifts from spec = failure</text>
+    </g>
+  </g>
+  
+  <!-- Content Domain (right) -->
+  <g transform="translate(890, 80)">
+    <text x="150" y="0" text-anchor="middle" class="heading">Content Factory</text>
+    
+    <rect x="20" y="20" width="260" height="180" class="content"/>
+    <g transform="translate(40, 50)">
+      <text x="0" y="0" class="label-white">Stations:</text>
+      <text x="0" y="25" class="item" fill="#ffffff">• Brief writer</text>
+      <text x="0" y="45" class="item" fill="#ffffff">• Researcher (sources)</text>
+      <text x="0" y="65" class="item" fill="#ffffff">• Writer</text>
+      <text x="0" y="85" class="item" fill="#ffffff">• Media producer</text>
+      <text x="0" y="105" class="item" fill="#ffffff">• Reviewer: facts</text>
+      <text x="0" y="125" class="item" fill="#ffffff">• Reviewer: voice</text>
+      <text x="0" y="145" class="item" fill="#ffffff">• Reviewer: platform</text>
+    </g>
+    
+    <rect x="20" y="220" width="260" height="80" class="content" fill-opacity="0.3"/>
+    <g transform="translate(40, 245)">
+      <text x="0" y="0" class="label-black">Truth source:</text>
+      <text x="0" y="20" class="item">Sources define facts</text>
+      <text x="0" y="40" class="item">Draft drifts from sources = failure</text>
+    </g>
+  </g>
+  
+  <!-- Dashed arrows showing connection -->
+  <path class="arrow" d="M 310 200 L 450 300"/>
+  <path class="arrow" d="M 890 200 L 750 300"/>
+  
+  <!-- Footer -->
+  <text x="600" y="650" text-anchor="middle" style="font-family: system-ui, sans-serif; font-size: 16px; fill: #898781;">Same core, same gates, same quality enforcement</text>
+  <text x="600" y="680" text-anchor="middle" style="font-family: system-ui, sans-serif; font-size: 16px; fill: #898781;">Different stations, different artifacts, rhyming failure modes</text>
+</svg>

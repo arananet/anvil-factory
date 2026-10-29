@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" style="background:#fcfcfb">
+  <defs>
+    <style>
+      .model-box { fill: #6250d6; stroke: #0b0b0b; stroke-width: 2; rx: 8; }
+      .station { fill: #2a78d6; stroke: #0b0b0b; stroke-width: 1.5; rx: 6; }
+      .gateway { fill: #eda100; stroke: #0b0b0b; stroke-width: 2; rx: 8; }
+      .label-white { font-family: system-ui, sans-serif; font-size: 14px; fill: #ffffff; font-weight: 500; }
+      .title { font-family: system-ui, sans-serif; font-size: 28px; fill: #0b0b0b; font-weight: 600; }
+      .heading { font-family: system-ui, sans-serif; font-size: 20px; fill: #0b0b0b; font-weight: 600; }
+      .arrow { fill: none; stroke: #52514e; stroke-width: 2; marker-end: url(#arrowhead); }
+      .item { font-family: system-ui, sans-serif; font-size: 13px; fill: #0b0b0b; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#52514e"/>
+    </marker>
+  </defs>
+  
+  <text x="700" y="40" text-anchor="middle" class="title">Model Routing Policy</text>
+  <text x="700" y="70" text-anchor="middle" class="heading" style="font-size: 18px; fill: #52514e;">Configured per station in anvil.yaml</text>
+  
+  <!-- Three model pools -->
+  
+  <!-- GPT-6 Astra pool (left) -->
+  <g transform="translate(50, 120)">
+    <rect x="0" y="0" width="350" height="120" class="model-box"/>
+    <text x="175" y="35" text-anchor="middle" class="label-white" style="font-size: 18px;">GPT-6 Astra</text>
+    <text x="175" y="55" text-anchor="middle" class="label-white" style="font-size: 14px;">openai/gpt-6-astra</text>
+    <text x="175" y="80" text-anchor="middle" class="label-white" style="font-size: 13px; font-style: italic;">via Cloudflare AI Gateway</text>
+    <text x="175" y="100" text-anchor="middle" class="label-white" style="font-size: 13px; font-style: italic;">Unified endpoints + managed credentials</text>
+  </g>
+  
+  <!-- Claude Opus 5.5 pool (center) -->
+  <g transform="translate(475, 120)">
+    <rect x="0" y="0" width="350" height="120" class="model-box"/>
+    <text x="175" y="35" text-anchor="middle" class="label-white" style="font-size: 18px;">Claude Opus 5.5</text>
+    <text x="175" y="55" text-anchor="middle" class="label-white" style="font-size: 14px;">claude-opus-5-5</text>
+    <text x="175" y="80" text-anchor="middle" class="label-white" style="font-size: 13px; font-style: italic;">Direct to Anthropic API</text>
+  </g>
+  
+  <!-- Claude Sonnet 5.5 pool (right) -->
+  <g transform="translate(900, 120)">
+    <rect x="0" y="0" width="350" height="120" class="model-box"/>
+    <text x="175" y="35" text-anchor="middle" class="label-white" style="font-size: 18px;">Claude Sonnet 5.5</text>
+    <text x="175" y="55" text-anchor="middle" class="label-white" style="font-size: 14px;">claude-sonnet-5-5</text>
+    <text x="175" y="80" text-anchor="middle" class="label-white" style="font-size: 13px; font-style: italic;">Direct to Anthropic API</text>
+  </g>
+  
+  <!-- Arrows to stations -->
+  <path class="arrow" d="M 225 240 L 225 310"/>
+  <path class="arrow" d="M 650 240 L 650 310"/>
+  <path class="arrow" d="M 1075 240 L 1075 310"/>
+  
+  <!-- Station groups -->
+  
+  <!-- Astra stations (left) -->
+  <g transform="translate(50, 310)">
+    <text x="175" y="0" text-anchor="middle" class="heading" style="font-size: 16px;">UI & Design Stations</text>
+    
+    <rect x="40" y="20" width="130" height="50" class="station"/>
+    <text x="105" y="50" text-anchor="middle" class="label-white">builder</text>
+    <text x="105" y="63" text-anchor="middle" class="label-white" style="font-size: 11px;">(UI mode)</text>
+    
+    <rect x="180" y="20" width="130" height="50" class="station"/>
+    <text x="245" y="50" text-anchor="middle" class="label-white">reviewer-</text>
+    <text x="245" y="63" text-anchor="middle" class="label-white">design</text>
+  </g>
+  
+  <!-- Opus stations (center) -->
+  <g transform="translate(475, 310)">
+    <text x="175" y="0" text-anchor="middle" class="heading" style="font-size: 16px;">Non-UI Builder</text>
+    
+    <rect x="110" y="20" width="130" height="50" class="station"/>
+    <text x="175" y="50" text-anchor="middle" class="label-white">builder</text>
+    <text x="175" y="63" text-anchor="middle" class="label-white" style="font-size: 11px;">(default)</text>
+  </g>
+  
+  <!-- Sonnet stations (right) -->
+  <g transform="translate(900, 310)">
+    <text x="175" y="0" text-anchor="middle" class="heading" style="font-size: 16px;">Spec, Tests, Reviews</text>
+    
+    <rect x="10" y="20" width="100" height="50" class="station"/>
+    <text x="60" y="45" text-anchor="middle" class="label-white" style="font-size: 12px;">spec-</text>
+    <text x="60" y="58" text-anchor="middle" class="label-white" style="font-size: 12px;">writer</text>
+    
+    <rect x="120" y="20" width="100" height="50" class="station"/>
+    <text x="170" y="45" text-anchor="middle" class="label-white" style="font-size: 12px;">test-</text>
+    <text x="170" y="58" text-anchor="middle" class="label-white" style="font-size: 12px;">writer</text>
+    
+    <rect x="230" y="20" width="100" height="50" class="station"/>
+    <text x="280" y="45" text-anchor="middle" class="label-white" style="font-size: 12px;">reviewer-</text>
+    <text x="280" y="58" text-anchor="middle" class="label-white" style="font-size: 12px;">spec</text>
+    
+    <rect x="10" y="80" width="100" height="50" class="station"/>
+    <text x="60" y="105" text-anchor="middle" class="label-white" style="font-size: 12px;">reviewer-</text>
+    <text x="60" y="118" text-anchor="middle" class="label-white" style="font-size: 12px;">security</text>
+    
+    <rect x="120" y="80" width="100" height="50" class="station"/>
+    <text x="170" y="105" text-anchor="middle" class="label-white" style="font-size: 12px;">reviewer-</text>
+    <text x="170" y="118" text-anchor="middle" class="label-white" style="font-size: 12px;">tests</text>
+    
+    <rect x="230" y="80" width="100" height="50" class="station"/>
+    <text x="280" y="105" text-anchor="middle" class="label-white" style="font-size: 12px;">reviewer-</text>
+    <text x="280" y="118" text-anchor="middle" class="label-white" style="font-size: 12px;">architecture</text>
+  </g>
+  
+  <!-- Migration rationale -->
+  <g transform="translate(100, 500)">
+    <rect x="0" y="0" width="1200" height="150" fill="#ffffff" stroke="#2a78d6" stroke-width="2" rx="8"/>
+    <text x="600" y="35" text-anchor="middle" class="heading">Migration Driver</text>
+    <g transform="translate(50, 55)">
+      <text x="0" y="0" class="item" style="font-size: 15px;">⚠ claude-sonnet-4-5 deprecated: 2026-09-30</text>
+      <text x="0" y="25" class="item" style="font-size: 15px;">⚠ claude-sonnet-4-5 retires from Anthropic API: 2026-11-30</text>
+      <text x="0" y="55" class="item" style="font-size: 15px;">✓ Station models now read from anvil.yaml configuration</text>
+      <text x="0" y="80" class="item" style="font-size: 15px;">✓ Routing is declared, not hardcoded in wrappers</text>
+    </g>
+  </g>
+  
+  <!-- Cloudflare gateway detail -->
+  <g transform="translate(100, 680)">
+    <rect x="0" y="0" width="1200" height="150" class="gateway" fill-opacity="0.2"/>
+    <text x="600" y="35" text-anchor="middle" class="heading">Cloudflare AI Gateway Access</text>
+    <g transform="translate(50, 55)">
+      <text x="0" y="0" class="item">• Classic provider endpoints: require BYOK, do not fall back to Unified Billing → 401 errors</text>
+      <text x="0" y="25" class="item">• Unified endpoints (api.cloudflare.com): serve Cloudflare managed credentials → verified live</text>
+      <text x="0" y="50" class="item">• CI token: scoped to Workers AI Write only, stored as repository secret</text>
+      <text x="0" y="75" class="item">• Token value: never appeared in chat or files</text>
+    </g>
+  </g>
+</svg>

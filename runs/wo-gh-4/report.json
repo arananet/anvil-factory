@@ -1,0 +1,271 @@
+{
+  "work_order_id": "wo-gh-4",
+  "pipeline": "content-default",
+  "title": "Update the ANVIL LinkedIn article: design systems, model routing, Astra access, and the Sentia exam",
+  "kind": "content",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "completed",
+      "detail": "Work order normalized",
+      "duration_ms": 0.009,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-4/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "brief-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-4/brief-writer.output.md",
+      "duration_ms": 126293.699,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-4/brief-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "researcher",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-4/researcher.output.md",
+      "duration_ms": 234159.06,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-4/researcher.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-4/writer.output.md",
+      "duration_ms": 204749.512,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-4/writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "media-producer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-4/media-producer.output.md",
+      "duration_ms": 361887.04,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-4/media-producer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-facts",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-4/reviewer-facts.output.md; review output did not parse as a review JSON",
+      "duration_ms": 179450.443,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-4/reviewer-facts.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-voice",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-4/reviewer-voice.output.md",
+      "duration_ms": 154423.401,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-4/reviewer-voice.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-platform",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-4/reviewer-platform.output.md; review output did not parse as a review JSON",
+      "duration_ms": 64231.597,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-4/reviewer-platform.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-brand",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-4/reviewer-brand.output.md; review output did not parse as a review JSON",
+      "duration_ms": 142594.822,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-4/reviewer-brand.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-4/reviewer-design.output.md",
+      "duration_ms": 133028.73,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-4/reviewer-design.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: changes_requested",
+      "duration_ms": 0.029,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-4/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "approver",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Line 120: Sentence fragment 'A fourth round with those findings as acceptance criteria.' lacks a main verb and should be a complete sentence or properly connected to the previous sentence.; Line 120: The paragraph covering Round 3 execution compresses 4-5 distinct facts into two very long sentences plus a fragment, creating excessive density that breaks from the author's clearer, more measured sentence pacing seen throughout the original article.; Line 122: Technical notation style in 'Suite: 38 pass, 0 fail, 1 skipped' and 'Reviews: 5 of 5, all parseable' reads like test output rather than article prose. The author's voice explains technical details in natural prose, not tabular notation.; Line 56: Grammatically awkward phrasing 'verified live with chat completions and responses calls returning the exact control replies' - should be 'response calls' not 'responses calls', and the construction could be clearer as 'verified via live chat completion and response calls'.",
+      "reason": "Line 120: Sentence fragment 'A fourth round with those findings as acceptance criteria.' lacks a main verb and should be a complete sentence or properly connected to the previous sentence.; Line 120: The paragraph covering Round 3 execution compresses 4-5 distinct facts into two very long sentences plus a fragment, creating excessive density that breaks from the author's clearer, more measured sentence pacing seen throughout the original article.; Line 122: Technical notation style in 'Suite: 38 pass, 0 fail, 1 skipped' and 'Reviews: 5 of 5, all parseable' reads like test output rather than article prose. The author's voice explains technical details in natural prose, not tabular notation.; Line 56: Grammatically awkward phrasing 'verified live with chat completions and responses calls returning the exact control replies' - should be 'response calls' not 'responses calls', and the construction could be clearer as 'verified via live chat completion and response calls'.",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: required",
+      "duration_ms": 0.005,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "publisher",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-4/publisher.output.md",
+      "duration_ms": 160447.354,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-4/publisher.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-4/observer.output.md",
+      "duration_ms": 68843.612,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-4/observer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    }
+  ],
+  "verdict": "changes_requested",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 1,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [
+    "publishing"
+  ],
+  "decision": {
+    "approver": {
+      "reviews_counted": [
+        {
+          "station": "reviewer-voice",
+          "verdict": "changes_requested"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "pass"
+        }
+      ],
+      "reviews_expected": [
+        "reviewer-facts",
+        "reviewer-voice",
+        "reviewer-platform",
+        "reviewer-brand",
+        "reviewer-design"
+      ],
+      "rule": "Reviewer reviewer-voice requested changes."
+    },
+    "human_gate": {
+      "required": true,
+      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": []
+}

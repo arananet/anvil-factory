@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" style="background:#fcfcfb">
+  <defs>
+    <style>
+      .box { fill: #ffffff; stroke: #2a78d6; stroke-width: 3; rx: 8; }
+      .core { fill: #2a78d6; stroke: #0b0b0b; stroke-width: 2; rx: 8; }
+      .input { fill: #1baf7a; stroke: #0b0b0b; stroke-width: 2; rx: 6; }
+      .output { fill: #eb6834; stroke: #0b0b0b; stroke-width: 2; rx: 6; }
+      .label { font-family: system-ui, sans-serif; font-size: 16px; fill: #0b0b0b; font-weight: 500; }
+      .label-white { font-family: system-ui, sans-serif; font-size: 16px; fill: #ffffff; font-weight: 500; }
+      .title { font-family: system-ui, sans-serif; font-size: 28px; fill: #0b0b0b; font-weight: 600; }
+      .arrow { fill: none; stroke: #52514e; stroke-width: 2; marker-end: url(#arrowhead); }
+      .component { font-family: system-ui, sans-serif; font-size: 14px; fill: #0b0b0b; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#52514e"/>
+    </marker>
+  </defs>
+  
+  <text x="450" y="40" text-anchor="middle" class="title">Station Anatomy</text>
+  
+  <!-- Outer container -->
+  <rect x="50" y="80" width="800" height="550" class="box"/>
+  
+  <!-- Inputs (left side) -->
+  <g transform="translate(100, 150)">
+    <text x="0" y="0" class="label">INPUTS</text>
+    <rect x="0" y="10" width="150" height="50" class="input"/>
+    <text x="75" y="40" text-anchor="middle" class="label-white">Packet</text>
+    
+    <rect x="0" y="70" width="150" height="50" class="input"/>
+    <text x="75" y="100" text-anchor="middle" class="label-white">Context</text>
+    
+    <rect x="0" y="130" width="150" height="50" class="input"/>
+    <text x="75" y="160" text-anchor="middle" class="label-white">Upstream</text>
+    <text x="75" y="175" text-anchor="middle" class="label-white" style="font-size: 12px;">Outputs</text>
+  </g>
+  
+  <!-- Core Station -->
+  <rect x="350" y="200" width="200" height="300" class="core"/>
+  <text x="450" y="240" text-anchor="middle" class="label-white" style="font-size: 20px;">Station</text>
+  
+  <!-- Station components -->
+  <g transform="translate(370, 260)">
+    <text x="0" y="0" class="component" fill="#ffffff">• Manifest</text>
+    <text x="0" y="25" class="component" fill="#ffffff">• Prompt template</text>
+    <text x="0" y="50" class="component" fill="#ffffff">• Model assignment</text>
+    <text x="0" y="75" class="component" fill="#ffffff">• Tool allowlist</text>
+    <text x="0" y="100" class="component" fill="#ffffff">• Contract</text>
+    <text x="20" y="120" class="component" fill="#e1e0d9" style="font-size: 12px;">- Input schema</text>
+    <text x="20" y="135" class="component" fill="#e1e0d9" style="font-size: 12px;">- Output schema</text>
+    <text x="20" y="150" class="component" fill="#e1e0d9" style="font-size: 12px;">- Validation rules</text>
+    
+    <text x="0" y="180" class="component" fill="#ffffff" style="font-style: italic;">Never approves itself</text>
+  </g>
+  
+  <!-- Arrows from inputs to core -->
+  <path class="arrow" d="M 250 185 L 350 250"/>
+  <path class="arrow" d="M 250 245 L 350 300"/>
+  <path class="arrow" d="M 250 305 L 350 350"/>
+  
+  <!-- Outputs (right side) -->
+  <g transform="translate(650, 150)">
+    <text x="0" y="0" class="label">OUTPUTS</text>
+    <rect x="0" y="10" width="150" height="50" class="output"/>
+    <text x="75" y="40" text-anchor="middle" class="label-white">Artifact</text>
+    
+    <rect x="0" y="70" width="150" height="50" class="output"/>
+    <text x="75" y="100" text-anchor="middle" class="label-white">Metadata</text>
+    
+    <rect x="0" y="130" width="150" height="50" class="output"/>
+    <text x="75" y="160" text-anchor="middle" class="label-white">Provenance</text>
+  </g>
+  
+  <!-- Arrows from core to outputs -->
+  <path class="arrow" d="M 550 250 L 650 185"/>
+  <path class="arrow" d="M 550 300 L 650 245"/>
+  <path class="arrow" d="M 550 350 L 650 305"/>
+  
+  <!-- Footer note -->
+  <text x="450" y="660" text-anchor="middle" style="font-family: system-ui, sans-serif; font-size: 16px; fill: #898781;">Configured per project in anvil.yaml</text>
+</svg>

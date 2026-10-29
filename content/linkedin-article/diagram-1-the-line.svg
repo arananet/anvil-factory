@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 800" style="background:#fcfcfb">
+  <defs>
+    <style>
+      .station { fill: #2a78d6; stroke: #0b0b0b; stroke-width: 2; rx: 8; }
+      .reviewer { fill: #1baf7a; stroke: #0b0b0b; stroke-width: 2; rx: 8; }
+      .gate { fill: #eda100; stroke: #0b0b0b; stroke-width: 2; }
+      .label { font-family: system-ui, sans-serif; font-size: 16px; fill: #ffffff; font-weight: 500; }
+      .title { font-family: system-ui, sans-serif; font-size: 24px; fill: #0b0b0b; font-weight: 600; }
+      .arrow { fill: none; stroke: #52514e; stroke-width: 3; marker-end: url(#arrowhead); }
+      .loop { fill: none; stroke: #e87ba4; stroke-width: 2; stroke-dasharray: 5,5; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#52514e"/>
+    </marker>
+  </defs>
+  
+  <text x="700" y="40" text-anchor="middle" class="title">The ANVIL Line</text>
+  
+  <!-- Work Order Intake -->
+  <rect x="50" y="80" width="140" height="60" class="station"/>
+  <text x="120" y="115" text-anchor="middle" class="label">Work Order</text>
+  
+  <!-- Spec Writer -->
+  <path class="arrow" d="M 190 110 L 240 110"/>
+  <rect x="240" y="80" width="140" height="60" class="station"/>
+  <text x="310" y="115" text-anchor="middle" class="label">Spec Writer</text>
+  
+  <!-- Test Writer -->
+  <path class="arrow" d="M 380 110 L 430 110"/>
+  <rect x="430" y="80" width="140" height="60" class="station"/>
+  <text x="500" y="115" text-anchor="middle" class="label">Test Writer</text>
+  
+  <!-- Builder -->
+  <path class="arrow" d="M 570 110 L 620 110"/>
+  <rect x="620" y="80" width="140" height="60" class="station"/>
+  <text x="690" y="115" text-anchor="middle" class="label">Builder</text>
+  
+  <!-- Arrow to parallel reviewers -->
+  <path class="arrow" d="M 760 110 L 850 110 L 850 280"/>
+  
+  <!-- Four Parallel Reviewers -->
+  <rect x="100" y="280" width="140" height="60" class="reviewer"/>
+  <text x="170" y="305" text-anchor="middle" class="label">Reviewer:</text>
+  <text x="170" y="325" text-anchor="middle" class="label">Spec</text>
+  
+  <rect x="280" y="280" width="140" height="60" class="reviewer"/>
+  <text x="350" y="305" text-anchor="middle" class="label">Reviewer:</text>
+  <text x="350" y="325" text-anchor="middle" class="label">Security</text>
+  
+  <rect x="460" y="280" width="140" height="60" class="reviewer"/>
+  <text x="530" y="305" text-anchor="middle" class="label">Reviewer:</text>
+  <text x="530" y="325" text-anchor="middle" class="label">Tests</text>
+  
+  <rect x="640" y="280" width="140" height="60" class="reviewer"/>
+  <text x="710" y="305" text-anchor="middle" class="label">Reviewer:</text>
+  <text x="710" y="325" text-anchor="middle" class="label">Architecture</text>
+  
+  <!-- Lines from builder to each reviewer -->
+  <path class="arrow" d="M 850 280 L 850 310 L 240 310"/>
+  <path class="arrow" d="M 850 310 L 420 310"/>
+  <path class="arrow" d="M 850 310 L 600 310"/>
+  <path class="arrow" d="M 850 310 L 780 310"/>
+  
+  <!-- Approver -->
+  <path class="arrow" d="M 170 340 L 170 420 L 420 420"/>
+  <path class="arrow" d="M 350 340 L 350 420 L 420 420"/>
+  <path class="arrow" d="M 530 340 L 530 420 L 420 420"/>
+  <path class="arrow" d="M 710 340 L 710 420 L 420 420"/>
+  
+  <rect x="420" y="390" width="140" height="60" class="station"/>
+  <text x="490" y="425" text-anchor="middle" class="label">Approver</text>
+  
+  <!-- Human Gate (diamond) -->
+  <path class="arrow" d="M 560 420 L 680 420"/>
+  <path d="M 680 420 L 730 390 L 780 420 L 730 450 Z" class="gate"/>
+  <text x="730" y="427" text-anchor="middle" class="label" style="font-size: 14px;">Human</text>
+  
+  <!-- Deployer -->
+  <path class="arrow" d="M 780 420 L 850 420"/>
+  <rect x="850" y="390" width="140" height="60" class="station"/>
+  <text x="920" y="425" text-anchor="middle" class="label">Deployer</text>
+  
+  <!-- Observer -->
+  <path class="arrow" d="M 990 420 L 1060 420"/>
+  <rect x="1060" y="390" width="140" height="60" class="station"/>
+  <text x="1130" y="425" text-anchor="middle" class="label">Observer</text>
+  
+  <!-- Loop back path (if rejected) -->
+  <path class="loop" d="M 420 450 L 420 550 L 690 550 L 690 140"/>
+  <text x="500" y="570" text-anchor="middle" style="font-family: system-ui, sans-serif; font-size: 14px; fill: #e87ba4; font-style: italic;">Loop if changes requested</text>
+  
+  <!-- Legend -->
+  <g transform="translate(100, 650)">
+    <rect x="0" y="0" width="80" height="30" class="station"/>
+    <text x="90" y="20" style="font-family: system-ui, sans-serif; font-size: 14px; fill: #52514e;">Station (agent)</text>
+    
+    <rect x="250" y="0" width="80" height="30" class="reviewer"/>
+    <text x="340" y="20" style="font-family: system-ui, sans-serif; font-size: 14px; fill: #52514e;">Reviewer (parallel)</text>
+    
+    <path d="M 500 15 L 550 0 L 600 15 L 550 30 Z" class="gate"/>
+    <text x="610" y="20" style="font-family: system-ui, sans-serif; font-size: 14px; fill: #52514e;">Gate (deterministic)</text>
+  </g>
+</svg>
