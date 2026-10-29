@@ -38,13 +38,22 @@ The agent stations still matter, obviously. Writing a good spec, building an imp
 
 ## Composable stations, and the Core Four
 
+[IMAGE: diagram-6-station-catalog.png]
 [IMAGE: diagram-3-station.png]
 
-A station in ANVIL is a small thing: a manifest, a prompt, and a contract about what it takes in and what it produces. There are 24 of them in one catalog, and a pipeline is just a JSON file that lists stations in order, with the parallel ones grouped. Eight pipelines ship with it. The default is the full SDLC line. There are shorter ones for a hotfix, for docs only, for a read only scouting pass, and for content.
+A station in ANVIL is a small thing: a manifest, a prompt, and a contract about what it takes in and what it produces. There are 25 of them in one catalog, and a pipeline is just a JSON file that lists stations in order, with the parallel ones grouped. Eight pipelines ship with it. The default is the full SDLC line. There are shorter ones for a hotfix, for docs only, for a read only scouting pass, and for content.
 
 Every station is configured through four things: its context, its model, its prompt, and its tools. Those four live in one file per project, anvil.yaml, so tuning the whole roster is editing one place. It also means the model question stops being which single model is best. Different stations get different models: a strong reasoning model for the spec writer, a fast one for the builder, a balanced one for reviewers. It is a model stack, assigned per role, and changing it is a config edit, not a rewrite.
 
 And one rule is baked into every station contract: a station never approves its own work. The builder does not get a vote on whether the build is good. That sounds obvious. In agent systems it is surprisingly easy to end up with exactly that, one agent generating, checking and approving its own output in a single pass, which is not quality control. It is self approval with extra steps.
+
+## Model routing
+
+[IMAGE: diagram-5-model-routing.png]
+
+ANVIL now routes different stations to different models as policy. UI and design stations run GPT-6 Astra (openai/gpt-6-astra) through the Cloudflare AI Gateway. The non-UI builder runs Claude Opus 5.5. Reviewers, the spec writer and the test writer run Claude Sonnet 5.5. The driver is practical: claude-sonnet-4-5 was deprecated on 2026-09-30 and retires from the Anthropic API on 2026-11-30. Station models are now taken from each station's configuration instead of being hardcoded in a wrapper, so routing is declared, not scattered.
+
+The gateway's classic provider endpoints do not fall back to Unified Billing and demand a stored BYOK key. The first Sentia runs stopped at the smoke gate on OpenAI 401 errors. The unified endpoints on api.cloudflare.com do serve Cloudflare managed credentials, verified live with chat completions and responses calls returning the exact control replies. A dedicated CI token scoped to Workers AI Write only was minted and stored as a repository secret. Its value never appeared in chat or in any file.
 
 ## Build from zero, or start from what exists
 
@@ -62,6 +71,16 @@ So the same core also runs a content factory. The stations change: a brief write
 
 One rule I care about personally made it into the triage list. Publishing is treated as a risk, in the same set as payments and data deletion. A content work order always stops at the human gate before the publisher station. The factory can prepare and check everything. What goes out under my name is still my decision.
 
+## Per project design systems
+
+[IMAGE: diagram-4-design-system.png]
+
+ANVIL now builds design systems into projects. When a project is scaffolded, the factory creates design/DESIGN.md and design/tokens.json only when those files are absent, and it never overwrites them. When a project has a design system, station packets for interface producing stations gain a Project design section carrying its tokens and quality bars. A new station, reviewer-design, judges interface output against the project design system. It joined the parallel reviewer group in sdlc-default and in both content pipelines.
+
+When a pipeline includes interface producing stations and the project has no design system, the run report carries a visible warning. Reviewer-design must not pass vacuously without one. The factory dogfoods its own design folder.
+
+The design system work reached main through PR 3, merged 2026-10-28, after an executed run on work order wo-gh-1 in this repo, GitHub Actions run 40778873024. The verdict was approved, human not required. A caveat: that approval counted 2 of 4 reviews, because reviewer-spec and reviewer-architecture returned prose that failed to parse as review JSON.
+
 ## Memory that has to earn trust, and evolution with a constitution
 
 Two recent additions came from reading research on evolving agent teams, and disagreeing with half of it.
@@ -78,19 +97,29 @@ I would rather state these plainly than let the diagrams oversell it.
 
 The deterministic spine runs for real: the engine, the gates, the approver, the triage, the scaffolding, the onboarding, the run reports. The agent stations start as contracts plus task packets, and there is now an execution mode that sends those packets to a runtime you configure yourself: a command template for an agent CLI, Claude Code or Codex style, or an HTTP endpoint in the OpenAI shape. Reviewer output is parsed back into reviews, the approver only counts reviews produced in that same run, and every step records which model was configured for it and, when it executed, which model actually ran, because a result you cannot attribute to a model is a result you cannot reproduce. The run report records what actually executed. ANVIL ships no model of its own, and your keys stay in your environment, never in the config file.
 
-What is not proven yet is the last mile: a full run where a real model does the building and the reviewing on a real change, end to end. The public examples are honest about which parts used packets and which used a small stand-in executor, and they are labeled that way in the repos. That full model run is the next job, and now it is a small one: pick a runtime, point the config at it, open an issue.
+What the executed runs proved is that the spine holds: runs execute, reviewers produce parseable output, the approver aggregates them, the gate logic routes correctly, and deploys reach their targets. What they exposed is that reviewer parse failures still happen, and two of the approvals above rested on a subset of the reviews produced. The full run is proven. The full quality bar is not automatic yet.
 
 ## What the examples prove
 
 Talk is cheap, so both repos carry their evidence.
 
-The example project, Taskline, is a small task API built from zero on the line. Its repo contains the whole trail: the original work order, the approved spec with six scenarios, the tests written first, the saved output of those tests failing before any implementation existed, the implementation, the output of the same tests passing, the four reviews, and the run report. Nothing in that chain is a screenshot or a claim. It is files you can open.
+The example project, Taskline, is a small task API built from zero on the line. Its repo contains the whole trail: the original work order, the approved spec with six scenarios, the tests written first, the saved output of those tests failing before any implementation existed, the implementation, the output of the same tests passing, the four reviews, and the run report.
+
+An executed ending has been added to that example. Work order wo-gh-3, the issue 3 test coverage gap, reached verdict approved, human not required, and deployment deployed_verified. The builder diff was exactly the missing test, with the API file byte identical to main. A caveat: the approval counted 1 of 2 reviews, because the spec reviewer's answer did not parse.
 
 The content example is smaller and, to me, more telling. Its demo run went down the content line, produced its packets, and stopped at the human gate, because publishing requires a human. The factory refusing to finish the job on its own is not a bug in the demo. It is the demo.
 
-The trigger is live, too. Open an issue on the example repo, label it anvil, and a GitHub Actions workflow runs the line on it and posts the run report back as a comment on the issue. You can watch it happen on a real one: a test coverage gap I filed as issue 3. Its verdict reads no_reviews, because in that run the reviewer stations produced packets and no runtime executed them, and the report says so instead of borrowing the reviews from an earlier build. A separate demonstration run goes further: executed stations, an automatic deploy, and a verification pass against the deployed copy, ending in the state the factory calls deployed_verified. Every run of the example is on a public status page, generated from the run reports themselves: https://anvil-status.pages.dev
+The trigger is live, too. Open an issue on the example repo, label it anvil, and a GitHub Actions workflow runs the line on it and posts the run report back as a comment on the issue. Every run of the example is on a public status page, generated from the run reports themselves: https://anvil-status.pages.dev
 
 The front door is a Cloudflare Worker: it receives GitHub webhooks, verifies their signatures, and turns issues into normalized work orders, so the line starts from a real event and not just a command line.
+
+## The Sentia exam
+
+Sentia is a mock startup whose launch page shipped correct and live but visually basic. That gap motivated the design system work. The Sentia exam ran across four rounds, work order wo-gh-1 on arananet/sentia.
+
+Round 1 stopped at the Astra smoke gate on the 401 wall described above. Round 2 executed, but the builder wrapper crashed in tempdir cleanup, and a second wiring bug left reviewer-design unrouted. The approval counted only 4 of 5 reviews, and the verdict was changes_requested. Round 3 was rejected: the Codex bubblewrap sandbox cannot run on GitHub hosted runners, so the builder could run no commands at all, and the reviewers correctly rejected an empty change. With the sandbox bypassed on the throwaway runner, the same posture the Claude stations already use, the line executed for real: the Astra builder created Sentia's design/DESIGN.md first and then elevated the page against it, presentation layer only, and the security and architecture reviewers confirmed no behavior change. Suite: 38 pass, 0 fail, 1 skipped. Reviews: 5 of 5 parseable, four passes, and reviewer-design, also running Astra, requested changes with three concrete findings against the builder's own design system: small width type below the documented minimums, spacing values off the documented rhythm, and palette drift. A fourth round with those findings as acceptance criteria.
+
+Round 4 has concluded, GitHub Actions run 40814522329. Verdict changes_requested, human required. The builder fixed all four acceptance criteria in the diff: the hero keeps a 56px floor at small widths, body copy sits at the documented 17px, the off-rhythm spacing values are gone, the palette matches the design file, and the 800ms reveal motion is restored. Design/DESIGN.md itself gained the rhythm and motion rules. The suite grew to 44 tests: 43 pass, 0 fail, 1 skipped. The skip is a git-diff scope test that needs a main ref in the checkout, and reviewers verified the scope by hand instead. Reviews counted 5 of 5, all parseable: reviewer-spec, reviewer-security, reviewer-tests and reviewer-architecture passed, and reviewer-design requested changes again, this time with four smaller findings: nav padding overriding the documented horizontal gutters, footer prose at 13px against the 17px body minimum, label size and tracking tokens, and white fills on two elements that are not the physical patch. The run stopped at the human gate again. Nothing has been deployed: the live Sentia page still serves the original design, because the deployer never runs past a gate like this.
 
 ## Where to look
 
@@ -100,7 +129,7 @@ Factory: github.com/arananet/anvil-factory
 Example: github.com/arananet/anvil-example-taskline
 Live run status: https://anvil-status.pages.dev
 
-Eighty nine tests cover the factory itself, six cover the example, nine cover the intake worker, and every gate I described is exercised by test suites and gate checks you can reproduce locally. If you build agent workflows, I would genuinely like to hear where this design breaks for you: which station is missing, which gate you would never accept, which part you think should be an agent and I made code, or the reverse. That feedback is worth more to me than a star.
+Ninety four tests cover the factory itself, six cover the example, nine cover the intake worker, and every gate I described is exercised by test suites and gate checks you can reproduce locally. If you build agent workflows, I would genuinely like to hear where this design breaks for you: which station is missing, which gate you would never accept, which part you think should be an agent and I made code, or the reverse. That feedback is worth more to me than a star.
 
 ## Credit where it is due
 

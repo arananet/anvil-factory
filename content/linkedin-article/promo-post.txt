@@ -1,0 +1,9 @@
+I stopped prompting agents one chat at a time and built a factory instead.
+
+ANVIL is my open source framework that moves work down a line: spec first, tests before code, four reviewers in parallel, and a human gate for anything risky.
+
+The key idea: agents do the work, deterministic code does the validating. You own the code. You only rent the models.
+
+Read the full article below. 👇
+
+#AIAgents #SoftwareEngineering #OpenSource
