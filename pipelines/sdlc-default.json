@@ -14,6 +14,9 @@
       "station": "builder"
     },
     {
+      "station": "checks-gate"
+    },
+    {
       "parallel": [
         "reviewer-spec",
         "reviewer-security",

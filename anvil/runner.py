@@ -116,6 +116,177 @@ def _run_shell(command, cwd, work_order_id, timeout):
     except subprocess.TimeoutExpired:
         return None, f"Timed out after {timeout}s"
 
+def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None):
+    """Get list of changed files relative to base ref.
+
+    Uses git to detect changes. If git is not available and initial_files
+    snapshot is provided, compares current state against the snapshot to find
+    new or deleted files.
+
+    Returns a set of file paths relative to project root.
+    """
+    project_path = Path(project_dir)
+
+    # Try git first
+    try:
+        # Check if this is a git repo
+        result = subprocess.run(
+            ["git", "rev-parse", "--git-dir"],
+            cwd=str(project_dir),
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        if result.returncode == 0:
+            # Get changed files from git
+            result = subprocess.run(
+                ["git", "diff", "--name-only", "HEAD"],
+                cwd=str(project_dir),
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            files = {line.strip() for line in result.stdout.split('\n') if line.strip()}
+
+            # Also get untracked files
+            result2 = subprocess.run(
+                ["git", "ls-files", "--others", "--exclude-standard"],
+                cwd=str(project_dir),
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result2.returncode == 0:
+                files.update({line.strip() for line in result2.stdout.split('\n') if line.strip()})
+            return files
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        pass
+
+    # Fallback: compare against initial snapshot
+    if initial_files is not None:
+        current_files = set()
+        for p in project_path.rglob("*"):
+            if p.is_file() and ".git" not in p.parts and "runs" not in p.parts:
+                try:
+                    rel_path = p.relative_to(project_path)
+                    current_files.add(str(rel_path))
+                except ValueError:
+                    pass
+
+        # Files that are NEW or were DELETED
+        new_files = current_files - initial_files
+        deleted_files = initial_files - current_files
+        changed = new_files | deleted_files
+
+        # Also treat files in work output directories as changed
+        # (e.g., tests/ is for test files created during work)
+        if work_output_dirs:
+            for file_path in current_files:
+                # Check if file is in a work output directory
+                for work_dir in work_output_dirs:
+                    if file_path.startswith(work_dir + "/") or file_path.startswith(work_dir + "\\"):
+                        changed.add(file_path)
+                        break
+
+        return changed
+
+    # No git and no snapshot: can't determine changes
+    return set()
+
+def _run_checks_gate(phase, base_ref_config, changed_files, project, work_order_id, timeout=300):
+    """Run the checks gate: execute check commands and validate protected paths.
+
+    Returns a dict with gate results including status, commands, exit_codes,
+    protected_path_verdict, gate_verdict, and output.
+    """
+    checks = base_ref_config.get("checks", [])
+
+    # Get protected paths from base ref config
+    if "protected_paths" in base_ref_config:
+        protected_paths = base_ref_config["protected_paths"]
+    else:
+        # Default protected paths (S3)
+        protected_paths = ["tests/", "anvil.json"]
+
+    # If no checks configured (S6)
+    if not checks:
+        return {
+            "phase": phase,
+            "status": "not_configured",
+            "detail": "No checks configured",
+            "commands": [],
+            "exit_codes": [],
+            "protected_paths": protected_paths,
+            "protected_path_verdict": "pass",
+            "protected_path_findings": [],
+            "gate_verdict": "not_configured",
+            "output": ""
+        }
+
+    # Check for protected path violations (S3)
+    protected_path_findings = []
+    for changed_file in changed_files:
+        for protected_path in protected_paths:
+            if changed_file.startswith(protected_path):
+                protected_path_findings.append(f"Protected path touched: {changed_file} (matches {protected_path})")
+                break
+
+    protected_path_verdict = "fail" if protected_path_findings else "pass"
+
+    # Run check commands
+    commands = []
+    exit_codes = []
+    outputs = []
+
+    for check_cmd in checks:
+        commands.append(check_cmd)
+        code, out = _run_shell(str(check_cmd), project, work_order_id, timeout)
+        exit_codes.append(code if code is not None else -1)
+        outputs.append(out)
+
+    # Determine overall gate verdict
+    checks_passed = all(code == 0 for code in exit_codes)
+
+    if protected_path_verdict == "fail":
+        gate_verdict = "fail"
+        status = "failed"
+    elif not checks_passed:
+        gate_verdict = "fail"
+        status = "failed"
+    else:
+        gate_verdict = "pass"
+        status = "passed"
+
+    # Build output summary
+    output_lines = []
+    if protected_path_findings:
+        output_lines.append("# Protected Path Violations")
+        output_lines.extend(protected_path_findings)
+        output_lines.append("")
+
+    output_lines.append("# Check Commands")
+    for i, (cmd, code, out) in enumerate(zip(commands, exit_codes, outputs)):
+        output_lines.append(f"## Command {i+1}: {cmd}")
+        output_lines.append(f"Exit code: {code}")
+        output_lines.append("Output:")
+        output_lines.append("```")
+        output_lines.append(out[-2000:] if out else "(no output)")
+        output_lines.append("```")
+        output_lines.append("")
+
+    return {
+        "phase": phase,
+        "status": status,
+        "detail": f"Gate {status}: {len(checks)} checks, protected paths: {protected_path_verdict}",
+        "commands": commands,
+        "exit_codes": exit_codes,
+        "protected_paths": protected_paths,
+        "protected_path_verdict": protected_path_verdict,
+        "protected_path_findings": protected_path_findings,
+        "gate_verdict": gate_verdict,
+        "output": "\n".join(output_lines)
+    }
+
 def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section=""):
     upstream = "\n".join(f"- {s['station']}: {s['status']}" for s in steps) or "- (none)"
     text = (f"# Task packet: {station_id}\n\n## Station prompt\n\n{prompt}\n\n## Work order\n\n"
@@ -161,6 +332,32 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     # from brain/learnings.md, never inbox proposals (see anvil/brain.py).
     learnings_section = packet_learnings_section(project)
 
+    # Snapshot base ref configuration for checks gate (S4)
+    base_ref_config = {}
+    config_file = project / "anvil.json"
+    if config_file.exists():
+        try:
+            base_ref_config = json.loads(config_file.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    # Snapshot initial files at run start for non-git changed file tracking
+    # Directories where new files are always considered "changed" (spec S3)
+    # These are work output directories that start empty in a fresh project
+    work_output_dirs = {"tests", "reviews"}
+
+    initial_files = set()
+    for p in project.rglob("*"):
+        if p.is_file() and ".git" not in p.parts and "runs" not in p.parts:
+            try:
+                rel_path = p.relative_to(project)
+                initial_files.add(str(rel_path))
+            except ValueError:
+                pass
+
+    # Track gate state
+    gate_failed = False
+
     # Check for design system and prepare warnings
     warnings = []
     has_design_system = load_design_system(project) is not None
@@ -205,6 +402,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         extra_envelope = {}
         step_usage = None
         deferred_verifier = None
+        deferred_pre_deploy_gate = None
         next_station = order[idx + 1] if idx + 1 < len(order) else None
         if station_id == "intake":
             detail = "Work order normalized"
@@ -222,13 +420,91 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                                  "rule": verdict_rule}
             detail = f"Approver verdict: {verdict}"
             artifact = str(run_dir / "report.json")
+        elif station_id == "checks-gate":
+            # Determine phase: pre-review or pre-deploy
+            # Pre-review: right after builder
+            # Pre-deploy: after approver/triage and before deployer/publisher
+            builder_idx = order.index("builder") if "builder" in order else -1
+            approver_idx = order.index("approver") if "approver" in order else -1
+            if builder_idx >= 0 and idx > builder_idx and (approver_idx < 0 or idx < approver_idx):
+                phase = "pre-review"
+            else:
+                phase = "pre-deploy"
+
+            # Get changed files at gate time
+            current_changed_files = _get_changed_files(project, initial_files, work_output_dirs)
+
+            # Run the gate
+            gate_result = _run_checks_gate(phase, base_ref_config, current_changed_files, project, work_order.id)
+            status = gate_result["status"]
+            detail = gate_result["detail"]
+
+            # Write gate output
+            gate_output_file = run_dir / f"{station_id}.{phase}.output.md"
+            gate_output_file.write_text(gate_result["output"], encoding="utf-8")
+            artifact = str(gate_output_file)
+
+            # Record gate results in the step
+            extra_envelope = {
+                "phase": gate_result["phase"],
+                "commands": gate_result["commands"],
+                "exit_codes": gate_result["exit_codes"],
+                "protected_paths": gate_result["protected_paths"],
+                "protected_path_verdict": gate_result["protected_path_verdict"],
+                "protected_path_findings": gate_result["protected_path_findings"],
+                "gate_verdict": gate_result["gate_verdict"]
+            }
+
+            # If gate failed and we're in pre-review phase, trigger loopback (S2)
+            if gate_result["gate_verdict"] == "fail" and phase == "pre-review":
+                gate_failed = True
+                # Skip reviewers by marking that we should loop back
+            # If gate failed in pre-deploy phase, block deployment (S5)
+            elif gate_result["gate_verdict"] == "fail" and phase == "pre-deploy":
+                verdict = "gate_failed"
+                detail += "; deployment blocked by gate failure"
         elif station_id == "triage-human":
             hr = needs_human(work_order, verdict) if verdict else (human_gate(work_order) == "required")
             human_blocked = hr
             detail = f"Human review: {'required' if hr else 'not_required'}"
         elif station_id == "deployer" and execute_mode and deploy_cfg and deploy_cfg.get("command"):
             blocked = human_blocked if human_blocked is not None else needs_human(work_order, verdict)
-            if verdict == "approved" and not blocked:
+            # Run pre-deploy checks gate (S5) - only if pre-review gate didn't fail
+            deferred_pre_deploy_gate = None
+            if verdict == "approved" and not blocked and not gate_failed:
+                gate_started = time.perf_counter()
+                current_changed_files = _get_changed_files(project, initial_files, work_output_dirs)
+                gate_result = _run_checks_gate("pre-deploy", base_ref_config, current_changed_files, project, work_order.id)
+
+                gate_output_file = run_dir / "checks-gate.pre-deploy.output.md"
+                gate_output_file.write_text(gate_result["output"], encoding="utf-8")
+
+                gate_step = {
+                    "station": "checks-gate",
+                    "status": gate_result["status"],
+                    "detail": gate_result["detail"],
+                    "duration_ms": round((time.perf_counter() - gate_started) * 1000, 3),
+                    "cost": None,
+                    "artifacts": [str(gate_output_file)],
+                    "configured_model": None,
+                    "executed_model": None,
+                    "executor": None,
+                    "phase": gate_result["phase"],
+                    "commands": gate_result["commands"],
+                    "exit_codes": gate_result["exit_codes"],
+                    "protected_paths": gate_result["protected_paths"],
+                    "protected_path_verdict": gate_result["protected_path_verdict"],
+                    "protected_path_findings": gate_result["protected_path_findings"],
+                    "gate_verdict": gate_result["gate_verdict"]
+                }
+                deferred_pre_deploy_gate = gate_step
+
+                # If pre-deploy gate fails, block deployment (S5)
+                if gate_result["gate_verdict"] == "fail":
+                    verdict = "gate_failed"
+                    blocked = True
+
+            if verdict == "approved" and not blocked and verdict != "gate_failed":
                 timeout = int(deploy_cfg.get("timeout_seconds", 600))
                 code, out = _run_shell(str(deploy_cfg.get("command", "")), project, work_order.id, timeout)
                 out_file = run_dir / "deployer.output.md"
@@ -294,51 +570,65 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             detail = f"Packet written to {packet}"
             artifact = str(packet)
         elif execute_mode:
-            packet = packet_step(station, station_id)
-            packet_text = packet.read_text(encoding="utf-8")
-            output_file = run_dir / f"{station_id}.output.md"
-            try:
-                result = executor.execute(packet_text, station_id, packet_path=packet,
-                                          output_path=output_file, cwd=project)
-                output_text = result.get("output", "") if isinstance(result, dict) else str(result)
-                usage = result.get("usage") if isinstance(result, dict) else None
-                output_file.write_text(output_text, encoding="utf-8")
-                status = "executed"
-                detail = f"Executed by {executor.name}; output written to {output_file}"
-                artifact = str(output_file)
-                step_executor, step_executed_model = _executor_provenance(executor, output_text)
-                extra_envelope = {}
-                if isinstance(usage, dict):
-                    step_usage = usage
-                    extra_envelope["usage"] = usage
-                    tokens = {k: usage[k] for k in usage if "token" in k}
-                    if tokens:
-                        extra_envelope["tokens"] = tokens
-                if station_id.startswith("reviewer"):
-                    review = parse_review(output_text, station_id)
-                    # Special handling for reviewer-design when no design system exists
-                    if station_id == "reviewer-design" and not has_design_system:
-                        # Force a changes_requested verdict with a finding about missing design system
-                        review = Review(
-                            station="reviewer-design",
-                            verdict="changes_requested",
-                            findings=["No design system exists for this project. The project must define "
-                                     "design/DESIGN.md and design/tokens.json before interface output can be "
-                                     "reviewed against design standards."]
-                        )
-                    if review is not None:
-                        run_reviews.append(review)
-                        run_findings.extend(review.findings)
-                        extra_envelope["review"] = review.to_dict()
-                    else:
-                        extra_envelope["review_parse_failed"] = True
-                        detail += "; review output did not parse as a review JSON"
-            except ExecutorError as exc:
-                status = "failed"
-                detail = f"Executor failed: {exc}"
+            # Skip reviewers if gate failed (S2)
+            if gate_failed and station_id.startswith("reviewer"):
+                status = "skipped"
+                detail = "Skipped due to gate failure"
+                packet = packet_step(station, station_id)
                 artifact = str(packet)
-                step_executor, step_executed_model = _executor_provenance(executor)
-                extra_envelope = {"error": str(exc)}
+            else:
+                packet = packet_step(station, station_id)
+                packet_text = packet.read_text(encoding="utf-8")
+                output_file = run_dir / f"{station_id}.output.md"
+                try:
+                    result = executor.execute(packet_text, station_id, packet_path=packet,
+                                              output_path=output_file, cwd=project)
+                    output_text = result.get("output", "") if isinstance(result, dict) else str(result)
+                    usage = result.get("usage") if isinstance(result, dict) else None
+                    output_file.write_text(output_text, encoding="utf-8")
+                    status = "executed"
+                    detail = f"Executed by {executor.name}; output written to {output_file}"
+                    artifact = str(output_file)
+                    step_executor, step_executed_model = _executor_provenance(executor, output_text)
+                    extra_envelope = {}
+                    if isinstance(usage, dict):
+                        step_usage = usage
+                        extra_envelope["usage"] = usage
+                        tokens = {k: usage[k] for k in usage if "token" in k}
+                        if tokens:
+                            extra_envelope["tokens"] = tokens
+                    if station_id.startswith("reviewer"):
+                        review = parse_review(output_text, station_id)
+                        # Special handling for reviewer-design when no design system exists
+                        if station_id == "reviewer-design" and not has_design_system:
+                            # Force a changes_requested verdict with a finding about missing design system
+                            review = Review(
+                                station="reviewer-design",
+                                verdict="changes_requested",
+                                findings=["No design system exists for this project. The project must define "
+                                         "design/DESIGN.md and design/tokens.json before interface output can be "
+                                         "reviewed against design standards."]
+                            )
+                        if review is not None:
+                            run_reviews.append(review)
+                            run_findings.extend(review.findings)
+                            extra_envelope["review"] = review.to_dict()
+                        else:
+                            extra_envelope["review_parse_failed"] = True
+                            detail += "; review output did not parse as a review JSON"
+
+                    # Track changed files for builder and other stations that modify files
+                    if station_id == "builder":
+                        # Track any files modified by the builder
+                        # In a real implementation, this would compare with base ref
+                        # For now, we'll track based on what exists in the project
+                        pass
+                except ExecutorError as exc:
+                    status = "failed"
+                    detail = f"Executor failed: {exc}"
+                    artifact = str(packet)
+                    step_executor, step_executed_model = _executor_provenance(executor)
+                    extra_envelope = {"error": str(exc)}
         else:
             packet = packet_step(station, station_id)
             status = "packet_ready"
@@ -353,6 +643,12 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             step["usage"] = step_usage
             if isinstance(step_usage.get("cost"), (int, float)):
                 step["cost"] = step_usage["cost"]
+        # Add extra fields from checks-gate to the step itself
+        if station_id == "checks-gate" and extra_envelope:
+            for key in ["phase", "commands", "exit_codes", "protected_paths",
+                       "protected_path_verdict", "protected_path_findings", "gate_verdict"]:
+                if key in extra_envelope:
+                    step[key] = extra_envelope[key]
         steps.append(step)
         env_extra = dict(extra_envelope)
         env_extra["configured_model"] = configured_model
@@ -360,13 +656,33 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             env_extra["executor"] = step_executor
             env_extra["executed_model"] = step_executed_model
         write_envelope(station_id, next_station, artifact or str(run_dir / "report.json"), status, env_extra)
+        # Insert pre-deploy gate before deployer (S5)
+        if deferred_pre_deploy_gate is not None:
+            steps.append(deferred_pre_deploy_gate)
+            write_envelope("checks-gate", station_id,
+                           deferred_pre_deploy_gate["artifacts"][0] if deferred_pre_deploy_gate["artifacts"] else str(run_dir / "report.json"),
+                           deferred_pre_deploy_gate["status"],
+                           {k: v for k, v in deferred_pre_deploy_gate.items()
+                            if k in ["phase", "commands", "exit_codes", "protected_paths",
+                                   "protected_path_verdict", "protected_path_findings", "gate_verdict"]})
         if deferred_verifier is not None:
             steps.append(deferred_verifier)
             write_envelope("verifier", next_station,
                            deferred_verifier["artifacts"][0] if deferred_verifier["artifacts"] else str(run_dir / "report.json"),
                            deferred_verifier["status"], {"configured_model": None})
+        # Loopback after checks-gate failure (S2)
+        if station_id == "checks-gate" and gate_failed and loopbacks < max_loopbacks:
+            loopbacks += 1
+            return_to = "builder"
+            reason = f"Gate failure: {'; '.join(extra_envelope.get('protected_path_findings', [])[:3])}" if extra_envelope.get('protected_path_findings') else "Gate checks failed"
+            steps.append({"station": "loopback", "status": "loopback", "return_to": return_to,
+                          "detail": f"Loopback to {return_to}: {reason}", "reason": reason,
+                          "duration_ms": 0.0, "cost": None, "artifacts": [],
+                          "configured_model": None, "executed_model": None, "executor": None,
+                          "feedback": extra_envelope.get("output", ""),
+                          "from_station": "checks-gate"})
         # Loopback right after approver when aggregation fails
-        if station_id == "approver" and verdict in {"rejected", "changes_requested"} and loopbacks < max_loopbacks:
+        elif station_id == "approver" and verdict in {"rejected", "changes_requested"} and loopbacks < max_loopbacks:
             loopbacks += 1
             # Spec failures return to spec-writer, implementation failures to builder.
             return_to = "spec-writer" if any("spec" in str(f).lower() and "missing" in str(f).lower() for f in run_findings) else "builder"

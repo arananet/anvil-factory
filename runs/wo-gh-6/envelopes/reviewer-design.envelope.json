@@ -1,0 +1,22 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-design",
+  "to_station": "approver",
+  "work_order_id": "wo-gh-6",
+  "artifact_path": "runs/wo-gh-6/reviewer-design.output.md",
+  "status": "executed",
+  "created_at": "2026-10-29T12:14:05.146960+00:00",
+  "review": {
+    "station": "reviewer-design",
+    "verdict": "pass",
+    "findings": [
+      "No interface output present in this feature. The checks gate implementation is purely backend infrastructure (Python runner code, configuration, and tests) with no HTML, React components, CSS, or user-facing pages to review against the design system."
+    ]
+  },
+  "configured_model": "review-balanced",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
+}

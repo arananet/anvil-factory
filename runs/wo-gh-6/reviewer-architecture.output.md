@@ -1,0 +1,11 @@
+```json
+{
+  "station": "reviewer-architecture",
+  "verdict": "changes_requested",
+  "findings": [
+    "Gate logic belongs in anvil/gates.py, not inline in runner.py: The functions _run_checks_gate() and _get_changed_files() (177 lines) are defined directly in anvil/runner.py, but ARCHITECTURE.md documents that 'Gate layer: anvil/gates.py and anvil/approver.py are deterministic.' All other gates (spec_gate, tdd_gate, review_gate, human_gate) live in anvil/gates.py as pure functions. Extract the checks gate evaluation logic into anvil/gates.py as checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_id, timeout) -> dict, keeping only the orchestration logic in runner.py.",
+    "Station kind 'gate' is undocumented: stations/checks-gate/station.json uses kind: 'gate', but ARCHITECTURE.md only documents 'agent' and 'deterministic' as station kinds. Other deterministic stations (approver, intake, triage-human) use kind: 'deterministic'. Either use kind: 'deterministic' consistently, or document what 'gate' means and why it differs from 'deterministic'.",
+    "Protected paths default includes 'anvil.json' but should include the entire checks configuration path: The spec states 'Protected paths default to the checks configuration itself and the project's tests directory'. Line 111 in runner.py hardcodes protected_paths = ['tests/', 'anvil.json'], but this assumes the checks config is always in anvil.json. A project could configure checks elsewhere. The default should reference 'the checks configuration file path' generically, or the requirement should be clarified in the spec."
+  ]
+}
+```

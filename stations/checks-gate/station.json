@@ -1,0 +1,16 @@
+{
+  "id": "checks-gate",
+  "name": "Checks Gate",
+  "kind": "gate",
+  "inputs": [
+    "builder output"
+  ],
+  "outputs": [
+    "gate verdict"
+  ],
+  "description": "Deterministic gate that runs project checks and validates protected paths before review.",
+  "context": [],
+  "model": "default",
+  "prompt": "stations/checks-gate/PROMPT.md",
+  "tools": []
+}

@@ -1,0 +1,8 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "changes_requested",
+  "findings": [
+    "Missing capability documentation (docs/CHECKS-GATE.md): The spec requires 'docs updated in the style of the existing capability docs'. Other features (memory-gate, supervisor, design-system) have docs/[FEATURE].md files. The checks-gate needs similar documentation explaining purpose, configuration, and behavior.",
+    "Missing CHANGELOG.md update: The spec requires 'CHANGELOG Unreleased updated'. The Unreleased section was not modified to include the checks-gate feature. Other features have entries in CHANGELOG.md describing their capabilities (design systems, verified memory gate, bounded supervisor)."
+  ]
+}

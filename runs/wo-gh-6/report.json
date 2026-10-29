@@ -1,0 +1,258 @@
+{
+  "work_order_id": "wo-gh-6",
+  "pipeline": "sdlc-default",
+  "title": "Deterministic checks gate with protected paths",
+  "kind": "feature",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "completed",
+      "detail": "Work order normalized",
+      "duration_ms": 0.02,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-6/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/spec-writer.output.md",
+      "duration_ms": 47158.482,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-6/spec-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "test-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/test-writer.output.md",
+      "duration_ms": 156523.125,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-6/test-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/builder.output.md",
+      "duration_ms": 787250.187,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-6/builder.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-spec.output.md",
+      "duration_ms": 130148.338,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-6/reviewer-spec.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-security",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-security.output.md; review output did not parse as a review JSON",
+      "duration_ms": 113945.147,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-6/reviewer-security.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-tests.output.md",
+      "duration_ms": 49260.345,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-6/reviewer-tests.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-architecture.output.md",
+      "duration_ms": 153562.588,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-6/reviewer-architecture.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-design.output.md",
+      "duration_ms": 40700.913,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-6/reviewer-design.output.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: changes_requested",
+      "duration_ms": 0.04,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-6/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "approver",
+      "status": "loopback",
+      "return_to": "spec-writer",
+      "detail": "Loopback to spec-writer: Missing capability documentation (docs/CHECKS-GATE.md): The spec requires 'docs updated in the style of the existing capability docs'. Other features (memory-gate, supervisor, design-system) have docs/[FEATURE].md files. The checks-gate needs similar documentation explaining purpose, configuration, and behavior.; Missing CHANGELOG.md update: The spec requires 'CHANGELOG Unreleased updated'. The Unreleased section was not modified to include the checks-gate feature. Other features have entries in CHANGELOG.md describing their capabilities (design systems, verified memory gate, bounded supervisor).; Gate logic belongs in anvil/gates.py, not inline in runner.py: The functions _run_checks_gate() and _get_changed_files() (177 lines) are defined directly in anvil/runner.py, but ARCHITECTURE.md documents that 'Gate layer: anvil/gates.py and anvil/approver.py are deterministic.' All other gates (spec_gate, tdd_gate, review_gate, human_gate) live in anvil/gates.py as pure functions. Extract the checks gate evaluation logic into anvil/gates.py as checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_id, timeout) -> dict, keeping only the orchestration logic in runner.py.; Station kind 'gate' is undocumented: stations/checks-gate/station.json uses kind: 'gate', but ARCHITECTURE.md only documents 'agent' and 'deterministic' as station kinds. Other deterministic stations (approver, intake, triage-human) use kind: 'deterministic'. Either use kind: 'deterministic' consistently, or document what 'gate' means and why it differs from 'deterministic'.; Protected paths default includes 'anvil.json' but should include the entire checks configuration path: The spec states 'Protected paths default to the checks configuration itself and the project's tests directory'. Line 111 in runner.py hardcodes protected_paths = ['tests/', 'anvil.json'], but this assumes the checks config is always in anvil.json. A project could configure checks elsewhere. The default should reference 'the checks configuration file path' generically, or the requirement should be clarified in the spec.; No interface output present in this feature. The checks gate implementation is purely backend infrastructure (Python runner code, configuration, and tests) with no HTML, React components, CSS, or user-facing pages to review against the design system.",
+      "reason": "Missing capability documentation (docs/CHECKS-GATE.md): The spec requires 'docs updated in the style of the existing capability docs'. Other features (memory-gate, supervisor, design-system) have docs/[FEATURE].md files. The checks-gate needs similar documentation explaining purpose, configuration, and behavior.; Missing CHANGELOG.md update: The spec requires 'CHANGELOG Unreleased updated'. The Unreleased section was not modified to include the checks-gate feature. Other features have entries in CHANGELOG.md describing their capabilities (design systems, verified memory gate, bounded supervisor).; Gate logic belongs in anvil/gates.py, not inline in runner.py: The functions _run_checks_gate() and _get_changed_files() (177 lines) are defined directly in anvil/runner.py, but ARCHITECTURE.md documents that 'Gate layer: anvil/gates.py and anvil/approver.py are deterministic.' All other gates (spec_gate, tdd_gate, review_gate, human_gate) live in anvil/gates.py as pure functions. Extract the checks gate evaluation logic into anvil/gates.py as checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_id, timeout) -> dict, keeping only the orchestration logic in runner.py.; Station kind 'gate' is undocumented: stations/checks-gate/station.json uses kind: 'gate', but ARCHITECTURE.md only documents 'agent' and 'deterministic' as station kinds. Other deterministic stations (approver, intake, triage-human) use kind: 'deterministic'. Either use kind: 'deterministic' consistently, or document what 'gate' means and why it differs from 'deterministic'.; Protected paths default includes 'anvil.json' but should include the entire checks configuration path: The spec states 'Protected paths default to the checks configuration itself and the project's tests directory'. Line 111 in runner.py hardcodes protected_paths = ['tests/', 'anvil.json'], but this assumes the checks config is always in anvil.json. A project could configure checks elsewhere. The default should reference 'the checks configuration file path' generically, or the requirement should be clarified in the spec.; No interface output present in this feature. The checks gate implementation is purely backend infrastructure (Python runner code, configuration, and tests) with no HTML, React components, CSS, or user-facing pages to review against the design system.",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: required",
+      "duration_ms": 0.006,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "detail": "Packet written to runs/wo-gh-6/deployer.packet.md",
+      "duration_ms": 0.089,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-6/deployer.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/observer.output.md",
+      "duration_ms": 171616.937,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-6/observer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    }
+  ],
+  "verdict": "changes_requested",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 1,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [
+        {
+          "station": "reviewer-spec",
+          "verdict": "changes_requested"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-architecture",
+          "verdict": "changes_requested"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "pass"
+        }
+      ],
+      "reviews_expected": [
+        "reviewer-spec",
+        "reviewer-security",
+        "reviewer-tests",
+        "reviewer-architecture",
+        "reviewer-design"
+      ],
+      "rule": "Reviewers reviewer-spec, reviewer-architecture requested changes."
+    },
+    "human_gate": {
+      "required": true,
+      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": []
+}
