@@ -131,6 +131,96 @@
       "model": "claude-sonnet-4-5",
       "prompt": "stations/supervisor/PROMPT.md",
       "tools": []
+    },
+    "brief-writer": {
+      "context": [
+        "brain/project.md",
+        "content/"
+      ],
+      "model": "claude-sonnet-4-5",
+      "prompt": "stations/brief-writer/PROMPT.md",
+      "tools": []
+    },
+    "researcher": {
+      "context": [
+        "brain/project.md",
+        "content/"
+      ],
+      "model": "claude-sonnet-4-5",
+      "prompt": "stations/researcher/PROMPT.md",
+      "tools": []
+    },
+    "writer": {
+      "context": [
+        "brain/project.md",
+        "content/"
+      ],
+      "model": "claude-sonnet-4-5",
+      "prompt": "stations/writer/PROMPT.md",
+      "tools": []
+    },
+    "media-producer": {
+      "context": [
+        "brain/project.md",
+        "content/"
+      ],
+      "model": "claude-sonnet-4-5",
+      "prompt": "stations/media-producer/PROMPT.md",
+      "tools": []
+    },
+    "reviewer-facts": {
+      "context": [
+        "brain/project.md",
+        "content/"
+      ],
+      "model": "claude-sonnet-4-5",
+      "prompt": "stations/reviewer-facts/PROMPT.md",
+      "tools": []
+    },
+    "reviewer-voice": {
+      "context": [
+        "brain/project.md",
+        "content/"
+      ],
+      "model": "claude-sonnet-4-5",
+      "prompt": "stations/reviewer-voice/PROMPT.md",
+      "tools": []
+    },
+    "reviewer-platform": {
+      "context": [
+        "brain/project.md",
+        "content/"
+      ],
+      "model": "claude-sonnet-4-5",
+      "prompt": "stations/reviewer-platform/PROMPT.md",
+      "tools": []
+    },
+    "reviewer-brand": {
+      "context": [
+        "brain/project.md",
+        "content/"
+      ],
+      "model": "claude-sonnet-4-5",
+      "prompt": "stations/reviewer-brand/PROMPT.md",
+      "tools": []
+    },
+    "publisher": {
+      "context": [
+        "brain/project.md",
+        "content/"
+      ],
+      "model": "claude-sonnet-4-5",
+      "prompt": "stations/publisher/PROMPT.md",
+      "tools": []
+    },
+    "reviewer-design": {
+      "context": [
+        "brain/project.md",
+        "design/"
+      ],
+      "model": "claude-sonnet-4-5",
+      "prompt": "stations/reviewer-design/PROMPT.md",
+      "tools": []
     }
   }
 }
