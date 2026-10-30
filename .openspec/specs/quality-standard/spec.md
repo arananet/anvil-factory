@@ -2,6 +2,7 @@
 
 Status: approved
 Slug: quality-standard
+Amendment (2026-10-30): set consistency added. A new requirement, Consistency within a deliverable set, and scenario S7: a set of related visual deliverables holds one canonical identity reference, and the review runs a same subject test across the whole set against it. Filed unexecuted; the amendment is recorded here because the work order's issue could not carry it.
 
 ## Roles
 - implementer: builds the change described here
@@ -35,6 +36,13 @@ The factory can prove a visual deliverable complies with a project's design syst
 - An output the generating station itself judges below the bar is regenerated within the run's normal loopback discipline, or the shortfall is carried into the recorded comparison as an open gap. The station never silently forwards imagery it has not looked at.
 - The recorded self comparison is run evidence, not a verdict. Reviewers judge independently, a station's claim of no gaps does not bind them, and the approver weighs the reviewers' sections as it weighs any other review.
 
+### Consistency within a deliverable set
+- Some visual work orders produce a set of related deliverables rather than a single output: several images of one product, one character across several scenes, the figures of one document. Compliance with the anchors is judged per output, and a set can pass output by output while disagreeing with itself, two assets of one product reading as two different products. Set consistency is a distinct property from anchor compliance, and this section gives it a reference and a test.
+- A work order that produces a set designates one canonical identity reference inside the set: an owner approved asset of the set itself, or one element of the run's anchor boards that the work order names as the identity reference. The generating stations produce the remaining assets of the set from that reference, and the reference travels in the packets alongside the anchors.
+- The work order's spec enumerates the identity traits the set must hold constant, in the same observable form as the charter criteria. For a physical product the traits are finish, detail colors, mounting or attachment, proportions and markings. For other product types the work order states the equivalent traits for its subject (for a character: silhouette, palette, facial and costume details; for a document's figures: style, palette and line treatment), and the stated traits are the test's checklist.
+- reviewer-design's anchor comparison gains the same subject test for set work: the reviewer compares every asset of the set against the identity reference on each enumerated trait. Any divergence fails the quality judgment, with the divergent asset and the trait it diverges on named in the review, even when every asset of the set individually passes the anchor comparison. reviewer-ux carries the same test for the experiential side once it exists, under the same naming rule.
+- The identity reference is an anchor under the rules of the Reference anchors section: the work order names it or inherits it, it is stored where the run can cite it, and it holds the first place in the composition order for the set's identity traits. The same subject test is part of the anchor comparison section of the review, not a separate verdict, so one quality section records both the anchor judgment and the set judgment.
+
 ### Composition with design systems and learnings
 - The order of authority for a visual deliverable is: the project's reference anchors first (the owner's pictures of this product), then the project's design system and its verified brain learnings, then the charter floor. On conflict the anchor wins: if an anchor shows a deliberately stylized product, the stylized reading is the bar for that project, and the charter's realism criteria for the type do not override it.
 - The charter supplies the floor below which no visual deliverable may fall. A project may hold itself above the charter through its anchors and design system; a deliverable that falls below the charter floor is a named floor gap in the review record, never silently waived by any station.
@@ -59,3 +67,6 @@ The factory can prove a visual deliverable complies with a project's design syst
 
 ### Scenario: A game product is judged by its own stated standard
 - S6: Given a fixture visual run for a game product whose design system states its standard in observable terms, when reviewer-design judges its output, then the review applies the stated standard, and the charter's photorealism criteria for physical products are absent from the judgment.
+
+### Scenario: Two assets pass the anchor comparison yet diverge from each other
+- S7: Given a fixture visual run producing a set of images of one physical product with a designated identity reference and enumerated identity traits, and two assets of the set that each pass the anchor comparison on their own, when the two assets diverge from each other on one enumerated trait (for example a detail rendered in different colors, or the product mounted differently), then reviewer-design's same subject test fails the quality judgment, naming the divergent asset and the trait, and the run does not approve.
