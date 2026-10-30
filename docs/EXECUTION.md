@@ -26,16 +26,25 @@ configured runtime, each agent station packet is rendered as today (station
 prompt, work order, upstream step summary) and sent to the executor:
 
 - The executor output is written to `runs/<id>/<station>.output.md`.
+- For reviewer stations, the executor output is additionally written to
+  `runs/<id>/<station>.review.json`, which is the authoritative review channel.
+  The runner parses reviews only from this file, never from the free output
+  transcript (which stays as provenance).
 - The step status becomes `executed`, and the envelope records status
   `executed` plus the executor object `{kind, detail}` (see Model
   provenance below).
 - If the executor fails or the kind is unknown, the step status is `failed`
   with the error recorded in the step and the envelope. A failed step is never
   quietly reported as `packet_ready`.
-- Reviewer stations are expected to answer with a review JSON (their prompts
-  ask for it). A parsed review feeds the approver of that same run. If the
-  output does not parse, the envelope records `review_parse_failed` and the
-  station contributes no review.
+- Reviewer stations are expected to answer with exactly one review JSON object:
+  `{"station": "<station-id>", "verdict": "pass | fail | changes_requested",
+  "findings": ["..."]}`. The review file must parse as exactly one JSON object
+  (surrounding whitespace and one surrounding markdown code fence allowed) with
+  the station field equal to the step station id, verdict one of pass, fail, or
+  changes_requested, and findings a list of strings. A parsed review feeds the
+  approver of that same run. If the review file is missing, empty, malformed,
+  or does not match the expected shape, the envelope records
+  `review_parse_failed` and the station contributes no review.
 - Cost stays null unless the executor reports usage. When usage is reported,
   token counts are recorded on the step and the envelope; a numeric cost in
   the usage object is the only way a step cost becomes non null.

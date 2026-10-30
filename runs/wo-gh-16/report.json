@@ -1,0 +1,258 @@
+{
+  "work_order_id": "wo-gh-16",
+  "pipeline": "sdlc-default",
+  "title": "Review parsing integrity: one authoritative review channel, counted fail closed",
+  "kind": "bug",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "completed",
+      "detail": "Work order normalized",
+      "duration_ms": 0.007,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-16/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/spec-writer.output.md",
+      "duration_ms": 59253.429,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-16/spec-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "test-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/test-writer.output.md",
+      "duration_ms": 286896.549,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-16/test-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/builder.output.md",
+      "duration_ms": 277545.572,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-16/builder.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-spec.output.md",
+      "duration_ms": 204580.871,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-16/reviewer-spec.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-security",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-security.output.md",
+      "duration_ms": 106765.305,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-16/reviewer-security.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-tests.output.md; review output did not parse as a review JSON",
+      "duration_ms": 77771.938,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-16/reviewer-tests.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-architecture.output.md",
+      "duration_ms": 93239.977,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-16/reviewer-architecture.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-design.output.md",
+      "duration_ms": 75736.796,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-16/reviewer-design.output.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: changes_requested",
+      "duration_ms": 0.028,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-16/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "approver",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: S5 PROMPT.md contract requirement not fully implemented: Spec requires 'every PROMPT.md carries the same output contract', but only stations/reviewer-design/PROMPT.md explicitly contains the output contract section. Other reviewer stations (reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture, reviewer-platform, reviewer-voice, reviewer-brand, reviewer-facts) lack explicit output contract documentation in their PROMPT.md files. While the runtime adds the contract via _packet_text (anvil/runner.py:148-152) and REVIEW_SUFFIX (tools/claude_station.py:50-56), the static PROMPT.md files don't carry it as specified.; Spec file modified after approval: The spec .openspec/specs/review-parsing-integrity/spec.md shows Status: approved and the work order states it was 'approved and written before this implementation', but the file has modifications in this implementation (Purpose section simplified from detailed explanation to brief summary, Requirements reorganized and condensed, Scenarios reworded). While the changes appear editorial and clarifying rather than substantive requirement changes, modifying an approved spec during implementation deviates from the stated process where the spec should be complete before implementation begins.; Dual output contract channels (violates S5): The implementation adds the output contract statement in TWO places - both in the packet text (runner.py:149-153) and as a runtime suffix (claude_station.py:50-56, 77-78). S5 explicitly states the runtime restatement should 'introduce no second channel.' Having two places that state the contract creates maintenance burden and risk of divergence. Choose one channel: either the packet-level contract section OR the runtime suffix, not both.; Incomplete reviewer prompt updates (violates S5): Only reviewer-design/PROMPT.md has an 'Output Format' section explaining the JSON contract. S5 requires 'Every reviewer station PROMPT.md carries the same output contract.' The other reviewer prompts (reviewer-spec, reviewer-architecture, reviewer-security, reviewer-tests, reviewer-voice, reviewer-platform, reviewer-facts, reviewer-brand) lack this section and must be updated to include the same output format documentation.; Inconsistent output contract wording between channels: The runner.py version states 'written to runs/{work_order.id}/{station_id}.review.json' while claude_station.py says 'and nothing else' but omits the file path. S5 requires 'Reviewer packets name the review file path.' If keeping both channels, they should use identical wording; if consolidating to one channel, ensure it includes the file path as required by S5.",
+      "reason": "S5 PROMPT.md contract requirement not fully implemented: Spec requires 'every PROMPT.md carries the same output contract', but only stations/reviewer-design/PROMPT.md explicitly contains the output contract section. Other reviewer stations (reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture, reviewer-platform, reviewer-voice, reviewer-brand, reviewer-facts) lack explicit output contract documentation in their PROMPT.md files. While the runtime adds the contract via _packet_text (anvil/runner.py:148-152) and REVIEW_SUFFIX (tools/claude_station.py:50-56), the static PROMPT.md files don't carry it as specified.; Spec file modified after approval: The spec .openspec/specs/review-parsing-integrity/spec.md shows Status: approved and the work order states it was 'approved and written before this implementation', but the file has modifications in this implementation (Purpose section simplified from detailed explanation to brief summary, Requirements reorganized and condensed, Scenarios reworded). While the changes appear editorial and clarifying rather than substantive requirement changes, modifying an approved spec during implementation deviates from the stated process where the spec should be complete before implementation begins.; Dual output contract channels (violates S5): The implementation adds the output contract statement in TWO places - both in the packet text (runner.py:149-153) and as a runtime suffix (claude_station.py:50-56, 77-78). S5 explicitly states the runtime restatement should 'introduce no second channel.' Having two places that state the contract creates maintenance burden and risk of divergence. Choose one channel: either the packet-level contract section OR the runtime suffix, not both.; Incomplete reviewer prompt updates (violates S5): Only reviewer-design/PROMPT.md has an 'Output Format' section explaining the JSON contract. S5 requires 'Every reviewer station PROMPT.md carries the same output contract.' The other reviewer prompts (reviewer-spec, reviewer-architecture, reviewer-security, reviewer-tests, reviewer-voice, reviewer-platform, reviewer-facts, reviewer-brand) lack this section and must be updated to include the same output format documentation.; Inconsistent output contract wording between channels: The runner.py version states 'written to runs/{work_order.id}/{station_id}.review.json' while claude_station.py says 'and nothing else' but omits the file path. S5 requires 'Reviewer packets name the review file path.' If keeping both channels, they should use identical wording; if consolidating to one channel, ensure it includes the file path as required by S5.",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: required",
+      "duration_ms": 0.005,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "detail": "Packet written to runs/wo-gh-16/deployer.packet.md",
+      "duration_ms": 0.048,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-16/deployer.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/observer.output.md",
+      "duration_ms": 204044.841,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-16/observer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    }
+  ],
+  "verdict": "changes_requested",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 1,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [
+        {
+          "station": "reviewer-spec",
+          "verdict": "changes_requested"
+        },
+        {
+          "station": "reviewer-security",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-architecture",
+          "verdict": "changes_requested"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "pass"
+        }
+      ],
+      "reviews_expected": [
+        "reviewer-spec",
+        "reviewer-security",
+        "reviewer-tests",
+        "reviewer-architecture",
+        "reviewer-design"
+      ],
+      "rule": "Reviewers reviewer-spec, reviewer-architecture requested changes."
+    },
+    "human_gate": {
+      "required": true,
+      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": []
+}

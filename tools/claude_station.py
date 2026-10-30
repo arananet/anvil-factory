@@ -48,11 +48,12 @@ NO_EDIT_TOOLS = "Edit,Write,NotebookEdit"
 TIMEOUT_SECONDS = 1500
 
 REVIEW_SUFFIX = (
-    "\n\n## Output contract\n\n"
-    "Answer with a single JSON object and nothing else, in exactly this shape:\n"
+    "\n\n## Runtime output contract\n\n"
+    "Your complete answer is exactly one review JSON object and nothing else, in this shape:\n"
     '{"station": "<your station id>", "verdict": "pass", "findings": ["..."]}\n'
     "The verdict must be one of: pass, fail, changes_requested. "
-    "Findings must be concrete and checkable against the spec, the code and the tests.\n"
+    "Findings must be concrete and checkable against the spec, the code and the tests. "
+    "The runner writes your output to the authoritative review channel and parses only that file.\n"
 )
 
 

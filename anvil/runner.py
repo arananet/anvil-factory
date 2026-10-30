@@ -36,31 +36,49 @@ class RunReport:
                 "risk_hints": self.risk_hints, "decision": self.decision, "warnings": self.warnings}
 
 def parse_review(text, station_id):
-    """Find a review JSON object in executor output and build a Review.
+    """Parse exactly one review JSON object from the authoritative channel.
 
-    Station prompts ask reviewers for JSON. Anything that does not parse to
-    an object with a valid verdict returns None; the caller records that as
-    review_parse_failed and the station contributes no review to the run.
+    The review file must parse as exactly one JSON object (surrounding
+    whitespace and one surrounding markdown code fence allowed) with station
+    equal to the step station id, verdict one of pass, fail, changes_requested,
+    and findings a list of strings. Anything else returns None; the caller
+    records that as review_parse_failed and the station contributes no review.
     """
     if not text:
         return None
-    decoder = json.JSONDecoder()
-    for idx, ch in enumerate(text):
-        if ch != "{":
-            continue
-        try:
-            obj, _ = decoder.raw_decode(text[idx:])
-        except json.JSONDecodeError:
-            continue
-        if not isinstance(obj, dict) or "verdict" not in obj:
-            continue
-        try:
-            return Review(station=str(obj.get("station") or station_id),
-                          verdict=str(obj["verdict"]),
-                          findings=[str(f) for f in obj.get("findings", [])])
-        except ValueError:
-            return None
-    return None
+
+    # Strip whitespace and optional markdown code fence
+    content = text.strip()
+    if content.startswith("```json") or content.startswith("```"):
+        lines = content.splitlines()
+        # Remove first line (opening fence)
+        lines = lines[1:]
+        # Remove last line if it's a closing fence
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        content = "\n".join(lines).strip()
+
+    # Parse as exactly one JSON object
+    try:
+        obj = json.loads(content)
+    except json.JSONDecodeError:
+        return None
+
+    if not isinstance(obj, dict):
+        return None
+    if "verdict" not in obj or "station" not in obj:
+        return None
+    if obj["station"] != station_id:
+        return None
+    if obj["verdict"] not in {"pass", "fail", "changes_requested"}:
+        return None
+
+    try:
+        return Review(station=str(obj["station"]),
+                      verdict=str(obj["verdict"]),
+                      findings=[str(f) for f in obj.get("findings", [])])
+    except ValueError:
+        return None
 
 def _reported_model(text):
     """A model name counts only when the runtime output itself reports one.
@@ -127,6 +145,12 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
         text += f"\n{learnings_section}\n"
     if design_section:
         text += f"\n{design_section}\n"
+    # Reviewer stations have a specific output contract
+    if station_id.startswith("reviewer"):
+        text += (f"\n## Output contract\n\n"
+                f"Your complete answer is exactly one review JSON object written to "
+                f"runs/{work_order.id}/{station_id}.review.json. The free output transcript "
+                f"stays as provenance and is never parsed for a review.\n")
     return text
 
 def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks=2,
@@ -217,6 +241,12 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 verdict_rule = ("No reviews were produced in this run, so the verdict is no_reviews; "
                                 "standing project reviews are never counted.")
                 counted = []
+            # When execution was attempted and counted reviews are fewer than expected,
+            # state both numbers to flag the shrinkage
+            counted_len = len(counted)
+            expected_len = len(reviews_expected)
+            if execute_mode and counted_len < expected_len:
+                verdict_rule += f" (Counted {counted_len} reviews, expected {expected_len}.)"
             decision_approver = {"reviews_counted": counted,
                                  "reviews_expected": list(reviews_expected),
                                  "rule": verdict_rule}
@@ -315,6 +345,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     if tokens:
                         extra_envelope["tokens"] = tokens
                 if station_id.startswith("reviewer"):
+                    # Write the executor output to the authoritative review channel
+                    review_file = run_dir / f"{station_id}.review.json"
+                    review_file.write_text(output_text, encoding="utf-8")
+
+                    # Parse review only from the authoritative channel
                     review = parse_review(output_text, station_id)
                     # Special handling for reviewer-design when no design system exists
                     if station_id == "reviewer-design" and not has_design_system:

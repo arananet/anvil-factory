@@ -1,0 +1,1 @@
+Spec written to `.openspec/specs/review-parsing-integrity/spec.md` with status approved. The spec defines six scenarios covering the authoritative review channel, whole-document parsing, fail-closed behavior, platform25 evidence handling, contract alignment, and regression tests.
