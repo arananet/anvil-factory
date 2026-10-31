@@ -1,0 +1,1 @@
+{"name":"content-video","stages":[{"station":"intake"},{"station":"brief-writer"},{"station":"researcher"},{"station":"writer"},{"station":"media-producer"},{"parallel":["reviewer-facts","reviewer-voice","reviewer-brand","reviewer-design"]},{"station":"approver"},{"station":"triage-human"},{"station":"publisher"},{"station":"observer"}]}
