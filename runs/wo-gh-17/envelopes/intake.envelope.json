@@ -1,0 +1,10 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "intake",
+  "to_station": "brief-writer",
+  "work_order_id": "wo-gh-17",
+  "artifact_path": "runs/wo-gh-17/report.json",
+  "status": "completed",
+  "created_at": "2026-10-31T12:21:40.361094+00:00",
+  "configured_model": "default"
+}

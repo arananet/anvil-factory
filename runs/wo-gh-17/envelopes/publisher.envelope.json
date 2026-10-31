@@ -1,0 +1,15 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "publisher",
+  "to_station": "observer",
+  "work_order_id": "wo-gh-17",
+  "artifact_path": "runs/wo-gh-17/publisher.output.md",
+  "status": "executed",
+  "created_at": "2026-10-31T12:32:49.653661+00:00",
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}

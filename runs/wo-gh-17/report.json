@@ -1,0 +1,262 @@
+{
+  "work_order_id": "wo-gh-17",
+  "pipeline": "content-video",
+  "title": "ANVIL the video: a 60 to 90 second YouTube explainer produced by the content line",
+  "kind": "content",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "completed",
+      "detail": "Work order normalized",
+      "duration_ms": 0.012,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-17/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "brief-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-17/brief-writer.output.md",
+      "duration_ms": 26785.974,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-17/brief-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "researcher",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-17/researcher.output.md",
+      "duration_ms": 58050.698,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-17/researcher.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-17/writer.output.md",
+      "duration_ms": 60692.936,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-17/writer.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "media-producer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-17/media-producer.output.md",
+      "duration_ms": 425520.335,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-17/media-producer.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-facts",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-17/reviewer-facts.output.md",
+      "duration_ms": 15231.965,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-17/reviewer-facts.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-voice",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-17/reviewer-voice.output.md",
+      "duration_ms": 15370.182,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-17/reviewer-voice.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-brand",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-17/reviewer-brand.output.md",
+      "duration_ms": 26854.803,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-17/reviewer-brand.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-17/reviewer-design.output.md",
+      "duration_ms": 18441.383,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-17/reviewer-design.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: changes_requested",
+      "duration_ms": 0.031,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-17/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "approver",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Every factual claim in script.md maps to the spec's closed claim list (C1 to C11), and I found no claim outside it.; Hook: 'designed and built by a software factory called ANVIL' and 'work enters as an intake and leaves as reviewed, approved output' match C1 and C10 and are supported by the source pack.; The line: the intake wording 'a feature, an idea or an issue' matches the pack's safe wording for C2. It does not say 'only' and it adds no other kinds. The spec-before-code, stations-in-a-line and no-self-approval statements match C3 and C4, and 'A human approves before anything ships' matches C6.; The line: 'For software, five reviewers check the work in parallel: spec, security, tests, architecture and design' matches C5. The 'For software' qualifier keeps it from implying these five reviewed this video, which is the caution in the source pack. The video's own panel is facts, voice, brand and design, and it is not mentioned.; Verified memory: provenance tied to a run record, and quarantine for proposals that cannot be verified, match C7 and docs/MEMORY-GATE.md.; Proof: the script leaves out 'first product', which the pack could not source (C10 gap), and uses the safe wording of a concept sensor patch product designed and built end to end. The spoken URL 'sentia dot info dash six nine three dot workers dot dev' matches sentia.info-693.workers.dev. This is the correct handling of the C10 gap, so I am not raising it as a finding.; Close: per-station routing through Cloudflare AI Gateway, the work on GitHub, and Apache 2.0 open source match C8 and C9. 'Wrote, produced and reviewed this video, and it stopped at the human gate' matches C11. It is true by the design of the run, and production-notes.md now exists as the record. The review and gate parts are confirmed only by later stations, so the approver should check them.; Counts: only 'five reviewers' appears, and the script states no other counts (stations, pipelines, panel size). No third-party names, no author name, no employer and no other factory, product or video is named. The script contains no em or en dashes.; Narration length is 189 words, inside the spec's 150 to 200 range. Every section carries a Target timing line.; Minor, not blocking: the script ends at a 1:10 target. I did not check the actual MP4 duration or the production notes, since that is outside the facts scope and belongs to tools/video_checks.py and the other reviewers.; Minor, not blocking: the Hook's 'the product on this page' relies on the hook visual being the Sentia page frame. The storyboard confirms it is assets/sentia-page-hero.png, so the reference holds.; Grammar: all five narration blocks are full, natural spoken sentences. There are no stacked fragments and no slogan runs. The title line 'ANVIL: an open source software factory' is a plain title.; Dashes: script.md contains no em dash or en dash characters (checked by character scan). The spoken URL is written out as 'sentia dot info dash six nine three dot workers dot dev', so no dash character appears in the text.; Hype words: none of revolutionary, game changing, cutting edge, supercharge or unleash appear, and the register is plain statement of what the factory does. This matches the spec's 'plain confidence' rule, with no promises about the future.; Length and structure: the narration is 189 words, inside the 150 to 200 range. There are five ### blocks in spec order, and each has a Target timing line. The timings run 0:00 to 1:10, which is consistent with the 60 to 90 second target.; Disclosure: the video and its media are AI generated (synthetic edge-tts voice, two AI generated diagrams). The narration's last sentence says ANVIL's own content line wrote, produced and reviewed the video and that it stopped at the human gate. production-notes.md states plainly that the diagrams are AI generated. The brain has no separate voice or disclosure rule that conflicts with this. Nothing was published, so any YouTube AI-content label can be set at the human gate. I recommend the human gate sets that label when it publishes, because the spoken line does not use the words 'AI generated'. This is a note, not a blocker.; Scope: I checked only voice. Claim accuracy belongs to reviewer-facts, naming to reviewer-brand, and the frames to reviewer-design.; Review file written to content/youtube-anvil/review-brand.md.; Naming: script.md, storyboard.md, production-notes.md and the burned-in frames name only ANVIL and Sentia, plus Cloudflare AI Gateway and GitHub as worded in claim C8. No employer, person, other factory, product or video is named or referenced.; Dashes: a grep for em and en dash characters across the .md files returned nothing, which meets S4.; On screen text matches the spec exactly. The close card shows github.com/arananet/anvil-factory, which the spec requires. The dashboard crop removes the tab names with personal names and the third party network column. I checked frames 1 to 4 and a hook frame at 5 s.; Promises: the script states present facts only, with no future promises and no hype words.; Non-blocking: the hook frame shows the Sentia site headline 'A patch that whispers through networks that already exist.' This is first party product copy outside the closed claim list. reviewer-facts or the human gate should confirm it is acceptable. I did not change the script or the video.; Non-blocking: tools/video_checks.py S3 counts 237 words against 189 spoken, because it counts the Target timing lines and the block headings. production-notes.md already records this as an operator checker question. It is not a brand issue.; design/DESIGN.md and design/tokens.json are unfilled templates: every color, typography, spacing, layout and motion value is TODO. No project tokens or motion rules exist to check against, and none are flagged because the output uses no undefined token. The review used the quality bars plus spec check S8: composition, legibility of burned-in titles, and palette consistency with the committed assets.; Composition, frame-3.png (Proof section): the dashboard crop cuts the charts off. The skin temperature line is clipped at the bottom edge of the frame, and the hydration index chart is clipped at the right edge of the dashboard panel. The viewer sees partial charts instead of whole ones, and the 'Proof' visual reads as cropped by accident. Quality bar: Visual Hierarchy, related elements grouped. Fix: scale or reposition the crop so each chart is whole, or crop to the tiles only.; Composition, frame-3.png: the large metric tiles leave a lot of empty space, and the battery value wraps to two lines ('70 % \u00b7 day 7 of / 14'). That pushes the charts to the bottom edge and breaks the spacing rhythm of the tile grid. A smaller scale-up would fix both problems.; Sampling gap against S8: frame-1.png and frame-2.png are both from the 'The line' section and are visually identical. No sample frame shows the Hook section or the Verified memory section. The burned-in 'Verified memory.' title and its clearance of the VERIFIED MEMORY and QUARANTINE labels therefore could not be judged from the sample frames. Fix: re-pick the sample frames so they cover different sections, or add one from section 3.; Passes: burned-in titles are legible. 'One intake. One line.' and 'Designed and built end to end by ANVIL.' are in dark ink green on paper and clearly exceed 4.5:1 contrast. On the close card, 'ANVIL' and the tagline are in near-white on dark ink, and the URL is in teal on dark ink at about 8:1. Titles do not overlap any diagram label, and the close card follows the storyboard hierarchy (largest, medium, smallest). Palette is consistent across the frames (paper, ink green, teal, coral accent). All four frames are 1920x1080 landscape. The title text matches the spec exactly, with no dashes.",
+      "reason": "Every factual claim in script.md maps to the spec's closed claim list (C1 to C11), and I found no claim outside it.; Hook: 'designed and built by a software factory called ANVIL' and 'work enters as an intake and leaves as reviewed, approved output' match C1 and C10 and are supported by the source pack.; The line: the intake wording 'a feature, an idea or an issue' matches the pack's safe wording for C2. It does not say 'only' and it adds no other kinds. The spec-before-code, stations-in-a-line and no-self-approval statements match C3 and C4, and 'A human approves before anything ships' matches C6.; The line: 'For software, five reviewers check the work in parallel: spec, security, tests, architecture and design' matches C5. The 'For software' qualifier keeps it from implying these five reviewed this video, which is the caution in the source pack. The video's own panel is facts, voice, brand and design, and it is not mentioned.; Verified memory: provenance tied to a run record, and quarantine for proposals that cannot be verified, match C7 and docs/MEMORY-GATE.md.; Proof: the script leaves out 'first product', which the pack could not source (C10 gap), and uses the safe wording of a concept sensor patch product designed and built end to end. The spoken URL 'sentia dot info dash six nine three dot workers dot dev' matches sentia.info-693.workers.dev. This is the correct handling of the C10 gap, so I am not raising it as a finding.; Close: per-station routing through Cloudflare AI Gateway, the work on GitHub, and Apache 2.0 open source match C8 and C9. 'Wrote, produced and reviewed this video, and it stopped at the human gate' matches C11. It is true by the design of the run, and production-notes.md now exists as the record. The review and gate parts are confirmed only by later stations, so the approver should check them.; Counts: only 'five reviewers' appears, and the script states no other counts (stations, pipelines, panel size). No third-party names, no author name, no employer and no other factory, product or video is named. The script contains no em or en dashes.; Narration length is 189 words, inside the spec's 150 to 200 range. Every section carries a Target timing line.; Minor, not blocking: the script ends at a 1:10 target. I did not check the actual MP4 duration or the production notes, since that is outside the facts scope and belongs to tools/video_checks.py and the other reviewers.; Minor, not blocking: the Hook's 'the product on this page' relies on the hook visual being the Sentia page frame. The storyboard confirms it is assets/sentia-page-hero.png, so the reference holds.; Grammar: all five narration blocks are full, natural spoken sentences. There are no stacked fragments and no slogan runs. The title line 'ANVIL: an open source software factory' is a plain title.; Dashes: script.md contains no em dash or en dash characters (checked by character scan). The spoken URL is written out as 'sentia dot info dash six nine three dot workers dot dev', so no dash character appears in the text.; Hype words: none of revolutionary, game changing, cutting edge, supercharge or unleash appear, and the register is plain statement of what the factory does. This matches the spec's 'plain confidence' rule, with no promises about the future.; Length and structure: the narration is 189 words, inside the 150 to 200 range. There are five ### blocks in spec order, and each has a Target timing line. The timings run 0:00 to 1:10, which is consistent with the 60 to 90 second target.; Disclosure: the video and its media are AI generated (synthetic edge-tts voice, two AI generated diagrams). The narration's last sentence says ANVIL's own content line wrote, produced and reviewed the video and that it stopped at the human gate. production-notes.md states plainly that the diagrams are AI generated. The brain has no separate voice or disclosure rule that conflicts with this. Nothing was published, so any YouTube AI-content label can be set at the human gate. I recommend the human gate sets that label when it publishes, because the spoken line does not use the words 'AI generated'. This is a note, not a blocker.; Scope: I checked only voice. Claim accuracy belongs to reviewer-facts, naming to reviewer-brand, and the frames to reviewer-design.; Review file written to content/youtube-anvil/review-brand.md.; Naming: script.md, storyboard.md, production-notes.md and the burned-in frames name only ANVIL and Sentia, plus Cloudflare AI Gateway and GitHub as worded in claim C8. No employer, person, other factory, product or video is named or referenced.; Dashes: a grep for em and en dash characters across the .md files returned nothing, which meets S4.; On screen text matches the spec exactly. The close card shows github.com/arananet/anvil-factory, which the spec requires. The dashboard crop removes the tab names with personal names and the third party network column. I checked frames 1 to 4 and a hook frame at 5 s.; Promises: the script states present facts only, with no future promises and no hype words.; Non-blocking: the hook frame shows the Sentia site headline 'A patch that whispers through networks that already exist.' This is first party product copy outside the closed claim list. reviewer-facts or the human gate should confirm it is acceptable. I did not change the script or the video.; Non-blocking: tools/video_checks.py S3 counts 237 words against 189 spoken, because it counts the Target timing lines and the block headings. production-notes.md already records this as an operator checker question. It is not a brand issue.; design/DESIGN.md and design/tokens.json are unfilled templates: every color, typography, spacing, layout and motion value is TODO. No project tokens or motion rules exist to check against, and none are flagged because the output uses no undefined token. The review used the quality bars plus spec check S8: composition, legibility of burned-in titles, and palette consistency with the committed assets.; Composition, frame-3.png (Proof section): the dashboard crop cuts the charts off. The skin temperature line is clipped at the bottom edge of the frame, and the hydration index chart is clipped at the right edge of the dashboard panel. The viewer sees partial charts instead of whole ones, and the 'Proof' visual reads as cropped by accident. Quality bar: Visual Hierarchy, related elements grouped. Fix: scale or reposition the crop so each chart is whole, or crop to the tiles only.; Composition, frame-3.png: the large metric tiles leave a lot of empty space, and the battery value wraps to two lines ('70 % \u00b7 day 7 of / 14'). That pushes the charts to the bottom edge and breaks the spacing rhythm of the tile grid. A smaller scale-up would fix both problems.; Sampling gap against S8: frame-1.png and frame-2.png are both from the 'The line' section and are visually identical. No sample frame shows the Hook section or the Verified memory section. The burned-in 'Verified memory.' title and its clearance of the VERIFIED MEMORY and QUARANTINE labels therefore could not be judged from the sample frames. Fix: re-pick the sample frames so they cover different sections, or add one from section 3.; Passes: burned-in titles are legible. 'One intake. One line.' and 'Designed and built end to end by ANVIL.' are in dark ink green on paper and clearly exceed 4.5:1 contrast. On the close card, 'ANVIL' and the tagline are in near-white on dark ink, and the URL is in teal on dark ink at about 8:1. Titles do not overlap any diagram label, and the close card follows the storyboard hierarchy (largest, medium, smallest). Palette is consistent across the frames (paper, ink green, teal, coral accent). All four frames are 1920x1080 landscape. The title text matches the spec exactly, with no dashes.",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: required",
+      "duration_ms": 0.005,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "publisher",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-17/publisher.output.md",
+      "duration_ms": 22342.387,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-17/publisher.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-17/observer.output.md",
+      "duration_ms": 94124.524,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-17/observer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": "claude-sonnet-4-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    }
+  ],
+  "verdict": "changes_requested",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 1,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [
+    "publishing"
+  ],
+  "decision": {
+    "approver": {
+      "reviews_counted": [
+        {
+          "station": "reviewer-facts",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-voice",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-brand",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "changes_requested"
+        }
+      ],
+      "reviews_expected": [
+        "reviewer-facts",
+        "reviewer-voice",
+        "reviewer-brand",
+        "reviewer-design"
+      ],
+      "rule": "Reviewer reviewer-design requested changes."
+    },
+    "human_gate": {
+      "required": true,
+      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": []
+}

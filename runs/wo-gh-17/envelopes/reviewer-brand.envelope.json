@@ -1,0 +1,28 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-brand",
+  "to_station": "reviewer-design",
+  "work_order_id": "wo-gh-17",
+  "artifact_path": "runs/wo-gh-17/reviewer-brand.output.md",
+  "status": "executed",
+  "created_at": "2026-10-31T12:32:08.869321+00:00",
+  "review": {
+    "station": "reviewer-brand",
+    "verdict": "pass",
+    "findings": [
+      "Review file written to content/youtube-anvil/review-brand.md.",
+      "Naming: script.md, storyboard.md, production-notes.md and the burned-in frames name only ANVIL and Sentia, plus Cloudflare AI Gateway and GitHub as worded in claim C8. No employer, person, other factory, product or video is named or referenced.",
+      "Dashes: a grep for em and en dash characters across the .md files returned nothing, which meets S4.",
+      "On screen text matches the spec exactly. The close card shows github.com/arananet/anvil-factory, which the spec requires. The dashboard crop removes the tab names with personal names and the third party network column. I checked frames 1 to 4 and a hook frame at 5 s.",
+      "Promises: the script states present facts only, with no future promises and no hype words.",
+      "Non-blocking: the hook frame shows the Sentia site headline 'A patch that whispers through networks that already exist.' This is first party product copy outside the closed claim list. reviewer-facts or the human gate should confirm it is acceptable. I did not change the script or the video.",
+      "Non-blocking: tools/video_checks.py S3 counts 237 words against 189 spoken, because it counts the Target timing lines and the block headings. production-notes.md already records this as an operator checker question. It is not a brand issue."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}

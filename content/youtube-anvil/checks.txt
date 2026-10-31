@@ -1,0 +1,18 @@
+PASS S1-resolution (1920x1080)
+PASS S1-streams (video=1 audio=1)
+PASS S2-duration (80.17s)
+FAIL S3-word-count (237 words)
+PASS S3-timings (10 timing marks)
+PASS S4-clean-script.md
+PASS S4-clean-storyboard.md
+PASS S4-clean-production-notes.md
+PASS S5-asset-sentia-page-hero.png
+PASS S5-asset-diagram-line.png
+PASS S5-asset-diagram-memory.png
+PASS S5-asset-sentia-dashboard.png
+PASS S6-frame-count (4 frames)
+PASS S6-frame-frame-1.png (1920x1080)
+PASS S6-frame-frame-2.png (1920x1080)
+PASS S6-frame-frame-3.png (1920x1080)
+PASS S6-frame-frame-4.png (1920x1080)
+RESULT: FAIL (1 failing checks)
