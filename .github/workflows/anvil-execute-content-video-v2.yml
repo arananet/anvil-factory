@@ -1,0 +1,296 @@
+name: anvil-execute-content-video-v2
+
+# Execute mode run of the ANVIL content line against the factory repository
+# itself, for one known work order (issue 18, the ANVIL YouTube video v2).
+# It mirrors anvil-execute-content-video.yml (the wo-gh-17 run) with the
+# changes this run needs:
+#
+# - The pipeline is pipelines/content-video.json and the work order is
+#   work-orders/issue-18.json; the CLI runs from this checkout (PYTHONPATH=.)
+#   because the factory is both the line and the project.
+# - Model routing is per station (owner instruction, 2026-10-31): the
+#   writer station runs claude-opus-5-5; the reviewers and the other content
+#   stations run claude-sonnet-5-5. tools/anvil_station.py dispatches each
+#   station to tools/claude_station.py with its configured model from
+#   anvil.yaml. BOTH model routes pass an exact reply smoke gate below
+#   before the line runs; there is no fallback from one model to another.
+# - The media-producer station builds and renders the film inside the run
+#   with headless Blender (pinned 4.5.15, the factory's standing asset
+#   tool), so the workflow installs Blender (cached), edge-tts and ffmpeg
+#   before the line starts, and a Blender smoke gate (model a cube, export
+#   a glb) must pass before the line runs. Reviewer-design then judges the
+#   real contact sheet and sampled frames, which exist in the tree by its
+#   step. The Blender render working frames under
+#   content/youtube-anvil-v2/frames/s*/ are gitignored on purpose: only
+#   the sampled stills are committed as evidence.
+# - Deterministic checks (tools/video_checks_v2.py) run after the line and
+#   are committed with the run evidence, as is the factory suite result.
+# - The work order carries the publishing risk hint on purpose. The
+#   finished video stops at the human gate for the owner's review; the
+#   publisher station inside the sandbox can only write a text record into
+#   the run directory, and nothing in this workflow posts anything anywhere.
+# - This repo's .gitignore ignores runs/, so the commit back step force
+#   adds the run evidence for this work order.
+#
+# Trigger: the vault PAT cannot dispatch workflows or apply labels, so the
+# trigger is a push to the anvil/run-youtube-video-v2 branch. The commit
+# this workflow pushes back uses GITHUB_TOKEN, which does not retrigger
+# workflows, so the run cannot loop on its own push.
+
+on:
+  push:
+    branches: [anvil/run-youtube-video-v2]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: anvil-execute-content-video-v2-${{ github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  BLENDER_VERSION: "4.5.15"
+
+jobs:
+  anvil-execute-content-video-v2:
+    name: Run the ANVIL content line for the YouTube video v2 (Opus writes, Blender renders)
+    runs-on: ubuntu-latest
+    timeout-minutes: 320
+    env:
+      ANTHROPIC_BASE_URL: https://gateway.ai.cloudflare.com/v1/693ae9c587f1f2c34328bb47447366b0/arananet-ai-gateway/anthropic
+      ANTHROPIC_API_KEY: ${{ secrets.CF_AIG_TOKEN }}
+      ANTHROPIC_CUSTOM_HEADERS: "cf-aig-authorization: Bearer ${{ secrets.CF_AIG_TOKEN }}"
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+    steps:
+      - name: Check out this repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Claude Code and the production tools
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude --version
+          ffmpeg -version | head -1
+          pip install edge-tts
+          edge-tts --version || python3 -m edge_tts --version || true
+
+      - name: Cache the pinned Blender
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/blender-${{ env.BLENDER_VERSION }}
+          key: blender-${{ env.BLENDER_VERSION }}-linux-x64
+
+      - name: Set up Blender (pinned 4.5 LTS)
+        id: blender_setup
+        run: |
+          BLENDER_ROOT="${HOME}/blender-${BLENDER_VERSION}"
+          if [ ! -x "${BLENDER_ROOT}/blender" ]; then
+            echo "Cache miss: downloading Blender ${BLENDER_VERSION}"
+            curl -fsSL "https://download.blender.org/release/Blender4.5/blender-${BLENDER_VERSION}-linux-x64.tar.xz" -o /tmp/blender.tar.xz
+            mkdir -p "${BLENDER_ROOT}"
+            tar -xJf /tmp/blender.tar.xz -C "${BLENDER_ROOT}" --strip-components=1
+            rm -f /tmp/blender.tar.xz
+          else
+            echo "Blender restored from cache"
+          fi
+          echo "${BLENDER_ROOT}" >> "${GITHUB_PATH}"
+          "${BLENDER_ROOT}/blender" --version
+
+      - name: Blender smoke gate (model and export headless)
+        id: smoke_blender
+        run: |
+          SMOKE_DIR="${RUNNER_TEMP}/blender-smoke"
+          mkdir -p "${SMOKE_DIR}"
+          cat > "${SMOKE_DIR}/smoke.py" <<'EOF'
+          import bpy
+          import os
+          import sys
+
+          out = os.path.join(sys.argv[sys.argv.index("--") + 1], "smoke.glb")
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.mesh.primitive_cube_add(size=2)
+          cube = bpy.context.active_object
+          cube.name = "smoke_cube"
+          bpy.ops.export_scene.gltf(filepath=out, export_format="GLB")
+          print("BLENDER_SMOKE_EXPORTED", out)
+          EOF
+          blender --background --python "${SMOKE_DIR}/smoke.py" -- "${SMOKE_DIR}" > "${SMOKE_DIR}/smoke.txt" 2>&1 || true
+          cat "${SMOKE_DIR}/smoke.txt"
+          if [ ! -s "${SMOKE_DIR}/smoke.glb" ]; then
+            echo "BLENDER SMOKE FAILED: headless Blender did not export smoke.glb. Stopping before the line runs."
+            exit 1
+          fi
+          echo "Blender smoke passed: blender ${BLENDER_VERSION} modeled and exported a glb headless."
+
+      - name: Gateway smoke test (claude-sonnet-5-5)
+        id: smoke_sonnet
+        if: steps.smoke_blender.outcome == 'success'
+        run: |
+          REPLY=$(claude -p "Reply with exactly: GATEWAY_OK" --model claude-sonnet-5-5 --output-format text)
+          echo "Gateway reply: ${REPLY}"
+          CLEAN=$(printf '%s' "${REPLY}" | tr -d '[:space:]')
+          if [ "${CLEAN}" != "GATEWAY_OK" ]; then
+            echo "Sonnet smoke failed: expected GATEWAY_OK and got the reply above. Stopping before the line runs."
+            exit 1
+          fi
+          echo "Sonnet smoke passed: claude-sonnet-5-5 answered through the gateway Anthropic endpoint."
+
+      - name: Gateway smoke test (claude-opus-5-5)
+        id: smoke_opus
+        if: steps.smoke_sonnet.outcome == 'success'
+        run: |
+          REPLY=$(claude -p "Reply with exactly: GATEWAY_OK" --model claude-opus-5-5 --output-format text)
+          echo "Gateway reply: ${REPLY}"
+          CLEAN=$(printf '%s' "${REPLY}" | tr -d '[:space:]')
+          if [ "${CLEAN}" != "GATEWAY_OK" ]; then
+            echo "Opus smoke failed: expected GATEWAY_OK and got the reply above. Stopping before the line runs."
+            exit 1
+          fi
+          echo "Opus smoke passed: claude-opus-5-5 answered through the gateway Anthropic endpoint."
+
+      - name: Run the ANVIL content-video line in execute mode
+        id: line
+        if: steps.smoke_blender.outcome == 'success' && steps.smoke_sonnet.outcome == 'success' && steps.smoke_opus.outcome == 'success'
+        run: |
+          PYTHONPATH=. python3 -m anvil.cli run . \
+            --pipeline pipelines/content-video.json \
+            --work-order work-orders/issue-18.json \
+            --execute
+
+      - name: Run the deterministic video checks
+        id: checks
+        if: always() && steps.smoke_blender.outcome == 'success' && steps.smoke_sonnet.outcome == 'success' && steps.smoke_opus.outcome == 'success'
+        run: |
+          python3 tools/video_checks_v2.py > content/youtube-anvil-v2/checks.txt 2>&1
+          echo "CHECKS_EXIT=$?" >> content/youtube-anvil-v2/checks.txt
+          cat content/youtube-anvil-v2/checks.txt
+
+      - name: Run the factory test suite after the line
+        id: suite
+        if: always() && steps.smoke_blender.outcome == 'success' && steps.smoke_sonnet.outcome == 'success' && steps.smoke_opus.outcome == 'success'
+        run: |
+          python3 -m pytest tests/ -q > suite-output.txt 2>&1
+          echo "SUITE_EXIT=$?" >> suite-result.txt
+          tail -5 suite-output.txt
+
+      - name: Commit the run evidence back to the branch
+        if: always() && steps.smoke_blender.outcome == 'success' && steps.smoke_sonnet.outcome == 'success' && steps.smoke_opus.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git add -f runs/ 2>/dev/null || true
+          git diff --cached --stat > run-diff.txt || true
+          if git diff --cached --quiet; then
+            echo "The run produced no file changes to commit."
+            exit 0
+          fi
+          VERDICT=$(python3 -c "import json; print(json.load(open('runs/wo-gh-18/report.json'))['verdict'])" 2>/dev/null || echo "no-report")
+          git commit -m "ANVIL execute run wo-gh-18 (issue 18): verdict ${VERDICT}" -m "Content line executed with per station routing: writer on claude-opus-5-5, reviewers and remaining content stations on claude-sonnet-5-5, through the Cloudflare AI Gateway. The media-producer built and rendered the film inside the run with headless Blender 4.5.15 (Eevee) and assembled it with ffmpeg. Publishing hold: the video stops at the human gate, nothing posted."
+          git fetch origin "${GITHUB_REF_NAME}"
+          git rebase "origin/${GITHUB_REF_NAME}" || { git rebase --abort; echo "Rebase onto the branch tip failed; pushing as is not attempted."; exit 1; }
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Comment the run report on issue 18
+        if: always() && steps.smoke_blender.outcome == 'success' && steps.smoke_sonnet.outcome == 'success' && steps.smoke_opus.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          python3 - <<'PYEOF'
+          import json, os
+          from pathlib import Path
+          run_url = os.environ["RUN_URL"]
+          branch = os.environ["BRANCH"]
+          report_path = Path("runs/wo-gh-18/report.json")
+          if not report_path.exists():
+              lines = [
+                  "## ANVIL execute run report",
+                  "",
+                  "The executed run did not produce a report.json, so there is no verdict to report. "
+                  f"See the workflow run for the failure: {run_url}",
+              ]
+              Path("comment.md").write_text("\n".join(lines) + "\n")
+              raise SystemExit(0)
+          report = json.loads(report_path.read_text())
+          decision = report.get("decision", {})
+          lines = [
+              "## ANVIL execute run report",
+              "",
+              f"Work order: {report['work_order_id']}",
+              f"Pipeline: {report['pipeline']}",
+              f"Approver verdict: {report['verdict']}",
+              f"Human review required: {report['human_required']}",
+              f"Deployment status: {report.get('deployment_status')}",
+              "",
+              "Decision record:",
+              f"- Approver: {decision.get('approver', {}).get('rule', '')}",
+              f"- Human gate: {decision.get('human_gate', {}).get('rule', '')}",
+              "",
+              "| Station | Status | Configured model | Executed model |",
+              "|---|---|---|---|",
+          ]
+          for step in report.get("steps", []):
+              lines.append(
+                  f"| {step['station']} | {step['status']} | "
+                  f"{step.get('configured_model')} | {step.get('executed_model')} |"
+              )
+          warnings = report.get("warnings") or []
+          if warnings:
+              lines += ["", "Warnings recorded by the run:"] + [f"- {w}" for w in warnings]
+          checks = Path("content/youtube-anvil-v2/checks.txt")
+          if checks.exists():
+              lines += ["", "Deterministic video checks (tools/video_checks_v2.py):", "", "```",
+                        checks.read_text().strip(), "```"]
+          diff_path = Path("run-diff.txt")
+          if diff_path.exists() and diff_path.read_text().strip():
+              lines += ["", "Files changed by the run (committed to "
+                        f"`{branch}`):", "", "```", diff_path.read_text().strip(), "```"]
+          lines += [
+              "",
+              "Honest note: this run EXECUTED its content stations with per station "
+              "model routing. The writer (the scriptwriter) ran claude-opus-5-5 and "
+              "the reviewers (facts, voice, brand, design) ran claude-sonnet-5-5, "
+              "all through Claude Code against the Cloudflare AI Gateway Anthropic "
+              "route, each station dispatched by tools/anvil_station.py to "
+              "tools/claude_station.py with its configured model. Both model routes "
+              "and headless Blender passed smoke gates before the line ran. The "
+              "media-producer built and rendered the film inside the run with "
+              "Blender (Eevee) from its own committed scene scripts, synthesized "
+              "the narration, generated the procedural sound bed and assembled "
+              "the MP4 with ffmpeg. The work order carries the publishing risk "
+              "hint, so the finished video stops at the human gate: nothing was "
+              "published or posted anywhere.",
+              f"Workflow run: {run_url}",
+          ]
+          Path("comment.md").write_text("\n".join(lines) + "\n")
+          print(f"Verdict: {report['verdict']}")
+          PYEOF
+          gh issue comment 18 --body-file comment.md
+
+      - name: Upload the run directory
+        if: always() && steps.smoke_blender.outcome == 'success' && steps.smoke_sonnet.outcome == 'success' && steps.smoke_opus.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: anvil-execute-run-wo-gh-18
+          path: |
+            runs/
+            content/youtube-anvil-v2/*.mp4
+            content/youtube-anvil-v2/*.md
+            content/youtube-anvil-v2/*.txt
+            content/youtube-anvil-v2/*.png
+            content/youtube-anvil-v2/frames/frame-*.png
+            content/youtube-anvil-v2/blender/
+          if-no-files-found: ignore

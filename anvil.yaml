@@ -3,7 +3,7 @@
   "runtime": {
     "command": "python3 tools/anvil_station.py {packet} {output}",
     "kind": "command",
-    "timeout_seconds": 1800
+    "timeout_seconds": 3600
   },
   "stations": {
     "intake": {

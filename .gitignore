@@ -5,3 +5,9 @@ node_modules/
 .wrangler/
 runs/
 !reviews/
+
+# wo-gh-18 (video v2): Blender render working material stays out of the repo.
+# Only the sampled stills under frames/frame-*.png are run evidence.
+content/youtube-anvil-v2/frames/s*/
+content/youtube-anvil-v2/blender/*.blend
+content/youtube-anvil-v2/blender/*.blend1
