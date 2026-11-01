@@ -12,8 +12,8 @@ content/youtube-anvil-v2/frames/s*/
 content/youtube-anvil-v2/blender/*.blend
 content/youtube-anvil-v2/blender/*.blend1
 
-# wo-gh-18 loopback: render chunk logs, assembly intermediates and the
-# generated sound bed stay out of the repo; render-stats.json is the record.
-content/youtube-anvil-v2/frames/logs/
+# wo-gh-18 loopback: assembly intermediates and the generated sound bed
+# stay out of the repo; the render chunk logs are committed as evidence
+# alongside render-stats.json.
 content/youtube-anvil-v2/clips/
 content/youtube-anvil-v2/audio/bed.wav

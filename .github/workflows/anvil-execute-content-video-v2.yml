@@ -40,7 +40,10 @@ name: anvil-execute-content-video-v2
 #   step installs pytest, so the suite step actually runs the factory
 #   suite; and the commit back step stages run-diff.txt after writing
 #   it, so the unstaged change it creates no longer poisons its own
-#   rebase.
+#   rebase. A third repair landed after the first loopback run proved
+#   the runner image carries no ffmpeg: the install step installs
+#   ffmpeg and xvfb when they are missing and fails loudly if they are
+#   still absent afterwards.
 # - The work order carries the publishing risk hint on purpose. The
 #   finished video stops at the human gate for the owner's review; the
 #   publisher station inside the sandbox can only write a text record into
@@ -97,10 +100,20 @@ jobs:
         run: |
           npm install -g @anthropic-ai/claude-code
           claude --version
-          ffmpeg -version | head -1
           pip install edge-tts pytest
           edge-tts --version || python3 -m edge_tts --version || true
           python3 -m pytest --version
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            echo "ffmpeg is not on PATH on this runner image: installing it."
+            sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          fi
+          if ! command -v xvfb-run >/dev/null 2>&1; then
+            echo "xvfb-run is not on PATH on this runner image: installing xvfb."
+            sudo apt-get update -qq && sudo apt-get install -y -qq xvfb
+          fi
+          command -v ffmpeg
+          ffmpeg -version | head -1
+          command -v xvfb-run
 
       - name: Cache the pinned Blender
         uses: actions/cache@v4
