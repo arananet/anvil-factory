@@ -1,0 +1,18 @@
+FAIL S1-resolution (anvil-youtube-v2.mp4 missing)
+FAIL S1-framerate (anvil-youtube-v2.mp4 missing)
+FAIL S2-duration (anvil-youtube-v2.mp4 missing)
+PASS S3-word-count (194 words)
+PASS S3-timings (14 timing marks)
+PASS S5-opening (starts: 'Introducing ANVIL. I am a software facto')
+PASS S5-pronouns (12 first person pronouns)
+PASS S5-no-third-person
+PASS S4-clean-script.md
+PASS S4-clean-storyboard.md
+FAIL S4-clean-production-notes.md (file missing)
+PASS S6-glb-sha256 (daea8110b3568653...)
+FAIL S7-contact-sheet (contact-sheet.png missing)
+FAIL S7-still-count (0 sampled stills)
+PASS S7-still-size
+PASS S8-blender-scripts (8 python scripts)
+FAIL S8-render-stats (production-notes.md missing)
+RESULT: FAIL (7 failing checks)

@@ -1,0 +1,28 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-brand",
+  "to_station": "reviewer-design",
+  "work_order_id": "wo-gh-18",
+  "artifact_path": "runs/wo-gh-18/reviewer-brand.output.md",
+  "status": "executed",
+  "created_at": "2026-11-01T01:29:37.858812+00:00",
+  "review": {
+    "station": "reviewer-brand",
+    "verdict": "pass",
+    "findings": [
+      "No employer name appears in script.md, storyboard.md, brief.md, source-pack.md or blender/*.py. I searched case-insensitively for the forbidden strings used in tools/video_checks_v2.py (nestl\u00e9, nestle) and for employer wording.",
+      "No em or en dash appears in script.md, storyboard.md, brief.md, source-pack.md or blender/*.py. This is the spec's S4 rule.",
+      "The only names present are ANVIL, Sentia (Patch One), Cloudflare AI Gateway, GitHub, Apache 2.0 and sentia.info-693.workers.dev. All are on the spec's closed claim list. No person, other factory, product or video is named. source-pack.md explicitly keeps the person named in the Sentia footer out of the film.",
+      "The narration opens with 'Introducing ANVIL' and stays in first person. It makes no promises beyond the claim list. Five reviewers is stated for the factory in general, with no tie to this video's own panel.",
+      "The on screen text strings in blender/scene_line.py and blender/scene_proof.py match the storyboard strings exactly. I checked ANVIL, One intake, The spec comes first, Stations build, Five reviewers in parallel, A human approves., Verified memory., Sentia, sentia.info-693.workers.dev and Designed and built end to end by ANVIL.",
+      "Not reviewed: the media-producer step failed, so there is no anvil-youtube-v2.mp4, contact-sheet.png or production-notes.md. Only frames/s1 exists. After production is repaired, the brand check should be re-run on the final video. It should confirm that production-notes.md has the synthetic speech disclosure (YouTube AI generated content label at publish time) and no forbidden strings.",
+      "The script's target timings end at 1:20. The measured narration durations in durations.json decide the final cut."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}

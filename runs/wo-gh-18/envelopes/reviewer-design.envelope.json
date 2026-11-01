@@ -1,0 +1,26 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-design",
+  "to_station": "approver",
+  "work_order_id": "wo-gh-18",
+  "artifact_path": "runs/wo-gh-18/reviewer-design.output.md",
+  "status": "executed",
+  "created_at": "2026-11-01T01:29:51.035873+00:00",
+  "review": {
+    "station": "reviewer-design",
+    "verdict": "changes_requested",
+    "findings": [
+      "The media-producer step failed, so the artifacts this review is meant to judge are missing. There is no anvil-youtube-v2.mp4, no contact sheet, no sampled stills under frames/, and no production-notes.md.",
+      "Only frames/s1 exists, with 133 PNGs, and frames/logs holds four s1 render logs. Sections s2 to s7 have no rendered frames. Motion continuity at section midpoints and transitions cannot be judged for those sections, and the transitions between sections do not exist.",
+      "The spec requires one 1920x1080, 30 fps frame sequence per section. Section 1 alone is incomplete, because the 133 files fall short of the roughly 181 or more frames the logs imply, so even its midpoint and ending cannot be verified.",
+      "The design system is not usable as a standard for this film. design/DESIGN.md exists, but every token in design/tokens.json is still TODO: colors, typography, spacing, layout and motion. Its quality bars cover product pages, covering responsive layout, touch targets and text contrast, and do not cover film. Brand consistency and composition therefore cannot be checked against any defined token. I am not imposing outside design preferences, so this is flagged rather than judged.",
+      "Re-run the media-producer through the full render of all seven sections. Then produce the contact sheet, the sampled stills at section midpoints and transitions, the assembled mp4 and production-notes.md, and resubmit for design review."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}

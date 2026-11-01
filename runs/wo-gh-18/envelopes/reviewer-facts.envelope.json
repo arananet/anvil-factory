@@ -1,0 +1,29 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-facts",
+  "to_station": "reviewer-voice",
+  "work_order_id": "wo-gh-18",
+  "artifact_path": "runs/wo-gh-18/reviewer-facts.output.md",
+  "status": "executed",
+  "created_at": "2026-11-01T01:28:50.169865+00:00",
+  "review": {
+    "station": "reviewer-facts",
+    "verdict": "changes_requested",
+    "findings": [
+      "Review written to content/youtube-anvil-v2/reviews/reviewer-facts.md.",
+      "Claims C1 to C10 in script.md map to the spec's closed claim list, phrased in first person. No claim outside the list, no forbidden name, and no counts beyond three intake kinds, five reviewers and five layers. The narration is 189 words with no em or en dashes.",
+      "The storyboard on screen text matches the spec's wording exactly in all seven sections.",
+      "Section 7 says 'My content line wrote, rendered and reviewed this video, and it stopped at the human gate' (C11). No artifact supports it yet, because the media-producer step failed. There is no MP4, production-notes.md, render or review record. The source pack flags this as F5. Re-check it once the video is produced and the line reaches the gate.",
+      "Section 5 states five reviewers in general, but pipelines/content-video.json has four. The script avoids a conflict by giving no count in section 7 (flag F1). Keep it that way.",
+      "Section 4 says stations work 'one after another', which goes slightly beyond the list's 'in a line'. Suggest 'work down the line'.",
+      "Section 7 says 'My models are routed per station'. The claim concerns the models that staff the stations, so the wording is loose but acceptable.",
+      "Missing input: the produced artifacts (MP4, production-notes.md, checks.txt), without which on screen text as rendered and C11 cannot be confirmed."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}

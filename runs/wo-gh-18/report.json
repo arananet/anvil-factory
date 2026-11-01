@@ -1,0 +1,262 @@
+{
+  "work_order_id": "wo-gh-18",
+  "pipeline": "content-video",
+  "title": "ANVIL the video v2: a dynamic Blender rendered launch film produced by the content line",
+  "kind": "content",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "completed",
+      "detail": "Work order normalized",
+      "duration_ms": 0.013,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-18/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "brief-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-18/brief-writer.output.md",
+      "duration_ms": 34529.614,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-18/brief-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "researcher",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-18/researcher.output.md",
+      "duration_ms": 72166.449,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-18/researcher.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-18/writer.output.md",
+      "duration_ms": 113539.388,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-18/writer.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "media-producer",
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 4: claude_station: station media-producer timed out after 1500s",
+      "duration_ms": 1500184.037,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-18/media-producer.packet.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-facts",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-18/reviewer-facts.output.md",
+      "duration_ms": 25272.079,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-18/reviewer-facts.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-voice",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-18/reviewer-voice.output.md",
+      "duration_ms": 21805.812,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-18/reviewer-voice.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-brand",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-18/reviewer-brand.output.md",
+      "duration_ms": 25882.664,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-18/reviewer-brand.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-18/reviewer-design.output.md",
+      "duration_ms": 13176.836,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-18/reviewer-design.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: changes_requested",
+      "duration_ms": 0.042,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-18/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "approver",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Review written to content/youtube-anvil-v2/reviews/reviewer-facts.md.; Claims C1 to C10 in script.md map to the spec's closed claim list, phrased in first person. No claim outside the list, no forbidden name, and no counts beyond three intake kinds, five reviewers and five layers. The narration is 189 words with no em or en dashes.; The storyboard on screen text matches the spec's wording exactly in all seven sections.; Section 7 says 'My content line wrote, rendered and reviewed this video, and it stopped at the human gate' (C11). No artifact supports it yet, because the media-producer step failed. There is no MP4, production-notes.md, render or review record. The source pack flags this as F5. Re-check it once the video is produced and the line reaches the gate.; Section 5 states five reviewers in general, but pipelines/content-video.json has four. The script avoids a conflict by giving no count in section 7 (flag F1). Keep it that way.; Section 4 says stations work 'one after another', which goes slightly beyond the list's 'in a line'. Suggest 'work down the line'.; Section 7 says 'My models are routed per station'. The claim concerns the models that staff the stations, so the wording is loose but acceptable.; Missing input: the produced artifacts (MP4, production-notes.md, checks.txt), without which on screen text as rendered and C11 cannot be confirmed.; script.md opens with exactly 'Introducing ANVIL' and stays in first person from the first line to the last. None of the third person constructions banned by S5 appear ('ANVIL is a', 'ANVIL is an', 'the factory is', and so on). Pronouns I and my appear well over eight times.; The narration is 189 words across seven ### blocks, inside the 150 to 200 range. Every block carries a Target timing line in M:SS form, and the timings run to 1:20.; script.md contains no em dash or en dash and none of the banned hype words. The sentences are full and natural, with no stacked fragments or slogans in a row.; Non-blocking style notes: sections 4 and 6 both open with 'Then'. Section 5 says 'in parallel, all at the same moment', which repeats itself. Section 7's 'a concept sensor patch product I designed and built end to end' is a dense noun stack.; The AI generated disclosure cannot be checked yet. The spec puts the synthetic speech disclosure (set the YouTube AI generated label at publish time) in production-notes.md. That file does not exist because media-producer failed upstream. The media-producer rerun must write it, and the disclosure must be re-checked then.; The review is written to content/youtube-anvil-v2/reviews/reviewer-voice.md.; No employer name appears in script.md, storyboard.md, brief.md, source-pack.md or blender/*.py. I searched case-insensitively for the forbidden strings used in tools/video_checks_v2.py (nestl\u00e9, nestle) and for employer wording.; No em or en dash appears in script.md, storyboard.md, brief.md, source-pack.md or blender/*.py. This is the spec's S4 rule.; The only names present are ANVIL, Sentia (Patch One), Cloudflare AI Gateway, GitHub, Apache 2.0 and sentia.info-693.workers.dev. All are on the spec's closed claim list. No person, other factory, product or video is named. source-pack.md explicitly keeps the person named in the Sentia footer out of the film.; The narration opens with 'Introducing ANVIL' and stays in first person. It makes no promises beyond the claim list. Five reviewers is stated for the factory in general, with no tie to this video's own panel.; The on screen text strings in blender/scene_line.py and blender/scene_proof.py match the storyboard strings exactly. I checked ANVIL, One intake, The spec comes first, Stations build, Five reviewers in parallel, A human approves., Verified memory., Sentia, sentia.info-693.workers.dev and Designed and built end to end by ANVIL.; Not reviewed: the media-producer step failed, so there is no anvil-youtube-v2.mp4, contact-sheet.png or production-notes.md. Only frames/s1 exists. After production is repaired, the brand check should be re-run on the final video. It should confirm that production-notes.md has the synthetic speech disclosure (YouTube AI generated content label at publish time) and no forbidden strings.; The script's target timings end at 1:20. The measured narration durations in durations.json decide the final cut.; The media-producer step failed, so the artifacts this review is meant to judge are missing. There is no anvil-youtube-v2.mp4, no contact sheet, no sampled stills under frames/, and no production-notes.md.; Only frames/s1 exists, with 133 PNGs, and frames/logs holds four s1 render logs. Sections s2 to s7 have no rendered frames. Motion continuity at section midpoints and transitions cannot be judged for those sections, and the transitions between sections do not exist.; The spec requires one 1920x1080, 30 fps frame sequence per section. Section 1 alone is incomplete, because the 133 files fall short of the roughly 181 or more frames the logs imply, so even its midpoint and ending cannot be verified.; The design system is not usable as a standard for this film. design/DESIGN.md exists, but every token in design/tokens.json is still TODO: colors, typography, spacing, layout and motion. Its quality bars cover product pages, covering responsive layout, touch targets and text contrast, and do not cover film. Brand consistency and composition therefore cannot be checked against any defined token. I am not imposing outside design preferences, so this is flagged rather than judged.; Re-run the media-producer through the full render of all seven sections. Then produce the contact sheet, the sampled stills at section midpoints and transitions, the assembled mp4 and production-notes.md, and resubmit for design review.",
+      "reason": "Review written to content/youtube-anvil-v2/reviews/reviewer-facts.md.; Claims C1 to C10 in script.md map to the spec's closed claim list, phrased in first person. No claim outside the list, no forbidden name, and no counts beyond three intake kinds, five reviewers and five layers. The narration is 189 words with no em or en dashes.; The storyboard on screen text matches the spec's wording exactly in all seven sections.; Section 7 says 'My content line wrote, rendered and reviewed this video, and it stopped at the human gate' (C11). No artifact supports it yet, because the media-producer step failed. There is no MP4, production-notes.md, render or review record. The source pack flags this as F5. Re-check it once the video is produced and the line reaches the gate.; Section 5 states five reviewers in general, but pipelines/content-video.json has four. The script avoids a conflict by giving no count in section 7 (flag F1). Keep it that way.; Section 4 says stations work 'one after another', which goes slightly beyond the list's 'in a line'. Suggest 'work down the line'.; Section 7 says 'My models are routed per station'. The claim concerns the models that staff the stations, so the wording is loose but acceptable.; Missing input: the produced artifacts (MP4, production-notes.md, checks.txt), without which on screen text as rendered and C11 cannot be confirmed.; script.md opens with exactly 'Introducing ANVIL' and stays in first person from the first line to the last. None of the third person constructions banned by S5 appear ('ANVIL is a', 'ANVIL is an', 'the factory is', and so on). Pronouns I and my appear well over eight times.; The narration is 189 words across seven ### blocks, inside the 150 to 200 range. Every block carries a Target timing line in M:SS form, and the timings run to 1:20.; script.md contains no em dash or en dash and none of the banned hype words. The sentences are full and natural, with no stacked fragments or slogans in a row.; Non-blocking style notes: sections 4 and 6 both open with 'Then'. Section 5 says 'in parallel, all at the same moment', which repeats itself. Section 7's 'a concept sensor patch product I designed and built end to end' is a dense noun stack.; The AI generated disclosure cannot be checked yet. The spec puts the synthetic speech disclosure (set the YouTube AI generated label at publish time) in production-notes.md. That file does not exist because media-producer failed upstream. The media-producer rerun must write it, and the disclosure must be re-checked then.; The review is written to content/youtube-anvil-v2/reviews/reviewer-voice.md.; No employer name appears in script.md, storyboard.md, brief.md, source-pack.md or blender/*.py. I searched case-insensitively for the forbidden strings used in tools/video_checks_v2.py (nestl\u00e9, nestle) and for employer wording.; No em or en dash appears in script.md, storyboard.md, brief.md, source-pack.md or blender/*.py. This is the spec's S4 rule.; The only names present are ANVIL, Sentia (Patch One), Cloudflare AI Gateway, GitHub, Apache 2.0 and sentia.info-693.workers.dev. All are on the spec's closed claim list. No person, other factory, product or video is named. source-pack.md explicitly keeps the person named in the Sentia footer out of the film.; The narration opens with 'Introducing ANVIL' and stays in first person. It makes no promises beyond the claim list. Five reviewers is stated for the factory in general, with no tie to this video's own panel.; The on screen text strings in blender/scene_line.py and blender/scene_proof.py match the storyboard strings exactly. I checked ANVIL, One intake, The spec comes first, Stations build, Five reviewers in parallel, A human approves., Verified memory., Sentia, sentia.info-693.workers.dev and Designed and built end to end by ANVIL.; Not reviewed: the media-producer step failed, so there is no anvil-youtube-v2.mp4, contact-sheet.png or production-notes.md. Only frames/s1 exists. After production is repaired, the brand check should be re-run on the final video. It should confirm that production-notes.md has the synthetic speech disclosure (YouTube AI generated content label at publish time) and no forbidden strings.; The script's target timings end at 1:20. The measured narration durations in durations.json decide the final cut.; The media-producer step failed, so the artifacts this review is meant to judge are missing. There is no anvil-youtube-v2.mp4, no contact sheet, no sampled stills under frames/, and no production-notes.md.; Only frames/s1 exists, with 133 PNGs, and frames/logs holds four s1 render logs. Sections s2 to s7 have no rendered frames. Motion continuity at section midpoints and transitions cannot be judged for those sections, and the transitions between sections do not exist.; The spec requires one 1920x1080, 30 fps frame sequence per section. Section 1 alone is incomplete, because the 133 files fall short of the roughly 181 or more frames the logs imply, so even its midpoint and ending cannot be verified.; The design system is not usable as a standard for this film. design/DESIGN.md exists, but every token in design/tokens.json is still TODO: colors, typography, spacing, layout and motion. Its quality bars cover product pages, covering responsive layout, touch targets and text contrast, and do not cover film. Brand consistency and composition therefore cannot be checked against any defined token. I am not imposing outside design preferences, so this is flagged rather than judged.; Re-run the media-producer through the full render of all seven sections. Then produce the contact sheet, the sampled stills at section midpoints and transitions, the assembled mp4 and production-notes.md, and resubmit for design review.",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: required",
+      "duration_ms": 0.007,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "publisher",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-18/publisher.output.md",
+      "duration_ms": 28631.261,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-18/publisher.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-18/observer.output.md",
+      "duration_ms": 115801.901,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-18/observer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": "claude-sonnet-4-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    }
+  ],
+  "verdict": "changes_requested",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 1,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [
+    "publishing"
+  ],
+  "decision": {
+    "approver": {
+      "reviews_counted": [
+        {
+          "station": "reviewer-facts",
+          "verdict": "changes_requested"
+        },
+        {
+          "station": "reviewer-voice",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-brand",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "changes_requested"
+        }
+      ],
+      "reviews_expected": [
+        "reviewer-facts",
+        "reviewer-voice",
+        "reviewer-brand",
+        "reviewer-design"
+      ],
+      "rule": "Reviewers reviewer-facts, reviewer-design requested changes."
+    },
+    "human_gate": {
+      "required": true,
+      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": []
+}
