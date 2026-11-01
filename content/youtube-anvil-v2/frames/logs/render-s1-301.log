@@ -1,0 +1,14 @@
+Blender 4.5.15 LTS (hash 5afeabba6097 built 2026-10-22 01:33:47)
+Fra:301 Mem:79.48M (Peak 79.48M) | Time:00:05.75 | Rendering 1 / 6 samples
+Fra:301 Mem:79.48M (Peak 79.48M) | Time:00:15.39 | Rendering 6 / 6 samples
+Saved: 'frames/s1/f_0301.png'
+Time: 00:16.15 (Saving: 00:00.72)
+
+Fra:302 Mem:79.46M (Peak 111.12M) | Time:00:03.87 | Rendering 1 / 6 samples
+Fra:302 Mem:79.46M (Peak 111.12M) | Time:00:13.42 | Rendering 6 / 6 samples
+Saved: 'frames/s1/f_0302.png'
+Time: 00:13.82 (Saving: 00:00.37)
+
+SECTION_RENDER_DONE s1 frames=2 seconds=30.0
+
+Blender quit

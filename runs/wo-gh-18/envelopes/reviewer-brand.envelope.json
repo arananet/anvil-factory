@@ -5,18 +5,16 @@
   "work_order_id": "wo-gh-18",
   "artifact_path": "runs/wo-gh-18/reviewer-brand.output.md",
   "status": "executed",
-  "created_at": "2026-11-01T02:56:00.726275+00:00",
+  "created_at": "2026-11-01T07:03:48.283177+00:00",
   "review": {
     "station": "reviewer-brand",
     "verdict": "pass",
     "findings": [
-      "Naming: script.md, storyboard.md, production-notes.md and brief.md name no employer. A grep for common employer and vendor names found none. The only third-party names are the ones the spec's closed claim list allows: Sentia (C10), Cloudflare AI Gateway and GitHub (C8), and Apache 2.0 (C9).",
-      "No other factory, product, video or person is named or referenced. production-notes.md cites the Sentia repository arananet/sentia only as GLB provenance, which is first-party and not a spoken claim.",
-      "Spec S4 is met: script.md, storyboard.md and production-notes.md contain no em dash or en dash characters. I checked with a grep for U+2013 and U+2014.",
-      "Promises: the script makes only claims from the spec's closed list C1 to C11. The only counts are the three intake kinds (named without a count), five reviewers and five Sentia layers. Section 5 states five reviewers for the factory in general, so it does not tie the number to this video's own panel (flag F1). Section 7 says the content line wrote, rendered and reviewed the video and that it stopped at the human gate, and it claims no publication.",
-      "Search-ranking risk: the spoken address sentia.info-693.workers.dev is the only external link and matches C10. The script contains no superlatives, no 'first' or 'best' claims, no subscribe or call-to-action wording, and no comparison with other products.",
-      "Disclosure: production-notes.md records that the narration is synthetic speech and that the YouTube AI generated content label must be set at publish time. Nothing is published in this pass.",
-      "Scope: I judged naming and policy on the text inputs only. The finished film is not yet in the tree, so on-screen text in the rendered frames is for the second pass to re-confirm."
+      "Naming: script.md names only Sentia, sentia.info-693.workers.dev, Cloudflare AI Gateway, GitHub and Apache 2.0. Each of these is on the spec's closed claim list (spec.md lines 33, 46-48). I found no employer of the author, other factory, product, video or person in script.md or storyboard.md. A grep for common employer and vendor names across script.md, storyboard.md, brief.md and production-notes.md returned nothing apart from brief.md's own rule against naming them.",
+      "Promises: the script promises nothing it cannot keep. The claims are the first-person ones the spec allows (C1-C11). The section 7 close says the content line wrote, rendered and reviewed the video and that it stopped at the human gate. That matches this work order, where nothing is published. I checked the narration only. I did not check any on-screen text.",
+      "Count discipline: the only counts stated are five reviewers and five Sentia layers, both allowed by the spec. Section 5 says 'Five of my reviewers' in general terms with no tie to this video's own panel (flag F1), and no reviewer count appears in section 7. The three intake kinds are listed without a number.",
+      "Search-ranking risk: nothing in the narration would embarrass the author if it ranked first on search. The only third-party names are the infrastructure vendors in claim C8. Two items still need attention at publish time. The narration is synthetic speech, so the YouTube AI generated content label must be set, as production-notes.md discloses. The address is spoken as written, and the voice reading it badly would be recorded in production-notes.md, not fixed by editing the words.",
+      "Scope: this is the pass 1 check, covering the script text. The finished film and any on-screen text are judged in pass 2, so I make no claim about them here."
     ]
   },
   "configured_model": "claude-sonnet-5-5",

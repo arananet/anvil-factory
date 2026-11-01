@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "completed",
       "detail": "Work order normalized",
-      "duration_ms": 0.01,
+      "duration_ms": 0.021,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/report.json"
@@ -21,7 +21,7 @@
       "station": "brief-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-18/brief-writer.output.md",
-      "duration_ms": 13692.687,
+      "duration_ms": 26368.492,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/brief-writer.output.md"
@@ -37,7 +37,7 @@
       "station": "researcher",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-18/researcher.output.md",
-      "duration_ms": 15954.062,
+      "duration_ms": 17393.207,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/researcher.output.md"
@@ -53,7 +53,7 @@
       "station": "writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-18/writer.output.md",
-      "duration_ms": 31446.037,
+      "duration_ms": 45062.468,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/writer.output.md"
@@ -69,7 +69,7 @@
       "station": "media-producer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-18/media-producer.output.md",
-      "duration_ms": 63389.659,
+      "duration_ms": 24732.257,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/media-producer.output.md"
@@ -85,7 +85,7 @@
       "station": "reviewer-facts",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-18/reviewer-facts.output.md",
-      "duration_ms": 24488.038,
+      "duration_ms": 20366.743,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/reviewer-facts.output.md"
@@ -101,7 +101,7 @@
       "station": "reviewer-voice",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-18/reviewer-voice.output.md",
-      "duration_ms": 13179.542,
+      "duration_ms": 21442.117,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/reviewer-voice.output.md"
@@ -117,7 +117,7 @@
       "station": "reviewer-brand",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-18/reviewer-brand.output.md",
-      "duration_ms": 14243.535,
+      "duration_ms": 11362.873,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/reviewer-brand.output.md"
@@ -133,7 +133,7 @@
       "station": "reviewer-design",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-18/reviewer-design.output.md",
-      "duration_ms": 12813.387,
+      "duration_ms": 18547.429,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/reviewer-design.output.md"
@@ -149,7 +149,7 @@
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: approved",
-      "duration_ms": 0.031,
+      "duration_ms": 0.046,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/report.json"
@@ -162,7 +162,7 @@
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: required",
-      "duration_ms": 0.015,
+      "duration_ms": 0.017,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -173,7 +173,7 @@
       "station": "publisher",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-18/publisher.output.md",
-      "duration_ms": 19637.62,
+      "duration_ms": 21560.25,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/publisher.output.md"
@@ -189,7 +189,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-18/observer.output.md",
-      "duration_ms": 77889.369,
+      "duration_ms": 138104.576,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/observer.output.md"

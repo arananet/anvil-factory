@@ -1,13 +1,12 @@
-I checked `brief.md` against the spec and kept it unchanged. I found no concrete error, so I made no corrections and committed nothing.
+I checked `brief.md` and `source-pack.md` against the spec and kept both unchanged, because I found no concrete error in either. I wrote the verification record to `runs/wo-gh-18/brief-writer.output.md`.
 
-- **Format and voice:** The brief matches the spec on every point: 1920x1080, H.264 plus AAC, 30 fps and 60 to 90 seconds. It also has the edge-tts voice `en-US-ChristopherNeural`, 150 to 200 words, and a Target timing in M:SS form per section. The first words are exactly "Introducing ANVIL". The first-person rule, the hype-word ban, the eight-pronoun minimum and the forbidden third-person constructions are all there as in S5.
-- **Structure:** The seven-section table matches the spec's sections in order. The on-screen texts match exactly, and the section 7 closing text sequence is correct.
-- **Claims:** C1 to C11 are the spec's closed list word for word. The allowed counts are three intake kinds, five reviewers and five Sentia layers, and nothing else.
-- **Four reviewers:** The brief does not rephrase C5. It leaves the discrepancy to the researcher. The content-video pipeline has four reviewers, so the "five reviewers" claim is scoped to the default pipelines.
-- **Dashes:** A scan of `brief.md`, `source-pack.md`, `script.md` and `storyboard.md` found no em or en dashes.
-- **Round 1 setup:** The tree is clean, with the frozen inputs as committed. The brief says nothing about the round 1 rendering failure or the loopback architecture. That was not a correction, since the brief's content is still accurate.
-- **Missing inputs:** Nothing is missing. The design tokens are all TODO, so the visual language comes from the spec (paper, ink green, teal). The brief already says the media-producer picks the exact values.
+- **Brief:** the format, voice rules, seven-section plan with exact on-screen text, and claims C1 to C11 all match the spec's wording. The allowed counts are the spec's.
+- **Source pack:** it covers C1 to C11 only, and flags F1 to F5 still hold.
+- **Asset:** the sha256 of `assets/patch-one.glb` on disk matches the spec's value.
+- **Dashes:** a search for em and en dashes in both files found none.
+- **Forbidden names:** neither file names an employer, another factory, product, video or person.
+- **Amendment:** the loopback amendment changes production architecture only, so nothing in the brief needed correcting for it.
 
-I did not render or encode anything, and I did not touch `script.md` or `storyboard.md`. I do not approve my own work. Approval belongs to a different station.
+I left `script.md`, `storyboard.md` and all other content files alone. The brief's C5 scope note stands. Five reviewers exist in the default software and content lines, and this film's own line has four. That is for reviewer-facts to judge. C11 can only be judged in the second pass, once the film exists.
 
 {"model": "claude-sonnet-5-5", "runtime": "claude-code"}

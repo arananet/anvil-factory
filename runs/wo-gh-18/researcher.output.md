@@ -1,19 +1,19 @@
-I checked `brief.md` and `source-pack.md` against the spec and kept both unchanged. I found no concrete error in either, so I corrected nothing and the tree is still clean.
+I verified `brief.md` and `source-pack.md` against the spec and kept both unchanged. I found no concrete error, so I made no corrections and wrote no files. The source pack stays at `content/youtube-anvil-v2/source-pack.md`.
 
-**What I checked**
-- **Claims:** both files cover claims C1 to C11 in the spec's own wording. The brief's seven-section plan, on-screen texts and word budget (150 to 200) match the spec.
-- **Voice rules:** the first-person rules, the banned third-person phrases and the closed list of allowed counts are all present in the brief.
-- **Dashes:** neither file contains an em or en dash.
-- **Asset:** `assets/patch-one.glb` is 386708 bytes, and its sha256 matches the spec's `daea8110…f50f523`.
-- **Reviewer counts:** `pipelines/content-video.json` has four reviewers: facts, voice, brand and design. `pipelines/sdlc-default.json` and `pipelines/content-default.json` each have five. `anvil/model.py` lists six intake kinds. So flags F1 (C5) and F2 (C2) hold as written.
+**What I checked against the spec**
+- **Claim list:** The pack covers C1 to C11 in the spec's wording, with no extra claims and no counts beyond three intake kinds, five reviewers and five Sentia layers.
+- **Dashes:** Neither file contains an em dash or en dash.
+- **GLB:** The file is 386708 bytes and its sha256 is `daea8110b356865396b062bb1ca20944dd7103286758214cbc7804b43c50f523`. Both match the spec and the pack.
+- **C5 and F1:** Five parallel reviewers exist in `pipelines/sdlc-default.json` and `pipelines/content-default.json`. `pipelines/content-video.json` has four: facts, voice, brand and design. The pack states this scope and does not change the claim.
+- **C2 and F2:** `anvil/model.py` lists six kinds, and "issue" is not one of them. The pack flags this and leaves the claim as written.
+- **C9:** `LICENSE` is Apache 2.0 and `pyproject.toml` says `Apache-2.0`.
 
-**For reviewer-facts**
-- **C5:** "Five reviewers" is true of the default lines but not of this film's own four-reviewer panel. The script should keep section 5 about the factory in general. Section 7 should say nothing about a reviewer count.
-- **C2:** "Issue" is an entry source rather than a kind in the code. The claim is a simplification, and the pack cites what supports each word.
-- **C6:** the human gate is triggered by risk hints or a non-approved verdict. The claim is solid for published content, including this film.
-- **C11:** the evidence for the rendered, produced and reviewed parts does not exist yet at this station. It gets judged in the second pass once the film is in the tree.
-- **Provenance:** I did not verify the upstream Sentia commit `c9f9bf9` or `src/patch-one-glb.js`. That line rests on the spec's record. I also did not re-fetch the live Sentia site this pass. The pack's site facts come from its 2026-11-01 fetch.
+**Not re-verified this pass**
+- The live Sentia site fetch (2026-11-01) and the upstream commit `c9f9bf9` of the Sentia repository. The pack already records that the upstream commit was not checked.
+- The pack says the GLB was committed in `7344863`. My `git log` here shows only `fddea15` as the adding commit, so I couldn't confirm that hash. The spec doesn't use it, so I left it.
 
-I wrote no new files. I did not touch `script.md`, `storyboard.md` or anything under `blender/`, and I ran no render, encode or contact-sheet step.
+**Handoffs**
+- **C11 (F5):** The pack can only cite the pipeline and the work order. reviewer-facts judges C11 in the second pass, once the film exists.
+- **No new sources:** The pack adds nothing for the two script wording edits. Section 4's edit drops a phrase and section 7's rewords the C8 claim, and both are covered by existing sources.
 
 {"model": "claude-sonnet-5-5", "runtime": "claude-code"}

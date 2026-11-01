@@ -58,4 +58,34 @@ The narration is synthetic speech (a neural text to speech voice). The YouTube A
 
 ## Environment note
 
-The authoring session had no ffmpeg on PATH, so a temporary ffmpeg binary from the imageio-ffmpeg Python package, kept outside the repository, was used only to read audio durations. No encoding, rendering or frame extraction was run in this pass.
+ffmpeg was on PATH in this pass. blender/durations.py was re-run and reproduced durations.json exactly (2515 frames, 83.833 s), and blender/soundbed.py was re-run and wrote audio/bed.wav (84.33 s). The narration files s1.mp3 to s7.mp3 were kept as synthesized. The GLB sha256 was re-verified against the spec, and all Blender scripts compile. No Blender render, no ffmpeg encoding and no frame extraction was run in this pass.
+
+<!-- render-stats:start -->
+## Render statistics (recorded by the deterministic workflow render step)
+
+Rendered with Blender 4.5.15, Eevee, at 1920x1080 and 30 fps by the workflow's deterministic render step (parallel chunked headless Blender, at most 4 processes at once), outside any model station session.
+Total frames rendered: 2515 frames.
+Per section: section 1: 302 frames in 4178.6 s across 6 chunks, section 2: 207 frames in 3736.5 s across 4 chunks, section 3: 194 frames in 7361.7 s across 4 chunks, section 4: 205 frames in 3350.0 s across 4 chunks, section 5: 173 frames in 2841.0 s across 3 chunks, section 6: 498 frames in 7943.2 s across 9 chunks, section 7: 936 frames in 23423.5 s across 16 chunks.
+Logged render time in total: 52834.5 s of Blender render time summed across chunks (chunks ran in parallel, so wall time was lower).
+The full record is in render-stats.json next to this file.
+<!-- render-stats:end -->
+
+## Film review pass verification (media-producer, hold)
+
+No content file was changed in this pass. script.md and storyboard.md are unchanged from the setup commit. The render statistics block above is preserved exactly as recorded.
+
+Confirmed against the finished film and the spec:
+
+- anvil-youtube-v2.mp4: H.264 video 1920x1080 at 30 fps, one AAC audio stream, duration 83.83 s, inside the 60 to 90 second window.
+- Frames on disk per section match durations.json: 302, 207, 194, 205, 173, 498 and 936, 2515 in total. ffprobe counts 2514 frames in the encoded stream, one fewer than planned; the duration still matches durations.json at 83.83 s.
+- contact-sheet.png is 2560x1440. Fifteen sampled stills exist under frames/ (seven section midpoints, frame-cut stills for the transitions); the deterministic checks report each at 1920x1080.
+- tools/video_checks_v2.py result in checks.txt: PASS, 0 failing checks.
+- GLB sha256 daea8110b356865396b062bb1ca20944dd7103286758214cbc7804b43c50f523 matches the spec.
+
+Observations from viewing the contact sheet, passed to reviewer-design for judgment and not corrected here, since content files are held in this pass:
+
+- Some transition tiles show a nearly empty paper frame at the start of a section (for example the first frame of section 3) before elements enter.
+- In the section 6 midpoint tile, the "Verified memory." caption and the "A human approves." caption appear on screen together, and they overlap in part.
+- In the section 4 tile, the "Stations build" caption is partly covered by a station post.
+
+The disclosure above stands: the narration is synthetic speech, so the YouTube AI generated content label must be set at publish time. Nothing is published by this run.

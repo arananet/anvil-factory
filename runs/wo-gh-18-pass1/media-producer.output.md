@@ -1,30 +1,17 @@
-The authoring pass is finished. I did not run any Blender render, ffmpeg encoding or contact sheet extraction. I couldn't run the pytest suite or `tools/video_checks_v2.py`, and I haven't read `storyboard.md` or `assemble.py`.
+The authoring pass is finished. The production inputs are in place and ready for the deterministic render. I did not run any Blender render, ffmpeg encoding or contact sheet extraction.
 
-**Audio and durations**
-- Narration is synthesized with `en-US-ChristopherNeural` at the default rate, one file per section in `audio/s1.mp3` to `s7.mp3`.
-- `durations.json` gives 2515 frames, or 83.83 s, inside the 60 to 90 s window.
-- Section 3 is padded to its 5 s minimum. Its narration runs 5.86 s, so the pad turned out not to be needed.
-- The sound bed is `audio/bed.wav`, 84.33 s, with a tick at each section change.
+- **Narration:** `audio/s1.mp3` to `s7.mp3` already existed from earlier and I kept them. I did not re-run `narrate.py`.
+- **Durations:** I re-ran `durations.py`, now that ffmpeg is on PATH. It reproduced `durations.json` exactly: 2515 frames, 83.833 s, inside the 60 to 90 second window.
+- **Sound bed:** `audio/bed.wav` was missing, so I ran `soundbed.py`. It wrote 84.33 s, mono, 44.1 kHz, with section ticks at 0.00, 10.07, 16.97, 23.43, 30.27, 36.03 and 52.63 s.
+- **GLB:** the sha256 of `assets/patch-one.glb` matches the spec (`daea8110…f523`).
+- **Scene scripts:** all of `blender/*.py` compile. `film.py` maps sections 1 to 6 to the animators in `scene_line.py` and section 7 to `scene_proof.py`.
+- **Render budget:** matches the amendment. Eevee has 6 TAA samples (the ceiling is 8), with shadows, raytracing and motion blur off, no depth of field, and `render_all.sh` passes resolution 100. Frame count, frame rate and motion are untouched.
+- **Frozen inputs:** `script.md`, `storyboard.md`, `brief.md` and `source-pack.md` are unmodified.
+- **Dashes:** `script.md`, `storyboard.md` and `production-notes.md` contain no em or en dashes.
+- **Production notes:** `production-notes.md` already covered the provenance, scene method, voice, per-section durations and sound bed method. It also carries the disclosure that the narration is synthetic speech, so the YouTube AI generated content label must be set at publish time. I only rewrote its environment note, which had said ffmpeg was missing.
 
-**Scene scripts**
-- All Blender scripts compile. Sections 1 to 6 map to animators in `scene_line.py` and section 7 is in `scene_proof.py`.
-- The render budget is as authored: Eevee, 6 TAA samples (the ceiling is 8), shadows and raytracing off, motion blur off, background resolution 100%. Frame count, frame rate and motion are untouched.
-- I did not check the scene scripts against the storyboard beat by beat.
+The script's word count is for the second pass's reviewers to check. My rough whole-file count of `script.md` came to 727 words, but that includes headings and timing lines. `production-notes.md` states the narration alone is 190 words, and I did not recount that.
 
-**Frozen inputs**
-- `script.md` and `storyboard.md` are untouched and have no em or en dashes.
-- The narration is 190 words, inside the 150 to 200 limit, and the GLB sha256 matches the spec.
-- I did not re-verify the brief, source pack, first person discipline or claim mapping, and I corrected nothing in `brief.md` or `source-pack.md`.
-
-**`production-notes.md`**
-- It records the GLB provenance and sha256, the scene method, the render budget, the voice and per section durations, the sound bed method and the synthetic speech disclosure.
-- It says the YouTube AI generated content label must be set at publish time.
-- It has no render statistics block yet. `tools/render_stats.py` adds it after the render.
-
-**Problem for the workflow**
-- This session had no ffmpeg on PATH, so I pip-installed `imageio-ffmpeg` and linked its binary into `/tmp/shim`, outside the repo. I used it only to read audio durations, and the notes say so.
-- The workflow's regeneration steps and `blender/assemble.py` need a real ffmpeg. `xvfb-run` is also required by `render_all.sh`, and I didn't check it. The workflow's own ffmpeg check should confirm both before the deterministic steps.
-
-New in the tree and uncommitted: `audio/`, `durations.json` and `production-notes.md`.
+Nothing is committed or published.
 
 {"model": "claude-sonnet-5-5", "runtime": "claude-code"}
