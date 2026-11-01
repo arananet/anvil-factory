@@ -14,17 +14,33 @@ name: anvil-execute-content-video-v2
 #   station to tools/claude_station.py with its configured model from
 #   anvil.yaml. BOTH model routes pass an exact reply smoke gate below
 #   before the line runs; there is no fallback from one model to another.
-# - The media-producer station builds and renders the film inside the run
-#   with headless Blender (pinned 4.5.15, the factory's standing asset
-#   tool), so the workflow installs Blender (cached), edge-tts and ffmpeg
-#   before the line starts, and a Blender smoke gate (model a cube, export
-#   a glb) must pass before the line runs. Reviewer-design then judges the
-#   real contact sheet and sampled frames, which exist in the tree by its
-#   step. The Blender render working frames under
-#   content/youtube-anvil-v2/frames/s*/ are gitignored on purpose: only
-#   the sampled stills are committed as evidence.
-# - Deterministic checks (tools/video_checks_v2.py) run after the line and
-#   are committed with the run evidence, as is the factory suite result.
+# - Gate loopback (owner decision, 2026-10-31): production was
+#   re-architected after round 1, in which the media-producer rendered
+#   inside its model session and the station wrapper killed the session
+#   at its 1500 second cap with 133 of about 2400 frames done. The
+#   workflow still installs Blender (cached, pinned 4.5.15, the factory's
+#   standing asset tool), edge-tts and ffmpeg up front, and a Blender
+#   smoke gate (model a cube, export a glb) must pass before anything
+#   runs. The line then runs twice: an authoring pass, in which the
+#   media-producer authors the narration audio, the sound bed and the
+#   Blender scene scripts and renders nothing; then deterministic
+#   workflow steps render every frame with parallel chunked headless
+#   Blender (Eevee) and assemble the film with ffmpeg; then a film
+#   review pass, in which the reviewers judge the finished film and
+#   reviewer-design judges the real contact sheet and sampled frames.
+#   The authoring pass run record is snapshotted to
+#   runs/wo-gh-18-pass1/ before the review pass runs. The Blender render
+#   working frames under content/youtube-anvil-v2/frames/s*/ and the
+#   render chunk logs are gitignored on purpose: the sampled stills,
+#   the contact sheet and render-stats.json are the committed evidence.
+# - Deterministic checks (tools/video_checks_v2.py) run against the
+#   assembled film, before the film review pass, and are committed with
+#   the run evidence, as is the factory suite result. Two workflow
+#   repairs ride with this loopback, both proven defects: the install
+#   step installs pytest, so the suite step actually runs the factory
+#   suite; and the commit back step stages run-diff.txt after writing
+#   it, so the unstaged change it creates no longer poisons its own
+#   rebase.
 # - The work order carries the publishing risk hint on purpose. The
 #   finished video stops at the human gate for the owner's review; the
 #   publisher station inside the sandbox can only write a text record into
@@ -55,9 +71,9 @@ env:
 
 jobs:
   anvil-execute-content-video-v2:
-    name: Run the ANVIL content line for the YouTube video v2 (Opus writes, Blender renders)
+    name: Run the ANVIL content line for the YouTube video v2 (gate loopback, deterministic render)
     runs-on: ubuntu-latest
-    timeout-minutes: 320
+    timeout-minutes: 360
     env:
       ANTHROPIC_BASE_URL: https://gateway.ai.cloudflare.com/v1/693ae9c587f1f2c34328bb47447366b0/arananet-ai-gateway/anthropic
       ANTHROPIC_API_KEY: ${{ secrets.CF_AIG_TOKEN }}
@@ -82,8 +98,9 @@ jobs:
           npm install -g @anthropic-ai/claude-code
           claude --version
           ffmpeg -version | head -1
-          pip install edge-tts
+          pip install edge-tts pytest
           edge-tts --version || python3 -m edge_tts --version || true
+          python3 -m pytest --version
 
       - name: Cache the pinned Blender
         uses: actions/cache@v4
@@ -159,14 +176,49 @@ jobs:
           fi
           echo "Opus smoke passed: claude-opus-5-5 answered through the gateway Anthropic endpoint."
 
-      - name: Run the ANVIL content-video line in execute mode
-        id: line
+      - name: Run the ANVIL content line, authoring pass
+        id: line_authoring
         if: steps.smoke_blender.outcome == 'success' && steps.smoke_sonnet.outcome == 'success' && steps.smoke_opus.outcome == 'success'
         run: |
           PYTHONPATH=. python3 -m anvil.cli run . \
             --pipeline pipelines/content-video.json \
             --work-order work-orders/issue-18.json \
             --execute
+
+      - name: Snapshot the authoring pass run record
+        id: snapshot
+        if: always() && steps.smoke_blender.outcome == 'success' && steps.smoke_sonnet.outcome == 'success' && steps.smoke_opus.outcome == 'success'
+        run: |
+          if [ -d runs/wo-gh-18 ]; then
+            rm -rf runs/wo-gh-18-pass1
+            cp -r runs/wo-gh-18 runs/wo-gh-18-pass1
+            echo "Authoring pass run record snapshotted to runs/wo-gh-18-pass1."
+          else
+            echo "No authoring pass run record to snapshot."
+          fi
+
+      - name: Deterministic production (audio, render, statistics, assembly)
+        id: production
+        if: always() && steps.smoke_blender.outcome == 'success' && steps.smoke_sonnet.outcome == 'success' && steps.smoke_opus.outcome == 'success'
+        run: |
+          test -f content/youtube-anvil-v2/script.md || { echo "Frozen script missing: the loopback setup inputs are not in the tree. Stopping."; exit 1; }
+          test -f content/youtube-anvil-v2/blender/film.py || { echo "Authored Blender scripts missing. Stopping."; exit 1; }
+          cd content/youtube-anvil-v2
+          if [ ! -f audio/s1.mp3 ]; then
+            echo "Narration audio missing: synthesizing with the authored blender/narrate.py"
+            python3 blender/narrate.py
+          fi
+          python3 blender/durations.py
+          if [ ! -f audio/bed.wav ]; then
+            echo "Sound bed missing: generating with the authored blender/soundbed.py"
+            python3 blender/soundbed.py
+          fi
+          bash blender/render_all.sh
+          cd ../..
+          python3 tools/render_stats.py
+          python3 content/youtube-anvil-v2/blender/assemble.py all
+          ffprobe -v quiet -print_format json -show_format -show_streams content/youtube-anvil-v2/anvil-youtube-v2.mp4 > content/youtube-anvil-v2/ffprobe.json
+          ls -la content/youtube-anvil-v2/
 
       - name: Run the deterministic video checks
         id: checks
@@ -175,6 +227,21 @@ jobs:
           python3 tools/video_checks_v2.py > content/youtube-anvil-v2/checks.txt 2>&1
           echo "CHECKS_EXIT=$?" >> content/youtube-anvil-v2/checks.txt
           cat content/youtube-anvil-v2/checks.txt
+
+      - name: Run the ANVIL content line, film review pass
+        id: line_review
+        if: always() && steps.smoke_blender.outcome == 'success' && steps.smoke_sonnet.outcome == 'success' && steps.smoke_opus.outcome == 'success' && steps.production.outcome == 'success'
+        run: |
+          PYTHONPATH=. python3 -m anvil.cli run . \
+            --pipeline pipelines/content-video.json \
+            --work-order work-orders/issue-18.json \
+            --execute
+
+      - name: Finalize the render statistics in the production notes
+        id: finalize_stats
+        if: always() && steps.production.outcome == 'success'
+        run: |
+          python3 tools/render_stats.py
 
       - name: Run the factory test suite after the line
         id: suite
@@ -192,12 +259,13 @@ jobs:
           git add -A
           git add -f runs/ 2>/dev/null || true
           git diff --cached --stat > run-diff.txt || true
+          git add run-diff.txt || true
           if git diff --cached --quiet; then
             echo "The run produced no file changes to commit."
             exit 0
           fi
           VERDICT=$(python3 -c "import json; print(json.load(open('runs/wo-gh-18/report.json'))['verdict'])" 2>/dev/null || echo "no-report")
-          git commit -m "ANVIL execute run wo-gh-18 (issue 18): verdict ${VERDICT}" -m "Content line executed with per station routing: writer on claude-opus-5-5, reviewers and remaining content stations on claude-sonnet-5-5, through the Cloudflare AI Gateway. The media-producer built and rendered the film inside the run with headless Blender 4.5.15 (Eevee) and assembled it with ffmpeg. Publishing hold: the video stops at the human gate, nothing posted."
+          git commit -m "ANVIL execute run wo-gh-18 (issue 18) loopback: verdict ${VERDICT}" -m "Gate loopback with the production re-architecture: the content line ran twice (an authoring pass, then a film review pass) with per station routing: writer on claude-opus-5-5, reviewers and remaining content stations on claude-sonnet-5-5, through the Cloudflare AI Gateway. The media-producer authored only; deterministic workflow steps rendered every frame with headless Blender 4.5.15 (Eevee) and assembled the film with ffmpeg; the render statistics are in render-stats.json. Publishing hold: the video stops at the human gate, nothing posted."
           git fetch origin "${GITHUB_REF_NAME}"
           git rebase "origin/${GITHUB_REF_NAME}" || { git rebase --abort; echo "Rebase onto the branch tip failed; pushing as is not attempted."; exit 1; }
           git push origin "HEAD:${GITHUB_REF_NAME}"
@@ -260,18 +328,24 @@ jobs:
                         f"`{branch}`):", "", "```", diff_path.read_text().strip(), "```"]
           lines += [
               "",
-              "Honest note: this run EXECUTED its content stations with per station "
-              "model routing. The writer (the scriptwriter) ran claude-opus-5-5 and "
+              "Honest note: this was the gate loopback round with the production "
+              "re-architecture the owner approved. The line EXECUTED twice with "
+              "per station model routing: an authoring pass, then deterministic "
+              "production steps, then a film review pass whose report is the "
+              "one summarised above (the authoring pass record is committed "
+              "under runs/wo-gh-18-pass1/). The writer ran claude-opus-5-5 and "
               "the reviewers (facts, voice, brand, design) ran claude-sonnet-5-5, "
-              "all through Claude Code against the Cloudflare AI Gateway Anthropic "
-              "route, each station dispatched by tools/anvil_station.py to "
-              "tools/claude_station.py with its configured model. Both model routes "
-              "and headless Blender passed smoke gates before the line ran. The "
-              "media-producer built and rendered the film inside the run with "
-              "Blender (Eevee) from its own committed scene scripts, synthesized "
-              "the narration, generated the procedural sound bed and assembled "
-              "the MP4 with ffmpeg. The work order carries the publishing risk "
-              "hint, so the finished video stops at the human gate: nothing was "
+              "all through Claude Code against the Cloudflare AI Gateway "
+              "Anthropic route, each station dispatched by tools/anvil_station.py "
+              "to tools/claude_station.py with its configured model. The "
+              "media-producer authored the narration audio, the sound bed and "
+              "the Blender scene scripts and rendered nothing itself: "
+              "deterministic workflow steps rendered every frame with parallel "
+              "chunked headless Blender 4.5.15 (Eevee) and assembled the MP4 "
+              "with ffmpeg, recording the render statistics in render-stats.json. "
+              "Both model routes and headless Blender passed smoke gates before "
+              "the line ran. The work order carries the publishing risk hint, "
+              "so the finished video stops at the human gate: nothing was "
               "published or posted anywhere.",
               f"Workflow run: {run_url}",
           ]
@@ -292,5 +366,8 @@ jobs:
             content/youtube-anvil-v2/*.txt
             content/youtube-anvil-v2/*.png
             content/youtube-anvil-v2/frames/frame-*.png
+            content/youtube-anvil-v2/render-stats.json
+            content/youtube-anvil-v2/durations.json
+            content/youtube-anvil-v2/ffprobe.json
             content/youtube-anvil-v2/blender/
           if-no-files-found: ignore
