@@ -1,0 +1,87 @@
+ .pytest_cache/v/cache/nodeids                      |  65 +++++-
+ content/youtube-anvil-v2/audio/s1.mp3              | Bin 0 -> 56880 bytes
+ content/youtube-anvil-v2/audio/s2.mp3              | Bin 0 -> 37872 bytes
+ content/youtube-anvil-v2/audio/s3.mp3              | Bin 0 -> 35136 bytes
+ content/youtube-anvil-v2/audio/s4.mp3              | Bin 0 -> 37440 bytes
+ content/youtube-anvil-v2/audio/s5.mp3              | Bin 0 -> 31104 bytes
+ content/youtube-anvil-v2/audio/s6.mp3              | Bin 0 -> 96048 bytes
+ content/youtube-anvil-v2/audio/s7.mp3              | Bin 0 -> 183600 bytes
+ content/youtube-anvil-v2/checks.txt                |  18 ++
+ content/youtube-anvil-v2/durations.json            |  43 ++++
+ content/youtube-anvil-v2/observation-report.md     |  74 ++++++
+ content/youtube-anvil-v2/production-notes.md       |  61 +++++
+ content/youtube-anvil-v2/publish-record.md         |  26 +++
+ content/youtube-anvil-v2/review-facts.md           |  23 ++
+ runs/wo-gh-18-pass1/brief-writer.output.md         |  13 ++
+ runs/wo-gh-18-pass1/brief-writer.packet.md         | 131 +++++++++++
+ .../envelopes/approver.envelope.json               |  10 +
+ .../envelopes/brief-writer.envelope.json           |  15 ++
+ runs/wo-gh-18-pass1/envelopes/intake.envelope.json |  10 +
+ .../envelopes/media-producer.envelope.json         |  15 ++
+ .../envelopes/observer.envelope.json               |  15 ++
+ .../envelopes/publisher.envelope.json              |  15 ++
+ .../envelopes/researcher.envelope.json             |  15 ++
+ .../envelopes/reviewer-brand.envelope.json         |  28 +++
+ .../envelopes/reviewer-design.envelope.json        |  28 +++
+ .../envelopes/reviewer-facts.envelope.json         |  32 +++
+ .../envelopes/reviewer-voice.envelope.json         |  31 +++
+ .../envelopes/triage-human.envelope.json           |  10 +
+ runs/wo-gh-18-pass1/envelopes/writer.envelope.json |  15 ++
+ runs/wo-gh-18-pass1/media-producer.output.md       |  30 +++
+ runs/wo-gh-18-pass1/media-producer.packet.md       | 134 +++++++++++
+ runs/wo-gh-18-pass1/observer.output.md             |   3 +
+ runs/wo-gh-18-pass1/observer.packet.md             |  63 ++++++
+ runs/wo-gh-18-pass1/publisher.output.md            |  19 ++
+ runs/wo-gh-18-pass1/publisher.packet.md            |  63 ++++++
+ runs/wo-gh-18-pass1/report.json                    | 251 +++++++++++++++++++++
+ runs/wo-gh-18-pass1/researcher.output.md           |  19 ++
+ runs/wo-gh-18-pass1/researcher.packet.md           |  52 +++++
+ runs/wo-gh-18-pass1/reviewer-brand.output.md       |   3 +
+ runs/wo-gh-18-pass1/reviewer-brand.packet.md       |  57 +++++
+ runs/wo-gh-18-pass1/reviewer-design.output.md      |   3 +
+ runs/wo-gh-18-pass1/reviewer-design.packet.md      | 195 ++++++++++++++++
+ runs/wo-gh-18-pass1/reviewer-facts.output.md       |   3 +
+ runs/wo-gh-18-pass1/reviewer-facts.packet.md       |  56 +++++
+ runs/wo-gh-18-pass1/reviewer-voice.output.md       |   3 +
+ runs/wo-gh-18-pass1/reviewer-voice.packet.md       |  57 +++++
+ runs/wo-gh-18-pass1/swimlane.md                    |  24 ++
+ runs/wo-gh-18-pass1/writer.output.md               |  23 ++
+ runs/wo-gh-18-pass1/writer.packet.md               | 134 +++++++++++
+ runs/wo-gh-18/brief-writer.output.md               |  13 ++
+ runs/wo-gh-18/brief-writer.packet.md               | 131 +++++++++++
+ runs/wo-gh-18/envelopes/approver.envelope.json     |  10 +
+ runs/wo-gh-18/envelopes/brief-writer.envelope.json |  15 ++
+ runs/wo-gh-18/envelopes/intake.envelope.json       |  10 +
+ .../envelopes/media-producer.envelope.json         |  15 ++
+ runs/wo-gh-18/envelopes/observer.envelope.json     |  15 ++
+ runs/wo-gh-18/envelopes/publisher.envelope.json    |  15 ++
+ runs/wo-gh-18/envelopes/researcher.envelope.json   |  15 ++
+ .../envelopes/reviewer-brand.envelope.json         |  28 +++
+ .../envelopes/reviewer-design.envelope.json        |  28 +++
+ .../envelopes/reviewer-facts.envelope.json         |  32 +++
+ .../envelopes/reviewer-voice.envelope.json         |  31 +++
+ runs/wo-gh-18/envelopes/triage-human.envelope.json |  10 +
+ runs/wo-gh-18/envelopes/writer.envelope.json       |  15 ++
+ runs/wo-gh-18/media-producer.output.md             |  30 +++
+ runs/wo-gh-18/media-producer.packet.md             | 134 +++++++++++
+ runs/wo-gh-18/observer.output.md                   |   3 +
+ runs/wo-gh-18/observer.packet.md                   |  63 ++++++
+ runs/wo-gh-18/publisher.output.md                  |  19 ++
+ runs/wo-gh-18/publisher.packet.md                  |  63 ++++++
+ runs/wo-gh-18/report.json                          | 251 +++++++++++++++++++++
+ runs/wo-gh-18/researcher.output.md                 |  19 ++
+ runs/wo-gh-18/researcher.packet.md                 |  52 +++++
+ runs/wo-gh-18/reviewer-brand.output.md             |   3 +
+ runs/wo-gh-18/reviewer-brand.packet.md             |  57 +++++
+ runs/wo-gh-18/reviewer-design.output.md            |   3 +
+ runs/wo-gh-18/reviewer-design.packet.md            | 195 ++++++++++++++++
+ runs/wo-gh-18/reviewer-facts.output.md             |   3 +
+ runs/wo-gh-18/reviewer-facts.packet.md             |  56 +++++
+ runs/wo-gh-18/reviewer-voice.output.md             |   3 +
+ runs/wo-gh-18/reviewer-voice.packet.md             |  57 +++++
+ runs/wo-gh-18/swimlane.md                          |  24 ++
+ runs/wo-gh-18/writer.output.md                     |  23 ++
+ runs/wo-gh-18/writer.packet.md                     | 134 +++++++++++
+ suite-output.txt                                   |   4 +-
+ suite-result.txt                                   |   1 +
+ 86 files changed, 3463 insertions(+), 2 deletions(-)

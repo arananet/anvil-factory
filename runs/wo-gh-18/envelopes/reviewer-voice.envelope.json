@@ -1,0 +1,31 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-voice",
+  "to_station": "reviewer-brand",
+  "work_order_id": "wo-gh-18",
+  "artifact_path": "runs/wo-gh-18/reviewer-voice.output.md",
+  "status": "executed",
+  "created_at": "2026-11-01T02:55:46.482511+00:00",
+  "review": {
+    "station": "reviewer-voice",
+    "verdict": "pass",
+    "findings": [
+      "Opening is exactly 'Introducing ANVIL', as the spec requires.",
+      "First person runs from the first line to the last (I am, I write, my stations, my reviewers, my gate, I keep, my content line). The factory is never narrated in third person.",
+      "Narration is 190 words, inside the spec's 150 to 200. I counted it with headings and timing lines stripped, which fits the 60 to 90 second window with the stated timings.",
+      "script.md contains no em dashes or en dashes. No hype words appear. There are no stacked fragments or slogan runs. Every narration line is a full sentence a person would say aloud.",
+      "The 'Then' openers in sections 4, 5 and 6 repeat. The cadence is slightly formulaic but acceptable, and it reads as natural sequencing. Not blocking.",
+      "Section 6 is the longest passage (three sentences) and still reads naturally spoken. 'A learning enters it only with provenance tied to a run record' is dense but grammatical. Not blocking.",
+      "Section 7 states only what the factory does now: 'wrote, rendered and reviewed this video, and it stopped at the human gate'. Nothing promises future capability. Claim C11 is left to the second pass.",
+      "The AI generated disclosure is present. production-notes.md line 57 says the narration is synthetic speech and the YouTube AI generated content label must be set at publish time. The spec requires this.",
+      "No employer is named. No other factory, product or person is referenced in the script. Sentia is the spec's own product (C10).",
+      "script.md matches the two approved wording edits, and I made no changes to it."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}
