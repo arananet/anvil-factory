@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "completed",
       "detail": "Work order normalized",
-      "duration_ms": 0.021,
+      "duration_ms": 0.012,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/report.json"
@@ -21,7 +21,7 @@
       "station": "brief-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-18/brief-writer.output.md",
-      "duration_ms": 26368.492,
+      "duration_ms": 15483.972,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/brief-writer.output.md"
@@ -37,7 +37,7 @@
       "station": "researcher",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-18/researcher.output.md",
-      "duration_ms": 17393.207,
+      "duration_ms": 22483.365,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/researcher.output.md"
@@ -51,15 +51,15 @@
     },
     {
       "station": "writer",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-18/writer.output.md",
-      "duration_ms": 45062.468,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station writer: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $2.57. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 11863.261,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-18/writer.output.md"
+        "runs/wo-gh-18/writer.packet.md"
       ],
       "configured_model": "claude-opus-5-5",
-      "executed_model": "claude-opus-5-5",
+      "executed_model": null,
       "executor": {
         "kind": "command",
         "detail": "python3"
@@ -67,15 +67,15 @@
     },
     {
       "station": "media-producer",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-18/media-producer.output.md",
-      "duration_ms": 24732.257,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station media-producer: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.26. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 206427.004,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-18/media-producer.output.md"
+        "runs/wo-gh-18/media-producer.packet.md"
       ],
       "configured_model": "claude-sonnet-5-5",
-      "executed_model": "claude-sonnet-5-5",
+      "executed_model": null,
       "executor": {
         "kind": "command",
         "detail": "python3"
@@ -83,15 +83,15 @@
     },
     {
       "station": "reviewer-facts",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-18/reviewer-facts.output.md",
-      "duration_ms": 20366.743,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-facts: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.55. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 3581.936,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-18/reviewer-facts.output.md"
+        "runs/wo-gh-18/reviewer-facts.packet.md"
       ],
       "configured_model": "claude-sonnet-5-5",
-      "executed_model": "claude-sonnet-5-5",
+      "executed_model": null,
       "executor": {
         "kind": "command",
         "detail": "python3"
@@ -99,15 +99,15 @@
     },
     {
       "station": "reviewer-voice",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-18/reviewer-voice.output.md",
-      "duration_ms": 21442.117,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-voice: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.02. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 1118.029,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-18/reviewer-voice.output.md"
+        "runs/wo-gh-18/reviewer-voice.packet.md"
       ],
       "configured_model": "claude-sonnet-5-5",
-      "executed_model": "claude-sonnet-5-5",
+      "executed_model": null,
       "executor": {
         "kind": "command",
         "detail": "python3"
@@ -115,15 +115,15 @@
     },
     {
       "station": "reviewer-brand",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-18/reviewer-brand.output.md",
-      "duration_ms": 11362.873,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-brand: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $1.28. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 683.989,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-18/reviewer-brand.output.md"
+        "runs/wo-gh-18/reviewer-brand.packet.md"
       ],
       "configured_model": "claude-sonnet-5-5",
-      "executed_model": "claude-sonnet-5-5",
+      "executed_model": null,
       "executor": {
         "kind": "command",
         "detail": "python3"
@@ -131,15 +131,15 @@
     },
     {
       "station": "reviewer-design",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-18/reviewer-design.output.md",
-      "duration_ms": 18547.429,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-design: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $1.28. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 689.113,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-18/reviewer-design.output.md"
+        "runs/wo-gh-18/reviewer-design.packet.md"
       ],
       "configured_model": "claude-sonnet-5-5",
-      "executed_model": "claude-sonnet-5-5",
+      "executed_model": null,
       "executor": {
         "kind": "command",
         "detail": "python3"
@@ -148,8 +148,8 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: approved",
-      "duration_ms": 0.046,
+      "detail": "Approver verdict: no_reviews",
+      "duration_ms": 0.028,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-18/report.json"
@@ -162,7 +162,7 @@
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: required",
-      "duration_ms": 0.017,
+      "duration_ms": 0.006,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -171,15 +171,15 @@
     },
     {
       "station": "publisher",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-18/publisher.output.md",
-      "duration_ms": 21560.25,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station publisher: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $1.27. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 669.233,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-18/publisher.output.md"
+        "runs/wo-gh-18/publisher.packet.md"
       ],
       "configured_model": "claude-sonnet-5-5",
-      "executed_model": "claude-sonnet-5-5",
+      "executed_model": null,
       "executor": {
         "kind": "command",
         "detail": "python3"
@@ -187,22 +187,22 @@
     },
     {
       "station": "observer",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-18/observer.output.md",
-      "duration_ms": 138104.576,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station observer: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.31. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 16110.104,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-18/observer.output.md"
+        "runs/wo-gh-18/observer.packet.md"
       ],
       "configured_model": "claude-sonnet-4-5",
-      "executed_model": "claude-sonnet-4-5",
+      "executed_model": null,
       "executor": {
         "kind": "command",
         "detail": "python3"
       }
     }
   ],
-  "verdict": "approved",
+  "verdict": "no_reviews",
   "human_required": true,
   "max_loopbacks": 2,
   "loopbacks": 0,
@@ -213,38 +213,19 @@
   ],
   "decision": {
     "approver": {
-      "reviews_counted": [
-        {
-          "station": "reviewer-facts",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-voice",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-brand",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-design",
-          "verdict": "pass"
-        }
-      ],
+      "reviews_counted": [],
       "reviews_expected": [
         "reviewer-facts",
         "reviewer-voice",
         "reviewer-brand",
         "reviewer-design"
       ],
-      "rule": "All counted reviews passed."
+      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted."
     },
     "human_gate": {
       "required": true,
-      "rule": "Verdict approved, but the work order carries the risk hint 'publishing', so a human is required.",
-      "hints_matched": [
-        "publishing"
-      ]
+      "rule": "Verdict is no_reviews, not approved, so a human is required.",
+      "hints_matched": []
     }
   },
   "warnings": []

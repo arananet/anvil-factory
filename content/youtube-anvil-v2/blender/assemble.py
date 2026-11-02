@@ -44,9 +44,11 @@ if mode in ("all", "sheet"):
     for s in sorted(S, key=int):
         n = S[s]["frames"]
         picks.append((f"frame-mid-{s}.png", s, n // 2))
-    for a in (1, 3, 5, 6):   # transitions: last frame of section a, first frame of section a+1
+    for a in (1, 2, 3, 4, 5, 6):   # transitions: last frame of section a, first frame of section a+1 (every cut)
         picks.append((f"frame-cut-{a}-last.png", str(a), S[str(a)]["frames"]))
         picks.append((f"frame-cut-{a + 1}-first.png", str(a + 1), 1))
+    # early title proof: section 1 at about 30 percent
+    picks.append(("frame-proof-s1-title.png", "1", max(1, round(0.30 * S["1"]["frames"]))))
     for name, s, f in picks:
         (fr / name).write_bytes((fr / f"s{s}" / f"f_{f:04d}.png").read_bytes())
     inputs, labels = [], []

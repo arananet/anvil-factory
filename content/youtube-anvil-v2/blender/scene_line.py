@@ -179,10 +179,10 @@ def s1(sc, n):
         kloc(r, 1, (loc[0], 0, -4)); kloc(r, T(a), (loc[0], 0, -4)); kloc(r, T(a + 0.12), loc)
     set_emit(L.gantry_m, 0.0, 1); set_emit(L.gantry_m, 0.0, T(0.84)); set_emit(L.gantry_m, 2.0, T(0.90))
     set_emit(L.gate_m, 0.0, 1); set_emit(L.gate_m, 0.0, T(0.92)); set_emit(L.gate_m, 2.0, T(0.97))
-    tm = mat("TitleInk", (0.5, 0.48, 0.42, 1), 0.7)
+    # polish advisory 3: the opening title is full ink color from frame 1 and at full scale by 0.15 of the section
+    tm = mat("TitleInk", INK, 0.7)
     t, k = text("Title", "ANVIL", 7.5, (6, 0, 6.4), tm, face=cam, extrude=0.12)
-    kscl(t, 1, (k * 0.55,) * 3); kscl(t, T(0.45), (k * 0.6,) * 3); kscl(t, T(0.85), (k,) * 3); kscl(t, n, (k * 1.03,) * 3)
-    set_color(tm, (0.52, 0.5, 0.44, 1), 1); set_color(tm, (0.52, 0.5, 0.44, 1), T(0.4)); set_color(tm, INK, T(0.9))
+    kscl(t, 1, (k * 0.97,) * 3); kscl(t, T(0.15), (k,) * 3); kscl(t, n, (k * 1.03,) * 3)
     return n
 
 
@@ -191,16 +191,22 @@ def s2(sc, n):
     T = lambda f: max(1, round(f * n))
     cam, tg = camera(sc, 35, (-19, -8.5, 3.2), (-16, 0, 2.2))
     card, frame = make_card()
-    path = [(0.0, (-27, -1.6, 5.4), (0.6, 0.4, 0.9)), (0.25, (-19, -1.2, 3.9), (0.3, 0.2, 0.45)),
-            (0.55, (-13.0, -0.5, 2.4), (0.1, 0.04, 0.12)), (0.70, (-9.4, 0, 1.2), (0.02, 0.0, 0.02)),
+    # polish advisory 4: the card starts in frame, its face is tipped toward the camera through the flight (X tilt
+    # 78 -> 0 degrees, small Z yaw) and the camera rides beside it, so the card is the subject at every frame.
+    d = math.radians
+    path = [(0.0, (-21.0, -1.4, 4.4), (d(78), 0, d(-20))), (0.25, (-17.5, -1.2, 3.6), (d(68), 0, d(-8))),
+            (0.55, (-13.0, -0.5, 2.4), (d(42), 0, d(3))), (0.70, (-9.4, 0, 1.2), (d(14), 0, d(1))),
             (0.74, (HEAD_X, 0, 0.92), (0, 0, 0)), (0.80, (HEAD_X, 0, 0.815), (0, 0, 0.03)),
             (0.85, (HEAD_X, 0, 0.865), (0, 0, 0)), (0.90, (HEAD_X, 0, 0.815), (0, 0, 0)), (1.0, (HEAD_X, 0, 0.815), (0, 0, 0))]
     for f, loc, rot in path:
         kloc(card, T(f) if f > 0 else 1, loc); krot(card, T(f) if f > 0 else 1, rot)
     set_emit(frame, 0.0, 1); set_emit(frame, 0.0, T(0.76)); set_emit(frame, 4.5, T(0.86))
-    # camera: lateral track, then a gentle push in as the card lands
-    kloc(cam, 1, (-19, -8.5, 3.2)); kloc(cam, T(0.6), (-12.2, -8.4, 3.0)); kloc(cam, T(0.92), (-10.4, -5.6, 2.4)); kloc(cam, n, (-10.2, -5.2, 2.35))
-    kloc(tg, 1, (-17, 0, 2.8)); kloc(tg, T(0.6), (-11.0, 0, 1.8)); kloc(tg, T(0.92), (-8.7, 0, 1.0)); kloc(tg, n, (-8.6, 0, 1.0))
+    # camera: rides about 5.5 units off the card with the target just ahead of it (card sits left of center),
+    # then a gentle push in as the card lands
+    for f, c, g in ((0.0, (-20.2, -6.9, 4.9), (-19.8, 0, 4.2)), (0.25, (-16.6, -6.6, 4.3), (-16.3, 0, 3.5)),
+                    (0.55, (-12.0, -6.0, 3.3), (-11.8, 0, 2.4)), (0.70, (-11.0, -6.4, 2.7), (-9.2, 0, 1.2)),
+                    (0.92, (-10.4, -5.6, 2.4), (-8.7, 0, 1.0)), (1.0, (-10.2, -5.2, 2.35), (-8.6, 0, 1.0))):
+        kloc(cam, T(f) if f > 0 else 1, c); kloc(tg, T(f) if f > 0 else 1, g)
     tm = mat("TxtInk", INK, 0.7)
     t, k = text("T", "One intake", 2.1, (-7.0, 0, 1.9), tm, face=cam)
     kscl(t, 1, (0.001,) * 3); kscl(t, T(0.55), (0.001,) * 3); kscl(t, T(0.67), (k,) * 3); kscl(t, n, (k * 1.04,) * 3)
@@ -264,10 +270,10 @@ def s3(sc, n):
 def s4(sc, n):
     L = build_line(sc, None, gate=True)
     T = lambda f: max(1, round(f * n))
-    cam, tg = camera(sc, 35, (-9.5, -12.5, 2.8), (-9, 0, 1.6))
+    cam, tg = camera(sc, 35, (-9.5, -12.5, 3.0), (-9, 0, 2.5))
     linear(True)
-    kloc(cam, 1, (-9.6, -12.7, 2.8)); kloc(cam, T(0.10), (-9.0, -12.5, 2.8)); kloc(cam, T(0.97), (9.0, -12.0, 3.0)); kloc(cam, n, (9.4, -12.0, 3.0))
-    kloc(tg, 1, (-8.8, 0, 1.6)); kloc(tg, T(0.10), (-8.6, 0, 1.6)); kloc(tg, T(0.97), (9.8, 0, 1.5)); kloc(tg, n, (10.2, 0, 1.5))
+    kloc(cam, 1, (-9.6, -12.7, 3.0)); kloc(cam, T(0.10), (-9.0, -12.5, 3.0)); kloc(cam, T(0.97), (9.0, -12.0, 3.0)); kloc(cam, n, (9.4, -12.0, 3.0))
+    kloc(tg, 1, (-8.8, 0, 2.5)); kloc(tg, T(0.10), (-8.6, 0, 2.5)); kloc(tg, T(0.97), (9.8, 0, 2.5)); kloc(tg, n, (10.2, 0, 2.5))
     linear(False)
     doc, p2, p3, lines = build_doc((HEAD_X, 0, 0.815))
     for pn, s in ((p2, 1), (p3, -1)):
@@ -299,8 +305,17 @@ def s4(sc, n):
         set_emit(cm, 0.0, a); set_emit(cm, 6.0, b); set_emit(cm, 0.4, T(t0 + 0.145))
     set_emit(L.gantry_m, 0.0, 1); set_emit(L.gantry_m, 0.0, T(0.90)); set_emit(L.gantry_m, 2.5, T(0.98))
     tm = mat("TxtInk", INK, 0.7)
-    t, k = text("T", "Stations build", 6.0, (-3.0, 0, 4.1), tm, face=cam)
-    kscl(t, 1, (0.001,) * 3); kscl(t, T(0.14), (0.001,) * 3); kscl(t, T(0.24), (k,) * 3); kscl(t, n, (k,) * 3)
+    # polish advisory 1: arm tips and caps top out at z 4.37 (pivot 2.3 + arm 1.95 + tip) at y -1.9; the camera is at
+    # z 3.0 and 12 units off, so the title band is z 4.9 to 5.7 at y 0 (about 40 px clear of the highest tip and 40 px
+    # inside the top edge). The title rides with the camera in x (linear, same speed) so it stays on screen all section.
+    t, k = text("T", "Stations build", 5.2, (-3.0, 0, 5.28), tm, face=cam)
+    linear(True)
+    for f in (0.05, 0.97):
+        cx_ = -9.0 + 18.0 * (f - 0.10) / 0.87
+        kloc(t, T(f), (cx_ - 1.0, 0, 5.28))
+    kloc(t, n, (9.4 - 1.0, 0, 5.28))
+    linear(False)
+    kscl(t, 1, (0.001,) * 3); kscl(t, T(0.05), (0.001,) * 3); kscl(t, T(0.13), (k,) * 3); kscl(t, n, (k,) * 3)
     return n
 
 
@@ -400,10 +415,15 @@ def s6(sc, n):
         for j, f in enumerate((0.55, 0.62, 0.69, 0.76, 0.83, 0.90, 0.97)):
             x = bx - (0.35 if j % 2 == 0 else 0.0)
             kloc(b, T(f), (x, 0.1, 0.35 + 0.02 * j))
-    t1, k1 = text("T1", "A human approves.", 5.6, (15.5, 0, 3.55), mat("TxtInk", INK, 0.7), face=cam)
+    # polish advisory 2: both captions ride the camera (parented, 4 units in front, so nothing in the scene can touch
+    # them) in the clear top band of the frame, side by side and staggered, never one column. Each sits on the side
+    # of the line its subject is on: "Verified memory." left over the archive, "A human approves." right over the gate
+    # and the quarantine. Geometry tops stay at or below about y 300 px in every sampled frame; captions live in y 85 to
+    # 255 px. Pixel to camera space: 466.7 px per unit at 4 units. Wording unchanged.
+    t1, k1 = text("T1", "A human approves.", 1.52, (0.7286, 0.8785, -4.0), mat("TxtInk", INK, 0.7), parent=cam)
     kscl(t1, 1, (0.001,) * 3); kscl(t1, 6, (0.001,) * 3); kscl(t1, T(0.07), (k1,) * 3); kscl(t1, n, (k1,) * 3)
-    t2, k2 = text("T2", "Verified memory.", 5.2, (12.5, 5.2, 4.7), mat("TxtInk2", INK, 0.7), face=cam)
-    kscl(t2, 1, (0.001,) * 3); kscl(t2, T(0.52), (0.001,) * 3); kscl(t2, T(0.62), (k2,) * 3); kscl(t2, n, (k2,) * 3)
+    t2, k2 = text("T2", "Verified memory.", 1.36, (-0.771, 0.696, -4.0), mat("TxtInk2", INK, 0.7), parent=cam)
+    kscl(t2, 1, (0.001,) * 3); kscl(t2, T(0.40), (0.001,) * 3); kscl(t2, T(0.47), (k2,) * 3); kscl(t2, n, (k2,) * 3)
     return n
 
 

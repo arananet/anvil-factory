@@ -3,26 +3,14 @@
   "from_station": "reviewer-design",
   "to_station": "approver",
   "work_order_id": "wo-gh-18",
-  "artifact_path": "runs/wo-gh-18/reviewer-design.output.md",
-  "status": "executed",
-  "created_at": "2026-11-01T03:15:06.340970+00:00",
-  "review": {
-    "station": "reviewer-design",
-    "verdict": "pass",
-    "findings": [
-      "Scope: this is the authoring-pass review. I judged the storyboard and the scene construction (the Blender scripts under blender/ and the render budget in common.py). The finished film does not exist yet, so it is judged in the second pass. That pass will use the contact sheet at the section midpoints and the transitions, and the sampled stills, to check motion continuity, frozen beats and brand consistency.",
-      "design/DESIGN.md and design/tokens.json exist, so the no-design-system rule does not apply. Every token and every DESIGN.md section (palette, typography, voice, component and layout rules, motion rules) is still a TODO placeholder. Under the station rules a placeholder is a finding only if the output uses that undefined token. The output is a fixed-size Blender film with no HTML, CSS or web layout, so it uses none of those tokens. I am raising no token violation and imposing no outside palette or type opinions.",
-      "The Quality Bars (visual hierarchy, scale contrast, spacing rhythm, responsive behavior) are written for product pages. Touch targets, breakpoints and horizontal scrolling do not apply to a 1920x1080, 30 fps film. Hierarchy and on-screen text contrast will be checked against the finished stills in the second pass.",
-      "Render budget checked in blender/common.py. Eevee raytracing is off (use_raytracing = False) and shadows are off (use_shadows = False). Soft contact shadows are built as stacked translucent geometry (contact_shadow), so no look is lost. Resolution is 1920x1080 and fps is 30, so no frames or motion were cut. I read the TAA samples only as a parameter set at line 34. I did not confirm its default value of 6 or that the ceiling of 8 is enforced.",
-      "Audio inputs are present: audio/s1.mp3 to s7.mp3, audio/bed.wav and durations.json with per-section narration, visual duration and frame counts. This matches the requirement that the audio files and durations.json exist before the deterministic render.",
-      "The script set is complete for construction: scene_line.py, scene_proof.py, film.py, common.py, render_all.sh, assemble.py, durations.py, narrate.py and soundbed.py. I did not run any Blender render, ffmpeg step or contact sheet extraction, per the work order.",
-      "Recommendation, not a blocker: fill in the palette, typography and motion sections of design/DESIGN.md and tokens.json. The film's palette is currently defined only in the Blender scripts. Until the design system defines it, brand consistency in the second pass can only be judged for internal consistency across sections."
-    ]
-  },
+  "artifact_path": "runs/wo-gh-18/reviewer-design.packet.md",
+  "status": "failed",
+  "created_at": "2026-11-02T03:26:52.871159+00:00",
+  "error": "command executor exited 2: claude_station: claude exited 1 for station reviewer-design: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $1.28. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
   "configured_model": "claude-sonnet-5-5",
   "executor": {
     "kind": "command",
     "detail": "python3"
   },
-  "executed_model": "claude-sonnet-5-5"
+  "executed_model": null
 }

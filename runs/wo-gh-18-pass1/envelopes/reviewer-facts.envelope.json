@@ -3,29 +3,14 @@
   "from_station": "reviewer-facts",
   "to_station": "reviewer-voice",
   "work_order_id": "wo-gh-18",
-  "artifact_path": "runs/wo-gh-18/reviewer-facts.output.md",
-  "status": "executed",
-  "created_at": "2026-11-01T03:14:25.627806+00:00",
-  "review": {
-    "station": "reviewer-facts",
-    "verdict": "pass",
-    "findings": [
-      "Wording edit 1 is verified. Section 4 of script.md reads 'my specialized stations work down the line, and no station ever approves its own work'. The phrase 'one after another' is gone from the spoken text. It appears once in storyboard.md as a visual action description, not as a claim.",
-      "Wording edit 2 is verified. Section 7 reads 'The models that staff my stations are routed per station through Cloudflare AI Gateway'. This matches the C8 wording. The sources are tools/anvil_station.py, tools/claude_station.py and anvil.yaml, as cited in source-pack.md.",
-      "Claim mapping is complete. Every spoken claim maps to C1 through C11 in the claim trace and source-pack.md, and none falls outside the closed list. Section 1 maps to C1, section 2 to C2, section 3 to C3, section 4 to C4, section 5 to C5, section 6 to C6 and C7, and section 7 to C10, C8, C9 and C11.",
-      "C5 respects source flag F1. Section 5 states five reviewers for the factory in general, which pipelines/sdlc-default.json and pipelines/content-default.json support. Section 7 gives no reviewer count, so it does not conflict with the four-reviewer panel in pipelines/content-video.json.",
-      "The only counts spoken are the three intake kinds (listed with no count), five reviewers, five Sentia layers and Apache 2.0. No employer, other factory, product, video or person is named. The footer name on the Sentia site stays out of the script.",
-      "The script and storyboard are unchanged from the committed frozen inputs. git diff against HEAD shows no change to script.md or storyboard.md. The loopback setup commit and its repair commit are the last to touch script.md.",
-      "C11 is not judged in this pass. The film, anvil-youtube-v2.mp4, does not exist in the tree yet. It is judged in the second pass against the finished film, checks.txt and the run record, and reviewer-facts will close its round 1 findings there.",
-      "Minor, with no effect on any spoken claim: source-pack.md cites setup commit 7344863 for the GLB commit, but the loopback setup commit differs.",
-      "Minor: the script says 'wrote, rendered and reviewed' while spec C11 also says 'produced'. The spoken subset is not contradicted by any source.",
-      "The GLB provenance rests on the spec's record. The upstream arananet/sentia commit could not be verified, because the gh call was unauthenticated. The sha256 on disk matches the spec and production-notes.md."
-    ]
-  },
+  "artifact_path": "runs/wo-gh-18/reviewer-facts.packet.md",
+  "status": "failed",
+  "created_at": "2026-11-02T03:26:50.378713+00:00",
+  "error": "command executor exited 2: claude_station: claude exited 1 for station reviewer-facts: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.55. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
   "configured_model": "claude-sonnet-5-5",
   "executor": {
     "kind": "command",
     "detail": "python3"
   },
-  "executed_model": "claude-sonnet-5-5"
+  "executed_model": null
 }

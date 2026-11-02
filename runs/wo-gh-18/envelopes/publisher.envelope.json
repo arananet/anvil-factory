@@ -3,13 +3,14 @@
   "from_station": "publisher",
   "to_station": "observer",
   "work_order_id": "wo-gh-18",
-  "artifact_path": "runs/wo-gh-18/publisher.output.md",
-  "status": "executed",
-  "created_at": "2026-11-01T07:04:28.392016+00:00",
+  "artifact_path": "runs/wo-gh-18/publisher.packet.md",
+  "status": "failed",
+  "created_at": "2026-11-02T03:26:53.541300+00:00",
+  "error": "command executor exited 2: claude_station: claude exited 1 for station publisher: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $1.27. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
   "configured_model": "claude-sonnet-5-5",
   "executor": {
     "kind": "command",
     "detail": "python3"
   },
-  "executed_model": "claude-sonnet-5-5"
+  "executed_model": null
 }

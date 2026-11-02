@@ -3,28 +3,14 @@
   "from_station": "reviewer-voice",
   "to_station": "reviewer-brand",
   "work_order_id": "wo-gh-18",
-  "artifact_path": "runs/wo-gh-18/reviewer-voice.output.md",
-  "status": "executed",
-  "created_at": "2026-11-01T07:03:36.919976+00:00",
-  "review": {
-    "station": "reviewer-voice",
-    "verdict": "pass",
-    "findings": [
-      "I checked the final script.md text end to end against the spec voice rules (S5, S10). It passes.",
-      "The narration opens with 'Introducing ANVIL'. It stays in first person from the first line to the last ('I am a software factory', 'I write the spec', 'my specialized stations', 'my reviewers', 'my gate', 'I keep a verified memory', 'my work lives on GitHub', 'I am open source', 'My content line'). I counted 12 first person pronouns against the minimum of 8. None of the forbidden third person factory constructions appear.",
-      "Word count: the narration is 190 words, inside the 150 to 200 window. Each of the 7 sections carries a target timing, and the timings run contiguously from 0:00 to 1:20.",
-      "There are no em dashes or en dashes in script.md. The two round 1 wording edits are in place. Section 4 reads 'my specialized stations work down the line, and no station ever approves its own work', with no 'one after another'. Section 7 reads 'The models that staff my stations are routed per station through Cloudflare AI Gateway'.",
-      "The sentences are full and natural, with no stacked fragments, slogans in a row or hype words. Section 5 ends on 'all at the same moment'. It restates the parallel point but does not read as filler. Section 6 is long, at three sentences plus a fourth about quarantine. It still reads aloud naturally.",
-      "The AI generated disclosure is present. production-notes.md has a Disclosure section stating the narration is synthetic speech and that the YouTube AI generated content label must be set at publish time. The disclosure appears twice in the notes.",
-      "I found no employer name and no other factory, product, video or person named in the narration. The spoken address sentia.info-693.workers.dev is as written, per the notes for the media producer.",
-      "I did not compare the script.md and storyboard.md bytes against the round 1 outputs, because git diff showed no unstaged change to either file. The text I judged is what is committed.",
-      "I did not judge the film audio in this pass, because that belongs to the second pass. I judged only the text."
-    ]
-  },
+  "artifact_path": "runs/wo-gh-18/reviewer-voice.packet.md",
+  "status": "failed",
+  "created_at": "2026-11-02T03:26:51.497173+00:00",
+  "error": "command executor exited 2: claude_station: claude exited 1 for station reviewer-voice: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.02. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
   "configured_model": "claude-sonnet-5-5",
   "executor": {
     "kind": "command",
     "detail": "python3"
   },
-  "executed_model": "claude-sonnet-5-5"
+  "executed_model": null
 }

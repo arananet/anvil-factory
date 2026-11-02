@@ -3,24 +3,14 @@
   "from_station": "reviewer-brand",
   "to_station": "reviewer-design",
   "work_order_id": "wo-gh-18",
-  "artifact_path": "runs/wo-gh-18/reviewer-brand.output.md",
-  "status": "executed",
-  "created_at": "2026-11-01T07:03:48.283177+00:00",
-  "review": {
-    "station": "reviewer-brand",
-    "verdict": "pass",
-    "findings": [
-      "Naming: script.md names only Sentia, sentia.info-693.workers.dev, Cloudflare AI Gateway, GitHub and Apache 2.0. Each of these is on the spec's closed claim list (spec.md lines 33, 46-48). I found no employer of the author, other factory, product, video or person in script.md or storyboard.md. A grep for common employer and vendor names across script.md, storyboard.md, brief.md and production-notes.md returned nothing apart from brief.md's own rule against naming them.",
-      "Promises: the script promises nothing it cannot keep. The claims are the first-person ones the spec allows (C1-C11). The section 7 close says the content line wrote, rendered and reviewed the video and that it stopped at the human gate. That matches this work order, where nothing is published. I checked the narration only. I did not check any on-screen text.",
-      "Count discipline: the only counts stated are five reviewers and five Sentia layers, both allowed by the spec. Section 5 says 'Five of my reviewers' in general terms with no tie to this video's own panel (flag F1), and no reviewer count appears in section 7. The three intake kinds are listed without a number.",
-      "Search-ranking risk: nothing in the narration would embarrass the author if it ranked first on search. The only third-party names are the infrastructure vendors in claim C8. Two items still need attention at publish time. The narration is synthetic speech, so the YouTube AI generated content label must be set, as production-notes.md discloses. The address is spoken as written, and the voice reading it badly would be recorded in production-notes.md, not fixed by editing the words.",
-      "Scope: this is the pass 1 check, covering the script text. The finished film and any on-screen text are judged in pass 2, so I make no claim about them here."
-    ]
-  },
+  "artifact_path": "runs/wo-gh-18/reviewer-brand.packet.md",
+  "status": "failed",
+  "created_at": "2026-11-02T03:26:52.181566+00:00",
+  "error": "command executor exited 2: claude_station: claude exited 1 for station reviewer-brand: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $1.28. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
   "configured_model": "claude-sonnet-5-5",
   "executor": {
     "kind": "command",
     "detail": "python3"
   },
-  "executed_model": "claude-sonnet-5-5"
+  "executed_model": null
 }

@@ -3,22 +3,14 @@
   "from_station": "reviewer-design",
   "to_station": "approver",
   "work_order_id": "wo-gh-18",
-  "artifact_path": "runs/wo-gh-18/reviewer-design.output.md",
-  "status": "executed",
-  "created_at": "2026-11-01T07:04:06.830910+00:00",
-  "review": {
-    "station": "reviewer-design",
-    "verdict": "pass",
-    "findings": [
-      "design/DESIGN.md exists, so the no-design-system rule does not apply. Every section of it is still a TODO placeholder, and every value in design/tokens.json is \"TODO\". No design-token violation can be raised. The film is not a web interface, so the product-page quality bars (4.5:1 text contrast, 44px touch targets, breakpoints) do not apply. I judged it against the storyboard's own visual language: paper-coloured world, ink-green objects, emissive teal for anything active, one soft key light, 3D in-scene text. The project should define real tokens before the next design-bearing work order.",
-      "Scope of this pass: I judged the storyboard and the scene construction. The storyboard is internally consistent. Sections 1 to 6 share one line scene with fixed positions for the posts, gantry, gate and archive. Section 7 is a separate proof scene in the same paper world and light. Every section specifies a camera move and subject motion, and none uses a pan or zoom over a still. blender/common.py matches the render budget: 1920x1080, 30 fps, Eevee TAA samples at the authored 6, raytracing off, shadows off, with soft contact shadows built as geometry. The finished film is judged in the second pass, not this one.",
-      "Advance notes for the second pass. The contact-sheet.png currently in the tree shows several things to check at the real section midpoints and transitions: (a) 'Stations build' has a station post running through the word 'Stations', which breaks the storyboard's rule to keep text clear of subjects; (b) 'Verified memory.' and 'A human approves.' overlap in one frame; (c) the first-frame 'ANVIL' title is small and low contrast against the paper background; (d) one cell is nearly empty, with only a table corner visible. If these still show in the final contact sheet and stills, they are quality-bar findings against hierarchy and contrast, and should be requested as scene-script fixes. The script and storyboard stay frozen."
-    ]
-  },
+  "artifact_path": "runs/wo-gh-18/reviewer-design.packet.md",
+  "status": "failed",
+  "created_at": "2026-11-02T03:26:52.871159+00:00",
+  "error": "command executor exited 2: claude_station: claude exited 1 for station reviewer-design: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $1.28. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
   "configured_model": "claude-sonnet-5-5",
   "executor": {
     "kind": "command",
     "detail": "python3"
   },
-  "executed_model": "claude-sonnet-5-5"
+  "executed_model": null
 }

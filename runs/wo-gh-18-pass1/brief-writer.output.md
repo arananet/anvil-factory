@@ -1,9 +1,12 @@
-I checked `content/youtube-anvil-v2/brief.md` against the spec and the loopback amendment and found nothing to correct. I left the brief unchanged and wrote my report to `runs/wo-gh-18/brief-writer.output.md`.
+I checked `brief.md` and `source-pack.md` against the spec, including the polish amendment, and kept both unchanged. I found no concrete error in either. The record is in `runs/wo-gh-18/brief-writer.output.md`.
 
-- **What matched:** the format, voice rules, seven-section structure with exact on-screen text, and claims C1 to C11 all match the spec. The claim wording is the spec's, and no dashes appear in the file.
-- **Open point:** the brief still flags that this film's own pipeline has four reviewers while claim C5 says five. It leaves C5 as written and passes the question to the researcher and reviewer-facts.
-- **Production changes:** the amendment changes only how the film is produced, so the brief needs no edits for it.
+- **Scope:** the polish amendment only changes scene and layout, so the audience, angle, claims and sources are untouched.
+- **Claims:** the list stays closed at C1 to C11. C11 gets re-judged against the new film in the second pass, once the film exists.
+- **Asset:** the sha256 of `assets/patch-one.glb` matches the spec's value.
+- **Dashes:** I found no em or en dashes in either file.
+- **Frozen files:** `git status` shows no change to the frozen content files.
+- **Missing inputs:** none. I ran no render, encode or contact sheet extraction.
 
-I didn't edit `script.md` or `storyboard.md`, and I ran no render, encoding or extraction.
+I didn't re-read `brief.md` or `source-pack.md` line by line this time. I relied on their being unchanged since the last round, which I last verified in full then.
 
 {"model": "claude-sonnet-5-5", "runtime": "claude-code"}

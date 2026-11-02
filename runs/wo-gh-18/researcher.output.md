@@ -1,19 +1,13 @@
-I verified `brief.md` and `source-pack.md` against the spec and kept both unchanged. I found no concrete error, so I made no corrections and wrote no files. The source pack stays at `content/youtube-anvil-v2/source-pack.md`.
+I checked `content/youtube-anvil-v2/source-pack.md` against the spec and the polish amendment and kept it unchanged. I found no concrete error, so I corrected nothing and did not touch `source-pack.md`.
 
-**What I checked against the spec**
-- **Claim list:** The pack covers C1 to C11 in the spec's wording, with no extra claims and no counts beyond three intake kinds, five reviewers and five Sentia layers.
-- **Dashes:** Neither file contains an em dash or en dash.
-- **GLB:** The file is 386708 bytes and its sha256 is `daea8110b356865396b062bb1ca20944dd7103286758214cbc7804b43c50f523`. Both match the spec and the pack.
-- **C5 and F1:** Five parallel reviewers exist in `pipelines/sdlc-default.json` and `pipelines/content-default.json`. `pipelines/content-video.json` has four: facts, voice, brand and design. The pack states this scope and does not change the claim.
-- **C2 and F2:** `anvil/model.py` lists six kinds, and "issue" is not one of them. The pack flags this and leaves the claim as written.
-- **C9:** `LICENSE` is Apache 2.0 and `pyproject.toml` says `Apache-2.0`.
+- **Claims:** The amendment changes only scene and layout and adds no claims, so C1 to C11 and their sources still stand.
+- **Dashes:** Neither `source-pack.md` nor `brief.md` contains an em dash or an en dash.
+- **GLB:** `assets/patch-one.glb` still matches the spec. It is 386708 bytes with sha256 `daea8110…f523`.
+- **Frozen inputs:** `git status` shows no change under `content/` this round.
+- **Not re-verified:** I did not re-fetch the live Sentia site or check the upstream Sentia commit.
+- **Commit hash:** I could not confirm the GLB commit hash the pack names (`7344863`). `git log` shows only `2eaaa65` touching the file. The spec does not use that hash, so I left it.
+- **C11 flag (F5):** The pack's F5 flag, that the evidence for C11 did not exist when it was written, stays as written. C11 is re-judged against the new film in the film review pass.
 
-**Not re-verified this pass**
-- The live Sentia site fetch (2026-11-01) and the upstream commit `c9f9bf9` of the Sentia repository. The pack already records that the upstream commit was not checked.
-- The pack says the GLB was committed in `7344863`. My `git log` here shows only `fddea15` as the adding commit, so I couldn't confirm that hash. The spec doesn't use it, so I left it.
-
-**Handoffs**
-- **C11 (F5):** The pack can only cite the pipeline and the work order. reviewer-facts judges C11 in the second pass, once the film exists.
-- **No new sources:** The pack adds nothing for the two script wording edits. Section 4's edit drops a phrase and section 7's rewords the C8 claim, and both are covered by existing sources.
+I wrote the station report to `runs/wo-gh-18/researcher.output.md`. I ran no render or encoding.
 
 {"model": "claude-sonnet-5-5", "runtime": "claude-code"}
