@@ -32,6 +32,8 @@ Test coverage by scenario:
   * test_reviewer_prompts_have_no_json_examples_s5
   * test_reviewer_design_has_three_json_examples_before_fix_s5
   * test_reviewer_design_verdict_vocabulary_s5
+  * test_all_reviewer_prompts_have_output_format_section_loopback_l1 (Loopback round)
+  * test_wrapper_restatement_matches_or_defers_to_canonical_packet_loopback_l2 (Loopback round)
 
 - S6 (Regression tests):
   * test_all_eight_pipelines_valid_s6
@@ -45,6 +47,10 @@ Expected failures before implementation:
 - test_prose_only_output_fails_closed_and_reports_shrinkage_s3 (needs decision rule update)
 - test_example_object_before_real_review_counts_real_verdict_s4 (needs whole-document parsing)
 - test_reviewer_prompts_have_no_json_examples_s5 (needs prompt cleanup)
+
+Loopback round expected failures before implementation:
+- test_all_reviewer_prompts_have_output_format_section_loopback_l1 (needs Output Format section in 8 prompts)
+- test_wrapper_restatement_matches_or_defers_to_canonical_packet_loopback_l2 (needs wrapper alignment)
 """
 import json, tempfile, unittest
 from pathlib import Path
@@ -521,6 +527,129 @@ class TestPacketAndPromptContract(unittest.TestCase):
         # It will pass in either state (before or after fix)
         self.assertTrue(True, "Vocabulary check - implementation will standardize to pass/fail/changes_requested")
 
+    def test_all_reviewer_prompts_have_output_format_section_loopback_l1(self):
+        """Loopback L1: All 9 reviewer prompts carry the same output contract section"""
+        stations_dir = ROOT / "stations"
+
+        # All 9 reviewer stations
+        expected_reviewers = [
+            "reviewer-architecture",
+            "reviewer-brand",
+            "reviewer-design",
+            "reviewer-facts",
+            "reviewer-platform",
+            "reviewer-security",
+            "reviewer-spec",
+            "reviewer-tests",
+            "reviewer-voice"
+        ]
+
+        # Check that all prompts have the Output Format section
+        for station_name in expected_reviewers:
+            with self.subTest(station=station_name):
+                prompt_file = stations_dir / station_name / "PROMPT.md"
+                self.assertTrue(prompt_file.exists(),
+                              f"{station_name}/PROMPT.md should exist")
+
+                prompt_text = prompt_file.read_text()
+
+                # Check for Output Format section
+                self.assertIn("## Output Format", prompt_text,
+                            f"{station_name}/PROMPT.md should have '## Output Format' section")
+
+                # Check for key elements of the contract
+                self.assertIn('"station":', prompt_text,
+                            f"{station_name}/PROMPT.md should specify station field")
+                self.assertIn('"verdict":', prompt_text,
+                            f"{station_name}/PROMPT.md should specify verdict field")
+                self.assertIn('"findings":', prompt_text,
+                            f"{station_name}/PROMPT.md should specify findings field")
+
+                # Check for correct verdict vocabulary
+                self.assertIn("pass", prompt_text,
+                            f"{station_name}/PROMPT.md should mention 'pass' verdict")
+                self.assertIn("fail", prompt_text,
+                            f"{station_name}/PROMPT.md should mention 'fail' verdict")
+                self.assertIn("changes_requested", prompt_text,
+                            f"{station_name}/PROMPT.md should mention 'changes_requested' verdict")
+
+                # Verify the station name appears in the output format section
+                # (each prompt should show its own station id)
+                self.assertIn(f'"{station_name}"', prompt_text,
+                            f"{station_name}/PROMPT.md should reference its own station id in output format")
+
+    def test_wrapper_restatement_matches_or_defers_to_canonical_packet_loopback_l2(self):
+        """Loopback L2: Wrapper restatement matches canonical packet wording or defers to it"""
+        # Read the canonical packet contract from anvil/runner.py
+        runner_file = ROOT / "anvil" / "runner.py"
+        runner_text = runner_file.read_text()
+
+        # Find the canonical contract wording (the section that names the review file path)
+        # It should be in the build_task_packet function for reviewer stations
+        self.assertIn("## Output contract", runner_text,
+                     "anvil/runner.py should contain the canonical '## Output contract' section")
+
+        # Extract the canonical wording
+        import re
+        canonical_match = re.search(
+            r'## Output contract.*?'
+            r'(Your complete answer.*?review\.json.*?never parsed for a review\.)',
+            runner_text, re.DOTALL
+        )
+        self.assertIsNotNone(canonical_match,
+                           "Could not find canonical contract wording in anvil/runner.py")
+        canonical_wording = canonical_match.group(1)
+
+        # Verify it names the specific file path
+        self.assertIn("runs/", canonical_wording,
+                     "Canonical contract should name the specific file path runs/...")
+        self.assertIn(".review.json", canonical_wording,
+                     "Canonical contract should name the .review.json file")
+
+        # Read the wrapper restatement from tools/claude_station.py
+        wrapper_file = ROOT / "tools" / "claude_station.py"
+        wrapper_text = wrapper_file.read_text()
+
+        # Find the REVIEW_SUFFIX or equivalent restatement
+        self.assertIn("REVIEW_SUFFIX", wrapper_text,
+                     "tools/claude_station.py should have REVIEW_SUFFIX")
+
+        # Extract the wrapper restatement
+        suffix_match = re.search(
+            r'REVIEW_SUFFIX\s*=\s*\((.*?)\)',
+            wrapper_text, re.DOTALL
+        )
+        self.assertIsNotNone(suffix_match,
+                           "Could not find REVIEW_SUFFIX in tools/claude_station.py")
+        wrapper_restatement = suffix_match.group(1)
+
+        # The wrapper must either:
+        # 1. Repeat the canonical statement word for word (contains the exact file path), OR
+        # 2. Defer to the packet without restating contract terms
+
+        # Check if it repeats the canonical wording
+        repeats_canonical = (
+            "runs/" in wrapper_restatement and
+            ".review.json" in wrapper_restatement and
+            "never parsed for a review" in wrapper_restatement
+        )
+
+        # Check if it defers without restating
+        defers_to_packet = (
+            "packet" in wrapper_restatement.lower() and
+            "runs/" not in wrapper_restatement  # Doesn't restate the file path
+        )
+
+        self.assertTrue(
+            repeats_canonical or defers_to_packet,
+            "tools/claude_station.py REVIEW_SUFFIX must either repeat the canonical "
+            "wording from anvil/runner.py (including the specific file path "
+            "runs/{work_order.id}/{station_id}.review.json) OR defer to the packet "
+            "without restating contract terms. Currently it does neither: it restates "
+            "the contract with different wording ('authoritative review channel' instead "
+            "of the specific file path), which creates divergent contract statements."
+        )
+
 
 class TestRegressionSuite(unittest.TestCase):
     """S6: Regression tests keep the whole suite green"""
@@ -547,10 +676,12 @@ class TestRegressionSuite(unittest.TestCase):
         stations_dir = ROOT / "stations"
         station_dirs = [d for d in stations_dir.iterdir() if d.is_dir() and not d.name.startswith(".")]
 
-        # Known reviewer stations that should exist
+        # Known reviewer stations that should exist (all 9)
         expected_reviewers = [
             "reviewer-architecture",
+            "reviewer-brand",
             "reviewer-design",
+            "reviewer-facts",
             "reviewer-platform",
             "reviewer-security",
             "reviewer-spec",

@@ -1,46 +1,20 @@
-Perfect! All existing tests pass, and only the 6 new tests that document implementation gaps are failing. Let me create a summary of what was delivered:
+## Summary
 
-## Test Suite Complete
+Extended `tests/test_review_parsing_integrity.py` with two loopback round tests for S5 catalog coverage:
 
-I've written comprehensive tests for the review parsing integrity spec (`.openspec/specs/review-parsing-integrity/spec.md`). The test suite is in `/home/runner/work/anvil-factory/anvil-factory/tests/test_review_parsing_integrity.py`.
+**L1 Test** (`test_all_reviewer_prompts_have_output_format_section_loopback_l1`):
+- Verifies all 9 reviewer prompts have the Output Format section
+- Checks for station, verdict, and findings fields
+- Validates correct verdict vocabulary (pass, fail, changes_requested)
+- **Status**: Failing on 8 of 9 stations (only reviewer-design has it)
 
-### Test Coverage
+**L2 Test** (`test_wrapper_restatement_matches_or_defers_to_canonical_packet_loopback_l2`):
+- Verifies `tools/claude_station.py` either repeats canonical wording from `anvil/runner.py` or defers to packet
+- Checks that wrapper doesn't create divergent contract statements
+- **Status**: Failing (wrapper uses "authoritative review channel" instead of specific file path)
 
-**17 tests mapping to all 6 spec scenarios:**
+**Additional updates**:
+- Fixed station count in `test_no_stations_added_removed_or_renamed_s6` to include all 9 reviewers
+- Updated test documentation with loopback test listings
 
-**S1 - One Authoritative Channel:**
-- ✅ `test_free_output_not_parsed_for_review_s1` - Verifies free output stays as provenance
-- ❌ `test_review_written_to_authoritative_channel_s1` - Needs .review.json implementation
-
-**S2 - Whole Document Parse:**
-- ✅ `test_json_with_markdown_fence_parses_s2` - Handles markdown fences
-- ❌ `test_exact_json_object_parses_s2` - Needs .review.json implementation
-- ❌ `test_no_scanning_for_first_match_s2` - Needs removal of scanning behavior
-
-**S3 - Fail Closed:**
-- ✅ `test_empty_review_file_fails_closed_s3` - Empty file handling
-- ✅ `test_malformed_json_fails_closed_s3` - Malformed JSON handling
-- ✅ `test_missing_review_file_fails_closed_s3` - Missing file handling
-- ❌ `test_prose_only_output_fails_closed_and_reports_shrinkage_s3` - Needs decision rule update
-
-**S4 - Platform25 Evidence:**
-- ✅ `test_platform25_actual_shape_with_single_review_s4` - Clean single review passes
-- ❌ `test_example_object_before_real_review_counts_real_verdict_s4` - Needs whole-document parsing
-
-**S5 - Packet and Prompt Contract:**
-- ✅ `test_reviewer_design_has_three_json_examples_before_fix_s5` - Documents current state
-- ✅ `test_reviewer_design_verdict_vocabulary_s5` - Documents vocabulary
-- ❌ `test_reviewer_prompts_have_no_json_examples_s5` - Needs prompt cleanup (reviewer-design)
-
-**S6 - Regression Tests:**
-- ✅ `test_all_eight_pipelines_valid_s6` - All 8 pipelines load correctly
-- ✅ `test_no_stations_added_removed_or_renamed_s6` - Station stability
-- ✅ `test_model_routing_unchanged_s6` - Model routing preserved
-
-### Test Results
-
-- **111 total tests** in the full suite (94 existing + 17 new)
-- **105 passing** (all existing tests + 11 new regression guards)
-- **6 failing** (documenting expected implementation gaps)
-
-All existing tests pass - no regressions introduced. The 6 failing tests precisely document what needs to be implemented.
+Tests are syntactically valid, executable, and confirmed failing before implementation. Output written to `runs/wo-gh-16/test-writer.output.md`.

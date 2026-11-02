@@ -25,57 +25,39 @@ Judge interface output against the project's own design system: its design token
 - Focus on the design system the project has defined. Do not impose external design opinions or preferences that are not documented in the project's design system.
 - A design token marked as "TODO" or placeholder means the project hasn't defined that value yet. Flag missing values as findings only if the interface output actually uses undefined tokens.
 - Findings should be specific and actionable: cite which quality bar was violated, which token was used incorrectly, or which rule was not followed.
-- Your verdict must be one of: `approved`, `changes_requested`, or `comment`.
+- Your verdict must be one of: `pass`, `fail`, or `changes_requested`.
 - Produce the output as a JSON object, not as chat text.
 
 ## Output Format
 
 Return a JSON object with this structure:
 
-```json
 {
   "station": "reviewer-design",
-  "verdict": "approved | changes_requested | comment",
+  "verdict": "pass | fail | changes_requested",
   "findings": [
     "Specific finding with reference to design system rule or quality bar",
     "Another finding if applicable"
   ]
 }
-```
+
+The station field must equal "reviewer-design", the verdict must be one of pass, fail, or changes_requested, and findings must be a list of strings.
 
 ## Examples
 
-### Example 1: No design system exists
-```json
-{
-  "station": "reviewer-design",
-  "verdict": "changes_requested",
-  "findings": [
-    "No design system exists for this project. The project must define design/DESIGN.md and design/tokens.json before interface output can be reviewed against design standards."
-  ]
-}
-```
+Example 1: No design system exists
+- verdict: changes_requested
+- finding: "No design system exists for this project. The project must define design/DESIGN.md and design/tokens.json before interface output can be reviewed against design standards."
 
-### Example 2: Interface violates quality bar
-```json
-{
-  "station": "reviewer-design",
-  "verdict": "changes_requested",
-  "findings": [
-    "Quality bar violation: Scale Contrast - The button text has only 2.8:1 contrast ratio against its background, failing the minimum 4.5:1 requirement stated in the quality bars.",
-    "Token usage: The page uses hardcoded color '#FF5733' instead of the defined primary color token."
-  ]
-}
-```
+Example 2: Interface violates quality bar
+- verdict: changes_requested
+- findings:
+  * "Quality bar violation: Scale Contrast - The button text has only 2.8:1 contrast ratio against its background, failing the minimum 4.5:1 requirement stated in the quality bars."
+  * "Token usage: The page uses hardcoded color '#FF5733' instead of the defined primary color token."
 
-### Example 3: Interface meets design system
-```json
-{
-  "station": "reviewer-design",
-  "verdict": "approved",
-  "findings": []
-}
-```
+Example 3: Interface meets design system
+- verdict: pass
+- findings: (empty list)
 
 
 ## Work order
@@ -103,6 +85,11 @@ S5: Packet and prompt contract. Reviewer packets name the review file path and s
 S6: Regression tests in the factory suite, named for their scenarios: example object before the real review counts the real verdict; prose only output counts zero with review_parse_failed and the decision rule sentence stating counted and expected numbers; the platform25 evidence shape counts as pass; a catalog test that every reviewer prompt carries the contract and none contains a JSON object that parses as a review. Update docs/EXECUTION.md to state the new contract and add a CHANGELOG Unreleased entry. Keep the whole suite green, all eight pipelines valid, no station added, removed or renamed, and model routing untouched.
 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/16
+
+LOOPBACK ROUND (final, authorized at the human gate on 2026-11-01). The round 1 implementation stands: authoritative review channel, whole document parse, fail closed, shrinkage sentence, regression tests, reviewer-design prompt contract. This round closes only the two counted S5 findings from round 1 and nothing else:
+(a) Add the identical output contract section that stations/reviewer-design/PROMPT.md carries (its Output Format section) to the other eight reviewer station prompts: reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture, reviewer-platform, reviewer-voice, reviewer-brand, reviewer-facts, changing only the station id where the section names it. After this change no reviewer prompt contains a worked example that parses as a review.
+(b) Resolve the packet versus wrapper wording tension: the packet output contract in anvil/runner.py, which names the review file path, is canonical. The runtime restatement in tools/claude_station.py either repeats that statement word for word or defers to the packet without restating contract terms, so the two channels cannot diverge.
+Extend the S5 catalog tests so the suite asserts both items: every reviewer prompt carries the contract section, and the wrapper restatement matches or defers. Keep the whole suite green, all eight pipelines valid, no station added, removed or renamed, model routing untouched, parser behavior unchanged. Do not rewrite or condense the spec in this round.
 - risk_hints: 
 - status: new
 
@@ -111,11 +98,11 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/16
 - intake: completed
 - spec-writer: executed
 - test-writer: executed
-- builder: executed
-- reviewer-spec: executed
-- reviewer-security: executed
-- reviewer-tests: executed
-- reviewer-architecture: executed
+- builder: failed
+- reviewer-spec: failed
+- reviewer-security: failed
+- reviewer-tests: failed
+- reviewer-architecture: failed
 
 ## Project design
 
@@ -195,3 +182,7 @@ These bars apply to every product page or interface this project ships.
 - [ ] Text is readable without zooming on any device
 - [ ] No horizontal scrolling on standard viewports
 
+
+## Output contract
+
+Your complete answer is exactly one review JSON object written to runs/wo-gh-16/reviewer-design.review.json. The free output transcript stays as provenance and is never parsed for a review.

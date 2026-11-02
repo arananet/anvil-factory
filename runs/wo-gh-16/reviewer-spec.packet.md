@@ -47,6 +47,11 @@ S5: Packet and prompt contract. Reviewer packets name the review file path and s
 S6: Regression tests in the factory suite, named for their scenarios: example object before the real review counts the real verdict; prose only output counts zero with review_parse_failed and the decision rule sentence stating counted and expected numbers; the platform25 evidence shape counts as pass; a catalog test that every reviewer prompt carries the contract and none contains a JSON object that parses as a review. Update docs/EXECUTION.md to state the new contract and add a CHANGELOG Unreleased entry. Keep the whole suite green, all eight pipelines valid, no station added, removed or renamed, and model routing untouched.
 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/16
+
+LOOPBACK ROUND (final, authorized at the human gate on 2026-11-01). The round 1 implementation stands: authoritative review channel, whole document parse, fail closed, shrinkage sentence, regression tests, reviewer-design prompt contract. This round closes only the two counted S5 findings from round 1 and nothing else:
+(a) Add the identical output contract section that stations/reviewer-design/PROMPT.md carries (its Output Format section) to the other eight reviewer station prompts: reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture, reviewer-platform, reviewer-voice, reviewer-brand, reviewer-facts, changing only the station id where the section names it. After this change no reviewer prompt contains a worked example that parses as a review.
+(b) Resolve the packet versus wrapper wording tension: the packet output contract in anvil/runner.py, which names the review file path, is canonical. The runtime restatement in tools/claude_station.py either repeats that statement word for word or defers to the packet without restating contract terms, so the two channels cannot diverge.
+Extend the S5 catalog tests so the suite asserts both items: every reviewer prompt carries the contract section, and the wrapper restatement matches or defers. Keep the whole suite green, all eight pipelines valid, no station added, removed or renamed, model routing untouched, parser behavior unchanged. Do not rewrite or condense the spec in this round.
 - risk_hints: 
 - status: new
 
@@ -55,4 +60,8 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/16
 - intake: completed
 - spec-writer: executed
 - test-writer: executed
-- builder: executed
+- builder: failed
+
+## Output contract
+
+Your complete answer is exactly one review JSON object written to runs/wo-gh-16/reviewer-spec.review.json. The free output transcript stays as provenance and is never parsed for a review.
