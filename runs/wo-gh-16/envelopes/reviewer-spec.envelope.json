@@ -1,0 +1,23 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-spec",
+  "to_station": "reviewer-security",
+  "work_order_id": "wo-gh-16",
+  "artifact_path": "runs/wo-gh-16/reviewer-spec.output.md",
+  "status": "executed",
+  "created_at": "2026-10-30T17:53:38.787528+00:00",
+  "review": {
+    "station": "reviewer-spec",
+    "verdict": "changes_requested",
+    "findings": [
+      "S5 PROMPT.md contract requirement not fully implemented: Spec requires 'every PROMPT.md carries the same output contract', but only stations/reviewer-design/PROMPT.md explicitly contains the output contract section. Other reviewer stations (reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture, reviewer-platform, reviewer-voice, reviewer-brand, reviewer-facts) lack explicit output contract documentation in their PROMPT.md files. While the runtime adds the contract via _packet_text (anvil/runner.py:148-152) and REVIEW_SUFFIX (tools/claude_station.py:50-56), the static PROMPT.md files don't carry it as specified.",
+      "Spec file modified after approval: The spec .openspec/specs/review-parsing-integrity/spec.md shows Status: approved and the work order states it was 'approved and written before this implementation', but the file has modifications in this implementation (Purpose section simplified from detailed explanation to brief summary, Requirements reorganized and condensed, Scenarios reworded). While the changes appear editorial and clarifying rather than substantive requirement changes, modifying an approved spec during implementation deviates from the stated process where the spec should be complete before implementation begins."
+    ]
+  },
+  "configured_model": "claude-sonnet-4-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
+}

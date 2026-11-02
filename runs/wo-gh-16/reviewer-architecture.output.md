@@ -1,0 +1,11 @@
+```json
+{
+  "station": "reviewer-architecture",
+  "verdict": "changes_requested",
+  "findings": [
+    "Dual output contract channels (violates S5): The implementation adds the output contract statement in TWO places - both in the packet text (runner.py:149-153) and as a runtime suffix (claude_station.py:50-56, 77-78). S5 explicitly states the runtime restatement should 'introduce no second channel.' Having two places that state the contract creates maintenance burden and risk of divergence. Choose one channel: either the packet-level contract section OR the runtime suffix, not both.",
+    "Incomplete reviewer prompt updates (violates S5): Only reviewer-design/PROMPT.md has an 'Output Format' section explaining the JSON contract. S5 requires 'Every reviewer station PROMPT.md carries the same output contract.' The other reviewer prompts (reviewer-spec, reviewer-architecture, reviewer-security, reviewer-tests, reviewer-voice, reviewer-platform, reviewer-facts, reviewer-brand) lack this section and must be updated to include the same output format documentation.",
+    "Inconsistent output contract wording between channels: The runner.py version states 'written to runs/{work_order.id}/{station_id}.review.json' while claude_station.py says 'and nothing else' but omits the file path. S5 requires 'Reviewer packets name the review file path.' If keeping both channels, they should use identical wording; if consolidating to one channel, ensure it includes the file path as required by S5."
+  ]
+}
+```
