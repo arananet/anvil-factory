@@ -41,3 +41,10 @@ Reviewers judge work, but nothing in the line first proves the work simply passe
 
 ### Scenario: A project with no checks configured records the gate as not configured
 - S6: Given a project with no checks in its configuration, when a run executes, then the report records the gate as not configured, the run proceeds through the reviewer stage as it does today, and no gate failure is recorded.
+
+## Loopback round (2026-11-01)
+
+The gate loopback closes the round 1 findings. Two clarifications this round makes binding:
+
+- S4 means resolution from the base ref itself: the runner records the base ref at run start and reads the check commands and protected paths from that ref's snapshot through git where a repo is present. Reading the working tree file at run start does not satisfy S4, because the working tree at run start is the work branch tip, not the base ref state the work order branched from.
+- A regression test must prove S4 by mutating the checks configuration after the base ref is recorded, once as an uncommitted working tree change and once as a commit on top of the base, and showing the gate runs the base ref commands in both cases.
