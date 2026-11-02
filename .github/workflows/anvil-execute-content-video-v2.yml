@@ -44,6 +44,15 @@ name: anvil-execute-content-video-v2
 #   the runner image carries no ffmpeg: the install step installs
 #   ffmpeg and xvfb when they are missing and fails loudly if they are
 #   still absent afterwards.
+# - Polish loopback (owner decision, 2026-11-01): the owner reviewed the
+#   approved film and ordered reviewer-design's four human gate advisories
+#   fixed: the section 4 title occlusion, the section 6 caption stacking,
+#   the section 1 opening title treatment, and dead air at the section 2
+#   midpoint. The spec carries the polish amendment at its end and the
+#   work order description carries the per station duties. The workflow
+#   steps are unchanged: the same two passes, the same deterministic
+#   production, the same checks. The film stops at the publisher gate
+#   again; nothing is uploaded or posted anywhere.
 # - The work order carries the publishing risk hint on purpose. The
 #   finished video stops at the human gate for the owner's review; the
 #   publisher station inside the sandbox can only write a text record into
