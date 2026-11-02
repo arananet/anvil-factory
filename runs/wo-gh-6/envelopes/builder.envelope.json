@@ -1,11 +1,12 @@
 {
   "schema": "anvil/envelope@1",
   "from_station": "builder",
-  "to_station": "reviewer-spec",
+  "to_station": "checks-gate",
   "work_order_id": "wo-gh-6",
-  "artifact_path": "runs/wo-gh-6/builder.output.md",
-  "status": "executed",
-  "created_at": "2026-10-29T12:05:57.528680+00:00",
+  "artifact_path": "runs/wo-gh-6/builder.packet.md",
+  "status": "failed",
+  "created_at": "2026-11-02T03:28:24.349457+00:00",
+  "error": "command executor exited 2: claude_station: claude exited 1 for station builder: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.27. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
   "configured_model": "claude-sonnet-4-5",
   "executor": {
     "kind": "command",

@@ -1,15 +1,18 @@
-The spec at `.openspec/specs/checks-gate/spec.md` already exists with status **approved** and comprehensively covers all requirements from work order wo-gh-6:
+# Spec Writer Output: wo-gh-6 Loopback Round
 
-**Coverage verification:**
-- ✓ S1: Passing checks scenario (line 27-28)
-- ✓ S2: Failing checks return to builder with loopback (line 30-32)
-- ✓ S3: Protected paths auto-fail gate (line 34-35)
-- ✓ S4: Config from base ref snapshot (line 37-38)
-- ✓ S5: Pre-deploy gate run after merge sync (line 40-41)
-- ✓ S6: No checks configured case (line 43-44)
-- ✓ Recording in report and swimlane (line 22-23)
-- ✓ Loopback consumption (line 19)
-- ✓ Protected paths default (checks config + tests/) (line 17)
-- ✓ Delete counts as touching (line 21)
+## Verdict
+No revision needed.
 
-The spec is complete, approved, and ready for implementation by the implementer station. No revision is needed.
+## Analysis
+The existing spec at `.openspec/specs/checks-gate/spec.md` is complete and correct for this loopback round.
+
+**S4 base ref enforcement**: The spec's loopback section (added 2026-11-01) already clarifies that check commands and protected paths must be resolved from the base ref snapshot through git, and specifies the required regression tests.
+
+**Hygiene findings (a-e)**: All are implementation details that don't require spec changes:
+- Items (a), (b): Documentation and CHANGELOG are process requirements, not spec scenarios
+- Item (c): Code organization (gates.py refactor) is an implementation detail
+- Item (d): Protected paths default is covered by existing spec text
+- Item (e): Station kind is established by the spec's title "Deterministic Checks Gate" and purpose section
+
+## Spec Reference
+`.openspec/specs/checks-gate/spec.md` (approved, with loopback clarifications from 2026-11-01)

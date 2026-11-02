@@ -3,17 +3,10 @@
   "from_station": "reviewer-spec",
   "to_station": "reviewer-security",
   "work_order_id": "wo-gh-6",
-  "artifact_path": "runs/wo-gh-6/reviewer-spec.output.md",
-  "status": "executed",
-  "created_at": "2026-10-29T12:08:07.677195+00:00",
-  "review": {
-    "station": "reviewer-spec",
-    "verdict": "changes_requested",
-    "findings": [
-      "Missing capability documentation (docs/CHECKS-GATE.md): The spec requires 'docs updated in the style of the existing capability docs'. Other features (memory-gate, supervisor, design-system) have docs/[FEATURE].md files. The checks-gate needs similar documentation explaining purpose, configuration, and behavior.",
-      "Missing CHANGELOG.md update: The spec requires 'CHANGELOG Unreleased updated'. The Unreleased section was not modified to include the checks-gate feature. Other features have entries in CHANGELOG.md describing their capabilities (design systems, verified memory gate, bounded supervisor)."
-    ]
-  },
+  "artifact_path": "runs/wo-gh-6/reviewer-spec.packet.md",
+  "status": "failed",
+  "created_at": "2026-11-02T03:28:47.325000+00:00",
+  "error": "command executor exited 2: claude_station: claude exited 1 for station reviewer-spec: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.36. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
   "configured_model": "claude-sonnet-4-5",
   "executor": {
     "kind": "command",

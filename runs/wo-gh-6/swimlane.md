@@ -4,22 +4,22 @@ Cost is reported as null here. Model runtimes report cost when they run a statio
 
 | Station | Status | Duration ms | Artifacts | Cost |
 |---|---|---|---|---|
-| intake | completed | 0.02 | runs/wo-gh-6/report.json | null |
-| spec-writer | executed | 47158.482 | runs/wo-gh-6/spec-writer.output.md | null |
-| test-writer | executed | 156523.125 | runs/wo-gh-6/test-writer.output.md | null |
-| builder | executed | 787250.187 | runs/wo-gh-6/builder.output.md | null |
-| reviewer-spec | executed | 130148.338 | runs/wo-gh-6/reviewer-spec.output.md | null |
-| reviewer-security | executed | 113945.147 | runs/wo-gh-6/reviewer-security.output.md | null |
-| reviewer-tests | executed | 49260.345 | runs/wo-gh-6/reviewer-tests.output.md | null |
-| reviewer-architecture | executed | 153562.588 | runs/wo-gh-6/reviewer-architecture.output.md | null |
-| reviewer-design | executed | 40700.913 | runs/wo-gh-6/reviewer-design.output.md | null |
-| approver | completed | 0.04 | runs/wo-gh-6/report.json | null |
-| approver | loopback | 0.0 | - | null |
-| triage-human | completed | 0.006 | - | null |
-| deployer | packet_ready | 0.089 | runs/wo-gh-6/deployer.packet.md | null |
-| observer | executed | 171616.937 | runs/wo-gh-6/observer.output.md | null |
+| intake | completed | 0.023 | runs/wo-gh-6/report.json | null |
+| spec-writer | failed | 108110.292 | runs/wo-gh-6/spec-writer.packet.md | null |
+| test-writer | failed | 10845.256 | runs/wo-gh-6/test-writer.packet.md | null |
+| builder | failed | 692.458 | runs/wo-gh-6/builder.packet.md | null |
+| checks-gate | passed | 6234.512 | runs/wo-gh-6/checks-gate.pre-review.output.md | null |
+| reviewer-spec | failed | 16740.52 | runs/wo-gh-6/reviewer-spec.packet.md | null |
+| reviewer-security | failed | 21695.875 | runs/wo-gh-6/reviewer-security.packet.md | null |
+| reviewer-tests | failed | 9836.196 | runs/wo-gh-6/reviewer-tests.packet.md | null |
+| reviewer-architecture | failed | 12032.435 | runs/wo-gh-6/reviewer-architecture.packet.md | null |
+| reviewer-design | failed | 651.604 | runs/wo-gh-6/reviewer-design.packet.md | null |
+| approver | completed | 0.039 | runs/wo-gh-6/report.json | null |
+| triage-human | completed | 0.007 | - | null |
+| deployer | packet_ready | 0.191 | runs/wo-gh-6/deployer.packet.md | null |
+| observer | failed | 876.358 | runs/wo-gh-6/observer.packet.md | null |
 
 ## Decision
 
-- Approver: Reviewers reviewer-spec, reviewer-architecture requested changes.
-- Human gate: Verdict is changes_requested, not approved, so a human is required.
+- Approver: No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)
+- Human gate: Verdict is no_reviews, not approved, so a human is required.
