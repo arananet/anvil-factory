@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "completed",
       "detail": "Work order normalized",
-      "duration_ms": 0.021,
+      "duration_ms": 0.01,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/report.json"
@@ -21,7 +21,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-6/spec-writer.output.md",
-      "duration_ms": 55185.595,
+      "duration_ms": 66240.686,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/spec-writer.output.md"
@@ -37,7 +37,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-6/test-writer.output.md",
-      "duration_ms": 186325.293,
+      "duration_ms": 127757.17,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/test-writer.output.md"
@@ -53,7 +53,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-6/builder.output.md",
-      "duration_ms": 379357.092,
+      "duration_ms": 167067.826,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/builder.output.md"
@@ -67,9 +67,9 @@
     },
     {
       "station": "checks-gate",
-      "status": "failed",
-      "detail": "Gate failed: 1 checks, protected paths: fail",
-      "duration_ms": 7131.733,
+      "status": "passed",
+      "detail": "Gate passed: 1 checks, protected paths: pass",
+      "duration_ms": 5538.333,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/checks-gate.pre-review.output.md"
@@ -89,97 +89,95 @@
         "anvil.json",
         "pipelines/"
       ],
-      "protected_path_verdict": "fail",
-      "protected_path_findings": [
-        "Protected path violation: tests/test_checks_gate.py (base ref file modified/deleted, matches tests/)"
-      ],
-      "gate_verdict": "fail"
-    },
-    {
-      "station": "loopback",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: Gate failure: Protected path violation: tests/test_checks_gate.py (base ref file modified/deleted, matches tests/)",
-      "reason": "Gate failure: Protected path violation: tests/test_checks_gate.py (base ref file modified/deleted, matches tests/)",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null,
-      "feedback": "",
-      "from_station": "checks-gate"
+      "protected_path_verdict": "pass",
+      "protected_path_findings": [],
+      "gate_verdict": "pass"
     },
     {
       "station": "reviewer-spec",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.233,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-spec.output.md; review output did not parse as a review JSON",
+      "duration_ms": 89332.66,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-6/reviewer-spec.packet.md"
+        "runs/wo-gh-6/reviewer-spec.output.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
-      "executor": null
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
     },
     {
       "station": "reviewer-security",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.18,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-security.output.md; review output did not parse as a review JSON",
+      "duration_ms": 135885.176,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-6/reviewer-security.packet.md"
+        "runs/wo-gh-6/reviewer-security.output.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
-      "executor": null
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
     },
     {
       "station": "reviewer-tests",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.196,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-tests.output.md; review output did not parse as a review JSON",
+      "duration_ms": 85378.268,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-6/reviewer-tests.packet.md"
+        "runs/wo-gh-6/reviewer-tests.output.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
-      "executor": null
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
     },
     {
       "station": "reviewer-architecture",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.21,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-architecture.output.md; review output did not parse as a review JSON",
+      "duration_ms": 142242.739,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-6/reviewer-architecture.packet.md"
+        "runs/wo-gh-6/reviewer-architecture.output.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
-      "executor": null
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
     },
     {
       "station": "reviewer-design",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.384,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-design.output.md; review output did not parse as a review JSON",
+      "duration_ms": 59958.646,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-6/reviewer-design.packet.md"
+        "runs/wo-gh-6/reviewer-design.output.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": null
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
     },
     {
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.029,
+      "duration_ms": 0.023,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/report.json"
@@ -203,7 +201,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-6/deployer.packet.md",
-      "duration_ms": 0.182,
+      "duration_ms": 0.241,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/deployer.packet.md"
@@ -216,7 +214,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-6/observer.output.md",
-      "duration_ms": 33616.399,
+      "duration_ms": 39917.111,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/observer.output.md"
@@ -232,7 +230,7 @@
   "verdict": "no_reviews",
   "human_required": true,
   "max_loopbacks": 2,
-  "loopbacks": 1,
+  "loopbacks": 0,
   "deployment_status": null,
   "verify_results": [],
   "risk_hints": [],
@@ -254,5 +252,6 @@
       "hints_matched": []
     }
   },
-  "warnings": []
+  "warnings": [],
+  "base_ref": "71bd3ecce8479407e725ea5194a08b7b067d6006"
 }

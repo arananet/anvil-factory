@@ -4,21 +4,20 @@ Cost is reported as null here. Model runtimes report cost when they run a statio
 
 | Station | Status | Duration ms | Artifacts | Cost |
 |---|---|---|---|---|
-| intake | completed | 0.021 | runs/wo-gh-6/report.json | null |
-| spec-writer | executed | 55185.595 | runs/wo-gh-6/spec-writer.output.md | null |
-| test-writer | executed | 186325.293 | runs/wo-gh-6/test-writer.output.md | null |
-| builder | executed | 379357.092 | runs/wo-gh-6/builder.output.md | null |
-| checks-gate | failed | 7131.733 | runs/wo-gh-6/checks-gate.pre-review.output.md | null |
-| loopback | loopback | 0.0 | - | null |
-| reviewer-spec | skipped | 0.233 | runs/wo-gh-6/reviewer-spec.packet.md | null |
-| reviewer-security | skipped | 0.18 | runs/wo-gh-6/reviewer-security.packet.md | null |
-| reviewer-tests | skipped | 0.196 | runs/wo-gh-6/reviewer-tests.packet.md | null |
-| reviewer-architecture | skipped | 0.21 | runs/wo-gh-6/reviewer-architecture.packet.md | null |
-| reviewer-design | skipped | 0.384 | runs/wo-gh-6/reviewer-design.packet.md | null |
-| approver | completed | 0.029 | runs/wo-gh-6/report.json | null |
+| intake | completed | 0.01 | runs/wo-gh-6/report.json | null |
+| spec-writer | executed | 66240.686 | runs/wo-gh-6/spec-writer.output.md | null |
+| test-writer | executed | 127757.17 | runs/wo-gh-6/test-writer.output.md | null |
+| builder | executed | 167067.826 | runs/wo-gh-6/builder.output.md | null |
+| checks-gate | passed | 5538.333 | runs/wo-gh-6/checks-gate.pre-review.output.md | null |
+| reviewer-spec | executed | 89332.66 | runs/wo-gh-6/reviewer-spec.output.md | null |
+| reviewer-security | executed | 135885.176 | runs/wo-gh-6/reviewer-security.output.md | null |
+| reviewer-tests | executed | 85378.268 | runs/wo-gh-6/reviewer-tests.output.md | null |
+| reviewer-architecture | executed | 142242.739 | runs/wo-gh-6/reviewer-architecture.output.md | null |
+| reviewer-design | executed | 59958.646 | runs/wo-gh-6/reviewer-design.output.md | null |
+| approver | completed | 0.023 | runs/wo-gh-6/report.json | null |
 | triage-human | completed | 0.007 | - | null |
-| deployer | packet_ready | 0.182 | runs/wo-gh-6/deployer.packet.md | null |
-| observer | executed | 33616.399 | runs/wo-gh-6/observer.output.md | null |
+| deployer | packet_ready | 0.241 | runs/wo-gh-6/deployer.packet.md | null |
+| observer | executed | 39917.111 | runs/wo-gh-6/observer.output.md | null |
 
 ## Decision
 

@@ -1,1 +1,1 @@
-Spec-writer output complete. The spec at `.openspec/specs/checks-gate/spec.md` already contains the loopback round 3 clarification for wiring S4 base ref enforcement through the CLI execution path. The output file confirms the spec is ready for the builder station.
+Spec verification complete. The spec at `.openspec/specs/checks-gate/spec.md` is approved and contains all six scenarios plus three loopback rounds of clarifications. Output written to `runs/wo-gh-6/spec-writer.output.md`.

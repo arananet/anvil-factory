@@ -1,26 +1,21 @@
-Review complete. The loopback round 2 implementation passes architecture review.
+Review complete. The checks gate implementation is architecturally sound and properly integrated.
 
-**Verified architecture fit:**
+**Key findings from architectural review:**
 
-1. **Pure function extraction** (finding c): `checks_gate()` properly isolated in `anvil/gates.py:207-360` with clean signature matching the requirement
-2. **Station kind alignment** (finding e): `stations/checks-gate/station.json` correctly declares `"kind": "deterministic"`
-3. **Documentation** (finding a): `docs/CHECKS-GATE.md` comprehensively covers purpose, configuration, base ref rule, protected path semantics, and threat model
-4. **Changelog** (finding b): Both initial implementation and loopback round 2 clarification properly documented in `CHANGELOG.md:3-5`
-5. **Protected paths default** (finding d): Default properly references checks configuration file (`anvil.json`) plus `tests/` directory
+✓ **Separation of concerns**: The pure `checks_gate()` function in `anvil/gates.py` follows the established gate pattern alongside `spec_gate`, `tdd_gate`, etc.
 
-**Loopback round 2 semantics verified:**
+✓ **Station registration**: Properly registered as `"deterministic"` kind in `stations/checks-gate/station.json`, consistent with other deterministic stations (intake, approver, triage-human).
 
-- **Builder delta tracking**: Runner captures working tree snapshots before/after builder execution (`anvil/runner.py:612-664`)
-- **Per-attempt judgment**: Each attempt judged on its own delta, not cumulative changes
-- **Addition vs modification distinction**: Base ref file set queried to distinguish violations (modifications/deletions of base ref files) from observations (builder additions)
-- **Base ref resolution** (S4): `resolve_base_ref_config()` uses `git show <base-ref>:anvil.json` to read configuration from base ref, never working tree
-- **Test coverage**: All 5 regression tests pass, plus 8 pure function tests, plus S1-S6 scenario tests (143 total tests green)
+✓ **Pipeline integration**: Correctly positioned in `sdlc-default.json` (after builder, before reviewers) as the spec requires.
 
-**Integration verified:**
+✓ **Base ref security control**: Configuration resolved from base ref via git where present, with proper fallback. CLI derives base ref automatically and records it in the run report for auditability.
 
-- Checks-gate properly integrated in `sdlc-default` pipeline (stage 5, after builder, before reviewers)
-- Runner orchestration correct: pre-review phase uses builder delta, pre-deploy phase reuses same basis
-- Gate output records basis judged, observed additions, and attempt number
-- All 8 pipelines remain valid, no stations renamed/removed, model routing untouched
+✓ **Protected path semantics**: Builder delta tracking and protected path checking match the loopback round 2 clarification.
 
-The implementation correctly realizes the clarified protected path semantics: test-writer output is part of the judging apparatus, not the work under review.
+✓ **Documentation**: `docs/CHECKS-GATE.md` is comprehensive and accurate. CHANGELOG entries present.
+
+✓ **Test coverage**: 25+ test methods covering S1-S6 scenarios plus regression tests.
+
+**One minor documentation gap**: The Gates section in `docs/ARCHITECTURE.md` (lines 15-19) lists only the original four gates and doesn't mention the checks gate.
+
+**Verdict**: Pass with one documentation finding.

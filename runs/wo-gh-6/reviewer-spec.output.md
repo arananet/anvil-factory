@@ -1,23 +1,11 @@
-Review complete. The implementation passes all spec requirements for loopback round 2:
+Review complete. The implementation satisfies all requirements:
 
-**Core Implementation Verified:**
-- Protected path semantics correctly judge only builder's delta per attempt (anvil/runner.py:609-664, anvil/gates.py:207-360)
-- Builder additions to protected paths recorded as observations, not violations
-- Each attempt judged independently on its own delta
+**Scenarios S1-S6:** All implemented correctly with comprehensive test coverage covering passing checks, failing checks, protected path violations, base ref resolution, pre-deploy gate, and not-configured state.
 
-**All 6 Regression Tests Present and Passing:**
-1. test_test_writer_adds_tests_builder_changes_source_gate_passes ✓
-2. test_builder_modifies_existing_base_ref_test_file_gate_fails ✓
-3. test_builder_deletes_test_file_gate_fails ✓
-4. test_builder_modifies_checks_config_gate_fails_commands_from_base_ref ✓
-5. test_loopback_attempt_judged_on_own_delta ✓
-6. test_builder_additions_to_protected_paths_recorded_not_violations ✓
+**Loopback Round 1:** All hygiene items addressed - docs/CHECKS-GATE.md is comprehensive, CHANGELOG entry present, pure checks_gate function extracted to anvil/gates.py with correct signature, protected paths default correctly references the config file, and station kind is "deterministic" per station.json.
 
-**Documentation & Quality:**
-- docs/CHECKS-GATE.md comprehensively updated with clarified semantics and threat model
-- CHANGELOG.md includes loopback round 2 clarification entry
-- Station kind correctly set to "deterministic"
-- All 143 tests pass, 8 pipelines valid
-- No unauthorized changes (stations, model routing)
+**Loopback Round 2:** Builder delta semantics correctly implemented - gate judges only builder's working tree delta (tracked via before/after snapshots), modifications/deletions of base ref protected files are violations, additions are observations, all 5 regression tests present and passing.
 
-The builder's assessment was accurate: loopback round 1 already included all required changes. The implementation correctly solves the identified issue where test-writer output was causing gate failures.
+**Loopback Round 3:** S4 control fully wired through CLI - --base-ref option present, derive_base_ref function implemented with merge-base logic, automatic derivation from base branch, base ref recorded in report, CLI regression test verifies both uncommitted and committed config mutations are blocked.
+
+**Verification:** All 144 tests pass, no implementation defects found. The standing implementation is correct.
