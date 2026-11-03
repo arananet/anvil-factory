@@ -1,15 +1,22 @@
-Tests review complete. All 8 tests passed with full spec coverage.
+## Test Review Complete
 
-**Verification summary:**
-- ✓ Tests are real: Proper unittest.TestCase tests with comprehensive assertions
-- ✓ Tests are mapped: Detailed mapping document links each test to spec scenarios S1-S5
-- ✓ Tests are passing: All 8 tests completed successfully in 0.801s
+All tests pass. The test suite for intake outcomes is comprehensive, real, and properly mapped:
 
-**Coverage:**
-- S1 (rejection): 1 test verifying terminal outcome, status change, and honest rendering
-- S2 (rescope): 1 test verifying rescoped description propagation and cut recording  
-- S3 (waiting_info): 2 tests covering parking and resume workflow
-- S4 (risk/surfaces): 2 tests for high-risk and low-risk acceptance paths
-- S5 (honest rendering): 2 tests verifying rejected and waiting states render truthfully
+**Coverage verified:**
+- **S1** (rejection): 2 tests verifying terminal rejection, reasons recorded, honest rendering
+- **S2** (rescoping): 1 test verifying rescoped description flows downstream  
+- **S3** (waiting_info): 2 tests verifying parking and resume workflow
+- **S4** (risk/surfaces): 2 tests verifying risk ratings and surface lists
+- **S5** (honest rendering): 2 tests verifying rejected and waiting states render without false approval
 
-Review written to `runs/wo-gh-7/reviewer-tests.review.json`.
+**Security validations (loopback round):**
+- 13 tests for intake_outcome/risk/surfaces validation (Findings 1-3)
+- 11 tests for executor output validation (Finding 4)
+- 4 tests for markdown/HTML injection protection (Finding 5)
+
+**Test quality:**
+- Real tests with temporary projects, mock executors, and concrete assertions
+- Explicit spec scenario references in docstrings
+- 35/35 tests passing
+
+Review written to `runs/wo-gh-7/reviewer-tests.review.json` with **pass** verdict.

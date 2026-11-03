@@ -1,24 +1,17 @@
-Perfect! All 219 tests pass. The test-writer work is complete.
+Test coverage verification complete. All 35 tests in `tests/test_intake_outcomes.py` pass and comprehensively cover:
 
-## Summary
+**Spec scenarios S1-S5:**
+- Rejection with reasons (terminal)
+- Rescope with cut recorded
+- Waiting info with questions
+- Risk rating and surfaces
+- Honest rendering
 
-Added comprehensive test coverage for the security findings from the loopback round:
+**All five security findings from the loopback round:**
+1. intake_outcome validation (8 tests)
+2. risk field validation (3 tests)
+3. surfaces field validation (3 tests)
+4. Executor output validation (11 tests)
+5. Markdown/HTML injection protection (4 tests)
 
-**New tests added (11 total):** `TestExecutorValidationIntegration` class
-- Tests the full integration path: executor → runner parsing → WorkOrder validation
-- Covers invalid intake_outcome structures (wrong type, missing fields, invalid values)
-- Covers invalid risk values (wrong type, invalid values, XSS attempts)
-- Covers invalid surfaces values (wrong type, invalid values)
-- Ensures validation catches all malformed executor output before it can reach the report
-
-**Existing test coverage verified:**
-- 12 model validation tests (direct WorkOrder construction)
-- 4 markdown/HTML escaping tests (safe report rendering)
-- 8 scenario tests (S1-S5 functional behavior)
-
-All security findings are now fully tested:
-1. **Finding 1-3**: Model validation catches invalid data structures ✓
-2. **Finding 4**: Runner-executor integration validates all parsed output ✓
-3. **Finding 5**: Report rendering safely escapes markdown/HTML ✓
-
-**Test suite status:** 219/219 tests passing
+The test suite verifies validation at both the model layer (WorkOrder construction) and through the runner (executor-parsed data), plus safe rendering in reports. Output written to `runs/wo-gh-7/test-writer.output.md`.

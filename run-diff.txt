@@ -1,40 +1,43 @@
- CHANGELOG.md                                       |   2 +-
- anvil/model.py                                     |  90 +++
- anvil/runner.py                                    |  23 +-
- runs/wo-gh-7/builder.output.md                     |  92 +--
- runs/wo-gh-7/builder.packet.md                     |  12 +-
- runs/wo-gh-7/checks-gate.pre-review.output.md      |  32 +-
- runs/wo-gh-7/deployer.packet.md                    |  26 +-
+ runs/wo-gh-7/builder.output.md                     |  57 +-------
+ runs/wo-gh-7/builder.packet.md                     |   2 +
+ runs/wo-gh-7/checks-gate.pre-review.output.md      |   9 +-
+ runs/wo-gh-7/deployer.packet.md                    |  15 +-
  runs/wo-gh-7/envelopes/approver.envelope.json      |   2 +-
  runs/wo-gh-7/envelopes/builder.envelope.json       |   2 +-
- runs/wo-gh-7/envelopes/checks-gate.envelope.json   |  31 +-
+ runs/wo-gh-7/envelopes/checks-gate.envelope.json   |  12 +-
  runs/wo-gh-7/envelopes/deployer.envelope.json      |   2 +-
- runs/wo-gh-7/envelopes/intake.envelope.json        |  13 +-
+ runs/wo-gh-7/envelopes/intake.envelope.json        |   2 +-
  runs/wo-gh-7/envelopes/observer.envelope.json      |   2 +-
- .../envelopes/reviewer-architecture.envelope.json  |  24 +-
- .../envelopes/reviewer-design.envelope.json        |  18 +-
- .../envelopes/reviewer-security.envelope.json      |  24 +-
- runs/wo-gh-7/envelopes/reviewer-spec.envelope.json |  18 +-
- .../wo-gh-7/envelopes/reviewer-tests.envelope.json |  18 +-
+ .../envelopes/reviewer-architecture.envelope.json  |  18 ++-
+ .../envelopes/reviewer-design.envelope.json        |  18 ++-
+ .../envelopes/reviewer-security.envelope.json      |  18 ++-
+ runs/wo-gh-7/envelopes/reviewer-spec.envelope.json |  18 ++-
+ .../wo-gh-7/envelopes/reviewer-tests.envelope.json |  18 ++-
  runs/wo-gh-7/envelopes/spec-writer.envelope.json   |   2 +-
  runs/wo-gh-7/envelopes/test-writer.envelope.json   |   2 +-
  runs/wo-gh-7/envelopes/triage-human.envelope.json  |   2 +-
- runs/wo-gh-7/intake.output.md                      |  57 ++
- runs/wo-gh-7/intake.packet.md                      | 111 ++++
- runs/wo-gh-7/observer.output.md                    |   6 +-
- runs/wo-gh-7/observer.packet.md                    |  26 +-
- runs/wo-gh-7/report.json                           | 167 +++---
- runs/wo-gh-7/report.md                             |  29 +
- runs/wo-gh-7/reviewer-architecture.packet.md       |  21 +-
- runs/wo-gh-7/reviewer-design.packet.md             |  23 +-
- runs/wo-gh-7/reviewer-security.packet.md           |  17 +-
- runs/wo-gh-7/reviewer-spec.packet.md               |  15 +-
- runs/wo-gh-7/reviewer-tests.packet.md              |  19 +-
- runs/wo-gh-7/spec-writer.output.md                 |  57 +-
- runs/wo-gh-7/spec-writer.packet.md                 |  12 +-
- runs/wo-gh-7/swimlane.md                           |  34 +-
- runs/wo-gh-7/test-writer.output.md                 |  41 +-
- runs/wo-gh-7/test-writer.packet.md                 |  12 +-
- tests/test_intake_outcomes.py                      | 614 +++++++++++++++++++++
- work_orders/wo-gh-7.json                           |   9 +
- 39 files changed, 1322 insertions(+), 385 deletions(-)
+ runs/wo-gh-7/intake.output.md                      |  66 ++-------
+ runs/wo-gh-7/intake.packet.md                      |   2 +
+ runs/wo-gh-7/observer.output.md                    |   4 +-
+ runs/wo-gh-7/observer.packet.md                    |  15 +-
+ runs/wo-gh-7/report.json                           | 153 ++++++++++++---------
+ runs/wo-gh-7/report.md                             |  23 ++--
+ runs/wo-gh-7/reviewer-architecture.output.md       |  14 +-
+ runs/wo-gh-7/reviewer-architecture.packet.md       |  11 +-
+ runs/wo-gh-7/reviewer-architecture.review.json     |   8 +-
+ runs/wo-gh-7/reviewer-design.output.md             |   2 +-
+ runs/wo-gh-7/reviewer-design.packet.md             |  13 +-
+ runs/wo-gh-7/reviewer-security.output.md           |  17 +--
+ runs/wo-gh-7/reviewer-security.packet.md           |   7 +-
+ runs/wo-gh-7/reviewer-security.review.json         |  10 +-
+ runs/wo-gh-7/reviewer-spec.output.md               |  33 ++---
+ runs/wo-gh-7/reviewer-spec.packet.md               |   5 +-
+ runs/wo-gh-7/reviewer-tests.output.md              |  31 +++--
+ runs/wo-gh-7/reviewer-tests.packet.md              |   9 +-
+ runs/wo-gh-7/spec-writer.output.md                 |  38 +----
+ runs/wo-gh-7/spec-writer.packet.md                 |   2 +
+ runs/wo-gh-7/swimlane.md                           |  33 +++--
+ runs/wo-gh-7/test-writer.output.md                 |  35 ++---
+ runs/wo-gh-7/test-writer.packet.md                 |   2 +
+ work_orders/wo-gh-7.json                           |  13 +-
+ 42 files changed, 352 insertions(+), 395 deletions(-)

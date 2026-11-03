@@ -1,5 +1,13 @@
-Review complete. The intake outcomes implementation passes architectural review.
+Architecture review complete. The intake outcomes implementation passes architectural review with no findings.
 
-The changes align with Decision 0001 (composable stations): the intake station is properly defined in `stations/intake/` with its prompt and manifest, following the established pattern. The runner's handling of terminal outcomes is architecturally sound—it orchestrates the pipeline by responding to intake's output without redefining the station. The model extensions follow the existing layer patterns, and the architecture documentation has been updated to describe the new intake outcomes system.
+**Summary:**
+- **Verdict:** pass
+- **Composable stations:** Adhered to Decision 0001 - intake enhanced in place, not redefined
+- **Separation of concerns:** Clean boundaries between model validation, runner orchestration, and station contract
+- **Single source of truth:** WorkOrder model owns intake_outcome/risk/surfaces validation through both `__post_init__` and `__setattr__`
+- **Terminal outcomes:** Correctly stops pipeline at line 814-815 for rejected/waiting_info
+- **Safe rendering:** Markdown escaping prevents content injection; rescoped_description properly fenced
+- **Downstream integration:** Rescoped descriptions flow correctly to spec-writer, test-writer, builder packets
+- **Test coverage:** 35 tests covering validation and scenarios S1-S5
 
-Review written to `runs/wo-gh-7/reviewer-architecture.review.json`.
+The implementation fits well with project structure and follows established architectural patterns.

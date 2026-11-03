@@ -2,9 +2,6 @@
 Basis: builder_delta
 Attempt: 1
 
-# Protected Path Violations
-Protected path violation: tests/test_intake_outcomes.py (base ref file modified/deleted, matches tests/)
-
 # Check Commands
 ## Command 1: python -m unittest discover -s tests -p 'test_*.py'
 Exit code: 0
@@ -37,15 +34,15 @@ hint: 	git branch -m <name>
 hint:
 hint: Disable this message with "git config set advice.defaultBranchName false"
 Switched to a new branch 'work-branch'
-...................................................../opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 35739)>
+...................................................../opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 46043)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-.../opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 40405)>
+.../opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 40373)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ............................................................................................................................
 ----------------------------------------------------------------------
-Ran 219 tests in 12.259s
+Ran 219 tests in 13.174s
 
 OK
 
