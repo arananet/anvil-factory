@@ -1,82 +1,99 @@
 # Observation Report: wo-gh-24
 
-## Status: Release Not Completed
+## Release Status
 
-**Missing Input**: Release record does not exist. The deployer station envelope shows status `packet_ready` but no release has been executed.
+**No deployment executed.** The deployer station reached `packet_ready` status but did not execute. Changes remain uncommitted in the working tree on branch `anvil/run-review-producer`.
 
-## Observable State at 2026-11-03
+## Implementation Validation Through Run Execution
 
-### Working Tree State
-- Branch: `anvil/run-review-producer`
-- Modified files (uncommitted): 6 files
-  - CHANGELOG.md
-  - anvil/model.py
-  - anvil/runner.py
-  - docs/EXECUTION.md
-  - tests/test_review_parsing_integrity.py
-  - tools/claude_station.py
-- New files (untracked): 1 file
-  - tests/test_review_producer.py
-- Commit: `41be1fa` - "wo-gh-24 loopback round: rebuild scope with round 1 findings F1 to F3; repair commit back staging (run-diff.txt)"
+While no formal deployment occurred, this run provided direct validation of the review producer fix through its own execution. This is Round 3, where per the work order brief: "This run starts with the fixed producer governing from run start, so its counted reviews are the first full live test of the fix."
 
-### Build Execution Evidence
+### Review Production Success: 5 of 5
 
-Pipeline execution stopped at deployer preparation. Upstream stations completed:
+All five reviewer stations successfully produced valid review JSON files:
 
-1. **Builder** (executed): Reported implementation complete
-   - Claims: 19/19 tests in test_review_producer.py passing
-   - Claims: 21/21 tests in test_review_parsing_integrity.py passing
-   - Implementation: path validation, scoped write, file-as-channel, correction loop
+- **reviewer-spec**: `{"station": "reviewer-spec", "verdict": "pass", "findings": []}`
+- **reviewer-security**: `{"station": "reviewer-security", "verdict": "pass", "findings": []}`
+- **reviewer-tests**: `{"station": "reviewer-tests", "verdict": "pass", "findings": []}`
+- **reviewer-architecture**: `{"station": "reviewer-architecture", "verdict": "pass", "findings": []}`
+- **reviewer-design**: `{"station": "reviewer-design", "verdict": "pass", "findings": []}`
 
-2. **Reviewers** (executed): 5 stations ran
-   - reviewer-spec: executed, review_parse_failed
-   - reviewer-security: executed, review_parse_failed
-   - reviewer-tests: executed, review_parse_failed
-   - reviewer-architecture: executed, review_parse_failed
-   - reviewer-design: executed, valid review produced
+All review files:
+- Exist at their designated paths (runs/wo-gh-24/<station>.review.json)
+- Contain valid JSON conforming to the review schema
+- Have matching station fields
+- Have valid verdicts (all "pass")
+- Were written by the reviewers themselves, not transcribed
 
-3. **Approver** (completed): Passed despite parse failures
+### Correction Loop Performance
 
-4. **Deployer** (packet_ready): Did not execute
+No correction metadata files exist (no `*.correction.json` files), indicating all five reviewers produced valid review files on their first attempt. The S4 correction mechanism was available but not needed.
 
-### Critical Finding: Review Producer Failure in Own Execution
+### Envelope Evidence
 
-The implementation intended to fix the review producer mechanism, but during this run's own execution, **4 out of 5 reviewers failed to produce valid review JSON files**:
+All five reviewer envelopes contain parsed review objects, confirming the wrapper successfully validated and extracted the review data from the files the reviewers wrote.
 
-- **reviewer-architecture.review.json**: Contains prose narrative starting with "Review complete. I've written my architectural review..."
-- **reviewer-security.review.json**: Contains markdown prose starting with "## Security Review Complete"
-- **reviewer-spec.review.json**: Contains prose narrative starting with "Review complete. I've written my review..."
-- **reviewer-tests.review.json**: Contains prose narrative starting with "## Summary"
-- **reviewer-design.review.json**: Valid JSON (sole success)
+### Comparison to Previous Runs
 
-All four failed reviewers wrote substantive content to their .output.md files and wrote prose to their .review.json files, triggering `review_parse_failed` in their envelopes. The runner's parse_review function correctly failed closed on the prose content.
+The work order documents historical review producer failure rates:
+- wo-gh-16: 2 of 5 counted (60% prose failure)
+- wo-gh-20: 1 of 5 counted (80% prose failure)
+- wo-gh-21 round 1: 0 of 5 counted (100% prose failure)
+- wo-gh-6: 0 of 5 counted (100% prose failure)
+- wo-gh-24 round 1: 0 of 5 counted (100% prose failure)
+- wo-gh-24 round 2: 1 of 5 counted (80% prose failure, but reviews were overwritten by old runner)
 
-### Paradox
+This run (round 3): **5 of 5 valid review files written (0% failure)**.
 
-The work order wo-gh-24 was opened because reviewers in prior runs (wo-gh-16, wo-gh-20, wo-gh-21, wo-gh-6) answered in prose instead of JSON, making reviews uncountable. The builder in this run implemented the specified fix. However, the reviewers in **this same run** - executing AFTER the builder completed the implementation - still produced prose reviews at the same failure rate (4/5 = 80% vs historical rates of 40-100%).
+## Spec Scenarios Validated
 
-This suggests either:
-1. The wrapper changes were not active for reviewers in this run (they ran with old code)
-2. The correction mechanism (S4) did not fire
-3. The reviewer prompt guidance was insufficient
+Evidence from this run confirms implementation of spec scenarios:
 
-No correction metadata (`correction_used: true`) appears in any reviewer envelope, indicating the S4 correction loop did not activate despite malformed review files.
+**S1 (scoped write)**: All reviewers successfully wrote to their allowed paths. No evidence of write permission errors in output files.
 
-## Deployment Status
+**S2 (channel is the file)**: Review files exist as the source of truth. Reviewers wrote narrative to .output.md files (all <1KB, brief confirmation messages) and structured reviews to .review.json files.
 
-**No deployment occurred.** Changes remain uncommitted in the working tree on branch `anvil/run-review-producer`. No merge to main, no release artifact, no production deployment.
+**S3 (review_file_missing)**: Not exercised in this run - all reviewers produced files.
 
-## Recommendation
+**S4 (one in-session correction)**: Mechanism was available but not triggered - all reviewers succeeded on first attempt.
 
-Cannot observe released behavior because no release exists. To proceed:
-1. Investigate why the S4 correction loop did not fire for the 4 failed reviewers
-2. Verify the wrapper validation logic is reachable during reviewer execution
-3. Re-run reviewers or deploy and observe actual production behavior
+## Round 3 Scope Verification
+
+The builder implemented the two bounded fixes specified for round 3:
+
+**Finding 1 (single removal owner)**: Tools inspection shows the wrapper no longer removes pre-existing review files (the duplicate logic referenced in the finding at lines 178-184 is absent from the current wrapper).
+
+**Finding 2 (validate_path_component duplication)**: Both anvil/model.py and tools/claude_station.py contain `validate_path_component` functions with SYNC documentation comments noting they must remain identical.
+
+## Test Suite Status
+
+The builder reported 151/151 tests passing. The test-writer and builder outputs claim full suite green, but this observation cannot independently verify test execution results without running the suite directly.
+
+## Deployed Artifacts
+
+None. No commits were created, no branches merged, no production deployment occurred.
+
+## Observable System State
+
+- Branch: `anvil/run-review-producer`  
+- Commit: `fad15d6` (wo-gh-24 loopback round 3)
+- Uncommitted changes: 42 files modified (mostly run artifacts and test updates)
+- Review files: All 5 valid and present
+- Report verdict: `approved` (based on early-run state showing 1 of 5 counted)
+- Deployer status: `packet_ready` (not executed)
+
+## Interpretation
+
+The review producer implementation demonstrates functional correctness through this run's own execution. The mechanism works: reviewers received the scoped write permission for their review file, wrote valid JSON to those files on first attempt, and the wrapper successfully validated and extracted the reviews.
+
+The report.json shows stale state (1 of 5 counted, 4 "did not parse") because it was written at 07:01 before reviewers executed (07:12-07:20). The authoritative evidence is the review files themselves and the envelopes that contain the parsed reviews.
+
+No deployment means no production validation, but the run provides direct evidence that the implementation achieves its stated goal: reviewers can write their own review files, producing 100% countable reviews in this execution.
 
 ## Evidence Locations
 
-- Run directory: `runs/wo-gh-24/`
-- Envelopes: `runs/wo-gh-24/envelopes/*.envelope.json`
 - Review files: `runs/wo-gh-24/reviewer-*.review.json`
-- Builder output: `runs/wo-gh-24/builder.output.md`
-- Modified code: Working tree on branch `anvil/run-review-producer`
+- Envelopes with parsed reviews: `runs/wo-gh-24/envelopes/reviewer-*.envelope.json`
+- Builder implementation: `tools/claude_station.py`, `anvil/runner.py`, `anvil/model.py`
+- Test suite: `tests/test_review_producer.py`, `tests/test_review_parsing_integrity.py`
+- Working tree: Branch `anvil/run-review-producer` at commit `fad15d6`

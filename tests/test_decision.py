@@ -15,13 +15,16 @@ ROOT = Path(__file__).resolve().parent.parent
 
 FAKE_EXECUTOR = '''
 import json, sys
+from pathlib import Path
 packet_path = sys.argv[1]
 mode = sys.argv[2] if len(sys.argv) > 2 else "pass"
 station = ""
+work_order_id = ""
 for line in open(packet_path, encoding="utf-8"):
     if line.startswith("# Task packet:"):
         station = line.split(":", 1)[1].strip()
-        break
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
 if station.startswith("reviewer"):
     if mode == "fail":
         verdict = "fail"
@@ -29,8 +32,13 @@ if station.startswith("reviewer"):
         verdict = "changes_requested"
     else:
         verdict = "pass"
-    print(json.dumps({"station": station, "verdict": verdict,
-                      "findings": ["Fake executor review for " + station]}))
+    review_obj = {"station": station, "verdict": verdict,
+                  "findings": ["Fake executor review for " + station]}
+    # Write review to file (new producer expects this)
+    review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+    review_path.parent.mkdir(parents=True, exist_ok=True)
+    review_path.write_text(json.dumps(review_obj))
+    print("Wrote review to file")
 else:
     print("Executed " + station)
 '''

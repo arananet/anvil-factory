@@ -54,6 +54,12 @@ def validate_path_component(component, name):
 
     Rejects components with path separators or parent directory references
     to prevent path traversal attacks (F3).
+
+    SYNC: This function is duplicated in anvil/model.py and tools/claude_station.py.
+    Both implementations must remain identical. The wrapper cannot import from anvil.model,
+    so the copies must be kept synchronized manually. Any change to validation logic
+    in either location must be mirrored to the other.
+    See: tests/test_review_producer.py::TestRound3Finding2PathValidationDuplication
     """
     if not component or component == "unknown":
         raise ValueError(f"{name} is unknown or empty")
@@ -174,14 +180,6 @@ def main():
 
     repo_root = Path(__file__).resolve().parent.parent
     correction_used = False
-
-    # For reviewer stations, remove any pre-existing review file (S3)
-    if station.startswith("reviewer") and work_order_id:
-        review_path = repo_root / "runs" / work_order_id / f"{station}.review.json"
-        try:
-            review_path.unlink()
-        except FileNotFoundError:
-            pass
 
     # Run station (with one potential correction attempt for reviewers)
     for attempt in range(2):

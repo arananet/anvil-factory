@@ -56,6 +56,7 @@ Expected failures before implementation:
 - test_path_traversal_work_order_id_rejected_f3 (needs path validation)
 """
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -692,6 +693,223 @@ class TestFrozenSurfaces(unittest.TestCase):
 
         # The review_suffix function should generate the canonical wording
         # (This is verified by reading the actual text in both files)
+
+
+class TestRound3Finding1RemovalDuplication(unittest.TestCase):
+    """Round 3 Finding 1: Review file removal should only be in runner, not wrapper"""
+
+    def test_wrapper_does_not_remove_review_file_round3_f1(self):
+        """Round 3 F1: Wrapper does not remove pre-existing review file"""
+        wrapper_code = (ROOT / "tools" / "claude_station.py").read_text()
+
+        # Verify wrapper does NOT remove review files
+        # S3 assigns removal to runner, so wrapper should not have this logic
+        lines = wrapper_code.splitlines()
+        for i, line in enumerate(lines):
+            # Check for review file removal patterns in wrapper
+            if "review_path" in line.lower() or "review_file" in line.lower():
+                # Look for unlink or removal in nearby lines
+                context = "\n".join(lines[max(0, i-3):min(len(lines), i+4)])
+                if "unlink" in context and "reviewer" in context:
+                    self.fail(
+                        f"Round 3 F1: Wrapper at line {i+1} should NOT remove review files. "
+                        f"Per spec S3, removal is the runner's responsibility (anvil/runner.py line ~331). "
+                        f"The wrapper implemented removal near line 178, creating duplication. "
+                        f"Remove the wrapper's duplicate removal to fix F1.\n"
+                        f"Context:\n{context}"
+                    )
+
+    def test_runner_removes_review_file_before_execution_round3_f1(self):
+        """Round 3 F1: Runner removes pre-existing review file (S3 requirement)"""
+        runner_code = (ROOT / "anvil" / "runner.py").read_text()
+
+        # Verify runner HAS the removal logic for reviewer stations (S3)
+        self.assertIn("review_file.unlink()", runner_code,
+                     "Runner should remove pre-existing review file before reviewer execution (S3)")
+
+        # Verify it's scoped to reviewer stations
+        # Look for the pattern: if station_id.startswith("reviewer"): ... review_file.unlink()
+        import re
+        pattern = r'if\s+station_id\.startswith\(["\']reviewer["\']\).*?review_file\.unlink\(\)'
+        self.assertTrue(
+            re.search(pattern, runner_code, re.DOTALL),
+            "Runner should remove review file only for reviewer stations before execution"
+        )
+
+    def test_single_ownership_of_removal_responsibility_round3_f1(self):
+        """Round 3 F1: Removal responsibility lives in exactly one place"""
+        wrapper_code = (ROOT / "tools" / "claude_station.py").read_text()
+        runner_code = (ROOT / "anvil" / "runner.py").read_text()
+
+        # Count removal sites across both files
+        # Acceptable: runner has removal, wrapper does not
+        # Violation: both have removal (duplication from round 2)
+
+        wrapper_has_removal = False
+        if "review_path.unlink()" in wrapper_code or "review_file.unlink()" in wrapper_code:
+            # Check if it's for reviewers specifically
+            if re.search(r'reviewer.*?\.unlink\(\)', wrapper_code, re.DOTALL):
+                wrapper_has_removal = True
+
+        runner_has_removal = "review_file.unlink()" in runner_code
+
+        self.assertTrue(runner_has_removal,
+                       "Runner must have review file removal (S3 requirement)")
+        self.assertFalse(wrapper_has_removal,
+                        "Wrapper must NOT have review file removal (F1 fix: single ownership)")
+
+
+class TestRound3Finding2PathValidationDuplication(unittest.TestCase):
+    """Round 3 Finding 2: validate_path_component duplication resolution"""
+
+    def test_validate_path_component_not_duplicated_or_synchronized_round3_f2(self):
+        """Round 3 F2: validate_path_component either shared or explicitly synchronized"""
+        # Read both implementations
+        import ast
+        import inspect
+
+        # Import both modules to access the functions
+        import sys
+        sys.path.insert(0, str(ROOT))
+        from anvil.model import validate_path_component as model_validate
+        sys.path.insert(0, str(ROOT / "tools"))
+        import claude_station
+        wrapper_validate = claude_station.validate_path_component
+
+        # Get source code of both functions
+        model_source = inspect.getsource(model_validate)
+        wrapper_source = inspect.getsource(wrapper_validate)
+
+        # Check if implementations are identical
+        # Normalize whitespace and comments for comparison
+        def normalize(source):
+            lines = [line.strip() for line in source.splitlines()]
+            # Remove docstrings and comments
+            normalized = []
+            for line in lines:
+                if line.startswith('"""') or line.startswith("'''"):
+                    continue
+                if line.startswith("#"):
+                    continue
+                if line and not line.startswith("def "):
+                    normalized.append(line)
+            return "\n".join(normalized)
+
+        model_normalized = normalize(model_source)
+        wrapper_normalized = normalize(wrapper_source)
+
+        # If implementations differ, that's a duplication risk (F2)
+        # Resolution: either make them identical, or use one shared implementation
+        if model_normalized != wrapper_normalized:
+            # Check if there are synchronization notes
+            model_code = (ROOT / "anvil" / "model.py").read_text()
+            wrapper_code = (ROOT / "tools" / "claude_station.py").read_text()
+
+            has_sync_notes = (
+                "synchronized with" in model_code.lower() or
+                "synchronized with" in wrapper_code.lower() or
+                "sync:" in model_code.lower() or
+                "sync:" in wrapper_code.lower()
+            )
+
+            self.fail(
+                f"Round 3 F2: validate_path_component differs between anvil/model.py and "
+                f"tools/claude_station.py. This is a duplication risk.\n\n"
+                f"Resolution options per F2:\n"
+                f"1. Use one shared implementation both sides import, OR\n"
+                f"2. If wrapper must stay standalone, add explicit synchronization notes "
+                f"in both copies stating they must be kept identical.\n\n"
+                f"Has sync notes: {has_sync_notes}\n\n"
+                f"Model version (normalized):\n{model_normalized}\n\n"
+                f"Wrapper version (normalized):\n{wrapper_normalized}"
+            )
+
+    def test_path_traversal_cases_identical_behavior_round3_f2(self):
+        """Round 3 F2: Both validate_path_component implementations reject traversal identically"""
+        # Test that both implementations handle traversal cases identically
+        import sys
+        sys.path.insert(0, str(ROOT))
+        from anvil.model import validate_path_component as model_validate
+
+        sys.path.insert(0, str(ROOT / "tools"))
+        import claude_station
+        wrapper_validate = claude_station.validate_path_component
+
+        # Test cases that should be rejected (F3 security)
+        dangerous_cases = [
+            "../etc/passwd",
+            "../../secret",
+            "wo/../etc",
+            "wo/../../..",
+            "wo\\..\\..\\etc",
+            "../wo",
+            "wo/..",
+            "/etc/passwd",
+            "C:\\Windows",
+            "wo~file",
+            "",
+            "unknown",
+        ]
+
+        for test_input in dangerous_cases:
+            model_raised = False
+            wrapper_raised = False
+
+            try:
+                model_validate(test_input, "test_component")
+            except (ValueError, Exception):
+                model_raised = True
+
+            try:
+                wrapper_validate(test_input, "test_component")
+            except (ValueError, Exception):
+                wrapper_raised = True
+
+            self.assertEqual(
+                model_raised, wrapper_raised,
+                f"Round 3 F2: Both implementations must handle '{test_input}' identically. "
+                f"Model raised: {model_raised}, Wrapper raised: {wrapper_raised}. "
+                f"This test pins both implementations to identical behavior on traversal cases."
+            )
+
+        # Test cases that should be accepted
+        safe_cases = [
+            "wo-123",
+            "reviewer-spec",
+            "simple_name",
+            "kebab-case-123",
+        ]
+
+        for test_input in safe_cases:
+            model_result = None
+            wrapper_result = None
+            model_error = None
+            wrapper_error = None
+
+            try:
+                model_result = model_validate(test_input, "test_component")
+            except Exception as e:
+                model_error = str(e)
+
+            try:
+                wrapper_result = wrapper_validate(test_input, "test_component")
+            except Exception as e:
+                wrapper_error = str(e)
+
+            # Both should accept or both should reject
+            self.assertEqual(
+                (model_result is not None and model_error is None),
+                (wrapper_result is not None and wrapper_error is None),
+                f"Round 3 F2: Both implementations must handle safe input '{test_input}' identically. "
+                f"Model: {model_result or model_error}, Wrapper: {wrapper_result or wrapper_error}"
+            )
+
+            # If both accepted, results should match
+            if model_result and wrapper_result:
+                self.assertEqual(
+                    model_result, wrapper_result,
+                    f"Round 3 F2: Both implementations must return same value for '{test_input}'"
+                )
 
 
 if __name__ == "__main__":

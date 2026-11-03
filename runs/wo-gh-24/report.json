@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "completed",
       "detail": "Work order normalized",
-      "duration_ms": 0.01,
+      "duration_ms": 0.02,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-24/report.json"
@@ -21,7 +21,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-24/spec-writer.output.md",
-      "duration_ms": 78638.556,
+      "duration_ms": 90015.5,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-24/spec-writer.output.md"
@@ -37,7 +37,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-24/test-writer.output.md",
-      "duration_ms": 199610.879,
+      "duration_ms": 173423.884,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-24/test-writer.output.md"
@@ -53,7 +53,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-24/builder.output.md",
-      "duration_ms": 630705.244,
+      "duration_ms": 304399.049,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-24/builder.output.md"
@@ -68,8 +68,8 @@
     {
       "station": "reviewer-spec",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-24/reviewer-spec.output.md; review output did not parse as a review JSON",
-      "duration_ms": 194592.619,
+      "detail": "Executed by command; output written to runs/wo-gh-24/reviewer-spec.output.md",
+      "duration_ms": 110428.774,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-24/reviewer-spec.output.md"
@@ -84,8 +84,8 @@
     {
       "station": "reviewer-security",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-24/reviewer-security.output.md; review output did not parse as a review JSON",
-      "duration_ms": 149132.045,
+      "detail": "Executed by command; output written to runs/wo-gh-24/reviewer-security.output.md",
+      "duration_ms": 117024.204,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-24/reviewer-security.output.md"
@@ -100,8 +100,8 @@
     {
       "station": "reviewer-tests",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-24/reviewer-tests.output.md; review output did not parse as a review JSON",
-      "duration_ms": 160806.349,
+      "detail": "Executed by command; output written to runs/wo-gh-24/reviewer-tests.output.md",
+      "duration_ms": 88488.967,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-24/reviewer-tests.output.md"
@@ -116,8 +116,8 @@
     {
       "station": "reviewer-architecture",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-24/reviewer-architecture.output.md; review output did not parse as a review JSON",
-      "duration_ms": 190074.05,
+      "detail": "Executed by command; output written to runs/wo-gh-24/reviewer-architecture.output.md",
+      "duration_ms": 175976.24,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-24/reviewer-architecture.output.md"
@@ -133,7 +133,7 @@
       "station": "reviewer-design",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-24/reviewer-design.output.md",
-      "duration_ms": 69006.676,
+      "duration_ms": 84376.637,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-24/reviewer-design.output.md"
@@ -149,7 +149,7 @@
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: approved",
-      "duration_ms": 0.041,
+      "duration_ms": 0.045,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-24/report.json"
@@ -162,7 +162,7 @@
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: not_required",
-      "duration_ms": 0.012,
+      "duration_ms": 0.013,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -173,7 +173,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-24/deployer.packet.md",
-      "duration_ms": 0.054,
+      "duration_ms": 0.233,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-24/deployer.packet.md"
@@ -186,7 +186,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-24/observer.output.md",
-      "duration_ms": 117072.749,
+      "duration_ms": 221668.367,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-24/observer.output.md"
@@ -210,6 +210,22 @@
     "approver": {
       "reviews_counted": [
         {
+          "station": "reviewer-spec",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-security",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-architecture",
+          "verdict": "pass"
+        },
+        {
           "station": "reviewer-design",
           "verdict": "pass"
         }
@@ -221,7 +237,7 @@
         "reviewer-architecture",
         "reviewer-design"
       ],
-      "rule": "All counted reviews passed. (Counted 1 reviews, expected 5.)"
+      "rule": "All counted reviews passed."
     },
     "human_gate": {
       "required": false,

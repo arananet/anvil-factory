@@ -194,12 +194,24 @@ class TestRunner(unittest.TestCase):
             self.assertIn("misses", loopbacks[0]["detail"])
 
 class FailReviewExecutor:
-    """Test double: reviewers return a fail review JSON, others plain text."""
+    """Test double: reviewers write a fail review file, others return plain text."""
     name = "command"
     def execute(self, packet_text, station_id, packet_path=None, output_path=None, cwd=None):
         if station_id.startswith("reviewer"):
-            return {"output": json.dumps({"station": station_id, "verdict": "fail",
-                    "findings": ["Implementation misses the required behaviour."]}), "usage": None}
+            # Extract work order ID from packet
+            work_order_id = ""
+            for line in packet_text.splitlines():
+                if line.strip().startswith("- id:"):
+                    work_order_id = line.split(":", 1)[1].strip()
+                    break
+            # Write review to file (new producer expects this)
+            if work_order_id and cwd:
+                review_obj = {"station": station_id, "verdict": "fail",
+                             "findings": ["Implementation misses the required behaviour."]}
+                review_path = Path(cwd) / "runs" / work_order_id / f"{station_id}.review.json"
+                review_path.parent.mkdir(parents=True, exist_ok=True)
+                review_path.write_text(json.dumps(review_obj))
+            return {"output": "Wrote fail review to file", "usage": None}
         return {"output": "done", "usage": None}
 
 if __name__ == "__main__":

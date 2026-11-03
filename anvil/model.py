@@ -10,10 +10,16 @@ def slugify(text):
     return text.strip("-")
 
 def validate_path_component(component, name):
-    """Validate that a path component does not contain traversal attempts (F3).
+    """Validate that a path component does not contain traversal attempts.
 
     Rejects components with path separators or parent directory references
-    to prevent path traversal attacks.
+    to prevent path traversal attacks (F3).
+
+    SYNC: This function is duplicated in anvil/model.py and tools/claude_station.py.
+    Both implementations must remain identical. The wrapper cannot import from anvil.model,
+    so the copies must be kept synchronized manually. Any change to validation logic
+    in either location must be mirrored to the other.
+    See: tests/test_review_producer.py::TestRound3Finding2PathValidationDuplication
     """
     if not component or component == "unknown":
         raise ValueError(f"{name} is unknown or empty")
