@@ -21,54 +21,36 @@ Judge interface output against the project's own design system: its design token
 - Focus on the design system the project has defined. Do not impose external design opinions or preferences that are not documented in the project's design system.
 - A design token marked as "TODO" or placeholder means the project hasn't defined that value yet. Flag missing values as findings only if the interface output actually uses undefined tokens.
 - Findings should be specific and actionable: cite which quality bar was violated, which token was used incorrectly, or which rule was not followed.
-- Your verdict must be one of: `approved`, `changes_requested`, or `comment`.
+- Your verdict must be one of: `pass`, `fail`, or `changes_requested`.
 - Produce the output as a JSON object, not as chat text.
 
 ## Output Format
 
 Return a JSON object with this structure:
 
-```json
 {
   "station": "reviewer-design",
-  "verdict": "approved | changes_requested | comment",
+  "verdict": "pass | fail | changes_requested",
   "findings": [
     "Specific finding with reference to design system rule or quality bar",
     "Another finding if applicable"
   ]
 }
-```
+
+The station field must equal "reviewer-design", the verdict must be one of pass, fail, or changes_requested, and findings must be a list of strings.
 
 ## Examples
 
-### Example 1: No design system exists
-```json
-{
-  "station": "reviewer-design",
-  "verdict": "changes_requested",
-  "findings": [
-    "No design system exists for this project. The project must define design/DESIGN.md and design/tokens.json before interface output can be reviewed against design standards."
-  ]
-}
-```
+Example 1: No design system exists
+- verdict: changes_requested
+- finding: "No design system exists for this project. The project must define design/DESIGN.md and design/tokens.json before interface output can be reviewed against design standards."
 
-### Example 2: Interface violates quality bar
-```json
-{
-  "station": "reviewer-design",
-  "verdict": "changes_requested",
-  "findings": [
-    "Quality bar violation: Scale Contrast - The button text has only 2.8:1 contrast ratio against its background, failing the minimum 4.5:1 requirement stated in the quality bars.",
-    "Token usage: The page uses hardcoded color '#FF5733' instead of the defined primary color token."
-  ]
-}
-```
+Example 2: Interface violates quality bar
+- verdict: changes_requested
+- findings:
+  * "Quality bar violation: Scale Contrast - The button text has only 2.8:1 contrast ratio against its background, failing the minimum 4.5:1 requirement stated in the quality bars."
+  * "Token usage: The page uses hardcoded color '#FF5733' instead of the defined primary color token."
 
-### Example 3: Interface meets design system
-```json
-{
-  "station": "reviewer-design",
-  "verdict": "approved",
-  "findings": []
-}
-```
+Example 3: Interface meets design system
+- verdict: pass
+- findings: (empty list)
