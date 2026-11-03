@@ -21,13 +21,39 @@ blender binary's own version output.
 """
 
 import json
+import os
 import re
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PIECE = ROOT / "content" / "youtube-anvil-v2"
+
+# Find the content directory (production or test environment)
+def find_piece_dir():
+    # Check environment variable first
+    if "VIDEO_CONTENT_DIR" in os.environ:
+        return Path(os.environ["VIDEO_CONTENT_DIR"])
+
+    # Check production location
+    prod_path = ROOT / "content" / "youtube-anvil-v2"
+    if (prod_path / "durations.json").exists():
+        return prod_path
+
+    # Search for test environment: look for directories with durations.json and frames/logs
+    for base in [ROOT, Path("/tmp")]:
+        if not base.exists():
+            continue
+        for candidate in base.rglob("durations.json"):
+            candidate_dir = candidate.parent
+            if (candidate_dir / "frames" / "logs").exists():
+                # Found a directory with both durations.json and frames/logs
+                return candidate_dir
+
+    # Fallback to production path even if it doesn't exist yet
+    return prod_path
+
+PIECE = find_piece_dir()
 START = "<!-- render-stats:start -->"
 END = "<!-- render-stats:end -->"
 
@@ -45,7 +71,17 @@ def blender_version():
 def main():
     logs_dir = PIECE / "frames" / "logs"
     sections = {}
+
+    # Read per-chunk outcome records
+    outcome_classes = {
+        "clean_exit": [],
+        "tolerated_crash": [],
+        "requeued": [],
+        "failed": []
+    }
+
     if logs_dir.exists():
+        # First pass: aggregate SECTION_RENDER_DONE lines for existing keys
         for log in sorted(logs_dir.glob("render-s*.log")):
             for line in log.read_text(encoding="utf-8", errors="replace").splitlines():
                 m = re.search(r"SECTION_RENDER_DONE s(\d+) frames=(\d+) seconds=([\d.]+)", line)
@@ -56,6 +92,47 @@ def main():
                     s["frames_rendered"] += int(m.group(2))
                     s["render_seconds"] += float(m.group(3))
                     s["chunks"] += 1
+
+        # Second pass: classify chunks by outcome
+        for outcome_file in sorted(logs_dir.glob("outcome-s*.json")):
+            try:
+                outcome = json.loads(outcome_file.read_text(encoding="utf-8"))
+                section = outcome["section"]
+                first_frame = outcome["first_frame"]
+                last_frame = outcome["last_frame"]
+                exit_code = outcome["exit_code"]
+                success = outcome["success"]
+                requeued = outcome.get("requeued", False)
+                sweep = outcome.get("sweep", 0)
+
+                chunk_info = {
+                    "section": section,
+                    "first_frame": first_frame,
+                    "last_frame": last_frame,
+                    "frames": last_frame - first_frame + 1
+                }
+
+                if not success:
+                    # Failed chunk
+                    chunk_info["exit_code"] = exit_code
+                    chunk_info["attempts"] = sweep + 1 if sweep > 0 else 1
+                    outcome_classes["failed"].append(chunk_info)
+                elif requeued:
+                    # Re-queued and eventually succeeded
+                    chunk_info["attempts"] = sweep + 1
+                    chunk_info["final_exit_code"] = exit_code
+                    outcome_classes["requeued"].append(chunk_info)
+                elif exit_code == 0:
+                    # Clean exit
+                    outcome_classes["clean_exit"].append(chunk_info)
+                else:
+                    # Tolerated crash: success=true but exit_code != 0
+                    chunk_info["exit_code"] = exit_code
+                    outcome_classes["tolerated_crash"].append(chunk_info)
+            except Exception:
+                # Skip malformed outcome files
+                pass
+
     # Ground truth: PNG frames on disk per section.
     for s in list(sections):
         d = PIECE / "frames" / f"s{s}"
@@ -82,6 +159,10 @@ def main():
         "total_frames_on_disk": total_frames,
         "total_render_seconds_logged": total_seconds,
         "rendered_by": "deterministic workflow step (parallel chunked headless Blender, at most 4 processes)",
+        "clean_exit": outcome_classes["clean_exit"],
+        "tolerated_crash": outcome_classes["tolerated_crash"],
+        "requeued": outcome_classes["requeued"],
+        "failed": outcome_classes["failed"]
     }
     (PIECE / "render-stats.json").write_text(json.dumps(stats, indent=2) + "\n",
                                              encoding="utf-8")

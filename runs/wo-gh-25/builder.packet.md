@@ -1,0 +1,142 @@
+# Task packet: builder
+
+## Station prompt
+
+# Builder
+
+## Role
+Implement the spec so the scenario tests pass.
+
+## Inputs
+- spec
+- tests
+
+## Outputs
+- code change
+
+## Rules
+- Work only from the inputs listed above and the work order in the packet.
+- Produce the output as a file in the repo, not as chat text.
+- If the inputs are not enough, say what is missing instead of guessing.
+- Never approve your own work. Approval belongs to a different station.
+- Keep the change small and mapped to a spec scenario where one applies.
+
+
+## Work order
+
+- id: wo-gh-25
+- kind: bug
+- title: Render crash tolerance: judge chunks by their outputs, sweep the missing ranges
+- source: github-issue
+- description: Implement the spec in .openspec/specs/render-crash-tolerance/spec.md in the factory. Pipeline for this order is sdlc-default, selected by the run workflow.
+
+The defect: the video line render wrapper (content/youtube-anvil-v2/blender/render_all.sh) judges each 60 frame chunk by the Blender process exit code, and a worker exiting 255 stops GNU xargs from launching the rest of the queue. Blender 4.5.15 headless under xvfb intermittently segfaults on exit after a chunk has completed (frames saved, SECTION_RENDER_DONE printed, then a crash writing /tmp/blender.crash.txt). Evidence: run 41382655551 died at the section 6 chunk at frame 121; run 41576145698 died at the section 7 chunk at frame 541 with 60 of 60 frames saved, stopping at 2,359 of 2,515 frames with 156 frames in three unlaunched chunks and no assembly. Peak memory in the logs is about 119 MB.
+
+Staging provenance: the two files under change are staged in this run branch byte identical from anvil/run-youtube-video-v2 at f48ddb50, where the video line tooling lives today: content/youtube-anvil-v2/blender/render_all.sh (blob 2d77ea0ac5fabe11ca39ced436cffca908949194) and tools/render_stats.py (blob 4cb98dbd0a6e42db55e46b02301c046929c145e4). Verify the blobs before building; if they differ, stop and say so in the builder output. The fix lands on main as the canonical home of this tooling.
+
+Build, per the spec scenarios:
+
+S1, output judgment: a chunk (section s, frames a to b) succeeds if and only if every expected frame file frames/s<s>/f_<frame>.png (zero padded to 4 digits) for a..b exists AND frames/logs/render-s<s>-<a>.log contains a SECTION_RENDER_DONE line whose frames count equals b-a+1. The Blender exit code alone never decides. When the outputs satisfy the judgment but the process exited non-zero, the chunk is a success recorded as a tolerated crash with its chunk id.
+
+S2, the queue never aborts: no chunk outcome prevents later queued chunks from launching. Remove the xargs abort behavior (today a worker exit of 255 stops the queue). The mechanism is the builder choice (for example workers that record their outcome and exit 0, with failure decided after the queue drains); the observable behavior is the spec.
+
+S3 and S4, completion sweep: after the initial queue drains, compute missing frame ranges per section from durations.json and re-queue only those ranges at the configured chunk size, at most two sweep passes. A chunk recovered by a sweep is reported as requeued. If frames remain missing after the second pass, the render step exits non-zero and names each missing range (section and frame range).
+
+S5, per chunk statistics: the wrapper leaves a machine readable per attempt outcome record under frames/logs/ (chunk id, range, exit code, output judgment), and tools/render_stats.py aggregates it into render-stats.json: every chunk reported under one of clean_exit, tolerated_crash, requeued, failed, with attempts count and final attempt exit behavior recorded for re-queued chunks. Existing render-stats.json keys and the production-notes statistics block form (read by tools/video_checks_v2.py scenario S8) are preserved exactly; per chunk data is additive only.
+
+Compatibility, frozen: bash blender/render_all.sh runs from content/youtube-anvil-v2 with BLENDER and CHUNK honored; python3 tools/render_stats.py runs from the repo root with no arguments; frame and log naming unchanged; the SECTION_RENDER_DONE format from blender/film.py unchanged; durations.json remains the expectation source; frames already on disk are not re-rendered. Python stays standard library only. Bash for the wrapper shell.
+
+Frozen surfaces: blender/film.py, blender/scene_line.py, blender/scene_proof.py, blender/common.py, blender/narrate.py, blender/soundbed.py, blender/durations.py, blender/assemble.py, the wo-gh-18 script and narration, work-orders/issue-18.json, the stations, the pipelines, model routing, parse_review semantics, the canonical review contract wording in anvil/runner.py, the nine reviewer prompts Output Format sections, and the wrapper review_suffix. Do not modify the run workflow (.github/workflows/anvil-execute-wo-gh-25.yml).
+
+Tests (in tests/, named for their scenarios, deterministic, no Blender): drive the wrapper and the statistics aggregation with a fake chunk binary standing in for Blender through the BLENDER environment variable. T1: a fake chunk that writes its frames and DONE line then exits 1 counts success, records tolerated_crash, and the next chunk still runs. T2: a fake chunk writing partial frames is re-queued by range only, and completes when the missing frames appear, reported as requeued. T3: a chunk that never writes its frames fails the step after exactly two sweep passes, with the missing range named in the output. T4: the statistics aggregation folds outcome records into render-stats.json under the per chunk classes while preserving the existing keys. T5: with the first job failing hard, every later job is observed to launch. Full factory suite green, all eight pipelines valid. Add a CHANGELOG Unreleased entry. No em dash or en dash character in any produced file (project style rule).
+
+Review channel discipline, restated for every reviewer station in this run: your review is exactly one JSON object that YOU write to runs/wo-gh-25/<your station>.review.json, and nothing else in that file. Prose and narrative belong in your .output.md only. Under the fixed producer merged in wo-gh-24, a review you only say in chat is not produced at all: if you do not write the file, the run records review_file_missing against your station.
+
+GitHub issue: https://github.com/arananet/anvil-factory/issues/25
+- risk_hints: 
+- status: new
+
+## Upstream steps
+
+- intake: completed
+- spec-writer: executed
+- test-writer: executed
+
+## Project design
+
+### Design tokens
+
+```json
+{
+  "colors": {
+    "primary": "TODO",
+    "secondary": "TODO",
+    "accent": "TODO",
+    "background": "TODO",
+    "surface": "TODO",
+    "text": "TODO",
+    "text-secondary": "TODO",
+    "error": "TODO",
+    "warning": "TODO",
+    "success": "TODO",
+    "info": "TODO"
+  },
+  "typography": {
+    "font-family-base": "TODO",
+    "font-family-heading": "TODO",
+    "font-family-mono": "TODO",
+    "font-size-base": "TODO",
+    "font-size-scale": "TODO",
+    "line-height-base": "TODO",
+    "line-height-heading": "TODO"
+  },
+  "spacing": {
+    "unit": "TODO",
+    "scale": [
+      "TODO"
+    ]
+  },
+  "layout": {
+    "max-width": "TODO",
+    "breakpoint-mobile": "TODO",
+    "breakpoint-tablet": "TODO",
+    "breakpoint-desktop": "TODO"
+  },
+  "motion": {
+    "duration-fast": "TODO",
+    "duration-base": "TODO",
+    "duration-slow": "TODO",
+    "easing-standard": "TODO",
+    "easing-enter": "TODO",
+    "easing-exit": "TODO"
+  }
+}
+```
+
+### Quality bars
+
+for Product Pages
+
+These bars apply to every product page or interface this project ships.
+
+### Visual Hierarchy
+- [ ] Clear content hierarchy with size, weight, and spacing
+- [ ] Important actions are visually prominent
+- [ ] Related elements are grouped
+
+### Scale Contrast
+- [ ] Minimum 4.5:1 contrast ratio for normal text
+- [ ] Minimum 3:1 contrast ratio for large text (18pt+)
+- [ ] Interactive elements have sufficient contrast
+
+### Spacing Rhythm
+- [ ] Consistent spacing scale used throughout
+- [ ] Whitespace creates clear content boundaries
+- [ ] Spacing adapts appropriately to different screen sizes
+
+### Responsive Behavior
+- [ ] Layout works on mobile, tablet, and desktop
+- [ ] Touch targets are at least 44x44px on mobile
+- [ ] Text is readable without zooming on any device
+- [ ] No horizontal scrolling on standard viewports
+
