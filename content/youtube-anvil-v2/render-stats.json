@@ -1,0 +1,15 @@
+{
+  "blender_version": "unknown",
+  "renderer": "Eevee",
+  "resolution": "1920x1080",
+  "fps": 30,
+  "sections": {},
+  "planned_frames": {},
+  "total_frames_on_disk": 0,
+  "total_render_seconds_logged": 0,
+  "rendered_by": "deterministic workflow step (parallel chunked headless Blender, at most 4 processes)",
+  "clean_exit": [],
+  "tolerated_crash": [],
+  "requeued": [],
+  "failed": []
+}
