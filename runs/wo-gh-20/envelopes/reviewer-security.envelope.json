@@ -1,0 +1,26 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-security",
+  "to_station": "reviewer-tests",
+  "work_order_id": "wo-gh-20",
+  "artifact_path": "runs/wo-gh-20/reviewer-security.output.md",
+  "status": "executed",
+  "created_at": "2026-11-03T04:18:50.984883+00:00",
+  "review": {
+    "station": "reviewer-security",
+    "verdict": "changes_requested",
+    "findings": [
+      "anvil/community.py:24-28,32,38-39: Content injection vulnerability. The name and contact parameters are inserted directly into markdown files without sanitization. An attacker can inject arbitrary markdown sections, malicious links, and HTML by including newlines and markdown syntax. Example: name='MyProject\\n\\n## Malicious Section\\n[Click](http://evil.com)' successfully injects a new header and link. The contact field can similarly inject additional lines redirecting users to different email addresses.",
+      "anvil/community.py:6: No input validation. The function accepts arbitrary strings for name, description, and contact parameters without validating format, length, or content. The contact parameter should be validated as a proper email address format. Empty strings are accepted and produce malformed output (e.g., 'Contributing to \\n'). No maximum length enforced, allowing potentially massive files from inputs like name='A'*10000.",
+      "anvil/community.py:21: Unused parameter. The description parameter is accepted but never used in template rendering. This is dead code that should be removed or implemented per the intended design.",
+      "anvil/community.py:49: Non-functional placeholder. The issue_config.yml template uses hardcoded 'owner/repo' as a placeholder, resulting in a broken discussions link in generated projects. While not a security issue, this functional defect will impact all generated projects.",
+      "Recommendation: Add input sanitization to escape or reject markdown special characters and newlines in name and contact parameters. Validate contact as proper email format or empty. Enforce reasonable length limits on all inputs (suggest 200 chars for name, 100 for contact). Remove or implement the unused description parameter. Resolve the repository name properly for issue_config.yml or document the limitation."
+    ]
+  },
+  "configured_model": "claude-sonnet-4-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
+}

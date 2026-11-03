@@ -1,0 +1,258 @@
+{
+  "work_order_id": "wo-gh-20",
+  "pipeline": "sdlc-default",
+  "title": "Community files by default in every project ANVIL generates",
+  "kind": "task",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "completed",
+      "detail": "Work order normalized",
+      "duration_ms": 0.02,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-20/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-20/spec-writer.output.md",
+      "duration_ms": 47336.937,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-20/spec-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "test-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-20/test-writer.output.md",
+      "duration_ms": 126194.814,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-20/test-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-20/builder.output.md",
+      "duration_ms": 203995.325,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-20/builder.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-20/reviewer-spec.output.md",
+      "duration_ms": 104713.103,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-20/reviewer-spec.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-security",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-20/reviewer-security.output.md",
+      "duration_ms": 137241.6,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-20/reviewer-security.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-20/reviewer-tests.output.md",
+      "duration_ms": 82600.499,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-20/reviewer-tests.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-20/reviewer-architecture.output.md; review output did not parse as a review JSON",
+      "duration_ms": 164912.556,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-20/reviewer-architecture.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-20/reviewer-design.output.md",
+      "duration_ms": 40164.714,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-20/reviewer-design.output.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: rejected",
+      "duration_ms": 0.039,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-20/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "approver",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: FAIL: issue_config.yml contains 'owner/repo' placeholder in rendered output at line 4. The spec requires 'Rendered output contains no template residue: no double brace tokens, no TODO markers, no bracketed insert instructions' and 'never at a placeholder'. The code at anvil/community.py:49 replaces {{REPO_PLACEHOLDER}} with the literal string 'owner/repo', which is still a placeholder. The spec states enforcement and reporting lines should 'point at the project's own GitHub surface in real sentences, never at a placeholder.' Solution: either omit the contact_links section entirely when repo name is not available, or construct it with actual project information if derivable.; anvil/community.py:24-28,32,38-39: Content injection vulnerability. The name and contact parameters are inserted directly into markdown files without sanitization. An attacker can inject arbitrary markdown sections, malicious links, and HTML by including newlines and markdown syntax. Example: name='MyProject\\n\\n## Malicious Section\\n[Click](http://evil.com)' successfully injects a new header and link. The contact field can similarly inject additional lines redirecting users to different email addresses.; anvil/community.py:6: No input validation. The function accepts arbitrary strings for name, description, and contact parameters without validating format, length, or content. The contact parameter should be validated as a proper email address format. Empty strings are accepted and produce malformed output (e.g., 'Contributing to \\n'). No maximum length enforced, allowing potentially massive files from inputs like name='A'*10000.; anvil/community.py:21: Unused parameter. The description parameter is accepted but never used in template rendering. This is dead code that should be removed or implemented per the intended design.; anvil/community.py:49: Non-functional placeholder. The issue_config.yml template uses hardcoded 'owner/repo' as a placeholder, resulting in a broken discussions link in generated projects. While not a security issue, this functional defect will impact all generated projects.; Recommendation: Add input sanitization to escape or reject markdown special characters and newlines in name and contact parameters. Validate contact as proper email format or empty. Enforce reasonable length limits on all inputs (suggest 200 chars for name, 100 for contact). Remove or implement the unused description parameter. Resolve the repository name properly for issue_config.yml or document the limitation.; All required test scenarios from the work order are implemented and passing.; S1 test (test_s1_init_project_creates_full_community_set) verifies init_project creates all 7 community files with metadata substituted and no template residue.; S2 test (test_s2_onboard_preserves_existing_contributing) confirms onboard preserves existing CONTRIBUTING.md byte-for-byte and creates the other 6 files, with correct reporting in created/kept lists.; S3 test (test_s3_scaffold_and_onboard_produce_identical_files) proves both doors render identical community files from the same metadata.; S4 test (test_s4_contact_substitution_and_no_hardcoded_identity) validates distinctive contact appears exactly where required and no other email addresses leak into community files.; Additional S4 test (test_s4_no_contact_fallback_to_github) covers the no-contact scenario with proper GitHub fallback references.; Unit test (test_renderer_produces_complete_set) verifies the renderer returns exactly 7 files with non-empty content.; All tests use unittest with tempfile fixtures matching the factory's existing test style.; Test docstrings properly map to spec scenarios using the community-by-default slug.; Full factory test suite passes with 100 tests OK in 2.653s, satisfying spec S6 requirement.; Pre-existing tests in test_onboard.py and test_greenfield.py do not enumerate complete file sets, so no updates were needed as confirmed by unchanged git diff.; Tests are real (they execute), mapped (docstrings reference spec scenarios), and passing (suite green).",
+      "reason": "FAIL: issue_config.yml contains 'owner/repo' placeholder in rendered output at line 4. The spec requires 'Rendered output contains no template residue: no double brace tokens, no TODO markers, no bracketed insert instructions' and 'never at a placeholder'. The code at anvil/community.py:49 replaces {{REPO_PLACEHOLDER}} with the literal string 'owner/repo', which is still a placeholder. The spec states enforcement and reporting lines should 'point at the project's own GitHub surface in real sentences, never at a placeholder.' Solution: either omit the contact_links section entirely when repo name is not available, or construct it with actual project information if derivable.; anvil/community.py:24-28,32,38-39: Content injection vulnerability. The name and contact parameters are inserted directly into markdown files without sanitization. An attacker can inject arbitrary markdown sections, malicious links, and HTML by including newlines and markdown syntax. Example: name='MyProject\\n\\n## Malicious Section\\n[Click](http://evil.com)' successfully injects a new header and link. The contact field can similarly inject additional lines redirecting users to different email addresses.; anvil/community.py:6: No input validation. The function accepts arbitrary strings for name, description, and contact parameters without validating format, length, or content. The contact parameter should be validated as a proper email address format. Empty strings are accepted and produce malformed output (e.g., 'Contributing to \\n'). No maximum length enforced, allowing potentially massive files from inputs like name='A'*10000.; anvil/community.py:21: Unused parameter. The description parameter is accepted but never used in template rendering. This is dead code that should be removed or implemented per the intended design.; anvil/community.py:49: Non-functional placeholder. The issue_config.yml template uses hardcoded 'owner/repo' as a placeholder, resulting in a broken discussions link in generated projects. While not a security issue, this functional defect will impact all generated projects.; Recommendation: Add input sanitization to escape or reject markdown special characters and newlines in name and contact parameters. Validate contact as proper email format or empty. Enforce reasonable length limits on all inputs (suggest 200 chars for name, 100 for contact). Remove or implement the unused description parameter. Resolve the repository name properly for issue_config.yml or document the limitation.; All required test scenarios from the work order are implemented and passing.; S1 test (test_s1_init_project_creates_full_community_set) verifies init_project creates all 7 community files with metadata substituted and no template residue.; S2 test (test_s2_onboard_preserves_existing_contributing) confirms onboard preserves existing CONTRIBUTING.md byte-for-byte and creates the other 6 files, with correct reporting in created/kept lists.; S3 test (test_s3_scaffold_and_onboard_produce_identical_files) proves both doors render identical community files from the same metadata.; S4 test (test_s4_contact_substitution_and_no_hardcoded_identity) validates distinctive contact appears exactly where required and no other email addresses leak into community files.; Additional S4 test (test_s4_no_contact_fallback_to_github) covers the no-contact scenario with proper GitHub fallback references.; Unit test (test_renderer_produces_complete_set) verifies the renderer returns exactly 7 files with non-empty content.; All tests use unittest with tempfile fixtures matching the factory's existing test style.; Test docstrings properly map to spec scenarios using the community-by-default slug.; Full factory test suite passes with 100 tests OK in 2.653s, satisfying spec S6 requirement.; Pre-existing tests in test_onboard.py and test_greenfield.py do not enumerate complete file sets, so no updates were needed as confirmed by unchanged git diff.; Tests are real (they execute), mapped (docstrings reference spec scenarios), and passing (suite green).",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: required",
+      "duration_ms": 0.006,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "detail": "Packet written to runs/wo-gh-20/deployer.packet.md",
+      "duration_ms": 0.093,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-20/deployer.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-20/observer.output.md",
+      "duration_ms": 58918.63,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-20/observer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    }
+  ],
+  "verdict": "rejected",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 1,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [
+        {
+          "station": "reviewer-spec",
+          "verdict": "fail"
+        },
+        {
+          "station": "reviewer-security",
+          "verdict": "changes_requested"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "pass"
+        }
+      ],
+      "reviews_expected": [
+        "reviewer-spec",
+        "reviewer-security",
+        "reviewer-tests",
+        "reviewer-architecture",
+        "reviewer-design"
+      ],
+      "rule": "Reviewer reviewer-spec returned fail."
+    },
+    "human_gate": {
+      "required": true,
+      "rule": "Verdict is rejected, not approved, so a human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": []
+}

@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from .brain import ensure_brain_memory
+from .community import render_community_files
 from .config import render_anvil_yaml
 from .design import scaffold_design_system
 
@@ -28,7 +29,7 @@ TODO: state the problem and the outcome in plain language.
 - S1: Given a starting state, when the action runs, then the expected result holds.
 """
 
-def init_project(path, name):
+def init_project(path, name, description=None, contact=None):
     root = Path(path)
     root.mkdir(parents=True, exist_ok=True)
     (root / ".openspec" / "specs").mkdir(parents=True, exist_ok=True)
@@ -46,6 +47,14 @@ def init_project(path, name):
     (root / "README.md").write_text(f"# {name}\n\nProject created with ANVIL. Pipeline: sdlc-default (see anvil.json). Station settings: see anvil.yaml. Specs live under .openspec/specs/.\n", encoding="utf-8")
     note = root / "PIPELINES.md"
     note.write_text("# Pipelines\n\nThis project uses the sdlc-default pipeline by default. Copy a pipeline JSON into pipelines/ to compose a different line from the same stations.\n", encoding="utf-8")
+
+    # Write community files
+    community_files = render_community_files(name, description=description, contact=contact)
+    for rel_path, content in community_files.items():
+        file_path = root / rel_path
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.write_text(content, encoding="utf-8")
+
     return root
 
 def scaffold_spec(project, slug, title):
