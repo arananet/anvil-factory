@@ -3,24 +3,8 @@
   "from_station": "reviewer-architecture",
   "to_station": "reviewer-design",
   "work_order_id": "wo-gh-7",
-  "artifact_path": "runs/wo-gh-7/reviewer-architecture.output.md",
-  "status": "executed",
-  "created_at": "2026-11-03T08:18:41.196253+00:00",
-  "review": {
-    "station": "reviewer-architecture",
-    "verdict": "pass",
-    "findings": [
-      "The intake station follows Decision 0001 (composable stations): it is defined once in stations/intake/ with station.json and PROMPT.md, consistent with the established station pattern.",
-      "The runner's special handling of intake terminal outcomes (rejected, waiting_info) is architecturally sound: the runner orchestrates pipeline execution and responds to station outputs without redefining the station. This pattern is documented in ARCHITECTURE.md under 'Intake outcomes'.",
-      "The work order model extensions (intake_outcome, risk, surfaces fields) follow the existing model layer pattern in anvil/model.py with proper serialization in to_dict/from_dict methods.",
-      "The rescoped description substitution in _packet_text() ensures downstream stations receive the buildable scope when intake rescopes work, which maintains the integrity of the composable stations pattern.",
-      "All changes align with the project's layered architecture: model extensions in the model layer, runner orchestration in the runner layer, and station definition in the station layer."
-    ]
-  },
-  "configured_model": "claude-sonnet-4-5",
-  "executor": {
-    "kind": "command",
-    "detail": "python3"
-  },
-  "executed_model": null
+  "artifact_path": "runs/wo-gh-7/reviewer-architecture.packet.md",
+  "status": "skipped",
+  "created_at": "2026-11-03T08:43:15.713287+00:00",
+  "configured_model": "claude-sonnet-4-5"
 }

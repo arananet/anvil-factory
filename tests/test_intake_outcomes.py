@@ -101,6 +101,84 @@ def intake_executor(tmp, outcome_mode="accept"):
 def sdlc_pipe(reg):
     return load_pipeline(ROOT / "pipelines" / "sdlc-default.json", known_stations=set(reg.ids()))
 
+
+def markdown_injection_executor(tmp, mode="reasons"):
+    """Create an executor that returns markdown/HTML injection payloads."""
+    script = Path(tmp) / "markdown_executor.py"
+    
+    executor_code = '''
+import json, sys
+from pathlib import Path
+packet_path = sys.argv[1]
+mode = sys.argv[2] if len(sys.argv) > 2 else "reasons"
+station = ""
+work_order_id = ""
+for line in open(packet_path, encoding="utf-8"):
+    if line.startswith("# Task packet:"):
+        station = line.split(":", 1)[1].strip()
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
+
+if station == "intake":
+    if mode == "reasons":
+        output = {
+            "intake_outcome": {
+                "outcome": "rejected",
+                "reasons": [
+                    "[Click here](http://evil.com) for details",
+                    "**Bold** text and *italic* text",
+                    "# Header injection"
+                ]
+            }
+        }
+    elif mode == "questions":
+        output = {
+            "intake_outcome": {
+                "outcome": "waiting_info",
+                "questions": [
+                    "What about [this link](http://malicious.com)?",
+                    "Should we use **bold** formatting?"
+                ]
+            }
+        }
+    elif mode == "rescoped":
+        output = {
+            "intake_outcome": {
+                "outcome": "rescoped",
+                "rescoped_description": "# Fake Header\\n[Fake link](http://evil.com)\\n**Fake bold**",
+                "reasons": ["Rescoped for safety"]
+            },
+            "risk": "low",
+            "surfaces": ["ui"]
+        }
+    elif mode == "html":
+        output = {
+            "intake_outcome": {
+                "outcome": "rejected",
+                "reasons": [
+                    "<script>alert(\\'XSS\\')</script>",
+                    "<img src=x onerror=alert(1)>"
+                ]
+            }
+        }
+    else:
+        output = {"intake_outcome": {"outcome": "accepted"}}
+    print(json.dumps(output))
+elif station.startswith("reviewer"):
+    review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+    review_path.parent.mkdir(parents=True, exist_ok=True)
+    review_obj = {"station": station, "verdict": "pass", "findings": []}
+    review_path.write_text(json.dumps(review_obj))
+    print("Wrote review to file")
+else:
+    print(f"Executed {station}")
+'''
+    
+    script.write_text(executor_code)
+    return create_executor({"kind": "command",
+                            "command": f"{sys.executable} {script} {{packet}} {mode}",
+                            "timeout_seconds": 60})
+
 class TestIntakeRejection(unittest.TestCase):
     def test_rejected_work_stops_pipeline_with_reasons_s1(self):
         """intake-outcomes S1: rejected work is terminal, runner stops after intake, status becomes rejected"""
@@ -348,6 +426,542 @@ class TestIntakeOutcomeWorkflow(unittest.TestCase):
             self.assertEqual(statuses["intake"], "executed")
             # This time downstream stations should be able to run (at least to packet_ready)
             # since we're using accept mode for the second run
+
+if __name__ == "__main__":
+    unittest.main()
+
+class TestIntakeValidation(unittest.TestCase):
+    """Tests for intake outcome validation (security findings 1-3)."""
+    
+    def test_invalid_outcome_value(self):
+        """Test that invalid outcome values are rejected."""
+        from anvil.model import IntakeValidationError
+        
+        with self.assertRaises(IntakeValidationError) as cm:
+            WorkOrder(
+                id="wo-invalid-001",
+                kind="feature",
+                title="Test",
+                intake_outcome={"outcome": "invalid_outcome"}
+            )
+        self.assertIn("Invalid outcome value", str(cm.exception))
+        self.assertIn("invalid_outcome", str(cm.exception))
+    
+    def test_rejected_missing_reasons(self):
+        """Test that rejected outcome requires reasons field."""
+        from anvil.model import IntakeValidationError
+        
+        with self.assertRaises(IntakeValidationError) as cm:
+            WorkOrder(
+                id="wo-invalid-002",
+                kind="feature",
+                title="Test",
+                intake_outcome={"outcome": "rejected"}
+            )
+        self.assertIn("requires 'reasons'", str(cm.exception))
+    
+    def test_rejected_empty_reasons(self):
+        """Test that rejected outcome requires non-empty reasons list."""
+        from anvil.model import IntakeValidationError
+        
+        with self.assertRaises(IntakeValidationError) as cm:
+            WorkOrder(
+                id="wo-invalid-003",
+                kind="feature",
+                title="Test",
+                intake_outcome={"outcome": "rejected", "reasons": []}
+            )
+        self.assertIn("non-empty list", str(cm.exception))
+    
+    def test_waiting_info_missing_questions(self):
+        """Test that waiting_info outcome requires questions field."""
+        from anvil.model import IntakeValidationError
+        
+        with self.assertRaises(IntakeValidationError) as cm:
+            WorkOrder(
+                id="wo-invalid-004",
+                kind="feature",
+                title="Test",
+                intake_outcome={"outcome": "waiting_info"}
+            )
+        self.assertIn("requires 'questions'", str(cm.exception))
+    
+    def test_waiting_info_empty_questions(self):
+        """Test that waiting_info outcome requires non-empty questions list."""
+        from anvil.model import IntakeValidationError
+        
+        with self.assertRaises(IntakeValidationError) as cm:
+            WorkOrder(
+                id="wo-invalid-005",
+                kind="feature",
+                title="Test",
+                intake_outcome={"outcome": "waiting_info", "questions": []}
+            )
+        self.assertIn("non-empty list", str(cm.exception))
+    
+    def test_rescoped_missing_description(self):
+        """Test that rescoped outcome requires rescoped_description field."""
+        from anvil.model import IntakeValidationError
+        
+        with self.assertRaises(IntakeValidationError) as cm:
+            WorkOrder(
+                id="wo-invalid-006",
+                kind="feature",
+                title="Test",
+                intake_outcome={"outcome": "rescoped"}
+            )
+        self.assertIn("requires 'rescoped_description'", str(cm.exception))
+    
+    def test_rescoped_empty_description(self):
+        """Test that rescoped outcome requires non-empty rescoped_description."""
+        from anvil.model import IntakeValidationError
+        
+        with self.assertRaises(IntakeValidationError) as cm:
+            WorkOrder(
+                id="wo-invalid-007",
+                kind="feature",
+                title="Test",
+                intake_outcome={"outcome": "rescoped", "rescoped_description": "   "}
+            )
+        self.assertIn("non-empty string", str(cm.exception))
+    
+    def test_invalid_risk_value(self):
+        """Test that invalid risk values are rejected."""
+        from anvil.model import RiskValidationError
+        
+        with self.assertRaises(RiskValidationError) as cm:
+            WorkOrder(
+                id="wo-invalid-008",
+                kind="feature",
+                title="Test",
+                risk="critical"  # Not in RISK_LEVELS
+            )
+        self.assertIn("Invalid risk value", str(cm.exception))
+        self.assertIn("critical", str(cm.exception))
+    
+    def test_valid_risk_values(self):
+        """Test that valid risk values are accepted."""
+        # low, medium, high, None should all be valid
+        for risk in ["low", "medium", "high", None]:
+            wo = WorkOrder(
+                id=f"wo-risk-{risk}",
+                kind="feature",
+                title="Test",
+                risk=risk
+            )
+            self.assertEqual(wo.risk, risk)
+    
+    def test_invalid_surface_value(self):
+        """Test that invalid surface values are rejected."""
+        with self.assertRaises(ValueError) as cm:
+            WorkOrder(
+                id="wo-invalid-009",
+                kind="feature",
+                title="Test",
+                surfaces=["ui", "invalid_surface"]
+            )
+        self.assertIn("Invalid surface values", str(cm.exception))
+        self.assertIn("invalid_surface", str(cm.exception))
+    
+    def test_valid_surface_values(self):
+        """Test that valid surface values are accepted."""
+        valid_surfaces = ["ui", "security", "data", "payments", "deploy", "content", "api"]
+        wo = WorkOrder(
+            id="wo-surfaces-001",
+            kind="feature",
+            title="Test",
+            surfaces=valid_surfaces
+        )
+        self.assertEqual(set(wo.surfaces), set(valid_surfaces))
+    
+    def test_validation_on_assignment(self):
+        """Test that validation occurs when fields are assigned after creation."""
+        from anvil.model import IntakeValidationError, RiskValidationError
+        
+        wo = WorkOrder(id="wo-assign-001", kind="feature", title="Test")
+        
+        # Invalid intake_outcome assignment should raise
+        with self.assertRaises(IntakeValidationError):
+            wo.intake_outcome = {"outcome": "invalid"}
+        
+        # Invalid risk assignment should raise
+        with self.assertRaises(RiskValidationError):
+            wo.risk = "extreme"
+        
+        # Invalid surfaces assignment should raise
+        with self.assertRaises(ValueError):
+            wo.surfaces = ["ui", "invalid"]
+
+class TestMarkdownEscaping(unittest.TestCase):
+    """Tests for markdown content escaping in report rendering (security finding 5)."""
+    
+    def test_markdown_injection_in_reasons(self):
+        """Test that markdown special characters in reasons are escaped."""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            
+            # Create a work order - executor will inject markdown
+            wo = WorkOrder(id="wo-markdown-001", kind="feature", title="Test")
+            
+            # Run pipeline with executor that returns markdown injection
+            report = run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                                  executor=markdown_injection_executor(tmp, "reasons"))
+            
+            # Read the report
+            report_file = proj / "runs" / "wo-markdown-001" / "report.md"
+            report_text = report_file.read_text()
+            
+            # The markdown should be escaped (backslash before special chars)
+            self.assertIn("\\[Click here\\]", report_text)
+            self.assertIn("\\*\\*Bold\\*\\*", report_text)
+            self.assertIn("\\# Header", report_text)
+            
+            # Should not render as actual markdown links/formatting
+            # The raw characters should be escaped
+            self.assertIn("\\(http://evil\\.com\\)", report_text)
+    
+    def test_markdown_injection_in_questions(self):
+        """Test that markdown special characters in questions are escaped."""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            
+            # Create a work order - executor will inject markdown
+            wo = WorkOrder(id="wo-markdown-002", kind="feature", title="Test")
+            
+            # Run pipeline with executor that returns markdown injection
+            report = run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                                  executor=markdown_injection_executor(tmp, "questions"))
+            
+            # Read the report
+            report_file = proj / "runs" / "wo-markdown-002" / "report.md"
+            report_text = report_file.read_text()
+            
+            # The markdown should be escaped
+            self.assertIn("\\[this link\\]\\(", report_text)
+            self.assertIn("\\*\\*bold\\*\\*", report_text)
+    
+    def test_markdown_injection_in_rescoped_description(self):
+        """Test that markdown in rescoped_description is safely fenced."""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            
+            # Create a work order - executor will inject markdown
+            wo = WorkOrder(id="wo-markdown-003", kind="feature", title="Test")
+            
+            # Run pipeline with executor that returns markdown injection
+            report = run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                                  executor=markdown_injection_executor(tmp, "rescoped"))
+            
+            # Read the report
+            report_file = proj / "runs" / "wo-markdown-003" / "report.md"
+            report_text = report_file.read_text()
+            
+            # The rescoped_description should be in a code fence (prevents rendering)
+            self.assertIn("```", report_text)
+            self.assertIn("# Fake Header", report_text)
+            self.assertIn("[Fake link](http://evil.com)", report_text)
+            self.assertIn("**Fake bold**", report_text)
+            
+            # The reasons should still be escaped
+            self.assertIn("Rescoped for safety", report_text)
+    
+    def test_html_injection_in_reasons(self):
+        """Test that HTML tags in reasons are escaped."""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            
+            # Create a work order - executor will inject HTML
+            wo = WorkOrder(id="wo-html-001", kind="feature", title="Test")
+            
+            # Run pipeline with executor that returns HTML injection
+            report = run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                                  executor=markdown_injection_executor(tmp, "html"))
+            
+            # Read the report
+            report_file = proj / "runs" / "wo-html-001" / "report.md"
+            report_text = report_file.read_text()
+            
+            # HTML should be escaped
+            self.assertIn("\\<script\\>", report_text)
+            self.assertIn("\\<img", report_text)
+
+class TestExecutorValidationIntegration(unittest.TestCase):
+    """Integration tests for Finding 4: executor output validation through runner."""
+
+    def make_invalid_executor(self, tmp, invalid_mode):
+        """Create an executor that returns invalid data based on mode."""
+        script = Path(tmp) / f"invalid_executor_{invalid_mode}.py"
+
+        executor_code = f'''
+import json, sys
+from pathlib import Path
+packet_path = sys.argv[1]
+mode = "{invalid_mode}"
+station = ""
+work_order_id = ""
+for line in open(packet_path, encoding="utf-8"):
+    if line.startswith("# Task packet:"):
+        station = line.split(":", 1)[1].strip()
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
+
+if station == "intake":
+    if mode == "invalid_outcome":
+        # Invalid outcome value not in INTAKE_OUTCOMES
+        output = {{
+            "intake_outcome": {{
+                "outcome": "maybe_accepted"
+            }}
+        }}
+    elif mode == "missing_outcome_field":
+        # Missing 'outcome' field
+        output = {{
+            "intake_outcome": {{
+                "reasons": ["Some reasons"]
+            }}
+        }}
+    elif mode == "invalid_outcome_type":
+        # Non-dict intake_outcome
+        output = {{
+            "intake_outcome": "accepted"
+        }}
+    elif mode == "rejected_no_reasons":
+        # Rejected without reasons
+        output = {{
+            "intake_outcome": {{
+                "outcome": "rejected"
+            }}
+        }}
+    elif mode == "waiting_no_questions":
+        # waiting_info without questions
+        output = {{
+            "intake_outcome": {{
+                "outcome": "waiting_info"
+            }}
+        }}
+    elif mode == "rescoped_no_description":
+        # rescoped without rescoped_description
+        output = {{
+            "intake_outcome": {{
+                "outcome": "rescoped",
+                "reasons": ["Cut features"]
+            }}
+        }}
+    elif mode == "invalid_risk":
+        # Invalid risk value
+        output = {{
+            "intake_outcome": {{
+                "outcome": "accepted"
+            }},
+            "risk": "CRITICAL"
+        }}
+    elif mode == "invalid_risk_type":
+        # Wrong type for risk
+        output = {{
+            "intake_outcome": {{
+                "outcome": "accepted"
+            }},
+            "risk": 123
+        }}
+    elif mode == "invalid_surfaces":
+        # Invalid surface values
+        output = {{
+            "intake_outcome": {{
+                "outcome": "accepted"
+            }},
+            "risk": "low",
+            "surfaces": ["ui", "blockchain", "ai"]
+        }}
+    elif mode == "invalid_surfaces_type":
+        # Wrong type for surfaces
+        output = {{
+            "intake_outcome": {{
+                "outcome": "accepted"
+            }},
+            "surfaces": "ui,security"
+        }}
+    elif mode == "xss_in_risk":
+        # Attempted XSS in risk field
+        output = {{
+            "intake_outcome": {{
+                "outcome": "accepted"
+            }},
+            "risk": "javascript:alert(1)"
+        }}
+    else:
+        output = {{"intake_outcome": {{"outcome": "accepted"}}, "risk": "low", "surfaces": ["ui"]}}
+    print(json.dumps(output))
+elif station.startswith("reviewer"):
+    review_path = Path.cwd() / "runs" / work_order_id / f"{{station}}.review.json"
+    review_path.parent.mkdir(parents=True, exist_ok=True)
+    review_obj = {{"station": station, "verdict": "pass", "findings": []}}
+    review_path.write_text(json.dumps(review_obj))
+    print("Wrote review to file")
+else:
+    print(f"Executed {{station}}")
+'''
+
+        script.write_text(executor_code)
+        return create_executor({"kind": "command",
+                                "command": f"{sys.executable} {script} {{packet}}",
+                                "timeout_seconds": 60})
+
+    def test_invalid_outcome_value_caught_by_validation(self):
+        """Test that invalid outcome values from executor are caught."""
+        from anvil.model import IntakeValidationError
+
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-exec-invalid-001", kind="feature", title="Test")
+
+            with self.assertRaises(IntakeValidationError) as cm:
+                run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                           executor=self.make_invalid_executor(tmp, "invalid_outcome"))
+            self.assertIn("Invalid outcome value", str(cm.exception))
+
+    def test_missing_outcome_field_caught_by_validation(self):
+        """Test that intake_outcome without 'outcome' field is caught."""
+        from anvil.model import IntakeValidationError
+
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-exec-invalid-002", kind="feature", title="Test")
+
+            with self.assertRaises(IntakeValidationError) as cm:
+                run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                           executor=self.make_invalid_executor(tmp, "missing_outcome_field"))
+            self.assertIn("must have 'outcome' field", str(cm.exception))
+
+    def test_invalid_outcome_type_caught_by_validation(self):
+        """Test that non-dict intake_outcome is caught."""
+        from anvil.model import IntakeValidationError
+
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-exec-invalid-003", kind="feature", title="Test")
+
+            with self.assertRaises(IntakeValidationError) as cm:
+                run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                           executor=self.make_invalid_executor(tmp, "invalid_outcome_type"))
+            self.assertIn("must be a dict", str(cm.exception))
+
+    def test_rejected_without_reasons_caught_by_validation(self):
+        """Test that rejected outcome without reasons is caught."""
+        from anvil.model import IntakeValidationError
+
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-exec-invalid-004", kind="feature", title="Test")
+
+            with self.assertRaises(IntakeValidationError) as cm:
+                run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                           executor=self.make_invalid_executor(tmp, "rejected_no_reasons"))
+            self.assertIn("requires 'reasons'", str(cm.exception))
+
+    def test_waiting_info_without_questions_caught_by_validation(self):
+        """Test that waiting_info outcome without questions is caught."""
+        from anvil.model import IntakeValidationError
+
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-exec-invalid-005", kind="feature", title="Test")
+
+            with self.assertRaises(IntakeValidationError) as cm:
+                run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                           executor=self.make_invalid_executor(tmp, "waiting_no_questions"))
+            self.assertIn("requires 'questions'", str(cm.exception))
+
+    def test_rescoped_without_description_caught_by_validation(self):
+        """Test that rescoped outcome without rescoped_description is caught."""
+        from anvil.model import IntakeValidationError
+
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-exec-invalid-006", kind="feature", title="Test")
+
+            with self.assertRaises(IntakeValidationError) as cm:
+                run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                           executor=self.make_invalid_executor(tmp, "rescoped_no_description"))
+            self.assertIn("requires 'rescoped_description'", str(cm.exception))
+
+    def test_invalid_risk_value_caught_by_validation(self):
+        """Test that invalid risk values from executor are caught."""
+        from anvil.model import RiskValidationError
+
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-exec-invalid-007", kind="feature", title="Test")
+
+            with self.assertRaises(RiskValidationError) as cm:
+                run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                           executor=self.make_invalid_executor(tmp, "invalid_risk"))
+            self.assertIn("Invalid risk value", str(cm.exception))
+            self.assertIn("CRITICAL", str(cm.exception))
+
+    def test_invalid_risk_type_caught_by_validation(self):
+        """Test that wrong type for risk is caught."""
+        from anvil.model import RiskValidationError
+
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-exec-invalid-008", kind="feature", title="Test")
+
+            with self.assertRaises(RiskValidationError) as cm:
+                run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                           executor=self.make_invalid_executor(tmp, "invalid_risk_type"))
+            self.assertIn("must be a string or None", str(cm.exception))
+
+    def test_invalid_surfaces_caught_by_validation(self):
+        """Test that invalid surface values from executor are caught."""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-exec-invalid-009", kind="feature", title="Test")
+
+            with self.assertRaises(ValueError) as cm:
+                run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                           executor=self.make_invalid_executor(tmp, "invalid_surfaces"))
+            self.assertIn("Invalid surface values", str(cm.exception))
+            self.assertIn("blockchain", str(cm.exception))
+            self.assertIn("ai", str(cm.exception))
+
+    def test_invalid_surfaces_type_caught_by_validation(self):
+        """Test that wrong type for surfaces is caught."""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-exec-invalid-010", kind="feature", title="Test")
+
+            with self.assertRaises(ValueError) as cm:
+                run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                           executor=self.make_invalid_executor(tmp, "invalid_surfaces_type"))
+            self.assertIn("must be a list", str(cm.exception))
+
+    def test_xss_attempt_in_risk_caught_by_validation(self):
+        """Test that XSS attempts in risk field are caught."""
+        from anvil.model import RiskValidationError
+
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-exec-invalid-011", kind="feature", title="Test")
+
+            with self.assertRaises(RiskValidationError) as cm:
+                run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                           executor=self.make_invalid_executor(tmp, "xss_in_risk"))
+            self.assertIn("Invalid risk value", str(cm.exception))
 
 if __name__ == "__main__":
     unittest.main()

@@ -11,6 +11,21 @@ from .gates import human_gate, checks_gate, resolve_base_ref_config, _run_shell
 from .approver import aggregate, needs_human, aggregate_explained, needs_human_explained, matched_risk_hints, RISK_SCAN_ORDER
 from .executor import ExecutorError
 
+def _escape_markdown(text):
+    """Escape markdown special characters to prevent content injection.
+    
+    Escapes characters that could be used to inject markdown formatting,
+    links, or other content into generated reports.
+    """
+    if not isinstance(text, str):
+        return str(text)
+    # Escape markdown special characters
+    special_chars = ['\\', '`', '*', '_', '{', '}', '[', ']', '(', ')', '#', '+', '-', '.', '!', '|', '<', '>']
+    result = text
+    for char in special_chars:
+        result = result.replace(char, '\\' + char)
+    return result
+
 @dataclass
 class RunReport:
     work_order_id: str
@@ -922,7 +937,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 report_lines.append("### Reasons")
                 report_lines.append("")
                 for reason in work_order.intake_outcome["reasons"]:
-                    report_lines.append(f"- {reason}")
+                    report_lines.append(f"- {_escape_markdown(reason)}")
                 report_lines.append("")
         elif outcome == "waiting_info":
             report_lines.append("This work order is waiting for additional information.")
@@ -931,7 +946,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 report_lines.append("### Questions")
                 report_lines.append("")
                 for question in work_order.intake_outcome["questions"]:
-                    report_lines.append(f"- {question}")
+                    report_lines.append(f"- {_escape_markdown(question)}")
                 report_lines.append("")
         elif outcome == "rescoped":
             report_lines.append("This work order was rescoped at intake.")
@@ -939,13 +954,15 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             if "rescoped_description" in work_order.intake_outcome:
                 report_lines.append("### Rescoped Description")
                 report_lines.append("")
+                report_lines.append("```")
                 report_lines.append(work_order.intake_outcome["rescoped_description"])
+                report_lines.append("```")
                 report_lines.append("")
             if "reasons" in work_order.intake_outcome:
                 report_lines.append("### Rescope Reasons")
                 report_lines.append("")
                 for reason in work_order.intake_outcome["reasons"]:
-                    report_lines.append(f"- {reason}")
+                    report_lines.append(f"- {_escape_markdown(reason)}")
                 report_lines.append("")
 
     # Include risk and surfaces

@@ -6,22 +6,25 @@
   "steps": [
     {
       "station": "intake",
-      "status": "completed",
-      "detail": "Work order normalized",
-      "duration_ms": 0.01,
+      "status": "executed",
+      "detail": "Executed by command; outcome: unknown",
+      "duration_ms": 630987.241,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-7/report.json"
+        "runs/wo-gh-7/intake.output.md"
       ],
       "configured_model": "default",
       "executed_model": null,
-      "executor": null
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
     },
     {
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-7/spec-writer.output.md",
-      "duration_ms": 108822.004,
+      "duration_ms": 225020.782,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-7/spec-writer.output.md"
@@ -37,7 +40,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-7/test-writer.output.md",
-      "duration_ms": 152601.986,
+      "duration_ms": 169436.273,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-7/test-writer.output.md"
@@ -53,7 +56,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-7/builder.output.md",
-      "duration_ms": 363205.91,
+      "duration_ms": 125258.596,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-7/builder.output.md"
@@ -67,9 +70,9 @@
     },
     {
       "station": "checks-gate",
-      "status": "passed",
-      "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 8560.967,
+      "status": "failed",
+      "detail": "Gate failed: 1 checks, protected paths: fail",
+      "duration_ms": 12384.807,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-7/checks-gate.pre-review.output.md"
@@ -89,95 +92,97 @@
         "anvil.json",
         "pipelines/"
       ],
-      "protected_path_verdict": "pass",
-      "protected_path_findings": [],
-      "gate_verdict": "pass"
+      "protected_path_verdict": "fail",
+      "protected_path_findings": [
+        "Protected path violation: tests/test_intake_outcomes.py (base ref file modified/deleted, matches tests/)"
+      ],
+      "gate_verdict": "fail"
+    },
+    {
+      "station": "loopback",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Gate failure: Protected path violation: tests/test_intake_outcomes.py (base ref file modified/deleted, matches tests/)",
+      "reason": "Gate failure: Protected path violation: tests/test_intake_outcomes.py (base ref file modified/deleted, matches tests/)",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null,
+      "feedback": "",
+      "from_station": "checks-gate"
     },
     {
       "station": "reviewer-spec",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-7/reviewer-spec.output.md",
-      "duration_ms": 143723.643,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.239,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-7/reviewer-spec.output.md"
+        "runs/wo-gh-7/reviewer-spec.packet.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-security",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-7/reviewer-security.output.md",
-      "duration_ms": 89882.282,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.227,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-7/reviewer-security.output.md"
+        "runs/wo-gh-7/reviewer-security.packet.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-tests",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-7/reviewer-tests.output.md",
-      "duration_ms": 43454.549,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.186,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-7/reviewer-tests.output.md"
+        "runs/wo-gh-7/reviewer-tests.packet.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-architecture",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-7/reviewer-architecture.output.md",
-      "duration_ms": 132091.642,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.19,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-7/reviewer-architecture.output.md"
+        "runs/wo-gh-7/reviewer-architecture.packet.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-design",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-7/reviewer-design.output.md",
-      "duration_ms": 86119.216,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.405,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-7/reviewer-design.output.md"
+        "runs/wo-gh-7/reviewer-design.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: changes_requested",
-      "duration_ms": 0.026,
+      "detail": "Approver verdict: no_reviews",
+      "duration_ms": 0.028,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-7/report.json"
@@ -187,23 +192,10 @@
       "executor": null
     },
     {
-      "station": "approver",
-      "status": "loopback",
-      "return_to": "spec-writer",
-      "detail": "Loopback to spec-writer: Missing input validation for intake_outcome structure in WorkOrder model (anvil/model.py:45): The intake_outcome dict accepts arbitrary keys and values without validation. An executor could inject invalid outcome values (not in accepted/rejected/rescoped/waiting_info), missing required fields (reasons for rejected, questions for waiting_info), or wrong types. The __post_init__ method validates work order ID but not intake_outcome structure.; Missing input validation for risk field in WorkOrder model (anvil/model.py:46): The risk field accepts any string value but should be constrained to {low, medium, high, None}. Invalid risk values like 'CRITICAL' or 'javascript:alert(1)' are accepted and would be written to work order files and reports.; Missing input validation for surfaces field in WorkOrder model (anvil/model.py:47): The surfaces list accepts arbitrary string values but should be constrained to the vocabulary {ui, security, data, payments, deploy, content, api} per the spec. Invalid or malicious surface names are accepted and included in reports.; Unsafe trust of executor output in runner.py:449-465: The code directly assigns executor-parsed JSON to work_order fields without validation. Lines 450, 463, 465 trust that intake_data contains well-formed outcome/risk/surfaces data. A compromised or buggy executor could inject malformed data that bypasses validation since the WorkOrder fields lack validation in __post_init__.; Potential content injection in report markdown rendering (runner.py:919-949): The intake outcome reasons, questions, and rescoped_description are written directly to report.md without sanitization. If these contain markdown syntax or HTML, they render as-is. Example: a reason containing [malicious link](javascript:...) or backticks with command injection syntax would be written verbatim to the markdown report.; The intake station follows Decision 0001 (composable stations): it is defined once in stations/intake/ with station.json and PROMPT.md, consistent with the established station pattern.; The runner's special handling of intake terminal outcomes (rejected, waiting_info) is architecturally sound: the runner orchestrates pipeline execution and responds to station outputs without redefining the station. This pattern is documented in ARCHITECTURE.md under 'Intake outcomes'.; The work order model extensions (intake_outcome, risk, surfaces fields) follow the existing model layer pattern in anvil/model.py with proper serialization in to_dict/from_dict methods.; The rescoped description substitution in _packet_text() ensures downstream stations receive the buildable scope when intake rescopes work, which maintains the integrity of the composable stations pattern.; All changes align with the project's layered architecture: model extensions in the model layer, runner orchestration in the runner layer, and station definition in the station layer.",
-      "reason": "Missing input validation for intake_outcome structure in WorkOrder model (anvil/model.py:45): The intake_outcome dict accepts arbitrary keys and values without validation. An executor could inject invalid outcome values (not in accepted/rejected/rescoped/waiting_info), missing required fields (reasons for rejected, questions for waiting_info), or wrong types. The __post_init__ method validates work order ID but not intake_outcome structure.; Missing input validation for risk field in WorkOrder model (anvil/model.py:46): The risk field accepts any string value but should be constrained to {low, medium, high, None}. Invalid risk values like 'CRITICAL' or 'javascript:alert(1)' are accepted and would be written to work order files and reports.; Missing input validation for surfaces field in WorkOrder model (anvil/model.py:47): The surfaces list accepts arbitrary string values but should be constrained to the vocabulary {ui, security, data, payments, deploy, content, api} per the spec. Invalid or malicious surface names are accepted and included in reports.; Unsafe trust of executor output in runner.py:449-465: The code directly assigns executor-parsed JSON to work_order fields without validation. Lines 450, 463, 465 trust that intake_data contains well-formed outcome/risk/surfaces data. A compromised or buggy executor could inject malformed data that bypasses validation since the WorkOrder fields lack validation in __post_init__.; Potential content injection in report markdown rendering (runner.py:919-949): The intake outcome reasons, questions, and rescoped_description are written directly to report.md without sanitization. If these contain markdown syntax or HTML, they render as-is. Example: a reason containing [malicious link](javascript:...) or backticks with command injection syntax would be written verbatim to the markdown report.; The intake station follows Decision 0001 (composable stations): it is defined once in stations/intake/ with station.json and PROMPT.md, consistent with the established station pattern.; The runner's special handling of intake terminal outcomes (rejected, waiting_info) is architecturally sound: the runner orchestrates pipeline execution and responds to station outputs without redefining the station. This pattern is documented in ARCHITECTURE.md under 'Intake outcomes'.; The work order model extensions (intake_outcome, risk, surfaces fields) follow the existing model layer pattern in anvil/model.py with proper serialization in to_dict/from_dict methods.; The rescoped description substitution in _packet_text() ensures downstream stations receive the buildable scope when intake rescopes work, which maintains the integrity of the composable stations pattern.; All changes align with the project's layered architecture: model extensions in the model layer, runner orchestration in the runner layer, and station definition in the station layer.",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null
-    },
-    {
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: required",
-      "duration_ms": 0.005,
+      "duration_ms": 0.007,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -214,7 +206,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-7/deployer.packet.md",
-      "duration_ms": 0.048,
+      "duration_ms": 0.214,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-7/deployer.packet.md"
@@ -227,7 +219,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-7/observer.output.md",
-      "duration_ms": 64258.67,
+      "duration_ms": 119693.765,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-7/observer.output.md"
@@ -240,7 +232,7 @@
       }
     }
   ],
-  "verdict": "changes_requested",
+  "verdict": "no_reviews",
   "human_required": true,
   "max_loopbacks": 2,
   "loopbacks": 1,
@@ -249,28 +241,7 @@
   "risk_hints": [],
   "decision": {
     "approver": {
-      "reviews_counted": [
-        {
-          "station": "reviewer-spec",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-security",
-          "verdict": "changes_requested"
-        },
-        {
-          "station": "reviewer-tests",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-architecture",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-design",
-          "verdict": "pass"
-        }
-      ],
+      "reviews_counted": [],
       "reviews_expected": [
         "reviewer-spec",
         "reviewer-security",
@@ -278,14 +249,14 @@
         "reviewer-architecture",
         "reviewer-design"
       ],
-      "rule": "Reviewer reviewer-security requested changes."
+      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)"
     },
     "human_gate": {
       "required": true,
-      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "rule": "Verdict is no_reviews, not approved, so a human is required.",
       "hints_matched": []
     }
   },
   "warnings": [],
-  "base_ref": "52b4717bdecf210788b99be757ceafff5b51073a"
+  "base_ref": "c147ece352f5c161cf062117d7094a5d223807e3"
 }

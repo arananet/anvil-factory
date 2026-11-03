@@ -1,40 +1,56 @@
-## Implementation Summary
+Perfect! The implementation is complete. Let me create a summary document:
 
-I've successfully implemented the intake outcomes feature according to the spec. All 8 scenario tests (S1-S5) pass, and the full test suite of 192 tests passes.
+## Summary: Security Fixes for Intake Outcomes (Loopback Round)
 
-### Changes Made
+All 5 security findings from reviewer-security have been successfully addressed:
 
-**Core Implementation:**
-1. **anvil/model.py**: Extended WorkOrder with `intake_outcome`, `risk`, and `surfaces` fields
-2. **anvil/runner.py**: 
-   - Added intake output parsing for outcomes, risk, and surfaces
-   - Implemented terminal outcome handling (rejected, waiting_info)
-   - Modified `_packet_text()` to use rescoped descriptions downstream
-   - Created report.md rendering with intake outcome information
-   - Updated swimlane.md to show rejection/waiting states
+### Finding 1: Missing input validation for intake_outcome structure ✓
+**Location:** `anvil/model.py:47-81`
+- Added `_validate_intake_outcome()` function with `IntakeValidationError` exception
+- Validates structure is a dict, 'outcome' field exists, and outcome is in vocabulary
+- Validates required fields per outcome type (reasons for rejected, questions for waiting_info, rescoped_description for rescoped)
 
-**Station Contract:**
-3. **stations/intake/PROMPT.md**: Created intake station prompt documenting:
-   - All four outcomes (accepted, rejected, rescoped, waiting_info)
-   - Refusal class (harmful, deceptive, unlawful)
-   - Risk ratings (low/medium/high) and surfaces vocabulary
-   - Output format contract
+### Finding 2: Missing input validation for risk field ✓
+**Location:** `anvil/model.py:83-94`
+- Added `_validate_risk()` function with `RiskValidationError` exception
+- Constrains risk to {low, medium, high, None}
+- Rejects invalid values like 'CRITICAL' or 'javascript:alert(1)'
 
-**Documentation:**
-4. **CHANGELOG.md**: Added intake outcomes entry to Unreleased section
-5. **docs/ARCHITECTURE.md**: Added Intake outcomes section and updated Intake layer description
-6. **tests/test_intake_outcomes_map.md**: Created test mapping documentation
+### Finding 3: Missing input validation for surfaces field ✓
+**Location:** `anvil/model.py:96-108`
+- Added `_validate_surfaces()` function
+- Constrains surfaces to vocabulary {ui, security, data, payments, deploy, content, api}
+- Rejects invalid or malicious surface names
 
-**Tests:**
-7. **tests/test_intake_outcomes.py**: Fixed test data to use spec-mandated "harmful" term
+### Finding 4: Unsafe trust of executor output ✓
+**Location:** `anvil/model.py:128-141`
+- Validation in both `__post_init__()` and `__setattr__()`
+- Covers direct construction AND runtime assignments from executor (runner.py:465, 478, 480)
+- Single owner of vocabularies in WorkOrder model
+- Invalid data fails loudly with named errors, never silently coerced
+
+### Finding 5: Potential content injection in report markdown rendering ✓
+**Location:** `anvil/runner.py:14-27, 940, 949, 957-959`
+- Added `_escape_markdown()` function escaping all markdown special characters
+- Applied to reasons and questions (escaped)
+- Rescoped description rendered in code fence (prevents markdown injection)
+- HTML tags like `<script>` are also escaped
 
 ### Test Coverage
+- **35 intake outcomes tests** - all passing
+  - 13 validation tests (TestIntakeValidation)
+  - 4 markdown escaping tests (TestMarkdownEscaping)
+  - 11 executor validation integration tests (TestExecutorValidationIntegration)
+  - 7 scenario tests (S1-S5)
+- **219 total tests** - all passing
+- **8 pipelines** - all valid
 
-All scenarios verified:
-- ✅ S1: Harmful work rejected with reasons (terminal)
-- ✅ S2: Oversized work rescoped with cut recorded  
-- ✅ S3: Work parked for information with questions
-- ✅ S4: Accepted work carries risk and surfaces
-- ✅ S5: Honest rendering in reports and swimlanes
+### Deliverables
+✓ Input validation enforced in WorkOrder model  
+✓ Safe report rendering (escaped/fenced)  
+✓ Comprehensive test coverage  
+✓ CHANGELOG updated  
+✓ All tests passing  
+✓ All pipelines valid
 
-The implementation keeps the change small and mapped to the spec scenarios as requested.
+The loopback round is complete. The implementation addresses exactly the five security findings while preserving all S1-S5 behavior that other reviewers passed.
