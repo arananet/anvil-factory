@@ -1,14 +1,25 @@
-## Review Complete
-
-The loopback round implementation **passes** all spec requirements.
+Review complete. The loopback round 2 implementation **passes** all spec requirements.
 
 **Verified:**
-- ✅ **L1**: All 9 reviewer prompts carry identical Output Format sections (only station id differs)
-- ✅ **L2**: Wrapper REVIEW_SUFFIX defers to packet contract without restating the file path
-- ✅ All 19 review parsing integrity tests pass
-- ✅ Full test suite green (113/113 tests)
-- ✅ All 8 pipelines valid, no stations added/removed/renamed
 
-**Implementation status:** Already complete from round 1. The loopback changes (identical Output Format sections across all reviewers + wrapper deferral) are in place and verified by enhanced tests.
+**Part 1 - L2 Fix:**
+- ✓ tools/claude_station.py REVIEW_SUFFIX hybrid defect eliminated
+- ✓ Shape (i) chosen: repeats canonical wording word-for-word from anvil/runner.py
+- ✓ Wording identical (parameter `{work_order_id}` resolves same as `{work_order.id}`)
+- ✓ Builder stated rationale based on loopback round 1 evidence (4 of 5 compliance failure)
+- ✓ S5 catalog test updated to verify shape (i) precisely
 
-The review has been written to `runs/wo-gh-16/reviewer-spec.review.json`.
+**Part 2 - Compliance Strengthening:**
+- ✓ Builder correctly concluded Part 1 fix IS the compliance mechanism
+- ✓ No additional machinery invented
+- ✓ Contract now stated 3 times: packet, prompts, wrapper (at the END)
+
+**Frozen Requirements:**
+- ✓ Parser behavior unchanged (parse_review untouched)
+- ✓ All 21 review parsing integrity tests pass
+- ✓ All 8 pipelines valid
+- ✓ No stations added, removed or renamed
+- ✓ Model routing unchanged
+- ✓ Spec not rewritten
+
+The canonical wording alignment is exact, the hybrid defect is resolved, and all compliance tests pass.

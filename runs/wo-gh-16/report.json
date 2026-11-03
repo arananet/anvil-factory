@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "completed",
       "detail": "Work order normalized",
-      "duration_ms": 0.02,
+      "duration_ms": 0.023,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/report.json"
@@ -21,7 +21,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-16/spec-writer.output.md",
-      "duration_ms": 101648.477,
+      "duration_ms": 66198.453,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/spec-writer.output.md"
@@ -37,7 +37,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-16/test-writer.output.md",
-      "duration_ms": 232398.687,
+      "duration_ms": 222151.938,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/test-writer.output.md"
@@ -53,7 +53,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-16/builder.output.md",
-      "duration_ms": 313117.457,
+      "duration_ms": 251332.159,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/builder.output.md"
@@ -69,7 +69,7 @@
       "station": "reviewer-spec",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-spec.output.md; review output did not parse as a review JSON",
-      "duration_ms": 148994.868,
+      "duration_ms": 169009.604,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/reviewer-spec.output.md"
@@ -85,7 +85,7 @@
       "station": "reviewer-security",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-security.output.md",
-      "duration_ms": 114642.591,
+      "duration_ms": 214645.94,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/reviewer-security.output.md"
@@ -101,7 +101,7 @@
       "station": "reviewer-tests",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-tests.output.md; review output did not parse as a review JSON",
-      "duration_ms": 88345.1,
+      "duration_ms": 89140.793,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/reviewer-tests.output.md"
@@ -117,7 +117,7 @@
       "station": "reviewer-architecture",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-architecture.output.md; review output did not parse as a review JSON",
-      "duration_ms": 120502.15,
+      "duration_ms": 90109.723,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/reviewer-architecture.output.md"
@@ -132,8 +132,8 @@
     {
       "station": "reviewer-design",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-design.output.md; review output did not parse as a review JSON",
-      "duration_ms": 64587.547,
+      "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-design.output.md",
+      "duration_ms": 40794.117,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/reviewer-design.output.md"
@@ -148,8 +148,8 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: changes_requested",
-      "duration_ms": 0.046,
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.042,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/report.json"
@@ -159,23 +159,10 @@
       "executor": null
     },
     {
-      "station": "approver",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: L2 incomplete: tools/claude_station.py REVIEW_SUFFIX defers to the packet ('The output contract is stated in the packet above') but then restates contract terms ('Your complete answer is exactly one review JSON object in this shape'). Per loopback spec L2, the wrapper must either repeat the canonical wording from anvil/runner.py word-for-word OR defer without restating. Currently it does both, creating divergent contract statements. Fix: either remove the restatement (keep only 'The output contract is stated in the packet above.') or repeat the canonical file path wording verbatim from anvil/runner.py lines 150-153.; Security posture is sound: The parse_review function implements fail-closed semantics (malformed reviews contribute zero, never guessed), uses strict validation (station ID match, verdict whitelist, findings type check), employs safe JSON parsing via stdlib json module, and maintains proper authorization boundaries (reviewer stations have Edit/Write/NotebookEdit disallowed per tools/claude_station.py lines 47-94). No unsafe defaults or injection risks detected.",
-      "reason": "L2 incomplete: tools/claude_station.py REVIEW_SUFFIX defers to the packet ('The output contract is stated in the packet above') but then restates contract terms ('Your complete answer is exactly one review JSON object in this shape'). Per loopback spec L2, the wrapper must either repeat the canonical wording from anvil/runner.py word-for-word OR defer without restating. Currently it does both, creating divergent contract statements. Fix: either remove the restatement (keep only 'The output contract is stated in the packet above.') or repeat the canonical file path wording verbatim from anvil/runner.py lines 150-153.; Security posture is sound: The parse_review function implements fail-closed semantics (malformed reviews contribute zero, never guessed), uses strict validation (station ID match, verdict whitelist, findings type check), employs safe JSON parsing via stdlib json module, and maintains proper authorization boundaries (reviewer stations have Edit/Write/NotebookEdit disallowed per tools/claude_station.py lines 47-94). No unsafe defaults or injection risks detected.",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null
-    },
-    {
       "station": "triage-human",
       "status": "completed",
-      "detail": "Human review: required",
-      "duration_ms": 0.007,
+      "detail": "Human review: not_required",
+      "duration_ms": 0.013,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -186,7 +173,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-16/deployer.packet.md",
-      "duration_ms": 0.197,
+      "duration_ms": 0.194,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/deployer.packet.md"
@@ -199,7 +186,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-16/observer.output.md",
-      "duration_ms": 110182.218,
+      "duration_ms": 194024.984,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/observer.output.md"
@@ -212,10 +199,10 @@
       }
     }
   ],
-  "verdict": "changes_requested",
-  "human_required": true,
+  "verdict": "approved",
+  "human_required": false,
   "max_loopbacks": 2,
-  "loopbacks": 1,
+  "loopbacks": 0,
   "deployment_status": null,
   "verify_results": [],
   "risk_hints": [],
@@ -224,7 +211,11 @@
       "reviews_counted": [
         {
           "station": "reviewer-security",
-          "verdict": "changes_requested"
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "pass"
         }
       ],
       "reviews_expected": [
@@ -234,11 +225,11 @@
         "reviewer-architecture",
         "reviewer-design"
       ],
-      "rule": "Reviewer reviewer-security requested changes. (Counted 1 reviews, expected 5.)"
+      "rule": "All counted reviews passed. (Counted 2 reviews, expected 5.)"
     },
     "human_gate": {
-      "required": true,
-      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
       "hints_matched": []
     }
   },

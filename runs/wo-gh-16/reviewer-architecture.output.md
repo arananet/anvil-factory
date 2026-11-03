@@ -1,11 +1,19 @@
-Review complete. The loopback implementation passes architectural review.
+Review complete. The loopback round 2 implementation **passes** architecture review.
 
-**Verified:**
-- ✅ **L1**: All 9 reviewer prompts carry identical Output Format sections (test confirms)
-- ✅ **L2**: Wrapper defers to canonical packet contract in anvil/runner.py (test confirms)
-- ✅ **Composable stations** (Decision 0001): Output contract defined once per station, injected into packets by runner, wrapper defers—maintaining reusability across all 8 pipelines
-- ✅ All 19 review parsing integrity tests pass
-- ✅ No stations added, removed, or renamed
-- ✅ Model routing unchanged
+**Architecture alignment verified:**
 
-The architecture maintains clean separation: stations are reusable components with their own output contracts, the runner composes them into pipelines and injects the review file path into packets, and the wrapper defers to the packet as the canonical source. This preserves the composability principle that allows the same reviewers to serve different pipeline types.
+✓ **Composable stations (Decision 0001):** The changes are in the runner/executor layer (tools/claude_station.py), not in station definitions. Station reusability preserved.
+
+✓ **Clear contracts:** The canonical wording remains in anvil/runner.py (lines 150-153). The wrapper repeats it verbatim with proper parameterization (work_order_id, station_id).
+
+✓ **Layering:** Changes are at the Runner layer where they belong per docs/ARCHITECTURE.md.
+
+✓ **Authoritative channel:** The .review.json file contract is maintained exactly as specified in docs/EXECUTION.md.
+
+The intentional duplication (canonical in packet + verbatim repetition at wrapper end) is architecturally sound given:
+- Empirical evidence: 4/5 reviewers failed compliance when contract stated once
+- Single source of truth: anvil/runner.py is canonical, wrapper repeats word-for-word
+- Test enforcement: L2 test verifies synchronization
+- Documented rationale: recency bias solution with explicit reasoning
+
+No architecture violations detected.

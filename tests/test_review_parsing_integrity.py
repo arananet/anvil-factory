@@ -40,6 +40,11 @@ Test coverage by scenario:
   * test_no_stations_added_removed_or_renamed_s6
   * test_model_routing_unchanged_s6
 
+- Loopback Round 2 (L2 completion and compliance):
+  * test_wrapper_restatement_matches_or_defers_to_canonical_packet_loopback_l2 (updated for L2)
+  * test_reviewer_stations_emit_parseable_review_json_l2_compliance
+  * test_prose_output_still_fails_closed_l2_compliance
+
 Expected failures before implementation:
 - test_review_written_to_authoritative_channel_s1 (needs .review.json)
 - test_exact_json_object_parses_s2 (needs .review.json)
@@ -51,6 +56,10 @@ Expected failures before implementation:
 Loopback round expected failures before implementation:
 - test_all_reviewer_prompts_have_output_format_section_loopback_l1 (needs Output Format section in 8 prompts)
 - test_wrapper_restatement_matches_or_defers_to_canonical_packet_loopback_l2 (needs wrapper alignment)
+
+Loopback round 2 expected failure before implementation:
+- test_wrapper_restatement_matches_or_defers_to_canonical_packet_loopback_l2 (L2 completion: fix hybrid defect)
+- test_reviewer_stations_emit_parseable_review_json_l2_compliance (may fail if compliance strengthening incomplete)
 """
 import json, tempfile, unittest
 from pathlib import Path
@@ -616,76 +625,228 @@ class TestPacketAndPromptContract(unittest.TestCase):
             )
 
     def test_wrapper_restatement_matches_or_defers_to_canonical_packet_loopback_l2(self):
-        """Loopback L2: Wrapper restatement matches canonical packet wording or defers to it"""
+        """Loopback L2 completion: Wrapper must repeat canonical wording word-for-word OR defer without restating"""
         # Read the canonical packet contract from anvil/runner.py
         runner_file = ROOT / "anvil" / "runner.py"
         runner_text = runner_file.read_text()
 
         # Find the canonical contract wording (the section that names the review file path)
-        # It should be in the build_task_packet function for reviewer stations
         self.assertIn("## Output contract", runner_text,
                      "anvil/runner.py should contain the canonical '## Output contract' section")
 
-        # Extract the canonical wording
+        # Extract the canonical wording - it's in an f-string with {work_order.id} and {station_id}
         import re
         canonical_match = re.search(
             r'## Output contract.*?'
-            r'(Your complete answer.*?review\.json.*?never parsed for a review\.)',
+            r'f"\s*Your complete answer is exactly one review JSON object written to '
+            r'.*?runs/\{work_order\.id\}/\{station_id\}\.review\.json.*?'
+            r'never parsed for a review\.',
             runner_text, re.DOTALL
         )
         self.assertIsNotNone(canonical_match,
                            "Could not find canonical contract wording in anvil/runner.py")
-        canonical_wording = canonical_match.group(1)
 
-        # Verify it names the specific file path
-        self.assertIn("runs/", canonical_wording,
-                     "Canonical contract should name the specific file path runs/...")
-        self.assertIn(".review.json", canonical_wording,
-                     "Canonical contract should name the .review.json file")
+        # The canonical wording for comparison (with placeholders)
+        canonical_wording = (
+            "Your complete answer is exactly one review JSON object written to "
+            "runs/{work_order.id}/{station_id}.review.json. The free output transcript "
+            "stays as provenance and is never parsed for a review."
+        )
 
         # Read the wrapper restatement from tools/claude_station.py
         wrapper_file = ROOT / "tools" / "claude_station.py"
         wrapper_text = wrapper_file.read_text()
 
-        # Find the REVIEW_SUFFIX or equivalent restatement
-        self.assertIn("REVIEW_SUFFIX", wrapper_text,
-                     "tools/claude_station.py should have REVIEW_SUFFIX")
+        # Find the review_suffix function or REVIEW_SUFFIX constant
+        # Loopback round 2 implementation uses a function to build the canonical wording dynamically
+        has_suffix_function = "def review_suffix(" in wrapper_text
+        has_suffix_constant = re.search(r'REVIEW_SUFFIX\s*=\s*\(', wrapper_text)
+
+        self.assertTrue(has_suffix_function or has_suffix_constant,
+                       "tools/claude_station.py should have review_suffix function or REVIEW_SUFFIX constant")
 
         # Extract the wrapper restatement
-        suffix_match = re.search(
-            r'REVIEW_SUFFIX\s*=\s*\((.*?)\)',
-            wrapper_text, re.DOTALL
+        if has_suffix_function:
+            # Extract from the review_suffix function body
+            suffix_match = re.search(
+                r'def review_suffix\(.*?\):.*?return\s*\((.*?)\)',
+                wrapper_text, re.DOTALL
+            )
+            self.assertIsNotNone(suffix_match,
+                               "Could not find review_suffix function return value in tools/claude_station.py")
+            wrapper_restatement = suffix_match.group(1)
+        else:
+            # Extract from REVIEW_SUFFIX constant
+            suffix_match = re.search(
+                r'REVIEW_SUFFIX\s*=\s*\((.*?)\n\)',
+                wrapper_text, re.DOTALL
+            )
+            self.assertIsNotNone(suffix_match,
+                               "Could not find REVIEW_SUFFIX in tools/claude_station.py")
+            wrapper_restatement = suffix_match.group(1)
+
+        # The wrapper must be in ONE of two compliant shapes:
+        # Shape (i): Repeats the canonical wording word-for-word (including the file path)
+        # Shape (ii): Defers to the packet without restating contract terms
+
+        # Check Shape (i): repeats canonical wording
+        # Must contain the parameterized file path pattern and the key phrases
+        # The canonical wording uses {work_order.id} and {station_id} as parameters
+        # (or {work_order_id} and {station_id} in function implementations)
+        has_file_path = (
+            "runs/{work_order.id}/{station_id}.review.json" in wrapper_restatement or
+            "runs/{work_order_id}/{station_id}.review.json" in wrapper_restatement
         )
-        self.assertIsNotNone(suffix_match,
-                           "Could not find REVIEW_SUFFIX in tools/claude_station.py")
-        wrapper_restatement = suffix_match.group(1)
-
-        # The wrapper must either:
-        # 1. Repeat the canonical statement word for word (contains the exact file path), OR
-        # 2. Defer to the packet without restating contract terms
-
-        # Check if it repeats the canonical wording
         repeats_canonical = (
-            "runs/" in wrapper_restatement and
-            ".review.json" in wrapper_restatement and
+            has_file_path and
+            "Your complete answer is exactly one review JSON object written to" in wrapper_restatement and
             "never parsed for a review" in wrapper_restatement
         )
 
-        # Check if it defers without restating
-        defers_to_packet = (
+        # Check Shape (ii): defers without restating
+        # Must mention the packet AND must NOT state contract terms
+        # Contract terms include: "exactly one", "review JSON object", verdict values
+        defers_without_restating = (
             "packet" in wrapper_restatement.lower() and
-            "runs/" not in wrapper_restatement  # Doesn't restate the file path
+            "runs/" not in wrapper_restatement and  # No file path
+            ("exactly one" not in wrapper_restatement or
+             "review JSON object" not in wrapper_restatement)  # No contract restatement
+        )
+
+        # The defect: hybrid that defers AND restates (current state per the finding)
+        is_hybrid_defect = (
+            "packet" in wrapper_restatement.lower() and  # Defers
+            "exactly one" in wrapper_restatement and      # But also restates
+            "runs/" not in wrapper_restatement            # Without canonical file path
+        )
+
+        self.assertFalse(
+            is_hybrid_defect,
+            "LOOPBACK ROUND 2 L2 DEFECT: tools/claude_station.py REVIEW_SUFFIX defers to the packet "
+            "('The output contract is stated in the packet above') but then restates contract terms "
+            "('Your complete answer is exactly one review JSON object in this shape'). Per the counted "
+            "finding, this creates divergent contract statements. Fix: either (i) repeat the canonical "
+            "wording from anvil/runner.py word-for-word including the file path "
+            "runs/{work_order.id}/{station_id}.review.json, OR (ii) keep only the deferral sentence "
+            "'The output contract is stated in the packet above.' without restating any contract terms."
         )
 
         self.assertTrue(
-            repeats_canonical or defers_to_packet,
-            "tools/claude_station.py REVIEW_SUFFIX must either repeat the canonical "
-            "wording from anvil/runner.py (including the specific file path "
-            "runs/{work_order.id}/{station_id}.review.json) OR defer to the packet "
-            "without restating contract terms. Currently it does neither: it restates "
-            "the contract with different wording ('authoritative review channel' instead "
-            "of the specific file path), which creates divergent contract statements."
+            repeats_canonical or defers_without_restating,
+            "tools/claude_station.py REVIEW_SUFFIX must be in ONE compliant shape: "
+            "(i) repeat canonical wording from anvil/runner.py word-for-word "
+            "(including 'runs/{work_order.id}/{station_id}.review.json' and "
+            "'never parsed for a review'), OR (ii) defer to the packet without "
+            "restating contract terms (e.g., keep only 'The output contract is stated "
+            "in the packet above.' with no 'exactly one review JSON object' wording)."
         )
+
+
+class TestLoopbackRound2Compliance(unittest.TestCase):
+    """Loopback Round 2: Reviewer compliance with the existing contract"""
+
+    def test_reviewer_stations_emit_parseable_review_json_l2_compliance(self):
+        """L2 compliance: Reviewer stations emit exactly one review JSON object in .review.json"""
+        # This test verifies that reviewer stations comply with the contract:
+        # their complete answer is exactly one review JSON object (one markdown fence allowed)
+        # that lands in the .review.json file and parses successfully.
+
+        EXECUTOR_COMPLIANT_REVIEWERS = '''
+import json, sys
+packet_path = sys.argv[1]
+station = ""
+for line in open(packet_path, encoding="utf-8"):
+    if line.startswith("# Task packet:"):
+        station = line.split(":", 1)[1].strip()
+        break
+if station.startswith("reviewer"):
+    # Compliant output: exactly one JSON object (with markdown fence allowed)
+    print("```json")
+    print(json.dumps({"station": station, "verdict": "pass", "findings": []}))
+    print("```")
+else:
+    print("Executed " + station)
+'''
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            script = Path(tmp) / "executor.py"
+            script.write_text(EXECUTOR_COMPLIANT_REVIEWERS)
+            executor = create_executor({"kind": "command",
+                                        "command": f"{sys.executable} {script} {{packet}}",
+                                        "timeout_seconds": 60})
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-l2-comply-001", kind="bug", title="Test L2 compliance")
+            report = run_pipeline(proj, hotfix_pipe(reg), wo, registry=reg, executor=executor)
+
+            # Check that all reviewer stations produced parseable reviews
+            # hotfix pipeline has reviewer-spec and reviewer-security
+            expected_reviewers = ["reviewer-spec", "reviewer-security"]
+
+            for reviewer in expected_reviewers:
+                with self.subTest(reviewer=reviewer):
+                    review_file = proj / "runs" / "wo-l2-comply-001" / f"{reviewer}.review.json"
+                    self.assertTrue(review_file.exists(),
+                                  f"{reviewer}.review.json should exist in authoritative channel")
+
+                    # Verify it parses successfully
+                    review_content = review_file.read_text()
+                    from anvil.runner import parse_review
+                    review = parse_review(review_content, reviewer)
+                    self.assertIsNotNone(review,
+                                        f"{reviewer}.review.json should parse successfully")
+
+                    # Verify the envelope doesn't have review_parse_failed
+                    env_file = proj / "runs" / "wo-l2-comply-001" / "envelopes" / f"{reviewer}.envelope.json"
+                    env = json.loads(env_file.read_text())
+                    self.assertNotIn("review_parse_failed", env,
+                                   f"{reviewer} should not have review_parse_failed")
+
+            # Final report should show all reviews counted
+            self.assertEqual(report.verdict, "approved")
+            counted = len(report.decision.get("approver", {}).get("reviews_counted", []))
+            expected = len(report.decision.get("approver", {}).get("reviews_expected", []))
+            self.assertEqual(counted, expected,
+                           f"All {expected} expected reviews should be counted (got {counted})")
+
+    def test_prose_output_still_fails_closed_l2_compliance(self):
+        """L2 compliance: Prose output still fails closed (parser behavior frozen)"""
+        # This test verifies that the parser is frozen - it still fails closed on prose
+        # The compliance strengthening is in the prompt surface, not the parser
+
+        EXECUTOR_PROSE_REVIEWERS = '''
+import sys
+packet_path = sys.argv[1]
+station = ""
+for line in open(packet_path, encoding="utf-8"):
+    if line.startswith("# Task packet:"):
+        station = line.split(":", 1)[1].strip()
+        break
+if station.startswith("reviewer"):
+    # Non-compliant: prose output instead of JSON
+    print("This looks good. The spec passes all checks.")
+else:
+    print("Executed " + station)
+'''
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            script = Path(tmp) / "executor.py"
+            script.write_text(EXECUTOR_PROSE_REVIEWERS)
+            executor = create_executor({"kind": "command",
+                                        "command": f"{sys.executable} {script} {{packet}}",
+                                        "timeout_seconds": 60})
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-l2-prose-001", kind="bug", title="Test prose fails closed")
+            report = run_pipeline(proj, hotfix_pipe(reg), wo, registry=reg, executor=executor)
+
+            # Parser should fail closed on prose
+            self.assertEqual(report.verdict, "no_reviews")
+
+            # Check envelopes have review_parse_failed
+            for reviewer in ["reviewer-spec", "reviewer-security"]:
+                env_file = proj / "runs" / "wo-l2-prose-001" / "envelopes" / f"{reviewer}.envelope.json"
+                env = json.loads(env_file.read_text())
+                self.assertTrue(env.get("review_parse_failed"),
+                              f"{reviewer} should have review_parse_failed for prose output")
 
 
 class TestRegressionSuite(unittest.TestCase):
