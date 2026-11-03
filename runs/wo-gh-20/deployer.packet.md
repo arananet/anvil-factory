@@ -54,6 +54,20 @@ Constraints: Python standard library only; no em dash or en dash character in an
 The reviewers write their reviews to the authoritative review files named in their packets; prose outside those files is not a review.
 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/20
+
+LOOPBACK ROUND 2 (operator addendum after the round 1 verdict rejected; reviews counted 4 of 5: reviewer-spec fail, reviewer-security changes_requested, reviewer-tests pass, reviewer-design pass; reviewer-architecture not counted, review_parse_failed true, its prose findings are item 4 below). Fix exactly these findings, in anvil/community.py, anvil/scaffold.py, templates/community/ and tests/test_community.py only. Everything else from round 1 stands.
+
+1. PLACEHOLDER IN RENDERED OUTPUT (reviewer-spec FAIL, verbatim): "issue_config.yml contains 'owner/repo' placeholder in rendered output at line 4. The spec requires 'Rendered output contains no template residue: no double brace tokens, no TODO markers, no bracketed insert instructions' and 'never at a placeholder'. The code at anvil/community.py:49 replaces {{REPO_PLACEHOLDER}} with the literal string 'owner/repo', which is still a placeholder." Fix per the reviewer's own accepted solution: the renderer has no repository slug in its metadata contract (name, description, contact only), so when rendering issue_config.yml, omit the contact_links section entirely. The rendered config keeps blank_issues_enabled: false and contains no URL and no "owner/repo" string. Strengthen the S1 test to assert the rendered set contains no "owner/repo" anywhere.
+
+2. CONTENT INJECTION AND VALIDATION (reviewer-security, verbatim core): "The name and contact parameters are inserted directly into markdown files without sanitization. An attacker can inject arbitrary markdown sections, malicious links, and HTML by including newlines and markdown syntax. Example: name='MyProject\n\n## Malicious Section\n[Click](http://evil.com)' successfully injects a new header and link." And: "No input validation. The function accepts arbitrary strings for name, description, and contact parameters without validating format, length, or content. The contact parameter should be validated as a proper email address format. Empty strings are accepted and produce malformed output. No maximum length enforced." Fix: in the renderer, treat name and contact as single line fields: reject values containing newline or carriage return characters with a clear ValueError (do not silently render them); validate a non-empty contact as an email shape and reject anything else; enforce length limits (name at most 200 characters, contact at most 100, description at most 500); reject an empty project name. Add regression tests using the reviewer's injection example verbatim: rendering with that name value must raise, and no file content is produced; plus a test that an over length or malformed contact raises.
+
+3. DESCRIPTION NEVER RENDERED (reviewer-security, verbatim): "The description parameter is accepted but never used in template rendering." Fix: render the project description in the CONTRIBUTING template (its opening paragraph is the natural place: what the project is, in the project's own words, before the how to contribute flow), so the metadata substitution the spec requires is real. Strengthen the S1 fixture test to assert the supplied description string appears in the rendered community set.
+
+4. GREENFIELD BLUEPRINT PATH CANNOT CARRY METADATA (reviewer-architecture, uncounted in round 1 only because its review failed to parse; finding verified by the operator in its output): new_project does not accept or forward description and contact; it calls init_project with only (path, name), so projects created through the blueprint path cannot receive metadata for the community files. Fix: new_project accepts optional description and contact parameters and forwards them to init_project; existing call sites and the CLI keep working unchanged.
+
+5. REVIEW CHANNEL DISCIPLINE FOR THIS ROUND: every reviewer states its verdict as exactly one JSON object in its station output, the shape the other reviewers used in round 1 and the shape its packet requires. Round 1 reviewer-architecture wrote prose and a separate file under reviews/ and its verdict was not counted (review_parse_failed). Do not repeat that.
+
+Keep the full factory suite green and report its result. No em dash or en dash in any produced or modified file. Do not touch this repository's own community files (wo-gh-19 owns them).
 - risk_hints: 
 - status: new
 
@@ -69,5 +83,4 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/20
 - reviewer-architecture: executed
 - reviewer-design: executed
 - approver: completed
-- approver: loopback
 - triage-human: completed

@@ -1,5 +1,6 @@
 """Community files renderer for ANVIL projects."""
 
+import re
 from pathlib import Path
 
 
@@ -13,11 +14,41 @@ def render_community_files(name, description=None, contact=None):
 
     Returns:
         Dictionary mapping relative file paths to rendered content
+
+    Raises:
+        ValueError: If inputs contain newlines, are malformed, exceed length limits, or name is empty
     """
+    # Validate name: required, no newlines, max 200 chars
+    if not name or not name.strip():
+        raise ValueError("Project name cannot be empty")
+    if '\n' in name or '\r' in name:
+        raise ValueError("Project name cannot contain newline characters")
+    if len(name) > 200:
+        raise ValueError("Project name cannot exceed 200 characters")
+
+    # Validate description: optional, no newlines, max 500 chars
+    if description:
+        if '\n' in description or '\r' in description:
+            raise ValueError("Project description cannot contain newline characters")
+        if len(description) > 500:
+            raise ValueError("Project description cannot exceed 500 characters")
+
+    # Validate contact: optional, must be email format, no newlines, max 100 chars
+    if contact:
+        if '\n' in contact or '\r' in contact:
+            raise ValueError("Contact email cannot contain newline characters")
+        if len(contact) > 100:
+            raise ValueError("Contact email cannot exceed 100 characters")
+        # Validate email format
+        email_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        if not email_pattern.match(contact):
+            raise ValueError("Contact must be a valid email address")
+
     templates_dir = Path(__file__).parent.parent / "templates" / "community"
 
     # Prepare substitution values
     project_name = name
+    project_description = description if description else ""
 
     # Handle contact substitution
     if contact:
@@ -33,6 +64,11 @@ def render_community_files(name, description=None, contact=None):
 
     contributing_template = (templates_dir / "contributing.md").read_text(encoding="utf-8")
     contributing = contributing_template.replace("{{PROJECT_NAME}}", project_name)
+    # If description is empty, remove the placeholder line entirely to avoid blank lines
+    if project_description:
+        contributing = contributing.replace("{{PROJECT_DESCRIPTION}}\n\n", project_description + "\n\n")
+    else:
+        contributing = contributing.replace("{{PROJECT_DESCRIPTION}}\n\n", "")
 
     security_template = (templates_dir / "security.md").read_text(encoding="utf-8")
     security = security_template.replace("{{PROJECT_NAME}}", project_name)
@@ -45,8 +81,7 @@ def render_community_files(name, description=None, contact=None):
     work_order = work_order_template.replace("{{PROJECT_NAME}}", project_name)
 
     issue_config_template = (templates_dir / "issue_config.yml").read_text(encoding="utf-8")
-    # Remove the placeholder repo link since we don't have the repo name yet
-    issue_config = issue_config_template.replace("{{REPO_PLACEHOLDER}}", "owner/repo")
+    issue_config = issue_config_template
 
     pr_template = (templates_dir / "pull_request_template.md").read_text(encoding="utf-8")
 

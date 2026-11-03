@@ -1,3 +1,13 @@
-```json
-{"station": "reviewer-security", "verdict": "changes_requested", "findings": ["anvil/community.py:24-28,32,38-39: Content injection vulnerability. The name and contact parameters are inserted directly into markdown files without sanitization. An attacker can inject arbitrary markdown sections, malicious links, and HTML by including newlines and markdown syntax. Example: name='MyProject\\n\\n## Malicious Section\\n[Click](http://evil.com)' successfully injects a new header and link. The contact field can similarly inject additional lines redirecting users to different email addresses.", "anvil/community.py:6: No input validation. The function accepts arbitrary strings for name, description, and contact parameters without validating format, length, or content. The contact parameter should be validated as a proper email address format. Empty strings are accepted and produce malformed output (e.g., 'Contributing to \\n'). No maximum length enforced, allowing potentially massive files from inputs like name='A'*10000.", "anvil/community.py:21: Unused parameter. The description parameter is accepted but never used in template rendering. This is dead code that should be removed or implemented per the intended design.", "anvil/community.py:49: Non-functional placeholder. The issue_config.yml template uses hardcoded 'owner/repo' as a placeholder, resulting in a broken discussions link in generated projects. While not a security issue, this functional defect will impact all generated projects.", "Recommendation: Add input sanitization to escape or reject markdown special characters and newlines in name and contact parameters. Validate contact as proper email format or empty. Enforce reasonable length limits on all inputs (suggest 200 chars for name, 100 for contact). Remove or implement the unused description parameter. Resolve the repository name properly for issue_config.yml or document the limitation."]}
-```
+Security review complete. All four security findings from loopback round 1 have been properly fixed:
+
+1. **Placeholder eliminated**: issue_config.yml no longer contains "owner/repo" - the contact_links section is omitted entirely since the renderer has no repository slug in its metadata contract.
+
+2. **Injection prevented**: Comprehensive input validation now rejects newlines, enforces length limits (name: 200, description: 500, contact: 100 chars), and validates email format. The exact injection payload from round 1 (`'MyProject\n\n## Malicious Section\n[Click](http://evil.com)'`) is now rejected.
+
+3. **Description rendered**: Now appears in CONTRIBUTING.md at line 3, with proper handling when empty.
+
+4. **Metadata forwarding**: new_project accepts and forwards description and contact parameters to init_project, enabling community files with metadata through the blueprint path.
+
+All 106 factory tests pass, including new security-specific tests that verify injection prevention, validation logic, and metadata rendering.
+
+**Verdict: PASS** - No security issues remain. Review written to runs/wo-gh-20/reviewer-security.output.md

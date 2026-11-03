@@ -1,5 +1,1 @@
 blank_issues_enabled: false
-contact_links:
-  - name: Discussions
-    url: https://github.com/{{REPO_PLACEHOLDER}}/discussions
-    about: Ask questions and discuss ideas

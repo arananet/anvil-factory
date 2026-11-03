@@ -5,7 +5,7 @@ from pathlib import Path
 
 from anvil.community import render_community_files
 from anvil.onboard import onboard_project
-from anvil.scaffold import init_project
+from anvil.scaffold import init_project, new_project
 
 
 class CommunityFilesTests(unittest.TestCase):
@@ -35,10 +35,15 @@ class CommunityFilesTests(unittest.TestCase):
                 self.assertNotIn("}}", content, f"{rel_path} contains template marker }}}}")
                 self.assertNotIn("TODO", content, f"{rel_path} contains TODO marker")
                 self.assertNotIn("[INSERT", content.upper(), f"{rel_path} contains bracketed insert instruction")
+                # Loopback round 2 finding 1: assert no "owner/repo" placeholder
+                self.assertNotIn("owner/repo", content, f"{rel_path} contains 'owner/repo' placeholder")
 
             # Verify project name appears in files
             contributing = (root / "CONTRIBUTING.md").read_text(encoding="utf-8")
             self.assertIn("Demo Project", contributing)
+
+            # Loopback round 2 finding 3: assert description appears in CONTRIBUTING.md
+            self.assertIn("A demonstration project for testing", contributing, "Description must appear in CONTRIBUTING.md")
 
             # Verify contact substitution in CODE_OF_CONDUCT.md
             conduct = (root / "CODE_OF_CONDUCT.md").read_text(encoding="utf-8")
@@ -218,6 +223,112 @@ class CommunityFilesTests(unittest.TestCase):
         for path, content in files.items():
             self.assertIsInstance(content, str, f"{path} content must be a string")
             self.assertGreater(len(content), 0, f"{path} content must not be empty")
+
+    def test_s8_newline_injection_rejected(self):
+        """community-by-default S8: renderer rejects name with newlines and injection syntax"""
+        # Loopback round 2 finding 2: use the exact injection example from the reviewer
+        malicious_name = 'MyProject\n\n## Malicious Section\n[Click](http://evil.com)'
+        with self.assertRaises(ValueError) as ctx:
+            render_community_files(
+                name=malicious_name,
+                description="A test project",
+                contact="test@example.org"
+            )
+        self.assertIn("newline", str(ctx.exception).lower())
+
+    def test_s8_contact_newline_rejected(self):
+        """community-by-default S8: renderer rejects contact with newlines"""
+        with self.assertRaises(ValueError) as ctx:
+            render_community_files(
+                name="Test Project",
+                description="A test project",
+                contact="test@example.org\nextra line"
+            )
+        self.assertIn("newline", str(ctx.exception).lower())
+
+    def test_s8_malformed_contact_rejected(self):
+        """community-by-default S8: renderer rejects malformed email addresses"""
+        invalid_contacts = [
+            "not-an-email",
+            "missing-at-sign.com",
+            "@no-local-part.com",
+            "no-domain@",
+            "spaces in email@example.com",
+            "double@@example.com"
+        ]
+        for invalid_contact in invalid_contacts:
+            with self.assertRaises(ValueError, msg=f"Should reject malformed contact: {invalid_contact}"):
+                render_community_files(
+                    name="Test Project",
+                    description="A test project",
+                    contact=invalid_contact
+                )
+
+    def test_s8_length_limits_enforced(self):
+        """community-by-default S8: renderer enforces length limits on all metadata"""
+        # Name over 200 characters
+        with self.assertRaises(ValueError):
+            render_community_files(
+                name="A" * 201,
+                description="A test project",
+                contact="test@example.org"
+            )
+
+        # Contact over 100 characters
+        with self.assertRaises(ValueError):
+            render_community_files(
+                name="Test Project",
+                description="A test project",
+                contact="a" * 90 + "@example.org"  # Total exceeds 100
+            )
+
+        # Description over 500 characters
+        with self.assertRaises(ValueError):
+            render_community_files(
+                name="Test Project",
+                description="A" * 501,
+                contact="test@example.org"
+            )
+
+    def test_s8_empty_name_rejected(self):
+        """community-by-default S8: renderer rejects empty project name"""
+        with self.assertRaises(ValueError):
+            render_community_files(
+                name="",
+                description="A test project",
+                contact="test@example.org"
+            )
+
+    def test_s9_new_project_forwards_metadata(self):
+        """community-by-default S9: new_project accepts and forwards description and contact to init_project"""
+        # Loopback round 2 finding 4: test the greenfield blueprint path
+        with tempfile.TemporaryDirectory() as tmp:
+            # Minimal blueprint for testing
+            blueprint = {
+                "id": "test-blueprint",
+                "name": "Test Blueprint",
+                "stack": ["Python"],
+                "structure": ["tests/", "src/"],
+                "first_specs": ["initial-spec"]
+            }
+            root = new_project(
+                Path(tmp) / "blueprint",
+                "Blueprint Project",
+                blueprint=blueprint,
+                description="Testing blueprint metadata forwarding",
+                contact="blueprint@example.org"
+            )
+
+            # Verify the description appears in CONTRIBUTING.md
+            contributing = (root / "CONTRIBUTING.md").read_text(encoding="utf-8")
+            self.assertIn("Testing blueprint metadata forwarding", contributing, "Description must appear in CONTRIBUTING.md when passed through new_project")
+
+            # Verify the contact appears in CODE_OF_CONDUCT.md and SECURITY.md
+            conduct = (root / "CODE_OF_CONDUCT.md").read_text(encoding="utf-8")
+            self.assertIn("blueprint@example.org", conduct, "Contact must appear in CODE_OF_CONDUCT.md when passed through new_project")
+
+            security = (root / "SECURITY.md").read_text(encoding="utf-8")
+            self.assertIn("blueprint@example.org", security, "Contact must appear in SECURITY.md when passed through new_project")
 
 
 if __name__ == "__main__":

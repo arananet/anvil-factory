@@ -1,5 +1,7 @@
 # Contributing to {{PROJECT_NAME}}
 
+{{PROJECT_DESCRIPTION}}
+
 Thank you for considering contributing to {{PROJECT_NAME}}. This project uses the ANVIL workflow to manage contributions, specs, and changes.
 
 ## How work enters the project

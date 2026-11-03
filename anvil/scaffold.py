@@ -72,7 +72,7 @@ def scaffold_spec(project, slug, title):
     return spec_file
 
 
-def new_project(path, name, blueprint, idea=""):
+def new_project(path, name, blueprint, idea="", description=None, contact=None):
     """Greenfield entry: scaffold a project from zero around a blueprint.
 
     blueprint is a catalog dict (see anvil/blueprints.py). The idea brief
@@ -80,7 +80,7 @@ def new_project(path, name, blueprint, idea=""):
     points at the greenfield pipeline, and the first spec is scaffolded
     so the line can start at spec-writer, not at a blank page.
     """
-    root = init_project(path, name)
+    root = init_project(path, name, description=description, contact=contact)
     lines = [f"# Blueprint: {name}", "", f"Catalog blueprint: {blueprint['name']} ({blueprint['id']})", ""]
     if idea:
         lines += ["## Idea", idea, ""]
