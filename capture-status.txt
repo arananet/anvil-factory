@@ -1,0 +1,1 @@
+capture ok: fixture/evidence/contact-sheet.png produced by tools/capture.py

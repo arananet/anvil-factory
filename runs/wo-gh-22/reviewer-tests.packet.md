@@ -1,0 +1,62 @@
+# Task packet: reviewer-tests
+
+## Station prompt
+
+# Reviewer Tests
+
+## Role
+Check that tests are real, mapped, and passing.
+
+## Inputs
+- spec
+- tests
+
+## Outputs
+- review
+
+## Rules
+- Work only from the inputs listed above and the work order in the packet.
+- Produce the output as a file in the repo, not as chat text.
+- If the inputs are not enough, say what is missing instead of guessing.
+- Never approve your own work. Approval belongs to a different station.
+- Keep the change small and mapped to a spec scenario where one applies.
+
+
+## Work order
+
+- id: wo-gh-22
+- kind: task
+- title: Benchmark the design station models: Astra vs Opus 5.5 vs 6.1 Sol, executed and scored
+- source: github-issue
+- description: Implement the spec in .openspec/specs/model-benchmark/spec.md in the factory. Pipeline for this order is plan-build-test, selected by the run workflow under a budget guardrail set by the product owner: the full reviewer set is not required to judge a self contained benchmark harness, and reviewer-tests is the critical judge for a scorer and fixture whose correctness is proven by tests.
+
+THE CHANGE: build the model benchmark harness under benchmarks/model-benchmark/, exactly as the spec defines. Do not invent a parallel layout.
+
+Deliverables:
+- fixture/design/DESIGN.md and fixture/design/tokens.json carrying the design system the spec enumerates token for token (Meridian Patch: paper #FAFAF6, ink #14201B, pine #53685C, teal #0E7C66, coral #FF6B4A reserved for the price badge only, line #E3E6DF; type scale 12, 14, 16, 20, 24, 32, 40, 56, 64 with hero at least 56 and body at least 16; spacing multiples of 8; radius tokens 4, 8, 12, 16, 999; line heights 1.2 headings and 1.5 body; heading stacks start with Space Grotesk, body with Inter; a focus-visible outline rule of 2px solid teal with 2px offset; text on paper at least 4.5 to 1; transitions only with a prefers-reduced-motion block disabling them). DESIGN.md states these as citable rules and quality bars in the shape of the design systems this factory already writes.
+- fixture/src/page.html: one self contained HTML file, one style block, no external resources, with contract elements carrying exactly these ids: page, hero-title, hero-sub, cta-primary, price-badge, section, heading-2, body-text, caption, link-inline, card. It plants exactly the 10 violations the spec lists (V1 to V10, values verbatim from the spec) and is otherwise fully compliant with every documented rule: every other value on the contract elements is a documented token, it carries a compliant prefers-reduced-motion block disabling its one transition, and no other property a design reviewer could check deviates from DESIGN.md.
+- fixture/ground-truth.json: exactly 10 entries, one per violation, each with id, scorer check id (K1 to K10), element, property, planted value, documented expectation and a one line description.
+- tools/scorer.py: Python standard library only. Reads one candidate HTML file in the fixture contract shape and evaluates exactly the 12 checks the spec defines (K1 to K12, K11 and K12 being controls), printing a JSON object with passed count, total and per check detail (check id, pass or fail, measured value, expectation). A missing element or property is a failed check that says missing; the scorer never guesses. Against the fixture page it must fail exactly K1 to K10 and pass K11 and K12; against a compliant page in the same shape it must pass 12 of 12.
+- tools/capture.py: renders one HTML file with Playwright Chromium at viewport width 1280, device scale factor 1, reduced motion emulated, and writes one full page PNG. The run workflow installs Playwright and produces fixture/evidence/contact-sheet.png with it after the line runs; the script itself is part of this order, its settings fixed in code.
+- RUNNER.md: how the operator runs the arms (packet contents per arm, the sealing rule, the scoring rubric restated from the spec verbatim in substance) so the benchmark is reproducible from the repository alone.
+
+Tests (tests/test_model_benchmark.py, unittest, scenario tagged docstrings like the existing suite, no browser or Playwright required):
+- S1: ground truth has exactly 10 entries V1 to V10 mapping to K1 to K10, and the fixture page carries each planted value as stated.
+- S2: the scorer against the fixture page fails exactly K1 to K10 and passes K11 and K12; against a compliant page carried in the test it passes 12 of 12.
+- S3: tokens.json and DESIGN.md agree on every token value.
+- S7 support: no test outside this module changes; the full factory suite stays green.
+
+Constraints: the scorer is Python standard library only; no em dash or en dash character in any produced or modified file; do not touch routing configuration, station prompts, pipelines, anvil.yaml or any policy file; do not run the benchmark arms (the operator runs them after this order lands); keep the fixture tiny, it is a benchmark instrument, not a product page.
+
+The reviewers write their reviews to the authoritative review files named in their packets; prose outside those files is not a review.
+
+GitHub issue: https://github.com/arananet/anvil-factory/issues/22
+- risk_hints: 
+- status: new
+
+## Upstream steps
+
+- intake: completed
+- spec-writer: executed
+- test-writer: executed
+- builder: executed

@@ -1,0 +1,120 @@
+{
+  "work_order_id": "wo-gh-22",
+  "pipeline": "plan-build-test",
+  "title": "Benchmark the design station models: Astra vs Opus 5.5 vs 6.1 Sol, executed and scored",
+  "kind": "task",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "completed",
+      "detail": "Work order normalized",
+      "duration_ms": 0.01,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-22/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-22/spec-writer.output.md",
+      "duration_ms": 126040.255,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-22/spec-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "test-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-22/test-writer.output.md",
+      "duration_ms": 100658.853,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-22/test-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-22/builder.output.md",
+      "duration_ms": 341587.664,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-22/builder.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-22/reviewer-tests.output.md; review output did not parse as a review JSON",
+      "duration_ms": 113280.921,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-22/reviewer-tests.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: no_reviews",
+      "duration_ms": 0.018,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-22/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    }
+  ],
+  "verdict": "no_reviews",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 0,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [],
+      "reviews_expected": [
+        "reviewer-tests"
+      ],
+      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted."
+    },
+    "human_gate": {
+      "required": true,
+      "rule": "Verdict is no_reviews, not approved, so a human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": []
+}

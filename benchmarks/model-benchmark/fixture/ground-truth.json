@@ -1,0 +1,92 @@
+[
+  {
+    "id": "V1",
+    "scorer_check": "K1",
+    "element": "hero-title",
+    "property": "font-size",
+    "planted_value": "48px",
+    "documented_expectation": "at least 56px from type scale",
+    "description": "Hero title font size is below minimum and off type scale"
+  },
+  {
+    "id": "V2",
+    "scorer_check": "K2",
+    "element": "body-text",
+    "property": "font-size",
+    "planted_value": "15px",
+    "documented_expectation": "at least 16px from type scale",
+    "description": "Body text font size is below minimum and off type scale"
+  },
+  {
+    "id": "V3",
+    "scorer_check": "K3",
+    "element": "section",
+    "property": "padding-top",
+    "planted_value": "30px",
+    "documented_expectation": "multiple of 8",
+    "description": "Section padding-top violates 8px spacing rhythm"
+  },
+  {
+    "id": "V4",
+    "scorer_check": "K4",
+    "element": "hero-sub",
+    "property": "color",
+    "planted_value": "#5C6F66",
+    "documented_expectation": "pine #53685C",
+    "description": "Hero subtitle color is not from documented palette"
+  },
+  {
+    "id": "V5",
+    "scorer_check": "K5",
+    "element": "link-inline",
+    "property": "color",
+    "planted_value": "#FF6B4A",
+    "documented_expectation": "coral reserved for price-badge only",
+    "description": "Inline link uses coral which is reserved for price badge"
+  },
+  {
+    "id": "V6",
+    "scorer_check": "K6",
+    "element": "page",
+    "property": "missing_rule",
+    "planted_value": "no :focus-visible rule",
+    "documented_expectation": ":focus-visible outline 2px solid teal with 2px offset",
+    "description": "Stylesheet missing required focus-visible outline rule"
+  },
+  {
+    "id": "V7",
+    "scorer_check": "K7",
+    "element": "card",
+    "property": "border-radius",
+    "planted_value": "10px",
+    "documented_expectation": "4, 8, 12, 16, or 999",
+    "description": "Card border radius is not from documented radius tokens"
+  },
+  {
+    "id": "V8",
+    "scorer_check": "K8",
+    "element": "body-text",
+    "property": "line-height",
+    "planted_value": "1.33",
+    "documented_expectation": "1.5 for body text",
+    "description": "Body text line height does not match documented body line height"
+  },
+  {
+    "id": "V9",
+    "scorer_check": "K9",
+    "element": "caption",
+    "property": "color",
+    "planted_value": "#E3E6DF",
+    "documented_expectation": "at least 4.5:1 contrast on paper #FAFAF6",
+    "description": "Caption color has insufficient contrast ratio on paper background"
+  },
+  {
+    "id": "V10",
+    "scorer_check": "K10",
+    "element": "heading-2",
+    "property": "font-family",
+    "planted_value": "Arial",
+    "documented_expectation": "Space Grotesk as first family",
+    "description": "Heading-2 font family does not start with Space Grotesk"
+  }
+]

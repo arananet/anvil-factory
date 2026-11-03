@@ -1,6 +1,6 @@
 # Model Benchmark: Design Station Models
 
-Status: proposed
+Status: approved
 Slug: model-benchmark
 
 ## Roles
