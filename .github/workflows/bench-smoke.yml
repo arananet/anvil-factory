@@ -1,0 +1,98 @@
+name: bench-smoke
+
+# One shot catalog and route probe for the model benchmark (wo-gh-22).
+# Records, for each candidate catalog id, whether the gateway answers a
+# minimal text call and a minimal image call through the unified endpoint,
+# plus whatever the gateway model listing endpoints return. Results are
+# committed back to this scratch branch as JSON evidence files.
+on:
+  push:
+    branches: [anvil/bench-smoke]
+
+permissions:
+  contents: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GW_BASE: https://gateway.ai.cloudflare.com/v1/693ae9c587f1f2c34328bb47447366b0/arananet-ai-gateway
+      CF_AIG_TOKEN: ${{ secrets.CF_AIG_TOKEN }}
+    steps:
+      - name: Check out this branch
+        uses: actions/checkout@v4
+
+      - name: Probe the gateway catalog and routes
+        run: |
+          mkdir -p smoke
+          python3 - <<'PYEOF'
+          import base64, json, struct, subprocess, zlib
+          from pathlib import Path
+
+          BASE = "https://gateway.ai.cloudflare.com/v1/693ae9c587f1f2c34328bb47447366b0/arananet-ai-gateway"
+          import os
+          TOKEN = os.environ["CF_AIG_TOKEN"]
+          out = Path("smoke"); out.mkdir(exist_ok=True)
+
+          def png_solid(rgb, size=64):
+              def chunk(typ, data):
+                  c = struct.pack(">I", len(data)) + typ + data
+                  c += struct.pack(">I", zlib.crc32(typ + data) & 0xFFFFFFFF)
+                  return c
+              ihdr = struct.pack(">IIBBBBB", size, size, 8, 2, 0, 0, 0)
+              raw = b""
+              row = bytes(rgb) * size
+              for _ in range(size):
+                  raw += b"\x00" + row
+              idat = zlib.compress(raw)
+              return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", ihdr) +
+                      chunk(b"IDAT", idat) + chunk(b"IEND", b""))
+
+          teal_b64 = base64.b64encode(png_solid((14, 124, 102))).decode()
+
+          def call(name, method, url, headers, body=None):
+              cmd = ["curl", "-sS", "-m", "120", "-X", method, "-w", "\n%{http_code}"]
+              for k, v in headers.items():
+                  cmd += ["-H", f"{k}: {v}"]
+              if body is not None:
+                  cmd += ["-H", "Content-Type: application/json", "-d", json.dumps(body)]
+              cmd.append(url)
+              p = subprocess.run(cmd, capture_output=True, text=True)
+              raw = p.stdout
+              status = raw.rsplit("\n", 1)[-1].strip() if "\n" in raw else "000"
+              payload = raw.rsplit("\n", 1)[0] if "\n" in raw else raw
+              rec = {"name": name, "method": method, "url_path": url.replace(BASE, ""),
+                     "http_status": status, "curl_stderr": p.stderr.strip()[:500],
+                     "response_body": payload[:4000]}
+              (out / f"{name}.json").write_text(json.dumps(rec, indent=2))
+              print(name, status)
+              return rec
+
+          auth = {"Authorization": f"Bearer {TOKEN}"}
+
+          call("models-openai", "GET", f"{BASE}/openai/models", auth)
+          call("models-root", "GET", f"{BASE}/models", auth)
+
+          models = ["openai/gpt-6-astra", "anthropic/claude-opus-5.5", "openai/gpt-6.1-sol"]
+          for m in models:
+              slug = m.split("/")[-1]
+              call(f"text-{slug}", "POST", BASE, auth,
+                   {"model": m, "max_tokens": 32,
+                    "messages": [{"role": "user", "content": "Reply with exactly: GATEWAY_OK"}]})
+              call(f"vision-{slug}", "POST", BASE, auth,
+                   {"model": m, "max_tokens": 32,
+                    "messages": [{"role": "user", "content": [
+                        {"type": "text", "text": "What color is this square? Reply with the color name only."},
+                        {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{teal_b64}"}}]}]})
+          PYEOF
+          ls -la smoke/
+
+      - name: Commit the probe evidence back to the branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add smoke/
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "Gateway catalog and route probe evidence for the model benchmark"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
