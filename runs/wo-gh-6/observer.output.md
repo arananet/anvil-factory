@@ -1,3 +1,1 @@
-Observer output created. The observer station requires a release record from the deployer as input, but the deployer hasn't executed yet (status: `packet_ready`). Following station rules, the output notes the missing input rather than guessing.
-
-The file is at `runs/wo-gh-6/observer.output.md`.
+Observer output created. The deployer station hasn't executed yet, so there's no release record to observe. The output file reports the missing input as required by the station rules.

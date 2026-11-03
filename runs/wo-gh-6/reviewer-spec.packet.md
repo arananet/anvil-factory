@@ -68,8 +68,7 @@ Regression tests proving the clarified semantics, in the factory suite style: (1
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
+- checks-gate: passed
 
 ## Output contract
 
