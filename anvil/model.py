@@ -9,6 +9,24 @@ def slugify(text):
     text = re.sub(r"[^a-z0-9]+", "-", text)
     return text.strip("-")
 
+def validate_path_component(component, name):
+    """Validate that a path component does not contain traversal attempts (F3).
+
+    Rejects components with path separators or parent directory references
+    to prevent path traversal attacks.
+    """
+    if not component or component == "unknown":
+        raise ValueError(f"{name} is unknown or empty")
+    # Reject path separators and parent references
+    dangerous = ["/", "\\", "..", "~"]
+    for pattern in dangerous:
+        if pattern in component:
+            raise ValueError(f"{name} contains dangerous path component: {pattern}")
+    # Reject absolute paths
+    if component.startswith("/") or (len(component) > 1 and component[1] == ":"):
+        raise ValueError(f"{name} looks like an absolute path")
+    return component
+
 @dataclass
 class WorkOrder:
     id: str
@@ -21,6 +39,8 @@ class WorkOrder:
     def __post_init__(self):
         if self.kind not in KINDS:
             raise ValueError(f"Invalid work order kind: {self.kind}")
+        # Validate work order ID to prevent path traversal (F3)
+        validate_path_component(self.id, "work_order_id")
     @classmethod
     def from_dict(cls, data):
         return cls(id=data["id"], kind=data["kind"], title=data["title"],

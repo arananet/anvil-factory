@@ -38,6 +38,7 @@ this script exit non-zero, so the runner marks the step failed. It never
 writes a partial or placeholder output and calls it success.
 """
 
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -48,10 +49,30 @@ NO_EDIT_TOOLS = "Edit,Write,NotebookEdit"
 TIMEOUT_SECONDS = 1500
 
 
+def validate_path_component(component, name):
+    """Validate that a path component does not contain traversal attempts.
+
+    Rejects components with path separators or parent directory references
+    to prevent path traversal attacks (F3).
+    """
+    if not component or component == "unknown":
+        raise ValueError(f"{name} is unknown or empty")
+    # Reject path separators and parent references
+    dangerous = ["/", "\\", "..", "~"]
+    for pattern in dangerous:
+        if pattern in component:
+            raise ValueError(f"{name} contains dangerous path component: {pattern}")
+    # Reject absolute paths
+    if component.startswith("/") or (len(component) > 1 and component[1] == ":"):
+        raise ValueError(f"{name} looks like an absolute path")
+    return component
+
+
 def station_of(packet_text):
     for line in packet_text.splitlines():
         if line.startswith("# Task packet:"):
-            return line.split(":", 1)[1].strip()
+            station = line.split(":", 1)[1].strip()
+            return validate_path_component(station, "station_id")
     return "unknown"
 
 
@@ -60,7 +81,8 @@ def work_order_id_of(packet_text):
     for line in packet_text.splitlines():
         line = line.strip()
         if line.startswith("- id:"):
-            return line.split(":", 1)[1].strip()
+            work_order_id = line.split(":", 1)[1].strip()
+            return validate_path_component(work_order_id, "work_order_id")
     return "unknown"
 
 
@@ -80,62 +102,166 @@ def review_suffix(work_order_id, station_id):
     )
 
 
+def validate_review_file(review_path, station_id):
+    """Validate review file using same acceptance rules as parse_review (S4).
+
+    Returns (is_valid, error_message).
+    - File must exist
+    - Content must parse as exactly one JSON object (surrounding whitespace and
+      one markdown code fence allowed)
+    - station field must equal station_id
+    - verdict must be one of: pass, fail, changes_requested
+    """
+    if not review_path.exists():
+        return False, f"Review file not found at {review_path}. You must write the review to this exact path."
+
+    try:
+        content = review_path.read_text(encoding="utf-8")
+    except Exception as e:
+        return False, f"Could not read review file: {e}"
+
+    if not content.strip():
+        return False, "Review file is empty. Write a valid review JSON object."
+
+    # Strip whitespace and optional markdown code fence (same logic as parse_review)
+    text = content.strip()
+    if text.startswith("```json") or text.startswith("```"):
+        lines = text.splitlines()
+        lines = lines[1:]  # Remove opening fence
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]  # Remove closing fence
+        text = "\n".join(lines).strip()
+
+    # Parse as exactly one JSON object
+    try:
+        obj = json.loads(text)
+    except json.JSONDecodeError as e:
+        return False, f"Review file does not contain valid JSON: {e}"
+
+    if not isinstance(obj, dict):
+        return False, "Review file must contain a JSON object, not a list or other type."
+
+    # Validate required fields
+    if "station" not in obj:
+        return False, "Review object is missing required field: station"
+    if "verdict" not in obj:
+        return False, "Review object is missing required field: verdict"
+
+    if obj["station"] != station_id:
+        return False, f"Review station field is '{obj['station']}' but must be '{station_id}'"
+
+    valid_verdicts = {"pass", "fail", "changes_requested"}
+    if obj["verdict"] not in valid_verdicts:
+        return False, f"Review verdict is '{obj['verdict']}' but must be one of: {', '.join(valid_verdicts)}"
+
+    return True, ""
+
+
 def main():
     if len(sys.argv) != 3:
         print("usage: claude_station.py <packet> <output>", file=sys.stderr)
         return 64
     packet_path = Path(sys.argv[1])
     output_path = Path(sys.argv[2])
-    packet_text = packet_path.read_text(encoding="utf-8")
-    station = station_of(packet_text)
 
-    prompt = packet_text
-    if station.startswith("reviewer"):
-        work_order_id = work_order_id_of(packet_text)
-        prompt += review_suffix(work_order_id, station)
-
-    # Never let a previous run's output survive into this one: the executor
-    # prefers a non-empty output file, so a stale file would be mistaken
-    # for this station's answer.
     try:
-        output_path.unlink()
-    except FileNotFoundError:
-        pass
-
-    command = [
-        "claude", "-p", prompt,
-        "--model", MODEL,
-        "--output-format", "text",
-        "--dangerously-skip-permissions",
-    ]
-    if station not in WRITE_STATIONS:
-        command += ["--disallowedTools", NO_EDIT_TOOLS]
+        packet_text = packet_path.read_text(encoding="utf-8")
+        station = station_of(packet_text)
+        work_order_id = work_order_id_of(packet_text) if station.startswith("reviewer") else None
+    except ValueError as e:
+        print(f"claude_station: path validation failed: {e}", file=sys.stderr)
+        return 6
 
     repo_root = Path(__file__).resolve().parent.parent
-    try:
-        proc = subprocess.run(command, cwd=str(repo_root), capture_output=True,
-                              text=True, timeout=TIMEOUT_SECONDS)
-    except subprocess.TimeoutExpired:
-        print(f"claude_station: station {station} timed out after {TIMEOUT_SECONDS}s",
-              file=sys.stderr)
-        return 4
-    except FileNotFoundError:
-        print("claude_station: the claude CLI is not on PATH", file=sys.stderr)
-        return 5
+    correction_used = False
 
-    if proc.returncode != 0:
-        detail = (proc.stderr or proc.stdout or "").strip()[:2000]
-        print(f"claude_station: claude exited {proc.returncode} for station {station}: {detail}",
-              file=sys.stderr)
-        return 2
+    # For reviewer stations, remove any pre-existing review file (S3)
+    if station.startswith("reviewer") and work_order_id:
+        review_path = repo_root / "runs" / work_order_id / f"{station}.review.json"
+        try:
+            review_path.unlink()
+        except FileNotFoundError:
+            pass
 
-    output = proc.stdout or ""
-    if not output.strip():
-        print(f"claude_station: claude produced empty output for station {station}",
-              file=sys.stderr)
-        return 3
+    # Run station (with one potential correction attempt for reviewers)
+    for attempt in range(2):
+        prompt = packet_text
+        if station.startswith("reviewer") and work_order_id:
+            if attempt == 0:
+                prompt += review_suffix(work_order_id, station)
+            else:
+                # Correction attempt: add specific error message
+                prompt += (
+                    f"\n\n## Review file correction needed\n\n"
+                    f"The review file validation failed with this error:\n\n{validation_error}\n\n"
+                    f"Please correct the issue and write a valid review JSON object to "
+                    f"runs/{work_order_id}/{station}.review.json.\n"
+                )
 
-    output_path.write_text(output, encoding="utf-8")
+        # Never let a previous run's output survive into this one
+        try:
+            output_path.unlink()
+        except FileNotFoundError:
+            pass
+
+        command = [
+            "claude", "-p", prompt,
+            "--model", MODEL,
+            "--output-format", "text",
+            "--dangerously-skip-permissions",
+        ]
+        if station not in WRITE_STATIONS:
+            command += ["--disallowedTools", NO_EDIT_TOOLS]
+
+        try:
+            proc = subprocess.run(command, cwd=str(repo_root), capture_output=True,
+                                  text=True, timeout=TIMEOUT_SECONDS)
+        except subprocess.TimeoutExpired:
+            print(f"claude_station: station {station} timed out after {TIMEOUT_SECONDS}s",
+                  file=sys.stderr)
+            return 4
+        except FileNotFoundError:
+            print("claude_station: the claude CLI is not on PATH", file=sys.stderr)
+            return 5
+
+        if proc.returncode != 0:
+            detail = (proc.stderr or proc.stdout or "").strip()[:2000]
+            print(f"claude_station: claude exited {proc.returncode} for station {station}: {detail}",
+                  file=sys.stderr)
+            return 2
+
+        output = proc.stdout or ""
+        if not output.strip():
+            print(f"claude_station: claude produced empty output for station {station}",
+                  file=sys.stderr)
+            return 3
+
+        output_path.write_text(output, encoding="utf-8")
+
+        # For reviewer stations, validate the review file (S4)
+        if station.startswith("reviewer") and work_order_id:
+            review_path = repo_root / "runs" / work_order_id / f"{station}.review.json"
+            is_valid, validation_error = validate_review_file(review_path, station)
+
+            if is_valid:
+                # Success - write metadata about correction if used
+                if correction_used:
+                    metadata_path = repo_root / "runs" / work_order_id / f"{station}.correction.json"
+                    metadata = {"correction_used": True, "attempts": attempt + 1}
+                    metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+                break  # Exit loop on success
+            elif attempt == 0:
+                # First failure - allow one correction attempt (S4)
+                correction_used = True
+                continue  # Loop will run second attempt
+            else:
+                # Second failure - no more correction (S4)
+                # validation_error will be handled by runner as review_file_missing or review_parse_failed
+                break
+
+        # Non-reviewer stations: exit after first attempt
+        break
+
     print(output)
     return 0
 

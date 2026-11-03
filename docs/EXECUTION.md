@@ -26,25 +26,32 @@ configured runtime, each agent station packet is rendered as today (station
 prompt, work order, upstream step summary) and sent to the executor:
 
 - The executor output is written to `runs/<id>/<station>.output.md`.
-- For reviewer stations, the executor output is additionally written to
+- For reviewer stations, the reviewer itself writes its review to
   `runs/<id>/<station>.review.json`, which is the authoritative review channel.
+  The runner removes any pre-existing review file before the reviewer executes,
+  so the file's presence at step exit means it was produced during this run.
   The runner parses reviews only from this file, never from the free output
-  transcript (which stays as provenance).
+  transcript (which stays as provenance only).
 - The step status becomes `executed`, and the envelope records status
   `executed` plus the executor object `{kind, detail}` (see Model
   provenance below).
 - If the executor fails or the kind is unknown, the step status is `failed`
   with the error recorded in the step and the envelope. A failed step is never
   quietly reported as `packet_ready`.
-- Reviewer stations are expected to answer with exactly one review JSON object:
-  `{"station": "<station-id>", "verdict": "pass | fail | changes_requested",
-  "findings": ["..."]}`. The review file must parse as exactly one JSON object
-  (surrounding whitespace and one surrounding markdown code fence allowed) with
-  the station field equal to the step station id, verdict one of pass, fail, or
-  changes_requested, and findings a list of strings. A parsed review feeds the
-  approver of that same run. If the review file is missing, empty, malformed,
-  or does not match the expected shape, the envelope records
-  `review_parse_failed` and the station contributes no review.
+- Reviewer stations are expected to write exactly one review JSON object to
+  their review file: `{"station": "<station-id>", "verdict": "pass | fail |
+  changes_requested", "findings": ["..."]}`. The review file must parse as
+  exactly one JSON object (surrounding whitespace and one surrounding markdown
+  code fence allowed) with the station field equal to the step station id,
+  verdict one of pass, fail, or changes_requested, and findings a list of
+  strings. A parsed review feeds the approver of that same run. If the review
+  file is missing when the station exits, the envelope records
+  `review_file_missing` and the station contributes no review. If the file
+  exists but is empty, malformed, or does not match the expected shape, the
+  envelope records `review_parse_failed` and the station contributes no review.
+  The wrapper validates the review file at station exit and allows one
+  in-session correction attempt when the file is missing or malformed; a second
+  failure stands as recorded.
 - Cost stays null unless the executor reports usage. When usage is reported,
   token counts are recorded on the step and the envelope; a numeric cost in
   the usage object is the only way a step cost becomes non null.

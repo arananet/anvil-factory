@@ -327,6 +327,15 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             packet = packet_step(station, station_id)
             packet_text = packet.read_text(encoding="utf-8")
             output_file = run_dir / f"{station_id}.output.md"
+
+            # For reviewer stations, remove any pre-existing review file before execution (S3)
+            if station_id.startswith("reviewer"):
+                review_file = run_dir / f"{station_id}.review.json"
+                try:
+                    review_file.unlink()
+                except FileNotFoundError:
+                    pass
+
             try:
                 result = executor.execute(packet_text, station_id, packet_path=packet,
                                           output_path=output_file, cwd=project)
@@ -345,15 +354,26 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     if tokens:
                         extra_envelope["tokens"] = tokens
                 if station_id.startswith("reviewer"):
-                    # Write the executor output to the authoritative review channel
+                    # S2: Read review from the file the reviewer wrote, never from stdout
                     review_file = run_dir / f"{station_id}.review.json"
-                    review_file.write_text(output_text, encoding="utf-8")
+                    review = None
+                    review_file_text = None
 
-                    # Parse review only from the authoritative channel
-                    review = parse_review(output_text, station_id)
+                    # Check if correction metadata exists
+                    correction_meta_path = run_dir / f"{station_id}.correction.json"
+                    if correction_meta_path.exists():
+                        extra_envelope["correction_used"] = True
+
+                    if review_file.exists():
+                        try:
+                            review_file_text = review_file.read_text(encoding="utf-8")
+                            review = parse_review(review_file_text, station_id)
+                        except Exception as e:
+                            # File exists but couldn't be read or parsed
+                            review = None
+
                     # Special handling for reviewer-design when no design system exists
                     if station_id == "reviewer-design" and not has_design_system:
-                        # Force a changes_requested verdict with a finding about missing design system
                         review = Review(
                             station="reviewer-design",
                             verdict="changes_requested",
@@ -361,13 +381,23 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                                      "design/DESIGN.md and design/tokens.json before interface output can be "
                                      "reviewed against design standards."]
                         )
+                    elif review is not None:
+                        # Valid review parsed from file
+                        pass
+                    elif review_file.exists():
+                        # File exists but failed to parse (S3)
+                        extra_envelope["review_parse_failed"] = True
+                        detail += "; review file exists but did not parse as valid review JSON"
+                    else:
+                        # File does not exist (S3)
+                        extra_envelope["review_file_missing"] = True
+                        detail += "; review file was not written by the station"
+
                     if review is not None:
                         run_reviews.append(review)
                         run_findings.extend(review.findings)
                         extra_envelope["review"] = review.to_dict()
-                    else:
-                        extra_envelope["review_parse_failed"] = True
-                        detail += "; review output did not parse as a review JSON"
+
             except ExecutorError as exc:
                 status = "failed"
                 detail = f"Executor failed: {exc}"
