@@ -59,10 +59,11 @@ Keep the whole suite green, all eight pipelines valid, no station added, removed
 ## Upstream steps
 
 - intake: completed
-- spec-writer: failed
-- test-writer: failed
-- builder: failed
-- checks-gate: passed
+- spec-writer: executed
+- test-writer: executed
+- builder: executed
+- checks-gate: failed
+- loopback: loopback
 
 ## Output contract
 

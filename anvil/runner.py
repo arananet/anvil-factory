@@ -7,7 +7,7 @@ from .model import WorkOrder, Review
 from .config import default_model
 from .brain import packet_learnings_section
 from .design import packet_design_section, load_design_system
-from .gates import human_gate
+from .gates import human_gate, checks_gate, resolve_base_ref_config, _run_shell
 from .approver import aggregate, needs_human, aggregate_explained, needs_human_explained, matched_risk_hints, RISK_SCAN_ORDER
 from .executor import ExecutorError
 
@@ -124,22 +124,19 @@ def _executor_provenance(executor, output_text=""):
         return {"kind": "command", "detail": detail}, _reported_model(output_text)
     return {"kind": str(kind), "detail": getattr(executor, "name", str(kind))}, None
 
-def _run_shell(command, cwd, work_order_id, timeout):
-    env = dict(os.environ)
-    env["ANVIL_WORK_ORDER_ID"] = work_order_id
-    try:
-        proc = subprocess.run(command, shell=True, cwd=str(cwd), env=env,
-                              capture_output=True, text=True, timeout=timeout)
-        return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
-    except subprocess.TimeoutExpired:
-        return None, f"Timed out after {timeout}s"
 
-def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None):
+def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None, base_ref=None):
     """Get list of changed files relative to base ref.
 
     Uses git to detect changes. If git is not available and initial_files
     snapshot is provided, compares current state against the snapshot to find
     new or deleted files.
+
+    Args:
+        project_dir: Path to project directory
+        initial_files: Set of initial files for fallback comparison
+        work_output_dirs: Set of directories where new files are always considered changed
+        base_ref: Git ref to compare against (if None, compares against HEAD for uncommitted)
 
     Returns a set of file paths relative to project root.
     """
@@ -157,13 +154,24 @@ def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None):
         )
         if result.returncode == 0:
             # Get changed files from git
-            result = subprocess.run(
-                ["git", "diff", "--name-only", "HEAD"],
-                cwd=str(project_dir),
-                capture_output=True,
-                text=True,
-                timeout=10
-            )
+            if base_ref:
+                # Compare current HEAD against base ref to get all changes on the work branch
+                result = subprocess.run(
+                    ["git", "diff", "--name-only", f"{base_ref}...HEAD"],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+            else:
+                # No base ref, just get uncommitted changes
+                result = subprocess.run(
+                    ["git", "diff", "--name-only", "HEAD"],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
             files = {line.strip() for line in result.stdout.split('\n') if line.strip()}
 
             # Also get untracked files
@@ -176,6 +184,19 @@ def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None):
             )
             if result2.returncode == 0:
                 files.update({line.strip() for line in result2.stdout.split('\n') if line.strip()})
+
+            # If we have a base_ref, also include uncommitted changes
+            if base_ref:
+                result3 = subprocess.run(
+                    ["git", "diff", "--name-only"],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                if result3.returncode == 0:
+                    files.update({line.strip() for line in result3.stdout.split('\n') if line.strip()})
+
             return files
     except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
         pass
@@ -211,99 +232,6 @@ def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None):
     # No git and no snapshot: can't determine changes
     return set()
 
-def _run_checks_gate(phase, base_ref_config, changed_files, project, work_order_id, timeout=300):
-    """Run the checks gate: execute check commands and validate protected paths.
-
-    Returns a dict with gate results including status, commands, exit_codes,
-    protected_path_verdict, gate_verdict, and output.
-    """
-    checks = base_ref_config.get("checks", [])
-
-    # Get protected paths from base ref config
-    if "protected_paths" in base_ref_config:
-        protected_paths = base_ref_config["protected_paths"]
-    else:
-        # Default protected paths (S3)
-        protected_paths = ["tests/", "anvil.json"]
-
-    # If no checks configured (S6)
-    if not checks:
-        return {
-            "phase": phase,
-            "status": "not_configured",
-            "detail": "No checks configured",
-            "commands": [],
-            "exit_codes": [],
-            "protected_paths": protected_paths,
-            "protected_path_verdict": "pass",
-            "protected_path_findings": [],
-            "gate_verdict": "not_configured",
-            "output": ""
-        }
-
-    # Check for protected path violations (S3)
-    protected_path_findings = []
-    for changed_file in changed_files:
-        for protected_path in protected_paths:
-            if changed_file.startswith(protected_path):
-                protected_path_findings.append(f"Protected path touched: {changed_file} (matches {protected_path})")
-                break
-
-    protected_path_verdict = "fail" if protected_path_findings else "pass"
-
-    # Run check commands
-    commands = []
-    exit_codes = []
-    outputs = []
-
-    for check_cmd in checks:
-        commands.append(check_cmd)
-        code, out = _run_shell(str(check_cmd), project, work_order_id, timeout)
-        exit_codes.append(code if code is not None else -1)
-        outputs.append(out)
-
-    # Determine overall gate verdict
-    checks_passed = all(code == 0 for code in exit_codes)
-
-    if protected_path_verdict == "fail":
-        gate_verdict = "fail"
-        status = "failed"
-    elif not checks_passed:
-        gate_verdict = "fail"
-        status = "failed"
-    else:
-        gate_verdict = "pass"
-        status = "passed"
-
-    # Build output summary
-    output_lines = []
-    if protected_path_findings:
-        output_lines.append("# Protected Path Violations")
-        output_lines.extend(protected_path_findings)
-        output_lines.append("")
-
-    output_lines.append("# Check Commands")
-    for i, (cmd, code, out) in enumerate(zip(commands, exit_codes, outputs)):
-        output_lines.append(f"## Command {i+1}: {cmd}")
-        output_lines.append(f"Exit code: {code}")
-        output_lines.append("Output:")
-        output_lines.append("```")
-        output_lines.append(out[-2000:] if out else "(no output)")
-        output_lines.append("```")
-        output_lines.append("")
-
-    return {
-        "phase": phase,
-        "status": status,
-        "detail": f"Gate {status}: {len(checks)} checks, protected paths: {protected_path_verdict}",
-        "commands": commands,
-        "exit_codes": exit_codes,
-        "protected_paths": protected_paths,
-        "protected_path_verdict": protected_path_verdict,
-        "protected_path_findings": protected_path_findings,
-        "gate_verdict": gate_verdict,
-        "output": "\n".join(output_lines)
-    }
 
 def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section=""):
     upstream = "\n".join(f"- {s['station']}: {s['status']}" for s in steps) or "- (none)"
@@ -325,7 +253,7 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
     return text
 
 def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks=2,
-                 executor=None, deploy_cfg=None):
+                 executor=None, deploy_cfg=None, base_ref=None):
     project = Path(project_dir)
     if isinstance(work_order, dict):
         work_order = WorkOrder.from_dict(work_order)
@@ -357,13 +285,10 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     learnings_section = packet_learnings_section(project)
 
     # Snapshot base ref configuration for checks gate (S4)
-    base_ref_config = {}
-    config_file = project / "anvil.json"
-    if config_file.exists():
-        try:
-            base_ref_config = json.loads(config_file.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
-            pass
+    # Configuration is resolved from the base ref through git where a repo is
+    # present, never from the working tree file (which may have been modified by
+    # the builder). The working tree fallback is only for projects with no git repo.
+    base_ref_config = resolve_base_ref_config(project, base_ref)
 
     # Snapshot initial files at run start for non-git changed file tracking
     # Directories where new files are always considered "changed" (spec S3)
@@ -462,10 +387,10 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 phase = "pre-deploy"
 
             # Get changed files at gate time
-            current_changed_files = _get_changed_files(project, initial_files, work_output_dirs)
+            current_changed_files = _get_changed_files(project, initial_files, work_output_dirs, base_ref)
 
             # Run the gate
-            gate_result = _run_checks_gate(phase, base_ref_config, current_changed_files, project, work_order.id)
+            gate_result = checks_gate(phase, base_ref_config, current_changed_files, project, work_order.id)
             status = gate_result["status"]
             detail = gate_result["detail"]
 
@@ -503,8 +428,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             deferred_pre_deploy_gate = None
             if verdict == "approved" and not blocked and not gate_failed:
                 gate_started = time.perf_counter()
-                current_changed_files = _get_changed_files(project, initial_files, work_output_dirs)
-                gate_result = _run_checks_gate("pre-deploy", base_ref_config, current_changed_files, project, work_order.id)
+                current_changed_files = _get_changed_files(project, initial_files, work_output_dirs, base_ref)
+                gate_result = checks_gate("pre-deploy", base_ref_config, current_changed_files, project, work_order.id)
 
                 gate_output_file = run_dir / "checks-gate.pre-deploy.output.md"
                 gate_output_file.write_text(gate_result["output"], encoding="utf-8")

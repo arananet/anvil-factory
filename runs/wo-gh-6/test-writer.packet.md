@@ -58,4 +58,4 @@ Keep the whole suite green, all eight pipelines valid, no station added, removed
 ## Upstream steps
 
 - intake: completed
-- spec-writer: failed
+- spec-writer: executed

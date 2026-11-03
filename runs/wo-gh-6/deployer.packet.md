@@ -58,14 +58,15 @@ Keep the whole suite green, all eight pipelines valid, no station added, removed
 ## Upstream steps
 
 - intake: completed
-- spec-writer: failed
-- test-writer: failed
-- builder: failed
-- checks-gate: passed
-- reviewer-spec: failed
-- reviewer-security: failed
-- reviewer-tests: failed
-- reviewer-architecture: failed
-- reviewer-design: failed
+- spec-writer: executed
+- test-writer: executed
+- builder: executed
+- checks-gate: failed
+- loopback: loopback
+- reviewer-spec: skipped
+- reviewer-security: skipped
+- reviewer-tests: skipped
+- reviewer-architecture: skipped
+- reviewer-design: skipped
 - approver: completed
 - triage-human: completed

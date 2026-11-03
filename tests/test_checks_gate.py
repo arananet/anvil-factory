@@ -231,6 +231,116 @@ class TestChecksGateBaseRefResolution(unittest.TestCase):
                 # Protected paths should be from base ref
                 self.assertIn("protected_paths", gate_step)
 
+    def test_uncommitted_checks_config_mutation_uses_base_ref_s4_regression(self):
+        """checks-gate S4 REGRESSION: uncommitted working tree change to checks config doesn't affect gate commands"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+
+            # Initialize git repo and create base ref state
+            import subprocess
+            subprocess.run(["git", "init"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.name", "Test"], cwd=proj, check=True)
+
+            # Set up base ref checks configuration
+            config = json.loads((proj / "anvil.json").read_text())
+            config["checks"] = ["echo 'base ref check'", "exit 0"]
+            config["protected_paths"] = ["anvil.json", "tests/"]
+            (proj / "anvil.json").write_text(json.dumps(config, indent=2))
+
+            # Commit to establish base ref
+            subprocess.run(["git", "add", "."], cwd=proj, check=True)
+            subprocess.run(["git", "commit", "-m", "Base ref state"], cwd=proj, check=True)
+            base_ref = subprocess.run(["git", "rev-parse", "HEAD"], cwd=proj,
+                                     capture_output=True, text=True, check=True).stdout.strip()
+
+            # Create work branch
+            subprocess.run(["git", "checkout", "-b", "work-branch"], cwd=proj, check=True)
+
+            # NOW mutate checks config as uncommitted change (working tree only)
+            malicious_config = json.loads((proj / "anvil.json").read_text())
+            malicious_config["checks"] = ["echo 'malicious check - should not run'", "exit 0"]
+            (proj / "anvil.json").write_text(json.dumps(malicious_config, indent=2))
+
+            # Run gate - it should resolve commands from base ref, not working tree
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-gate-s4-regression-1", kind="feature",
+                          title="S4 regression - uncommitted mutation")
+            report = run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                                  executor=command_executor(tmp, "pass"),
+                                  base_ref=base_ref)
+
+            # Verify gate ran base ref commands, not mutated ones
+            gate_steps = [s for s in report.steps if s.get("station") == "checks-gate"]
+            self.assertGreater(len(gate_steps), 0)
+            gate_step = gate_steps[0]
+
+            # Commands should be from base ref
+            self.assertIn("commands", gate_step)
+            commands = gate_step["commands"]
+            self.assertIn("base ref check", commands[0])
+            self.assertNotIn("malicious", commands[0])
+
+            # Protected path should be detected (anvil.json was modified)
+            self.assertEqual(gate_step["protected_path_verdict"], "fail")
+            self.assertIn("anvil.json", str(gate_step.get("protected_path_findings", "")))
+
+    def test_committed_checks_config_mutation_uses_base_ref_s4_regression(self):
+        """checks-gate S4 REGRESSION: committed change to checks config on work branch doesn't affect gate commands"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+
+            # Initialize git repo and create base ref state
+            import subprocess
+            subprocess.run(["git", "init"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.name", "Test"], cwd=proj, check=True)
+
+            # Set up base ref checks configuration
+            config = json.loads((proj / "anvil.json").read_text())
+            config["checks"] = ["echo 'base ref check'", "exit 0"]
+            config["protected_paths"] = ["anvil.json", "tests/"]
+            (proj / "anvil.json").write_text(json.dumps(config, indent=2))
+
+            # Commit to establish base ref
+            subprocess.run(["git", "add", "."], cwd=proj, check=True)
+            subprocess.run(["git", "commit", "-m", "Base ref state"], cwd=proj, check=True)
+            base_ref = subprocess.run(["git", "rev-parse", "HEAD"], cwd=proj,
+                                     capture_output=True, text=True, check=True).stdout.strip()
+
+            # Create work branch
+            subprocess.run(["git", "checkout", "-b", "work-branch"], cwd=proj, check=True)
+
+            # NOW mutate checks config and COMMIT it on the work branch
+            malicious_config = json.loads((proj / "anvil.json").read_text())
+            malicious_config["checks"] = ["echo 'malicious check - should not run'", "exit 0"]
+            (proj / "anvil.json").write_text(json.dumps(malicious_config, indent=2))
+            subprocess.run(["git", "add", "anvil.json"], cwd=proj, check=True)
+            subprocess.run(["git", "commit", "-m", "Attempt to modify checks"], cwd=proj, check=True)
+
+            # Run gate - it should resolve commands from base ref, not work branch tip
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-gate-s4-regression-2", kind="feature",
+                          title="S4 regression - committed mutation")
+            report = run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
+                                  executor=command_executor(tmp, "pass"),
+                                  base_ref=base_ref)
+
+            # Verify gate ran base ref commands, not mutated ones
+            gate_steps = [s for s in report.steps if s.get("station") == "checks-gate"]
+            self.assertGreater(len(gate_steps), 0)
+            gate_step = gate_steps[0]
+
+            # Commands should be from base ref
+            self.assertIn("commands", gate_step)
+            commands = gate_step["commands"]
+            self.assertIn("base ref check", commands[0])
+            self.assertNotIn("malicious", commands[0])
+
+            # Protected path should be detected (anvil.json was modified)
+            self.assertEqual(gate_step["protected_path_verdict"], "fail")
+            self.assertIn("anvil.json", str(gate_step.get("protected_path_findings", "")))
+
 class TestChecksGatePreDeploy(unittest.TestCase):
     def test_gate_runs_before_deploy_after_merge_sync_s5(self):
         """checks-gate S5: gate runs second time before deployer/publisher, failure stops deploy"""
@@ -474,6 +584,35 @@ class TestChecksGateDefaultProtectedPaths(unittest.TestCase):
                     protected = gate_step["protected_paths"]
                     self.assertIn("custom/path/", protected)
                     self.assertIn("important.py", protected)
+
+class TestChecksGateStationKind(unittest.TestCase):
+    def test_checks_gate_station_kind_is_deterministic(self):
+        """checks-gate: station kind should be 'deterministic' like other deterministic stations"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+            config = json.loads((proj / "anvil.json").read_text())
+            config["checks"] = ["exit 0"]
+            (proj / "anvil.json").write_text(json.dumps(config, indent=2))
+
+            reg = load_registry(ROOT / "stations")
+
+            # Load checks-gate station metadata
+            checks_gate_station = reg.get("checks-gate")
+            self.assertIsNotNone(checks_gate_station)
+
+            # Station kind should be 'deterministic' or documented in ARCHITECTURE.md
+            # This test verifies the hygiene requirement from loopback round
+            station_kind = checks_gate_station.kind
+            self.assertIsNotNone(station_kind, "checks-gate station must have a kind")
+
+            # If not deterministic, it must be documented in docs/ARCHITECTURE.md
+            if station_kind != "deterministic":
+                arch_doc = ROOT / "docs" / "ARCHITECTURE.md"
+                self.assertTrue(arch_doc.exists(),
+                              "ARCHITECTURE.md must exist to document non-deterministic gate kind")
+                arch_content = arch_doc.read_text()
+                self.assertIn("checks-gate", arch_content.lower(),
+                            "checks-gate kind must be documented in ARCHITECTURE.md")
 
 if __name__ == "__main__":
     unittest.main()

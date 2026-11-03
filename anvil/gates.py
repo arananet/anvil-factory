@@ -1,4 +1,4 @@
-import json, re
+import json, os, re, subprocess
 from pathlib import Path
 
 REVIEWER_STATIONS = ["reviewer-spec", "reviewer-security", "reviewer-tests", "reviewer-architecture"]
@@ -81,3 +81,181 @@ def disclosure_gate(project_dir, slug):
     if "ai generated" not in text and "ai-generated" not in text:
         return (False, "Draft has no AI generated disclosure")
     return (True, "Draft carries an AI generated disclosure")
+
+
+def _run_shell(command, cwd, work_order_id, timeout):
+    """Execute a shell command with timeout."""
+    env = dict(os.environ)
+    env["ANVIL_WORK_ORDER_ID"] = work_order_id
+    try:
+        proc = subprocess.run(command, shell=True, cwd=str(cwd), env=env,
+                              capture_output=True, text=True, timeout=timeout)
+        return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
+    except subprocess.TimeoutExpired:
+        return None, f"Timed out after {timeout}s"
+
+
+def resolve_base_ref_config(project_dir, base_ref=None, config_filename="anvil.json"):
+    """Resolve project configuration from base ref using git.
+
+    S4 requirement: check commands and protected paths are resolved from the base
+    ref snapshot taken at run start, never from files the builder changed during
+    the run. This function reads the configuration from the git base ref when
+    available, falling back to the working tree file only when git is not present.
+
+    Args:
+        project_dir: Path to project directory
+        base_ref: Git ref to resolve from (e.g., commit SHA). If None, reads from working tree.
+        config_filename: Name of the config file (default: "anvil.json")
+
+    Returns:
+        Dict with configuration, or empty dict if config cannot be read.
+    """
+    project_path = Path(project_dir)
+    config_file = project_path / config_filename
+
+    # If base_ref is provided, try to resolve from git
+    if base_ref:
+        try:
+            # Check if this is a git repo
+            result = subprocess.run(
+                ["git", "rev-parse", "--git-dir"],
+                cwd=str(project_dir),
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result.returncode == 0:
+                # Read config from base ref using git show
+                result = subprocess.run(
+                    ["git", "show", f"{base_ref}:{config_filename}"],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                if result.returncode == 0:
+                    try:
+                        return json.loads(result.stdout)
+                    except json.JSONDecodeError:
+                        pass
+        except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+            pass
+
+    # Fallback: read from working tree file
+    # This fallback is only safe for projects without a git repo
+    if config_file.exists():
+        try:
+            return json.loads(config_file.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    return {}
+
+
+def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_id, timeout=300):
+    """Run the checks gate: execute check commands and validate protected paths.
+
+    Args:
+        phase: "pre-review" or "pre-deploy"
+        base_ref_config: Configuration dict resolved from base ref
+        changed_files: Set of changed file paths relative to project root
+        project_dir: Path to project directory
+        work_order_id: Work order ID for logging
+        timeout: Timeout in seconds for each check command
+
+    Returns:
+        Dict with gate results including status, commands, exit_codes,
+        protected_path_verdict, gate_verdict, and output.
+    """
+    checks = base_ref_config.get("checks", [])
+
+    # Get protected paths from base ref config
+    # Default includes the checks configuration file path and tests/
+    if "protected_paths" in base_ref_config:
+        protected_paths = base_ref_config["protected_paths"]
+    else:
+        # Default protected paths: tests/ and the configuration file itself
+        # The config file path comes from the project structure, not hardcoded
+        config_file_name = "anvil.json"  # Standard config file name
+        protected_paths = ["tests/", config_file_name]
+
+    # If no checks configured (S6)
+    if not checks:
+        return {
+            "phase": phase,
+            "status": "not_configured",
+            "detail": "No checks configured",
+            "commands": [],
+            "exit_codes": [],
+            "protected_paths": protected_paths,
+            "protected_path_verdict": "pass",
+            "protected_path_findings": [],
+            "gate_verdict": "not_configured",
+            "output": ""
+        }
+
+    # Check for protected path violations (S3)
+    protected_path_findings = []
+    for changed_file in changed_files:
+        for protected_path in protected_paths:
+            if changed_file.startswith(protected_path):
+                protected_path_findings.append(
+                    f"Protected path touched: {changed_file} (matches {protected_path})")
+                break
+
+    protected_path_verdict = "fail" if protected_path_findings else "pass"
+
+    # Run check commands
+    commands = []
+    exit_codes = []
+    outputs = []
+
+    for check_cmd in checks:
+        commands.append(check_cmd)
+        code, out = _run_shell(str(check_cmd), project_dir, work_order_id, timeout)
+        exit_codes.append(code if code is not None else -1)
+        outputs.append(out)
+
+    # Determine overall gate verdict
+    checks_passed = all(code == 0 for code in exit_codes)
+
+    if protected_path_verdict == "fail":
+        gate_verdict = "fail"
+        status = "failed"
+    elif not checks_passed:
+        gate_verdict = "fail"
+        status = "failed"
+    else:
+        gate_verdict = "pass"
+        status = "passed"
+
+    # Build output summary
+    output_lines = []
+    if protected_path_findings:
+        output_lines.append("# Protected Path Violations")
+        output_lines.extend(protected_path_findings)
+        output_lines.append("")
+
+    output_lines.append("# Check Commands")
+    for i, (cmd, code, out) in enumerate(zip(commands, exit_codes, outputs)):
+        output_lines.append(f"## Command {i+1}: {cmd}")
+        output_lines.append(f"Exit code: {code}")
+        output_lines.append("Output:")
+        output_lines.append("```")
+        output_lines.append(out[-2000:] if out else "(no output)")
+        output_lines.append("```")
+        output_lines.append("")
+
+    return {
+        "phase": phase,
+        "status": status,
+        "detail": f"Gate {status}: {len(checks)} checks, protected paths: {protected_path_verdict}",
+        "commands": commands,
+        "exit_codes": exit_codes,
+        "protected_paths": protected_paths,
+        "protected_path_verdict": protected_path_verdict,
+        "protected_path_findings": protected_path_findings,
+        "gate_verdict": gate_verdict,
+        "output": "\n".join(output_lines)
+    }

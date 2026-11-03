@@ -4,20 +4,21 @@ Cost is reported as null here. Model runtimes report cost when they run a statio
 
 | Station | Status | Duration ms | Artifacts | Cost |
 |---|---|---|---|---|
-| intake | completed | 0.023 | runs/wo-gh-6/report.json | null |
-| spec-writer | failed | 108110.292 | runs/wo-gh-6/spec-writer.packet.md | null |
-| test-writer | failed | 10845.256 | runs/wo-gh-6/test-writer.packet.md | null |
-| builder | failed | 692.458 | runs/wo-gh-6/builder.packet.md | null |
-| checks-gate | passed | 6234.512 | runs/wo-gh-6/checks-gate.pre-review.output.md | null |
-| reviewer-spec | failed | 16740.52 | runs/wo-gh-6/reviewer-spec.packet.md | null |
-| reviewer-security | failed | 21695.875 | runs/wo-gh-6/reviewer-security.packet.md | null |
-| reviewer-tests | failed | 9836.196 | runs/wo-gh-6/reviewer-tests.packet.md | null |
-| reviewer-architecture | failed | 12032.435 | runs/wo-gh-6/reviewer-architecture.packet.md | null |
-| reviewer-design | failed | 651.604 | runs/wo-gh-6/reviewer-design.packet.md | null |
-| approver | completed | 0.039 | runs/wo-gh-6/report.json | null |
-| triage-human | completed | 0.007 | - | null |
-| deployer | packet_ready | 0.191 | runs/wo-gh-6/deployer.packet.md | null |
-| observer | failed | 876.358 | runs/wo-gh-6/observer.packet.md | null |
+| intake | completed | 0.028 | runs/wo-gh-6/report.json | null |
+| spec-writer | executed | 175354.936 | runs/wo-gh-6/spec-writer.output.md | null |
+| test-writer | executed | 126871.694 | runs/wo-gh-6/test-writer.output.md | null |
+| builder | executed | 342439.127 | runs/wo-gh-6/builder.output.md | null |
+| checks-gate | failed | 6828.054 | runs/wo-gh-6/checks-gate.pre-review.output.md | null |
+| loopback | loopback | 0.0 | - | null |
+| reviewer-spec | skipped | 0.278 | runs/wo-gh-6/reviewer-spec.packet.md | null |
+| reviewer-security | skipped | 0.224 | runs/wo-gh-6/reviewer-security.packet.md | null |
+| reviewer-tests | skipped | 0.659 | runs/wo-gh-6/reviewer-tests.packet.md | null |
+| reviewer-architecture | skipped | 0.226 | runs/wo-gh-6/reviewer-architecture.packet.md | null |
+| reviewer-design | skipped | 0.419 | runs/wo-gh-6/reviewer-design.packet.md | null |
+| approver | completed | 0.03 | runs/wo-gh-6/report.json | null |
+| triage-human | completed | 0.008 | - | null |
+| deployer | packet_ready | 0.294 | runs/wo-gh-6/deployer.packet.md | null |
+| observer | executed | 51078.376 | runs/wo-gh-6/observer.output.md | null |
 
 ## Decision
 

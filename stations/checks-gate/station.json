@@ -1,7 +1,7 @@
 {
   "id": "checks-gate",
   "name": "Checks Gate",
-  "kind": "gate",
+  "kind": "deterministic",
   "inputs": [
     "builder output"
   ],
