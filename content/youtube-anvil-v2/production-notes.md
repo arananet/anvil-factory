@@ -1,6 +1,6 @@
-# Production notes: ANVIL launch film v2 (wo-gh-18, gate loopback)
+# Production notes: ANVIL launch film v2 (wo-gh-18, polish loopback)
 
-This is the authoring pass record. The media-producer authored the production inputs only. Frames, encoding, the contact sheet and the sampled stills are made by deterministic workflow steps outside any model session. The render statistics block below is written by tools/render_stats.py after the render.
+This is the polish round authoring pass record (the earlier sections below describe the unchanged production method). The media-producer authored the production inputs only. Frames, encoding, the contact sheet and the sampled stills are made by deterministic workflow steps outside any model session. The render statistics block below is written by tools/render_stats.py after the render.
 
 ## Asset provenance
 
@@ -70,22 +70,19 @@ Logged render time in total: 52834.5 s of Blender render time summed across chun
 The full record is in render-stats.json next to this file.
 <!-- render-stats:end -->
 
-## Film review pass verification (media-producer, hold)
+## Polish loopback: the four scene fixes (authoring pass, media-producer)
 
-No content file was changed in this pass. script.md and storyboard.md are unchanged from the setup commit. The render statistics block above is preserved exactly as recorded.
+Scope: scene and layout only. script.md, storyboard.md, brief.md, source-pack.md, durations.json, audio/ and assets/patch-one.glb are frozen and were not edited by this station. No Blender render, no ffmpeg encoding and no frame extraction was run in this pass; the rendered film in the tree is still the previous round's film until the deterministic steps re-render it. Fixes below are authored in blender/scene_line.py and checked here by projecting the scene geometry through the authored cameras (arithmetic only, 35 mm lens, 1920x1080), not by viewing frames.
 
-Confirmed against the finished film and the spec:
+1. Section 4 title occlusion (scene_line.py, s4). The "Stations build" title moved from z 4.1 to z 5.28 at y 0 (band about z 4.9 to 5.7). The highest line geometry is the arm tips and caps at about z 4.38 at y -1.9; with the camera at z 3.0, 12.5 units off, the tip tops project to about y 297 px and the title glyph bottoms to about y 257 px, so there is about 40 px of clear paper, and the title top stays about 137 px below the frame top. The title still travels with the camera in x at the same linear speed, so it stays on screen the whole section. Wording, size and fade in timing are unchanged.
+2. Section 6 caption stacking (scene_line.py, s6). Both captions are parented to the camera, 4 units in front, so no scene object can touch them. "A human approves." sits right of center and higher (about x 1300, y 130 px, 1.52 units wide); "Verified memory." sits left of center and lower (about x 600, y 215 px, 1.36 units wide), so they are staggered side by side with a horizontal gap, not one column. Projected tops of the archive, the quarantine pane and the gate beam are at y 383 px or lower in the midpoint frame and y 420 px or lower in the last frame, well under the caption band (y 85 to 255 px). "Verified memory." keys in at 0.40 to 0.47 of the section, so it is already fully on screen at the midpoint (0.50) and in the last frame. Wording unchanged.
+3. Section 1 opening title (scene_line.py, s1). "ANVIL" uses the full ink material (INK) from frame 1 and is keyed at 0.97 of full scale at frame 1, full scale by 0.15 of the section, and 1.03 at the end, instead of pale gray at small scale until 0.85 to 0.90. The dolly in, the table rise, the post rise and the line assembly keys are untouched. Proof still: frame-proof-s1-title.png at 30 percent of the section.
+4. Section 2 dead air (scene_line.py, s2). The card now enters in frame (-21, -1.4, 4.4) instead of far off frame and its X tilt runs 78, 68, 42, 14, 0 degrees across the flight, so its face is turned toward the camera at the midpoint (about 44 degrees tilt) instead of edge on. The camera rides about 5.5 to 6 units off the card with its target just ahead of it. Projected at the midpoint the card spans about x 278 to 818 and y 462 to 682 px (about 540 px wide), where the previous film showed it tiny and edge on. Frame count and section timing are unchanged. Audit of the other sampled frames from the geometry: the section 1 opening is no longer empty paper because the title is present from frame 1; section 3 first frame, section 4 first frame and the midpoints of sections 3, 4, 5 and 6 carry the card or piece, posts, gantry or archive in frame. The first frame of section 3 shows the small card with the dark posts behind it by design; reviewer-design judges it on the finished film.
 
-- anvil-youtube-v2.mp4: H.264 video 1920x1080 at 30 fps, one AAC audio stream, duration 83.83 s, inside the 60 to 90 second window.
-- Frames on disk per section match durations.json: 302, 207, 194, 205, 173, 498 and 936, 2515 in total. ffprobe counts 2514 frames in the encoded stream, one fewer than planned; the duration still matches durations.json at 83.83 s.
-- contact-sheet.png is 2560x1440. Fifteen sampled stills exist under frames/ (seven section midpoints, frame-cut stills for the transitions); the deterministic checks report each at 1920x1080.
-- tools/video_checks_v2.py result in checks.txt: PASS, 0 failing checks.
-- GLB sha256 daea8110b356865396b062bb1ca20944dd7103286758214cbc7804b43c50f523 matches the spec.
+Sheet sampling (blender/assemble.py, sheet mode). Every previous still name is kept. Added transition stills: frame-cut-2-last, frame-cut-3-first, frame-cut-4-last and frame-cut-5-first, so each of the six cuts (after sections 1 to 6) is sampled as a pair, the last frame of section a and the first frame of section a+1. Added early title proof: frame-proof-s1-title.png from section 1 at 30 percent (frame 91 of 302). The sheet has 20 tiles.
 
-Observations from viewing the contact sheet, passed to reviewer-design for judgment and not corrected here, since content files are held in this pass:
+Render budget confirmed unchanged: common.setup_render keeps Eevee TAA render samples at 6 (never above 8), shadows off, raytracing off; 30 fps; no frames cut; render_all.sh and film.py untouched. Narration audio files, durations.json (2515 frames, 83.833 s) and the GLB sha256 (daea8110b356865396b062bb1ca20944dd7103286758214cbc7804b43c50f523) were checked and stand unchanged. No narration was re-synthesized. Scripts compile.
 
-- Some transition tiles show a nearly empty paper frame at the start of a section (for example the first frame of section 3) before elements enter.
-- In the section 6 midpoint tile, the "Verified memory." caption and the "A human approves." caption appear on screen together, and they overlap in part.
-- In the section 4 tile, the "Stations build" caption is partly covered by a station post.
+Disclosure stands: the narration is synthetic speech, so the YouTube AI generated content label must be set at publish time. Nothing is published by this run.
 
-The disclosure above stands: the narration is synthetic speech, so the YouTube AI generated content label must be set at publish time. Nothing is published by this run.
+Film review pass: to be completed in the second pass against the re-rendered film, preserving the render statistics block exactly.

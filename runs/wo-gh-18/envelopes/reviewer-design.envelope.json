@@ -3,14 +3,27 @@
   "from_station": "reviewer-design",
   "to_station": "approver",
   "work_order_id": "wo-gh-18",
-  "artifact_path": "runs/wo-gh-18/reviewer-design.packet.md",
-  "status": "failed",
-  "created_at": "2026-11-02T03:26:52.871159+00:00",
-  "error": "command executor exited 2: claude_station: claude exited 1 for station reviewer-design: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $1.28. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+  "artifact_path": "runs/wo-gh-18/reviewer-design.output.md",
+  "status": "executed",
+  "created_at": "2026-11-03T04:11:08.754108+00:00",
+  "review": {
+    "station": "reviewer-design",
+    "verdict": "pass",
+    "findings": [
+      "Scope: this is the first pass, so I judged the scene scripts and production-notes.md against the four polish advisories. I did not view the finished film. The film, the new contact sheet and the sampled stills are judged in the second pass. Each of the four advisories must be ruled closed or not there, citing stills.",
+      "Design system: design/DESIGN.md and design/tokens.json exist. Every token in tokens.json is still TODO, and the film uses no web color, type, spacing or motion tokens. I raise no token findings. The quality bars cover product pages, so I applied only hierarchy and contrast, from the advisories.",
+      "Advisory 1 (section 4 title occlusion): content/youtube-anvil-v2/blender/scene_line.py:311 moves the 'Stations build' title to z 5.28. production-notes.md states the highest line geometry, the arm tips and caps at about z 4.38, projects to about y 297 px and the glyph bottoms to about y 257 px, which leaves about 40 px clear. I checked this by reading the notes, not by projecting the scene. Closure needs stills across the whole section 4 envelope with no geometry crossing the glyphs.",
+      "Advisory 2 (section 6 captions): scene_line.py:420-425 parents both captions to the camera at 4 units. 'A human approves.' sits at the upper right and 'Verified memory.' at the lower left, so they are staggered side by side rather than stacked in one column. Camera-parented text cannot be crossed by archive or gate geometry. Per the notes, 'Verified memory.' keys in at 0.40 to 0.47 of the section, so it is fully on screen at the midpoint. The midpoint and final wide stills must confirm legibility and no overlap.",
+      "Advisory 3 (section 1 title): scene_line.py:184 sets 'ANVIL' in the full ink material, 0.97 of full scale at frame 1 and full scale by 0.15 of the section. The dolly and the line assembly keys are unchanged, per the notes. frame-proof-s1-title.png at about 30 percent (frame 91 of 302, assemble.py:51) is the proof still. It must show full-ink, full-scale type that matches the section's end.",
+      "Advisory 4 (section 2 dead air): the card now enters in frame, its X tilt profile is 78, 68, 42, 14, 0 degrees, and the camera rides about 5.5 to 6 units off the card. The notes project about 540 px of card width at the midpoint, instead of tiny and edge on. The section 2 midpoint still must show the card as the subject. The first frame of section 3 shows a small card with posts behind it, and the notes flag this for judgment on the film. Check the frame-cut pair around that cut in the second pass.",
+      "assemble.py sampling: every earlier still name is kept. Transition pairs now cover the cuts after sections 1 to 6, and frame-proof-s1-title.png is sampled at 0.30 of section 1. The notes put the sheet at 20 tiles. The second pass must confirm that all of these files exist.",
+      "Constraints: the production notes record that the Eevee TAA render samples stay at 6, never above 8, with shadows and raytracing off, 30 fps and no frames cut. They also record that the audio, durations.json and the GLB are unchanged. The frozen text files (brief.md, script.md, storyboard.md) show no diff in git status. The edits to source-pack.md and production-notes.md are for the other stations to judge."
+    ]
+  },
   "configured_model": "claude-sonnet-5-5",
   "executor": {
     "kind": "command",
     "detail": "python3"
   },
-  "executed_model": null
+  "executed_model": "claude-sonnet-5-5"
 }

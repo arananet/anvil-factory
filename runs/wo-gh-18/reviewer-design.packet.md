@@ -109,11 +109,11 @@ Voice and claim discipline are in the spec and bind every station. No employer o
 - intake: completed
 - brief-writer: executed
 - researcher: executed
-- writer: failed
-- media-producer: failed
-- reviewer-facts: failed
-- reviewer-voice: failed
-- reviewer-brand: failed
+- writer: executed
+- media-producer: executed
+- reviewer-facts: executed
+- reviewer-voice: executed
+- reviewer-brand: executed
 
 ## Project design
 

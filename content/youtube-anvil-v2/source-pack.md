@@ -77,7 +77,7 @@ As the spec records it (Assets section):
 
 Checked in this run:
 - Size on disk: 386708 bytes. sha256 on disk matches the value above.
-- Committed in 7344863 (the wo-gh-18 setup commit).
+- Committed in the wo-gh-18 setup commit, as the spec records (the commit hash is not resolvable in this checkout, so none is cited).
 - glTF 2.0 binary, generator "Khronos glTF Blender I/O v4.5.51"; the scene has five root nodes: Top cover, Comfort foam, Sensing and processing board, Adhesive layer, Release liner.
 - Not verified here: the upstream commit and the contents of src/patch-one-glb.js in the Sentia repository. The `gh` call was unauthenticated in this environment, so the provenance line rests on the spec's record.
 

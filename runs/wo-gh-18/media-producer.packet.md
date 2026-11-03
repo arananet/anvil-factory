@@ -52,7 +52,7 @@ Voice and claim discipline are in the spec and bind every station. No employer o
 - intake: completed
 - brief-writer: executed
 - researcher: executed
-- writer: failed
+- writer: executed
 
 ## Project design
 
