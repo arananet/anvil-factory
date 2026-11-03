@@ -1,15 +1,340 @@
-import json, os, shlex, subprocess, time
+import json, os, shlex, struct, subprocess, time, zlib
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 from .model import WorkOrder, Review
-from .config import default_model
+from .config import default_model, load_anvil_config, CHARS_PER_TOKEN
 from .brain import packet_learnings_section
 from .design import packet_design_section, load_design_system
 from .gates import human_gate
 from .approver import aggregate, needs_human, aggregate_explained, needs_human_explained, matched_risk_hints, RISK_SCAN_ORDER
 from .executor import ExecutorError
+
+class PacketBudgetError(Exception):
+    """Raised when a packet exceeds budget and policy is fail"""
+    pass
+
+class ContactSheetError(Exception):
+    """Raised when contact sheet assembly fails"""
+    pass
+
+class AllowlistViolation(Exception):
+    """Raised when packet contains content from outside allowlist"""
+    pass
+
+def estimate_tokens(text):
+    """S1: Deterministic token estimator for packet budgeting.
+
+    Returns an estimated token count based on character count. This is a
+    heuristic for budgeting, never presented as the provider's tokenizer count.
+    The constant CHARS_PER_TOKEN is visible in config for transparency.
+    """
+    if not text:
+        return 0
+    return int(len(text) / CHARS_PER_TOKEN)
+
+def assemble_contact_sheet(capture_paths, output_path, max_width):
+    """S2: Combine PNG captures into one contact sheet, scaled down if needed.
+
+    Captures are scaled down proportionally to fit max_width, never scaled up.
+    Returns the output path. Fails loudly on non-PNG inputs.
+    """
+    if not capture_paths:
+        raise ContactSheetError("No captures provided")
+
+    images = []
+    for path in capture_paths:
+        try:
+            width, height, pixels = _read_png(path)
+            images.append((width, height, pixels, path))
+        except Exception as e:
+            raise ContactSheetError(f"Failed to process {path}: {e}")
+
+    # Calculate contact sheet layout (vertical stack)
+    # Scale down images that exceed max_width
+    scaled_images = []
+    total_height = 0
+    sheet_width = 0
+
+    for width, height, pixels, path in images:
+        if width > max_width:
+            # Scale down proportionally
+            scale = max_width / width
+            new_width = max_width
+            new_height = int(height * scale)
+            scaled_pixels = _scale_png_pixels(pixels, width, height, new_width, new_height)
+            scaled_images.append((new_width, new_height, scaled_pixels))
+            total_height += new_height
+            sheet_width = max(sheet_width, new_width)
+        else:
+            # Keep original size (never scale up)
+            scaled_images.append((width, height, pixels))
+            total_height += height
+            sheet_width = max(sheet_width, width)
+
+    # Create contact sheet by stacking images vertically
+    contact_sheet_pixels = []
+    for img_width, img_height, img_pixels in scaled_images:
+        for row in img_pixels:
+            # Pad row to sheet width if needed
+            if img_width < sheet_width:
+                padding = b'\x00\x00\x00' * (sheet_width - img_width)
+                contact_sheet_pixels.append(row + padding)
+            else:
+                contact_sheet_pixels.append(row)
+
+    # Write contact sheet PNG
+    _write_png(output_path, sheet_width, total_height, contact_sheet_pixels)
+    return output_path
+
+def _read_png(path):
+    """Read PNG dimensions and pixel data. Raises on non-PNG or invalid files."""
+    data = Path(path).read_bytes()
+
+    # Verify PNG signature
+    if not data.startswith(b'\x89PNG\r\n\x1a\n'):
+        raise ValueError(f"Not a valid PNG file: {path}")
+
+    # Parse IHDR chunk for dimensions
+    idx = 8
+    ihdr_length = struct.unpack('>I', data[idx:idx+4])[0]
+    ihdr_type = data[idx+4:idx+8]
+
+    if ihdr_type != b'IHDR':
+        raise ValueError(f"IHDR chunk not found: {path}")
+
+    ihdr_data = data[idx+8:idx+8+ihdr_length]
+    width, height = struct.unpack('>II', ihdr_data[:8])
+
+    # Extract IDAT chunks and decompress pixel data
+    idx = 8
+    idat_data = b''
+    while idx < len(data):
+        chunk_length = struct.unpack('>I', data[idx:idx+4])[0]
+        chunk_type = data[idx+4:idx+8]
+        chunk_data = data[idx+8:idx+8+chunk_length]
+
+        if chunk_type == b'IDAT':
+            idat_data += chunk_data
+        elif chunk_type == b'IEND':
+            break
+
+        idx += 12 + chunk_length  # length + type + data + CRC
+
+    # Decompress pixel data
+    raw_pixels = zlib.decompress(idat_data)
+
+    # Parse scanlines (each row has a filter byte + RGB pixels)
+    pixels = []
+    bytes_per_row = width * 3 + 1  # filter byte + RGB for each pixel
+    for row_idx in range(height):
+        start = row_idx * bytes_per_row
+        row_data = raw_pixels[start:start + bytes_per_row]
+        pixels.append(row_data[1:])  # Skip filter byte
+
+    return width, height, pixels
+
+def _scale_png_pixels(pixels, orig_width, orig_height, new_width, new_height):
+    """Scale PNG pixels using nearest neighbor. Returns scaled pixel rows."""
+    scaled = []
+    for y in range(new_height):
+        orig_y = int(y * orig_height / new_height)
+        row = []
+        for x in range(new_width):
+            orig_x = int(x * orig_width / new_width)
+            pixel_start = orig_x * 3
+            pixel = pixels[orig_y][pixel_start:pixel_start + 3]
+            row.append(pixel)
+        scaled.append(b''.join(row))
+    return scaled
+
+def _write_png(path, width, height, pixels):
+    """Write PNG file with given dimensions and pixel rows."""
+    # PNG signature
+    signature = b'\x89PNG\r\n\x1a\n'
+
+    # IHDR chunk
+    ihdr_data = struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0)
+    ihdr_chunk = _make_png_chunk(b'IHDR', ihdr_data)
+
+    # IDAT chunk (compress pixel data with filter bytes)
+    raw_data = b''
+    for row in pixels:
+        raw_data += b'\x00' + row  # Add filter byte
+    compressed = zlib.compress(raw_data)
+    idat_chunk = _make_png_chunk(b'IDAT', compressed)
+
+    # IEND chunk
+    iend_chunk = _make_png_chunk(b'IEND', b'')
+
+    Path(path).write_bytes(signature + ihdr_chunk + idat_chunk + iend_chunk)
+
+def _make_png_chunk(chunk_type, data):
+    """Create PNG chunk with length, type, data, and CRC."""
+    length = struct.pack('>I', len(data))
+    chunk = chunk_type + data
+    crc = struct.pack('>I', zlib.crc32(chunk) & 0xffffffff)
+    return length + chunk + crc
+
+def build_reviewer_design_packet(project, work_order, files_changed, contact_sheet_path,
+                                 prompt=None):
+    """S3: Build a fresh, scoped packet for reviewer-design.
+
+    Contains: station prompt, design section, spec, diff summary, contact sheet.
+    Does NOT contain: builder transcript, other station outputs, whole file contents.
+    """
+    project = Path(project)
+
+    # Load station prompt if not provided
+    if prompt is None:
+        try:
+            from .stations import load_registry
+            root = project.parent if (project / "anvil").exists() else project
+            registry = load_registry(root / "stations")
+            station = registry.get("reviewer-design")
+            prompt = station.prompt if station and station.prompt else "Review the design against the design system."
+        except (ValueError, FileNotFoundError):
+            prompt = "Review the design against the design system."
+
+    # Design section
+    design_section = packet_design_section(project, "reviewer-design")
+
+    # Spec content
+    spec_content = ""
+    if work_order.spec_path:
+        spec_path = project / work_order.spec_path
+        if spec_path.exists():
+            spec_content = spec_path.read_text(encoding="utf-8")
+
+    # Diff summary (deterministic from files_changed)
+    diff_lines = ["## Diff summary", ""]
+    for file_info in files_changed:
+        file_name = file_info["file"]
+        added = file_info.get("added", 0)
+        removed = file_info.get("removed", 0)
+        diff_lines.append(f"- {file_name}: +{added}, -{removed}")
+    diff_summary = "\n".join(diff_lines)
+
+    # Contact sheet reference
+    contact_sheet_ref = ""
+    if contact_sheet_path:
+        contact_sheet_ref = f"\n## Evidence\n\nContact sheet: {contact_sheet_path}\n"
+
+    # Build packet
+    packet = (
+        f"# Task packet: reviewer-design\n\n"
+        f"## Station prompt\n\n{prompt}\n\n"
+        f"{design_section}\n\n"
+        f"## Spec\n\n{spec_content}\n\n"
+        f"{diff_summary}\n"
+        f"{contact_sheet_ref}\n"
+        f"## File access allowlist\n\n"
+        f"This packet may only embed content from:\n"
+        f"- Files changed in this work order\n"
+        f"- Design system files (design/DESIGN.md, design/tokens.json)\n"
+        f"- The spec: {work_order.spec_path}\n"
+    )
+
+    return packet
+
+def verify_packet_allowlist(packet, allowlist):
+    """S3: Verify packet contains no file content from outside allowlist.
+
+    Scans for file path references in the packet. Raises AllowlistViolation
+    if any file content appears to be embedded from outside the allowlist.
+    """
+    # Look for common file reference patterns
+    import re
+
+    # Pattern: "## File: <path>" or "From <path>:"
+    file_patterns = [
+        r'## File:\s+(\S+)',
+        r'From\s+([^\s:]+\.[a-z]{2,4}):',
+    ]
+
+    for pattern in file_patterns:
+        matches = re.findall(pattern, packet)
+        for match in matches:
+            file_path = match.strip()
+            # Check if this file is in the allowlist
+            if not any(allowed in file_path or file_path in allowed for allowed in allowlist):
+                raise AllowlistViolation(
+                    f"Packet contains content from file outside allowlist: {file_path}"
+                )
+
+def prepare_packet(project, station_id, prompt, work_order, steps,
+                   learnings_section="", design_section=""):
+    """S1: Prepare packet with budget measurement and trimming.
+
+    Returns (packet_text, action, measured_tokens, budget) where:
+    - action is 'sent', 'trimmed', or raises PacketBudgetError if policy is fail
+    - measured_tokens is the final packet size
+    - budget is the configured budget for this station
+    """
+    from .config import get_station_budget
+
+    project = Path(project)
+    config = load_anvil_config(project / "anvil.yaml")
+
+    # Get budget (factory defaults from config module)
+    budget = get_station_budget(config, station_id)
+
+    # Build initial packet
+    packet = _packet_text(station_id, prompt, work_order, steps,
+                         learnings_section, design_section)
+
+    measured = estimate_tokens(packet)
+
+    # Check if under budget
+    if measured <= budget:
+        return packet, "sent", measured, budget
+
+    # Over budget - try trimming
+    # Trim order: compact tokens, reduce quality bars, limit learnings
+
+    # Try compact tokens (no pretty print)
+    from .design import packet_design_section_compact
+    design_compact = packet_design_section_compact(project, station_id)
+    packet_trimmed = _packet_text(station_id, prompt, work_order, steps,
+                                   learnings_section, design_compact)
+    measured = estimate_tokens(packet_trimmed)
+
+    if measured <= budget:
+        return packet_trimmed, "trimmed", measured, budget
+
+    # Try reduced quality bars
+    from .design import packet_design_section_reduced
+    design_reduced = packet_design_section_reduced(project, station_id)
+    packet_trimmed = _packet_text(station_id, prompt, work_order, steps,
+                                   learnings_section, design_reduced)
+    measured = estimate_tokens(packet_trimmed)
+
+    if measured <= budget:
+        return packet_trimmed, "trimmed", measured, budget
+
+    # Try limited learnings
+    from .brain import packet_learnings_section_limited
+    learnings_limited = packet_learnings_section_limited(project, budget // 10)
+    packet_trimmed = _packet_text(station_id, prompt, work_order, steps,
+                                   learnings_limited, design_reduced)
+    measured = estimate_tokens(packet_trimmed)
+
+    if measured <= budget:
+        return packet_trimmed, "trimmed", measured, budget
+
+    # Still over budget - check policy
+    policy = config.get("over_budget_policy", "trim")
+    if policy == "fail":
+        raise PacketBudgetError(
+            f"Packet for {station_id} exceeds budget: {measured} tokens > {budget} budget"
+        )
+
+    # Policy is trim but we still exceed - fail anyway
+    raise PacketBudgetError(
+        f"Packet for {station_id} exceeds budget after all trim rules: "
+        f"{measured} tokens > {budget} budget"
+    )
 
 @dataclass
 class RunReport:
@@ -135,16 +460,30 @@ def _run_shell(command, cwd, work_order_id, timeout):
         return None, f"Timed out after {timeout}s"
 
 def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section=""):
+    """S4: Assemble packet with stable prefix layout.
+
+    Stable material first (prompt, design, learnings), variable material last
+    (work order, upstream steps). This enables provider prefix caching.
+    """
+    # Stable prefix: station prompt
+    text = f"# Task packet: {station_id}\n\n## Station prompt\n\n{prompt}\n"
+
+    # Stable: design section (when present)
+    if design_section:
+        text += f"\n{design_section}\n"
+
+    # Stable: learnings section (when present)
+    if learnings_section:
+        text += f"\n{learnings_section}\n"
+
+    # Variable: work order block
     upstream = "\n".join(f"- {s['station']}: {s['status']}" for s in steps) or "- (none)"
-    text = (f"# Task packet: {station_id}\n\n## Station prompt\n\n{prompt}\n\n## Work order\n\n"
+    text += (f"\n## Work order\n\n"
             f"- id: {work_order.id}\n- kind: {work_order.kind}\n- title: {work_order.title}\n"
             f"- source: {work_order.source}\n- description: {work_order.description}\n"
             f"- risk_hints: {', '.join(work_order.risk_hints)}\n- status: {work_order.status}\n\n"
             f"## Upstream steps\n\n{upstream}\n")
-    if learnings_section:
-        text += f"\n{learnings_section}\n"
-    if design_section:
-        text += f"\n{design_section}\n"
+
     # Reviewer stations have a specific output contract
     if station_id.startswith("reviewer"):
         text += (f"\n## Output contract\n\n"
@@ -204,12 +543,38 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             envelope.update(extra)
         (envelopes_dir / f"{station_id}.envelope.json").write_text(json.dumps(envelope, indent=2) + "\n", encoding="utf-8")
 
+    # S1: Identify stations subject to packet budgeting
+    budgeted_stations = {"builder", "writer", "media-producer", "brief-writer", "reviewer-design"}
+
     def packet_step(station, station_id):
+        """Generate packet, with budget measurement and trimming for budgeted stations.
+
+        Returns (packet_path, measured_tokens, budget, action) tuple.
+        For non-budgeted stations, measured/budget/action are 0/0/'none'.
+        """
         prompt = station.prompt if station and station.prompt else f"Station {station_id}: carry out your role for this work order."
-        design_section = packet_design_section(project, station_id)
         packet = run_dir / f"{station_id}.packet.md"
-        packet.write_text(_packet_text(station_id, prompt, work_order, steps, learnings_section, design_section), encoding="utf-8")
-        return packet
+        design_section = packet_design_section(project, station_id)
+
+        # S1: Apply budget for interface stations
+        if station_id in budgeted_stations:
+            try:
+                packet_text, action, measured, budget = prepare_packet(
+                    project, station_id, prompt, work_order, steps,
+                    learnings_section, design_section
+                )
+                packet.write_text(packet_text, encoding="utf-8")
+                return packet, measured, budget, action
+            except PacketBudgetError as exc:
+                # Budget exceeded - record the failure
+                raise exc
+        else:
+            # Non-budgeted stations - standard packet generation
+            packet_text = _packet_text(station_id, prompt, work_order, steps,
+                                      learnings_section, design_section)
+            packet.write_text(packet_text, encoding="utf-8")
+            measured = estimate_tokens(packet_text)
+            return packet, measured, 0, "none"
 
     for idx, station_id in enumerate(order):
         started = time.perf_counter()
@@ -230,6 +595,10 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         step_usage = None
         deferred_verifier = None
         next_station = order[idx + 1] if idx + 1 < len(order) else None
+        # S1 & S5: Budget tracking fields
+        measured_tokens = 0
+        budget = 0
+        budget_action = "none"
         if station_id == "intake":
             detail = "Work order normalized"
             artifact = str(run_dir / "report.json")
@@ -310,7 +679,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     detail = f"Deploy command failed with exit code {code}"
                     deployment_status = "deploy_failed"
             else:
-                packet = packet_step(station, station_id)
+                packet, measured_tokens, budget, budget_action = packet_step(station, station_id)
                 status = "packet_ready"
                 detail = f"Deploy skipped (verdict: {verdict or 'pending'}, human gate {'blocks' if blocked else 'open'}); packet written to {packet}"
                 artifact = str(packet)
@@ -319,12 +688,12 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         elif station_id == "deployer":
             # The deployer never runs through a generic executor: without a
             # deploy config and an approved, unblocked run it stays a packet.
-            packet = packet_step(station, station_id)
+            packet, measured_tokens, budget, budget_action = packet_step(station, station_id)
             status = "packet_ready"
             detail = f"Packet written to {packet}"
             artifact = str(packet)
         elif execute_mode:
-            packet = packet_step(station, station_id)
+            packet, measured_tokens, budget, budget_action = packet_step(station, station_id)
             packet_text = packet.read_text(encoding="utf-8")
             output_file = run_dir / f"{station_id}.output.md"
             try:
@@ -375,15 +744,17 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 step_executor, step_executed_model = _executor_provenance(executor)
                 extra_envelope = {"error": str(exc)}
         else:
-            packet = packet_step(station, station_id)
+            packet, measured_tokens, budget, budget_action = packet_step(station, station_id)
             status = "packet_ready"
             detail = f"Packet written to {packet}"
             artifact = str(packet)
         duration_ms = round((time.perf_counter() - started) * 1000, 3)
+        # S1 & S5: Build step with budget fields
         step = {"station": station_id, "status": status, "detail": detail, "duration_ms": duration_ms,
                 "cost": None, "artifacts": [artifact] if artifact else [],
                 "configured_model": configured_model, "executed_model": step_executed_model,
-                "executor": step_executor}
+                "executor": step_executor,
+                "measured_tokens": measured_tokens, "budget": budget, "budget_action": budget_action}
         if step_usage is not None:
             step["usage"] = step_usage
             if isinstance(step_usage.get("cost"), (int, float)):

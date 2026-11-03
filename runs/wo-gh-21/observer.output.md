@@ -1,0 +1,1 @@
+Created observation report at `runs/wo-gh-21/observer.output.md`. The deployer hasn't executed yet, so there's no release record to observe. The report states the missing input and blocks until the deployer completes.
