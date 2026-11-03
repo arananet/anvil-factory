@@ -87,6 +87,7 @@ jobs:
           git add -A
           git add -f runs/ 2>/dev/null || true
           git diff --cached --stat > run-diff.txt || true
+          git add run-diff.txt
           if git diff --cached --quiet; then
             echo "The run produced no file changes to commit."
             exit 0
