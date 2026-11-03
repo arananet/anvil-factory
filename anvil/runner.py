@@ -286,9 +286,13 @@ def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None, b
 
 def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section=""):
     upstream = "\n".join(f"- {s['station']}: {s['status']}" for s in steps) or "- (none)"
+    # Use rescoped description if intake rescoped the work
+    description = work_order.description
+    if work_order.intake_outcome.get("outcome") == "rescoped" and work_order.intake_outcome.get("rescoped_description"):
+        description = work_order.intake_outcome["rescoped_description"]
     text = (f"# Task packet: {station_id}\n\n## Station prompt\n\n{prompt}\n\n## Work order\n\n"
             f"- id: {work_order.id}\n- kind: {work_order.kind}\n- title: {work_order.title}\n"
-            f"- source: {work_order.source}\n- description: {work_order.description}\n"
+            f"- source: {work_order.source}\n- description: {description}\n"
             f"- risk_hints: {', '.join(work_order.risk_hints)}\n- status: {work_order.status}\n\n"
             f"## Upstream steps\n\n{upstream}\n")
     if learnings_section:
@@ -410,9 +414,73 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         deferred_verifier = None
         deferred_pre_deploy_gate = None
         next_station = order[idx + 1] if idx + 1 < len(order) else None
+        terminal_outcome = False  # Track if intake outcome is terminal
         if station_id == "intake":
-            detail = "Work order normalized"
-            artifact = str(run_dir / "report.json")
+            # In execute mode, parse intake output for outcomes
+            if execute_mode:
+                packet = packet_step(station, station_id)
+                packet_text = packet.read_text(encoding="utf-8")
+                output_file = run_dir / f"{station_id}.output.md"
+                try:
+                    result = executor.execute(packet_text, station_id, packet_path=packet,
+                                              output_path=output_file, cwd=project)
+                    output_text = result.get("output", "") if isinstance(result, dict) else str(result)
+                    usage = result.get("usage") if isinstance(result, dict) else None
+                    output_file.write_text(output_text, encoding="utf-8")
+                    step_executor, step_executed_model = _executor_provenance(executor, output_text)
+                    if isinstance(usage, dict):
+                        step_usage = usage
+
+                    # Parse intake output for intake_outcome, risk, surfaces
+                    intake_data = {}
+                    decoder = json.JSONDecoder()
+                    for idx, ch in enumerate(output_text):
+                        if ch != "{":
+                            continue
+                        try:
+                            obj, _ = decoder.raw_decode(output_text[idx:])
+                            if isinstance(obj, dict):
+                                intake_data = obj
+                                break
+                        except json.JSONDecodeError:
+                            continue
+
+                    # Update work order with intake outcome
+                    if "intake_outcome" in intake_data:
+                        work_order.intake_outcome = intake_data["intake_outcome"]
+                        outcome = work_order.intake_outcome.get("outcome")
+
+                        # Update work order status based on outcome
+                        if outcome == "rejected":
+                            work_order.status = "rejected"
+                            terminal_outcome = True
+                        elif outcome == "waiting_info":
+                            work_order.status = "waiting_info"
+                            terminal_outcome = True
+
+                    # Update risk and surfaces
+                    if "risk" in intake_data:
+                        work_order.risk = intake_data["risk"]
+                    if "surfaces" in intake_data:
+                        work_order.surfaces = intake_data["surfaces"]
+
+                    # Save work order
+                    wo_dir = project / "work_orders"
+                    wo_dir.mkdir(parents=True, exist_ok=True)
+                    wo_file = wo_dir / f"{work_order.id}.json"
+                    wo_file.write_text(json.dumps(work_order.to_dict(), indent=2) + "\n", encoding="utf-8")
+
+                    status = "executed"
+                    detail = f"Executed by {executor.name}; outcome: {work_order.intake_outcome.get('outcome', 'unknown')}"
+                    artifact = str(output_file)
+                except ExecutorError as exc:
+                    status = "failed"
+                    detail = f"Executor failed: {exc}"
+                    artifact = str(packet)
+                    step_executor, step_executed_model = _executor_provenance(executor)
+            else:
+                detail = "Work order normalized"
+                artifact = str(run_dir / "report.json")
         elif station_id == "approver":
             if run_reviews:
                 verdict, verdict_rule, counted = aggregate_explained(run_reviews)
@@ -726,6 +794,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             env_extra["executor"] = step_executor
             env_extra["executed_model"] = step_executed_model
         write_envelope(station_id, next_station, artifact or str(run_dir / "report.json"), status, env_extra)
+
+        # Stop pipeline if intake outcome is terminal (rejected or waiting_info)
+        if station_id == "intake" and terminal_outcome:
+            break
+
         # Insert pre-deploy gate before deployer (S5)
         if deferred_pre_deploy_gate is not None:
             steps.append(deferred_pre_deploy_gate)
@@ -795,8 +868,22 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                        base_ref=base_ref)
     (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
     # Swimlane
-    lines = ["# Swimlane", "", "Cost is reported as null here. Model runtimes report cost when they run a station; ANVIL never invents a number.", "",
-             "| Station | Status | Duration ms | Artifacts | Cost |", "|---|---|---|---|---|"]
+    lines = ["# Swimlane", ""]
+
+    # Add intake outcome summary if present
+    if work_order.intake_outcome:
+        outcome = work_order.intake_outcome.get("outcome")
+        if outcome == "rejected":
+            lines.append("**Status**: rejected at intake")
+            lines.append("")
+        elif outcome == "waiting_info":
+            lines.append("**Status**: waiting for information")
+            lines.append("")
+
+    lines.append("Cost is reported as null here. Model runtimes report cost when they run a station; ANVIL never invents a number.")
+    lines.append("")
+    lines.append("| Station | Status | Duration ms | Artifacts | Cost |")
+    lines.append("|---|---|---|---|---|")
     for s in steps:
         arts = ", ".join(s.get("artifacts", [])) or "-"
         cost = s.get("cost")
@@ -815,6 +902,75 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         for r in verify_results:
             lines.append(f"- {r['status']}: {r['command']}")
     (run_dir / "swimlane.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    # Render report.md
+    report_lines = ["# Run Report", "", f"Work Order: {work_order.id}", f"Title: {work_order.title}",
+                    f"Kind: {work_order.kind}", f"Status: {work_order.status}", ""]
+
+    # Include intake outcome if present
+    if work_order.intake_outcome:
+        outcome = work_order.intake_outcome.get("outcome", "unknown")
+        report_lines.append("## Intake Outcome")
+        report_lines.append("")
+        report_lines.append(f"Outcome: {outcome}")
+        report_lines.append("")
+
+        if outcome == "rejected":
+            report_lines.append("This work order was rejected at intake.")
+            report_lines.append("")
+            if "reasons" in work_order.intake_outcome:
+                report_lines.append("### Reasons")
+                report_lines.append("")
+                for reason in work_order.intake_outcome["reasons"]:
+                    report_lines.append(f"- {reason}")
+                report_lines.append("")
+        elif outcome == "waiting_info":
+            report_lines.append("This work order is waiting for additional information.")
+            report_lines.append("")
+            if "questions" in work_order.intake_outcome:
+                report_lines.append("### Questions")
+                report_lines.append("")
+                for question in work_order.intake_outcome["questions"]:
+                    report_lines.append(f"- {question}")
+                report_lines.append("")
+        elif outcome == "rescoped":
+            report_lines.append("This work order was rescoped at intake.")
+            report_lines.append("")
+            if "rescoped_description" in work_order.intake_outcome:
+                report_lines.append("### Rescoped Description")
+                report_lines.append("")
+                report_lines.append(work_order.intake_outcome["rescoped_description"])
+                report_lines.append("")
+            if "reasons" in work_order.intake_outcome:
+                report_lines.append("### Rescope Reasons")
+                report_lines.append("")
+                for reason in work_order.intake_outcome["reasons"]:
+                    report_lines.append(f"- {reason}")
+                report_lines.append("")
+
+    # Include risk and surfaces
+    if work_order.risk:
+        report_lines.append(f"Risk: {work_order.risk}")
+        report_lines.append("")
+    if work_order.surfaces:
+        report_lines.append(f"Surfaces: {', '.join(work_order.surfaces)}")
+        report_lines.append("")
+
+    # Include verdict
+    report_lines.append(f"## Verdict")
+    report_lines.append("")
+    report_lines.append(f"Verdict: {verdict}")
+    report_lines.append("")
+
+    # Include steps
+    report_lines.append("## Steps")
+    report_lines.append("")
+    for s in steps:
+        report_lines.append(f"- {s['station']}: {s['status']}")
+    report_lines.append("")
+
+    (run_dir / "report.md").write_text("\n".join(report_lines) + "\n", encoding="utf-8")
+
     return report
 
 run = run_pipeline

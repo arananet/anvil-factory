@@ -1,0 +1,11 @@
+{
+  "station": "reviewer-security",
+  "verdict": "changes_requested",
+  "findings": [
+    "Missing input validation for intake_outcome structure in WorkOrder model (anvil/model.py:45): The intake_outcome dict accepts arbitrary keys and values without validation. An executor could inject invalid outcome values (not in accepted/rejected/rescoped/waiting_info), missing required fields (reasons for rejected, questions for waiting_info), or wrong types. The __post_init__ method validates work order ID but not intake_outcome structure.",
+    "Missing input validation for risk field in WorkOrder model (anvil/model.py:46): The risk field accepts any string value but should be constrained to {low, medium, high, None}. Invalid risk values like 'CRITICAL' or 'javascript:alert(1)' are accepted and would be written to work order files and reports.",
+    "Missing input validation for surfaces field in WorkOrder model (anvil/model.py:47): The surfaces list accepts arbitrary string values but should be constrained to the vocabulary {ui, security, data, payments, deploy, content, api} per the spec. Invalid or malicious surface names are accepted and included in reports.",
+    "Unsafe trust of executor output in runner.py:449-465: The code directly assigns executor-parsed JSON to work_order fields without validation. Lines 450, 463, 465 trust that intake_data contains well-formed outcome/risk/surfaces data. A compromised or buggy executor could inject malformed data that bypasses validation since the WorkOrder fields lack validation in __post_init__.",
+    "Potential content injection in report markdown rendering (runner.py:919-949): The intake outcome reasons, questions, and rescoped_description are written directly to report.md without sanitization. If these contain markdown syntax or HTML, they render as-is. Example: a reason containing [malicious link](javascript:...) or backticks with command injection syntax would be written verbatim to the markdown report."
+  ]
+}

@@ -42,6 +42,9 @@ class WorkOrder:
     description: str = ""
     risk_hints: list = field(default_factory=list)
     status: str = "new"
+    intake_outcome: dict = field(default_factory=dict)
+    risk: str = None
+    surfaces: list = field(default_factory=list)
     def __post_init__(self):
         if self.kind not in KINDS:
             raise ValueError(f"Invalid work order kind: {self.kind}")
@@ -51,10 +54,20 @@ class WorkOrder:
     def from_dict(cls, data):
         return cls(id=data["id"], kind=data["kind"], title=data["title"],
                    source=data.get("source", "manual"), description=data.get("description", ""),
-                   risk_hints=list(data.get("risk_hints", [])), status=data.get("status", "new"))
+                   risk_hints=list(data.get("risk_hints", [])), status=data.get("status", "new"),
+                   intake_outcome=dict(data.get("intake_outcome", {})),
+                   risk=data.get("risk"),
+                   surfaces=list(data.get("surfaces", [])))
     def to_dict(self):
-        return {"id": self.id, "kind": self.kind, "title": self.title, "source": self.source,
+        result = {"id": self.id, "kind": self.kind, "title": self.title, "source": self.source,
                 "description": self.description, "risk_hints": list(self.risk_hints), "status": self.status}
+        if self.intake_outcome:
+            result["intake_outcome"] = dict(self.intake_outcome)
+        if self.risk:
+            result["risk"] = self.risk
+        if self.surfaces:
+            result["surfaces"] = list(self.surfaces)
+        return result
 
 @dataclass
 class Review:
