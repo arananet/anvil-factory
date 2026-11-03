@@ -1,0 +1,73 @@
+name: anvil-benchmark-arms
+
+# Operator arms for the design station model benchmark (issue 22). Runs
+# benchmarks/model-benchmark/arms/run_arms.py, which sends the six
+# controlled arm requests through the Cloudflare AI Gateway, then renders
+# each builder output with the harness capture script and commits all raw
+# results back to this branch. This workflow exists only on the arms
+# branch; the harness line run lives on anvil/run-model-benchmark.
+on:
+  push:
+    branches: [anvil/run-model-benchmark-arms]
+
+permissions:
+  contents: write
+
+jobs:
+  arms:
+    name: Run the six benchmark arms through the gateway
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GW_BASE: https://gateway.ai.cloudflare.com/v1/693ae9c587f1f2c34328bb47447366b0/arananet-ai-gateway
+      CF_AIG_TOKEN: ${{ secrets.CF_AIG_TOKEN }}
+    steps:
+      - name: Check out this branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run the arms
+        id: arms
+        run: python3 benchmarks/model-benchmark/arms/run_arms.py
+
+      - name: Render the builder outputs
+        if: always() && steps.arms.outcome == 'success'
+        continue-on-error: true
+        run: |
+          RES=benchmarks/model-benchmark/arms/results
+          mkdir -p "$RES/renders"
+          if ls "$RES"/builder-*.page.html 1> /dev/null 2>&1; then
+            pip install playwright > renders-install.log 2>&1
+            python3 -m playwright install --with-deps chromium >> renders-install.log 2>&1
+            : > renders-status.txt
+            for page in "$RES"/builder-*.page.html; do
+              base=$(basename "$page" .page.html)
+              if python3 benchmarks/model-benchmark/tools/capture.py "$page" "$RES/renders/${base}.png"; then
+                echo "$base: render ok" >> renders-status.txt
+              else
+                echo "$base: render FAILED" >> renders-status.txt
+              fi
+            done
+          else
+            echo "no builder pages to render" > renders-status.txt
+          fi
+          mv renders-status.txt "$RES/renders-status.txt" 2>/dev/null || true
+          cat "$RES/renders-status.txt" 2>/dev/null || true
+
+      - name: Commit the arm results back to the branch
+        if: always() && steps.arms.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git add -f benchmarks/model-benchmark/arms/results/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "The arms produced no file changes to commit."
+            exit 0
+          fi
+          git commit -m "Benchmark arms raw results (wo-gh-22)" -m "Six controlled arm requests through the Cloudflare AI Gateway (three reviewer-design arms, three builder arms), raw responses, extracted outputs, builder pages and renders. Scoring is the operator step that follows; see benchmarks/model-benchmark/arms/results/."
+          git push origin "HEAD:${GITHUB_REF_NAME}"
