@@ -1,7 +1,8 @@
-# Astra Consumption: Packet Budgets, Evidence Policy, Scoped Design Review
+# Astra Consumption: Packet Budgets, Evidence Policy, Scoped Design Review (Revised)
 
-Status: proposed
+Status: revised
 Slug: astra-consumption
+Revision: gate-round-3
 
 ## Roles
 - implementer: builds the change described here
@@ -32,16 +33,19 @@ Guardrails that bind the whole order:
 - If the packet still exceeds the budget after the trim rules, or the project config sets the over budget policy to fail, the step fails before any model call, with the measured size and the budget in the failure detail. An over budget packet is never sent silently.
 - The run report records, per measured step: the measured tokens, the budget, and the action taken (sent, trimmed or failed).
 
-### S2: Evidence image policy
+### S2: Evidence image policy with PNG security hardening
 - When a run produces rendered captures for a design review round, a deterministic assembler in the factory (standard library only) combines the round's PNG captures into one contact sheet PNG whose width does not exceed a configured maximum (factory default 1600 px). Captures are scaled down proportionally and never scaled up.
 - The reviewer-design packet references the contact sheet and only the contact sheet. The full resolution originals stay byte unchanged in the run evidence directory for humans.
 - The assembler fails loudly on a capture it cannot process (for example a file that is not PNG) instead of silently dropping or converting it.
 - Builder stations receive image evidence only when the work order declares it: the work order model gains an optional list of evidence image paths in scope, defaulting to empty, and existing work orders parse unchanged. Absent that declaration, builder packets carry no image references.
+- PNG security: the assembler enforces input byte size and pixel dimension caps read from PNG headers before any inflation of image data; verifies PNG chunk CRCs; bounds checks chunk lengths before reads; caps the accumulated compressed IDAT bytes before decompression to a bound tied to expected raw size; bounds the decompression itself to the expected raw size derived from IHDR dimensions (height rows of 1 filter byte plus width times 3 bytes per pixel), failing loudly when the stream yields more or less than expected. The contact sheet output path must validate to resolve inside the run evidence directory. WorkOrder evidence image paths must validate to resolve inside the project tree.
 
-### S3: Fresh session, scoped design review
+### S3: Fresh session, scoped design review with provenance verification
 - reviewer-design runs as its own fresh session. Its packet contains: the station prompt, the Project design section, the spec the order implements, a diff summary of the change under review produced deterministically by the runner from git (files changed with added and removed line counts), and the contact sheet reference from S2.
 - The reviewer-design packet does not contain the builder session's transcript, other stations' outputs, or whole worktree file contents.
-- The packet declares a file access allowlist as a contract section: the files the order touches, the design system files and the spec. A deterministic runner check verifies that the packet embeds no file content from outside that allowlist.
+- The packet declares a file access allowlist as a contract section: the files the order touches, the design system files and the spec. Each content block embedded in the packet is tagged with its source path at assembly time. A deterministic runner check verifies, by provenance tags, that no embedded content comes from outside the allowlist, and this check executes in the prepare_reviewer_design_step path on the built packet, against exactly the allowlist the packet declares, before any model call. A packet whose embedded content carries a provenance tag outside the allowlist fails the step with the violation as the failure detail.
+- Allowlist matching uses path boundaries: a source is allowed only when it equals an allowlist entry or lies beneath an allowlisted path at a path separator boundary. A source that merely shares a substring or a partial path segment with an entry is rejected.
+- The scoped packet builder accepts the station prompt as a parameter. The caller in the run path resolves the reviewer-design prompt through the station registry the runner already works with and passes it in. The runner must not import from .stations at any scope for this; the scoped packet builder never loads a registry itself.
 - Other reviewer stations keep their current packets in this order. Scoping them the same way is follow up work, named here so it is not mistaken for part of this order.
 
 ### S4: Stable prefix packet layout
@@ -59,11 +63,11 @@ Guardrails that bind the whole order:
 ### Scenario: An over budget packet is trimmed by rule or fails loudly
 - S1: Given a design station packet whose measured size exceeds its configured budget, when the runner prepares the step, then the packet is trimmed in the declared order (compact tokens, reduced quality bars, learnings limited) until it measures within budget, or the step fails before any model call with the measured size and the budget in the failure detail; and the run report shows the measured tokens, the budget and the action taken. An under budget packet reaches the executor byte unchanged.
 
-### Scenario: A design review round sends one contact sheet, originals preserved
-- S2: Given a run that produced several full resolution PNG captures for a design review round, when reviewer-design is prepared, then its packet references exactly one contact sheet PNG whose width is at most the configured maximum, the original captures remain byte unchanged in the run evidence, a non PNG capture in the round makes the assembler fail loudly, and a builder packet in the same run references images only if the work order declared evidence images in scope.
+### Scenario: A design review round sends one hardened contact sheet, originals preserved
+- S2: Given a run that produced several full resolution PNG captures for a design review round, when reviewer-design is prepared, then its packet references exactly one contact sheet PNG whose width is at most the configured maximum, the original captures remain byte unchanged in the run evidence, a non PNG capture in the round makes the assembler fail loudly, and a builder packet in the same run references images only if the work order declared evidence images in scope. The PNG assembler enforces byte size and dimension caps, verifies CRCs, bounds checks chunk lengths, caps accumulated IDAT bytes, bounds decompression to expected raw size, and validates all image paths to resolve inside their respective allowed directories.
 
-### Scenario: The design review starts fresh and scoped
-- S3: Given a change under review, when the reviewer-design packet is assembled, then it contains the design section, the spec, a git derived diff summary and the contact sheet reference; it contains no builder transcript, no other station outputs and no whole file contents; and the deterministic allowlist check passes, meaning no embedded content comes from a file outside the declared allowlist (the files the order touches, the design system files, the spec).
+### Scenario: The design review starts fresh and scoped with provenance verification executed
+- S3: Given a change under review, when prepare_reviewer_design_step runs, then it assembles the reviewer-design packet through the scoped builder with the station prompt passed in (the runner does not import from .stations), tags each embedded content block with its source path, executes the provenance verifier on the built packet against the declared allowlist before any model call, and the allowlist matching uses path boundaries (exact equality or nested beneath at a separator, rejecting substring or partial segment matches). A packet with out of allowlist content fails the step with the violation detail. The assembled packet contains the design section, the spec, a git derived diff summary and the contact sheet reference; it contains no builder transcript, no other station outputs and no whole file contents.
 
 ### Scenario: Packets share a stable prefix across runs
 - S4: Given two runs of the same project, when the packets for the same station are compared, then they are byte identical from the start up to the first variable section (the work order block), the variable material appears only after the stable material, and the operator's post run gateway log check is recorded on the issue with the cached values exactly as logged, with no caching saving claimed beyond them.
@@ -75,6 +79,9 @@ Guardrails that bind the whole order:
 - Estimator: the same input always yields the same count, an empty packet counts zero, and the count grows with input size.
 - Budget: an over budget fixture packet is trimmed in the declared order and then measures within budget; with the policy set to fail, preparation raises before execution and the executor is never called; an under budget packet reaches the executor byte unchanged; the report entries carry measured tokens, budget and action.
 - Contact sheet: fixture PNG captures of known sizes produce one PNG sheet whose width is at most the configured maximum; the originals are byte unchanged; a non PNG input fails loudly.
+- PNG security: the assembler enforces byte size and dimension caps; verifies CRCs; bounds checks chunk lengths; caps accumulated IDAT bytes; bounds decompression to expected raw size and fails when the stream yields more or less; validates contact sheet output path to resolve inside run evidence; validates WorkOrder evidence image paths to resolve inside project tree.
 - Packet layout: two packets for one station across two runs share the expected stable prefix and differ only from the work order block on; the design and learnings sections appear before the work order block.
 - Scoped review: a reviewer-design packet built over a fixture change contains the diff summary and the design section, contains no content from a fixture file outside the allowlist, and the allowlist check rejects a packet that embeds such content.
+- Provenance verification integration: prepare_reviewer_design_step itself is tested: a packet with out of allowlist content fails through the preparation path before any model call with the violation detail, and a clean packet passes through the same path.
+- Allowlist path boundaries: the allowlist matching rejects a sibling path sharing a prefix (design/DESIGN.md.bak when design/DESIGN.md is allowed), a partial segment match, and a parent traversal shape; it accepts exact entries and legitimately nested paths at separator boundaries.
 - The full factory suite passes.

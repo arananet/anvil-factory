@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "completed",
       "detail": "Work order normalized",
-      "duration_ms": 0.011,
+      "duration_ms": 0.02,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/report.json"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/spec-writer.output.md",
-      "duration_ms": 174267.914,
+      "duration_ms": 190044.719,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/spec-writer.output.md"
@@ -35,7 +35,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2870,
+      "measured_tokens": 4414,
       "budget": 0,
       "budget_action": "none"
     },
@@ -43,7 +43,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/test-writer.output.md",
-      "duration_ms": 234928.645,
+      "duration_ms": 181795.289,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/test-writer.output.md"
@@ -54,7 +54,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2876,
+      "measured_tokens": 4420,
       "budget": 0,
       "budget_action": "none"
     },
@@ -62,7 +62,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/builder.output.md",
-      "duration_ms": 365502.648,
+      "duration_ms": 327599.973,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/builder.output.md"
@@ -73,15 +73,15 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 3409,
+      "measured_tokens": 4952,
       "budget": 50000,
       "budget_action": "sent"
     },
     {
       "station": "reviewer-spec",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-spec.output.md; review output did not parse as a review JSON",
-      "duration_ms": 169974.546,
+      "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-spec.output.md",
+      "duration_ms": 270776.543,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/reviewer-spec.output.md"
@@ -92,15 +92,15 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 3074,
+      "measured_tokens": 4617,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-security",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-security.output.md; review output did not parse as a review JSON",
-      "duration_ms": 159732.248,
+      "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-security.output.md",
+      "duration_ms": 118989.525,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/reviewer-security.output.md"
@@ -111,15 +111,15 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 3085,
+      "measured_tokens": 4628,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-tests",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-tests.output.md; review output did not parse as a review JSON",
-      "duration_ms": 81685.113,
+      "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-tests.output.md",
+      "duration_ms": 80697.288,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/reviewer-tests.output.md"
@@ -130,15 +130,15 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 3087,
+      "measured_tokens": 4630,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-architecture",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-architecture.output.md; review output did not parse as a review JSON",
-      "duration_ms": 96568.359,
+      "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-architecture.output.md",
+      "duration_ms": 199712.38,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/reviewer-architecture.output.md"
@@ -149,7 +149,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 3110,
+      "measured_tokens": 4654,
       "budget": 0,
       "budget_action": "none"
     },
@@ -157,7 +157,7 @@
       "station": "reviewer-design",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-design.output.md; review output did not parse as a review JSON",
-      "duration_ms": 38144.627,
+      "duration_ms": 88498.235,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/reviewer-design.output.md"
@@ -168,15 +168,15 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 4208,
+      "measured_tokens": 2226,
       "budget": 50000,
       "budget_action": "sent"
     },
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.025,
+      "detail": "Approver verdict: changes_requested",
+      "duration_ms": 0.044,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/report.json"
@@ -187,6 +187,19 @@
       "measured_tokens": 0,
       "budget": 0,
       "budget_action": "none"
+    },
+    {
+      "station": "approver",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Spec S3 line 85-86 requires: 'prepare_reviewer_design_step itself is tested: a packet with out of allowlist content fails through the preparation path.' The test test_provenance_check_integration_fails_on_violation (tests/test_astra_consumption.py:1086-1145) does NOT satisfy this. It only calls verify_packet_allowlist_by_provenance directly (line 1139-1140), not through prepare_reviewer_design_step. To satisfy the spec: use unittest.mock.patch to make build_reviewer_design_packet return a packet with bad provenance tags, then call prepare_reviewer_design_step and verify it raises AllowlistViolation. The implementation is correct (anvil/runner.py:482 calls the verifier), but the required integration test is incomplete.; CRITICAL: IDAT decompression not actually bounded (anvil/runner.py:212). The code uses zlib.decompress(idat_data, bufsize=expected_raw_size) but the bufsize parameter is NOT a hard limit on decompression size - it is only an initial buffer size hint. A crafted PNG can decompress to much larger than expected_raw_size, exhausting memory before the size check at line 217 executes. Loopback gate round 3, finding 3b explicitly requires: 'decompress with an explicit maximum length' and 'fail loudly when the stream yields more than the expected size'. The current implementation checks size AFTER full decompression, allowing memory exhaustion. Attack vector: small crafted PNG (passing file size cap) with highly compressed IDAT expands to gigabytes during line 212 decompression. Required fix: Use zlib.decompress max_length parameter (Python 3.11+) or decompressobj() with incremental decompression and hard cap for older Python.; Finding 1 (provenance check integration): VERIFIED CORRECT. prepare_reviewer_design_step (line 482) calls verify_packet_allowlist_by_provenance(packet, allowlist) on the built packet before returning. Out-of-allowlist content fails before any model call as required.; Finding 2 (layer violation): VERIFIED RESOLVED. build_reviewer_design_packet no longer imports from .stations at any scope. Caller resolves prompt through registry (lines 468-472) and passes it in. Default fallback (line 386) uses plain text with no import.; Finding 3a (path boundaries): VERIFIED CORRECT. verify_packet_allowlist_by_provenance (lines 338-355) enforces path boundaries properly. Requires exact match or nested beneath at separator boundary. Correctly rejects sibling paths sharing prefix, partial segment matches, and parent traversals.; Finding 3c (IDAT accumulated cap): VERIFIED CORRECT. Lines 198-202 cap accumulated IDAT bytes before decompression using max_idat_compressed derived from expected raw size. Fails loudly when cap exceeded before any inflation.; PNG security hardening verified: File size cap (line 122) and dimension caps (line 161) enforced from headers before data inflation. CRC verification for all chunks (lines 152-155, 192-194). Path validation for WorkOrder paths (lines 275-299) and contact sheet output (lines 58-67) using resolve() and relative_to() preventing traversal.",
+      "reason": "Spec S3 line 85-86 requires: 'prepare_reviewer_design_step itself is tested: a packet with out of allowlist content fails through the preparation path.' The test test_provenance_check_integration_fails_on_violation (tests/test_astra_consumption.py:1086-1145) does NOT satisfy this. It only calls verify_packet_allowlist_by_provenance directly (line 1139-1140), not through prepare_reviewer_design_step. To satisfy the spec: use unittest.mock.patch to make build_reviewer_design_packet return a packet with bad provenance tags, then call prepare_reviewer_design_step and verify it raises AllowlistViolation. The implementation is correct (anvil/runner.py:482 calls the verifier), but the required integration test is incomplete.; CRITICAL: IDAT decompression not actually bounded (anvil/runner.py:212). The code uses zlib.decompress(idat_data, bufsize=expected_raw_size) but the bufsize parameter is NOT a hard limit on decompression size - it is only an initial buffer size hint. A crafted PNG can decompress to much larger than expected_raw_size, exhausting memory before the size check at line 217 executes. Loopback gate round 3, finding 3b explicitly requires: 'decompress with an explicit maximum length' and 'fail loudly when the stream yields more than the expected size'. The current implementation checks size AFTER full decompression, allowing memory exhaustion. Attack vector: small crafted PNG (passing file size cap) with highly compressed IDAT expands to gigabytes during line 212 decompression. Required fix: Use zlib.decompress max_length parameter (Python 3.11+) or decompressobj() with incremental decompression and hard cap for older Python.; Finding 1 (provenance check integration): VERIFIED CORRECT. prepare_reviewer_design_step (line 482) calls verify_packet_allowlist_by_provenance(packet, allowlist) on the built packet before returning. Out-of-allowlist content fails before any model call as required.; Finding 2 (layer violation): VERIFIED RESOLVED. build_reviewer_design_packet no longer imports from .stations at any scope. Caller resolves prompt through registry (lines 468-472) and passes it in. Default fallback (line 386) uses plain text with no import.; Finding 3a (path boundaries): VERIFIED CORRECT. verify_packet_allowlist_by_provenance (lines 338-355) enforces path boundaries properly. Requires exact match or nested beneath at separator boundary. Correctly rejects sibling paths sharing prefix, partial segment matches, and parent traversals.; Finding 3c (IDAT accumulated cap): VERIFIED CORRECT. Lines 198-202 cap accumulated IDAT bytes before decompression using max_idat_compressed derived from expected raw size. Fails loudly when cap exceeded before any inflation.; PNG security hardening verified: File size cap (line 122) and dimension caps (line 161) enforced from headers before data inflation. CRC verification for all chunks (lines 152-155, 192-194). Path validation for WorkOrder paths (lines 275-299) and contact sheet output (lines 58-67) using resolve() and relative_to() preventing traversal.",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
     },
     {
       "station": "triage-human",
@@ -206,7 +219,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-21/deployer.packet.md",
-      "duration_ms": 0.229,
+      "duration_ms": 0.224,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/deployer.packet.md"
@@ -214,7 +227,7 @@
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
       "executor": null,
-      "measured_tokens": 2949,
+      "measured_tokens": 4498,
       "budget": 0,
       "budget_action": "none"
     },
@@ -222,7 +235,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/observer.output.md",
-      "duration_ms": 52281.109,
+      "duration_ms": 36636.987,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/observer.output.md"
@@ -233,21 +246,38 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2956,
+      "measured_tokens": 4505,
       "budget": 0,
       "budget_action": "none"
     }
   ],
-  "verdict": "no_reviews",
+  "verdict": "changes_requested",
   "human_required": true,
   "max_loopbacks": 2,
-  "loopbacks": 0,
+  "loopbacks": 1,
   "deployment_status": null,
   "verify_results": [],
   "risk_hints": [],
   "decision": {
     "approver": {
-      "reviews_counted": [],
+      "reviews_counted": [
+        {
+          "station": "reviewer-spec",
+          "verdict": "changes_requested"
+        },
+        {
+          "station": "reviewer-security",
+          "verdict": "changes_requested"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-architecture",
+          "verdict": "pass"
+        }
+      ],
       "reviews_expected": [
         "reviewer-spec",
         "reviewer-security",
@@ -255,13 +285,14 @@
         "reviewer-architecture",
         "reviewer-design"
       ],
-      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)"
+      "rule": "Reviewers reviewer-spec, reviewer-security requested changes. (Counted 4 reviews, expected 5.)"
     },
     "human_gate": {
       "required": true,
-      "rule": "Verdict is no_reviews, not approved, so a human is required.",
+      "rule": "Verdict is changes_requested, not approved, so a human is required.",
       "hints_matched": []
     }
   },
-  "warnings": []
+  "warnings": [],
+  "astra_measured_tokens_total": 7178
 }

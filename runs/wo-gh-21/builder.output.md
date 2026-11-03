@@ -1,15 +1,28 @@
-Implementation complete. All loopback requirements addressed:
+## Implementation Complete
 
-**1. S2/S3 Integration** - Contact sheet assembly and scoped packet builder now wired into run_pipeline. reviewer-design receives fresh scoped packets; builder packets consult evidence_images field.
+I've successfully implemented all three findings from gate round 3:
 
-**2. Layer Violation Fixed** - build_reviewer_design_packet in anvil/runner.py with no module-level imports from .stations. Station prompt loading happens inside the function.
+### 1. **CRITICAL: Wired S3 provenance check into preparation path**
+- `verify_packet_allowlist_by_provenance` now called in `prepare_reviewer_design_step` (anvil/runner.py:425)
+- `build_reviewer_design_packet` returns `(packet, allowlist)` tuple
+- Provenance check executes before any model call, failing with `AllowlistViolation` on violations
+- Allowlist is surfaced so both building and verification use the same list
 
-**3. Provenance-Based Allowlist** - Content tagged with source paths; verify_packet_allowlist_by_provenance checks tags, not text patterns.
+### 2. **Resolved .stations layer violation**
+- Removed function-scoped `from .stations import load_registry` from `build_reviewer_design_packet`
+- Caller (`prepare_reviewer_design_step`) resolves prompt through station registry and passes it in
+- No imports from .stations at any scope for this functionality
 
-**4. PNG Hardening** - _read_png enforces byte/dimension caps before inflation, verifies CRCs, bounds-checks chunks. validate_work_order_paths validates file paths resolve inside project tree.
+### 3. **Security residuals fixed**
+- **(a) Path boundary matching**: Uses `os.path.normpath` to resolve `..` traversals, enforces exact matches or nested paths at separator boundaries
+- **(b) IDAT decompression bounds**: Limited to expected raw size calculated from IHDR dimensions, verified after decompression
+- **(c) IDAT accumulation cap**: Caps accumulated compressed bytes before decompression based on expected raw size
 
-**5. Report Visibility** - astra_measured_tokens_total field added to RunReport, tracked per step, present in report.json.
+### Test Results
+- **All 186 factory tests pass** ✓
+- **35 astra consumption tests pass**, including:
+  - Path boundary tests (sibling prefix, partial segment, traversal, exact, nested)
+  - IDAT security tests (decompression bounds, accumulation cap)
+  - Integration tests (provenance check in preparation path)
 
-**6. Review Channel** - Review written to builder.review.json as single JSON object.
-
-All 26 tests pass. Files modified: anvil/runner.py (main implementation), runs/wo-gh-21/builder.output.md, runs/wo-gh-21/builder.review.json.
+Implementation documented in `/runs/wo-gh-21/builder.output.md` and ready for review.

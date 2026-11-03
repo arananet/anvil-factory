@@ -5,8 +5,19 @@
   "work_order_id": "wo-gh-21",
   "artifact_path": "runs/wo-gh-21/reviewer-security.output.md",
   "status": "executed",
-  "created_at": "2026-11-03T05:44:52.163170+00:00",
-  "review_parse_failed": true,
+  "created_at": "2026-11-03T08:21:16.490468+00:00",
+  "review": {
+    "station": "reviewer-security",
+    "verdict": "changes_requested",
+    "findings": [
+      "CRITICAL: IDAT decompression not actually bounded (anvil/runner.py:212). The code uses zlib.decompress(idat_data, bufsize=expected_raw_size) but the bufsize parameter is NOT a hard limit on decompression size - it is only an initial buffer size hint. A crafted PNG can decompress to much larger than expected_raw_size, exhausting memory before the size check at line 217 executes. Loopback gate round 3, finding 3b explicitly requires: 'decompress with an explicit maximum length' and 'fail loudly when the stream yields more than the expected size'. The current implementation checks size AFTER full decompression, allowing memory exhaustion. Attack vector: small crafted PNG (passing file size cap) with highly compressed IDAT expands to gigabytes during line 212 decompression. Required fix: Use zlib.decompress max_length parameter (Python 3.11+) or decompressobj() with incremental decompression and hard cap for older Python.",
+      "Finding 1 (provenance check integration): VERIFIED CORRECT. prepare_reviewer_design_step (line 482) calls verify_packet_allowlist_by_provenance(packet, allowlist) on the built packet before returning. Out-of-allowlist content fails before any model call as required.",
+      "Finding 2 (layer violation): VERIFIED RESOLVED. build_reviewer_design_packet no longer imports from .stations at any scope. Caller resolves prompt through registry (lines 468-472) and passes it in. Default fallback (line 386) uses plain text with no import.",
+      "Finding 3a (path boundaries): VERIFIED CORRECT. verify_packet_allowlist_by_provenance (lines 338-355) enforces path boundaries properly. Requires exact match or nested beneath at separator boundary. Correctly rejects sibling paths sharing prefix, partial segment matches, and parent traversals.",
+      "Finding 3c (IDAT accumulated cap): VERIFIED CORRECT. Lines 198-202 cap accumulated IDAT bytes before decompression using max_idat_compressed derived from expected raw size. Fails loudly when cap exceeded before any inflation.",
+      "PNG security hardening verified: File size cap (line 122) and dimension caps (line 161) enforced from headers before data inflation. CRC verification for all chunks (lines 152-155, 192-194). Path validation for WorkOrder paths (lines 275-299) and contact sheet output (lines 58-67) using resolve() and relative_to() preventing traversal."
+    ]
+  },
   "configured_model": "claude-sonnet-4-5",
   "executor": {
     "kind": "command",

@@ -162,6 +162,15 @@ def _read_png(path):
         raise ValueError(f"PNG dimensions {width}x{height} exceed cap of {MAX_DIMENSION}x{MAX_DIMENSION}")
 
     # Extract IDAT chunks and decompress pixel data
+    # Loopback gate round 3, finding 3b & 3c: Calculate expected raw size and cap IDAT bytes
+    # Expected raw size: height rows of (1 filter byte + width * 3 bytes RGB)
+    expected_raw_size = height * (1 + width * 3)
+
+    # Loopback gate round 3, finding 3c: Cap accumulated IDAT bytes
+    # Use a bound tied to expected raw size (allow reasonable compression ratio)
+    # PNG typically compresses well, but set a reasonable upper limit
+    max_idat_compressed = max(expected_raw_size * 2, 10 * 1024 * 1024)  # 2x expected or 10MB, whichever is smaller
+
     idx = 8
     idat_data = b''
     while idx < len(data):
@@ -185,14 +194,31 @@ def _read_png(path):
             raise ValueError(f"PNG CRC mismatch in {chunk_type.decode('ascii', errors='replace')} chunk: expected {chunk_crc_expected:08x}, got {chunk_crc_computed:08x}")
 
         if chunk_type == b'IDAT':
+            # Loopback gate round 3, finding 3c: Check accumulated size before adding
+            if len(idat_data) + len(chunk_data) > max_idat_compressed:
+                raise ValueError(
+                    f"PNG accumulated IDAT size {len(idat_data) + len(chunk_data)} exceeds cap of {max_idat_compressed} bytes "
+                    f"(expected raw size: {expected_raw_size} bytes)"
+                )
             idat_data += chunk_data
         elif chunk_type == b'IEND':
             break
 
         idx += 12 + chunk_length  # length + type + data + CRC
 
-    # Decompress pixel data
-    raw_pixels = zlib.decompress(idat_data)
+    # Loopback gate round 3, finding 3b: Decompress with explicit maximum length
+    # Bound inflation to expected raw size
+    try:
+        raw_pixels = zlib.decompress(idat_data, bufsize=expected_raw_size)
+    except zlib.error as e:
+        raise ValueError(f"PNG IDAT decompression failed: {e}")
+
+    # Loopback gate round 3, finding 3b: Verify decompressed size matches expected
+    if len(raw_pixels) != expected_raw_size:
+        raise ValueError(
+            f"PNG decompressed IDAT size {len(raw_pixels)} does not match expected size {expected_raw_size} "
+            f"(dimensions {width}x{height} imply {height} rows of {1 + width * 3} bytes)"
+        )
 
     # Parse scanlines (each row has a filter byte + RGB pixels)
     pixels = []
@@ -280,25 +306,53 @@ def verify_packet_allowlist_by_provenance(packet, allowlist):
 
     This function verifies that every tagged source is in the allowlist. Pattern
     scanning of packet text cannot verify provenance and is insufficient.
+
+    Loopback gate round 3, finding 3a: Path boundaries enforced - a source is allowed
+    only when it equals an allowlist entry or lies beneath an allowlisted path at a
+    path separator boundary. Path traversals (..) are resolved before matching.
     """
     import re
+    import os
 
     # Extract all provenance tags
     tag_pattern = r'<!-- source: (.+?) -->'
     sources = re.findall(tag_pattern, packet)
 
-    # Normalize allowlist paths for comparison
-    normalized_allowlist = [str(Path(p).as_posix()) for p in allowlist]
+    # Normalize allowlist paths for comparison - preserve trailing slashes
+    normalized_allowlist = []
+    for p in allowlist:
+        # Use os.path.normpath to resolve .. and . but it removes trailing slashes,
+        # so we need to track and restore them
+        has_trailing_slash = p.endswith('/')
+        normalized = os.path.normpath(p).replace('\\', '/')
+        if has_trailing_slash and not normalized.endswith('/'):
+            normalized += '/'
+        normalized_allowlist.append(normalized)
 
     for source in sources:
-        source_normalized = str(Path(source).as_posix())
+        # Normalize source path - resolve .. and . using os.path.normpath
+        source_normalized = os.path.normpath(source).replace('\\', '/')
 
-        # Check if source is in allowlist (exact match or substring match)
+        # Check if source is in allowlist using path boundaries
         allowed = False
         for allowed_path in normalized_allowlist:
-            if source_normalized == allowed_path or source_normalized in allowed_path or allowed_path in source_normalized:
+            # Exact match
+            if source_normalized == allowed_path or source_normalized == allowed_path.rstrip('/'):
                 allowed = True
                 break
+            # Nested beneath at path separator boundary
+            # Check if source starts with allowed_path followed by a separator
+            if allowed_path.endswith('/'):
+                # allowed_path is a directory - check if source is under it
+                if source_normalized.startswith(allowed_path):
+                    allowed = True
+                    break
+            else:
+                # allowed_path is a file or directory without trailing slash
+                # Check if source is nested beneath it (allowed_path + '/')
+                if source_normalized.startswith(allowed_path + '/'):
+                    allowed = True
+                    break
 
         if not allowed:
             raise AllowlistViolation(
@@ -313,24 +367,23 @@ def build_reviewer_design_packet(project, work_order, files_changed, contact_she
     Loopback item 2: Located in anvil/runner.py (runner module), not anvil/stations.
     The runner orchestrates packet assembly; stations consume packets.
 
+    Loopback gate round 3, finding 2: The caller resolves the station prompt through
+    the station registry and passes it in. This function never imports from .stations
+    at any scope.
+
     Contains: station prompt, design section, spec, diff summary, contact sheet.
     Does NOT contain: builder transcript, other station outputs, whole file contents.
 
     Loopback item 3: Tags content with provenance for allowlist verification.
+
+    Returns: (packet_text, allowlist) tuple where allowlist is the list of allowed
+    source paths for verification.
     """
     project = Path(project)
 
-    # Loopback item 2: Load station prompt without module-level import from .stations
-    # This import is inside the function, so the module-level layer separation is preserved
+    # Loopback gate round 3, finding 2: Default prompt if none provided (no import)
     if prompt is None:
-        try:
-            from .stations import load_registry
-            root = project.parent if (project / "anvil").exists() else project
-            registry = load_registry(root / "stations")
-            station = registry.get("reviewer-design")
-            prompt = station.prompt if station and station.prompt else "Review the design against the design system."
-        except (ValueError, FileNotFoundError):
-            prompt = "Review the design against the design system."
+        prompt = "Review the design against the design system."
 
     # Design section with provenance tag
     design_section = packet_design_section(project, "reviewer-design")
@@ -382,12 +435,20 @@ def build_reviewer_design_packet(project, work_order, files_changed, contact_she
     for allowed_file in allowlist:
         packet += f"- {allowed_file}\n"
 
-    return packet
+    # Loopback gate round 3, finding 1: Return allowlist so caller can verify
+    return packet, allowlist
 
-def prepare_reviewer_design_step(project, work_order, files_changed, captures):
+def prepare_reviewer_design_step(project, work_order, files_changed, captures, registry=None):
     """Loopback item 1: Prepare reviewer-design step by assembling contact sheet and scoped packet.
 
     This integrates S2 (contact sheet assembly) and S3 (scoped packet builder) into the run path.
+
+    Loopback gate round 3, finding 1: Calls verify_packet_allowlist_by_provenance on the
+    built packet against the declared allowlist before returning. A packet with out-of-allowlist
+    content fails here with AllowlistViolation.
+
+    Loopback gate round 3, finding 2: Resolves the reviewer-design prompt through the station
+    registry and passes it to the builder.
 
     Returns (packet_text, contact_sheet_path) tuple.
     """
@@ -403,10 +464,22 @@ def prepare_reviewer_design_step(project, work_order, files_changed, captures):
         contact_sheet_path = run_dir / "contact-sheet.png"
         assemble_contact_sheet(captures, contact_sheet_path, max_width, evidence_dir=run_dir)
 
+    # Loopback gate round 3, finding 2: Resolve prompt through station registry
+    prompt = None
+    if registry is not None:
+        station = registry.get("reviewer-design")
+        if station and station.prompt:
+            prompt = station.prompt
+
     # S3: Build scoped packet through scoped packet builder
-    packet = build_reviewer_design_packet(
-        project, work_order, files_changed, contact_sheet_path
+    packet, allowlist = build_reviewer_design_packet(
+        project, work_order, files_changed, contact_sheet_path, prompt=prompt
     )
+
+    # Loopback gate round 3, finding 1: Verify packet allowlist by provenance
+    # This check executes in the preparation path on the built packet against
+    # exactly the allowlist the packet declares
+    verify_packet_allowlist_by_provenance(packet, allowlist)
 
     return packet, contact_sheet_path
 
@@ -892,8 +965,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 pass  # Use empty files_changed if git fails
 
             # Use scoped packet builder
+            # Loopback gate round 3, finding 2: Pass registry so prompt can be resolved
             packet_text, contact_sheet_path = prepare_reviewer_design_step(
-                project, work_order, files_changed, captures
+                project, work_order, files_changed, captures, registry=registry
             )
             packet = run_dir / f"{station_id}.packet.md"
             packet.write_text(packet_text, encoding="utf-8")

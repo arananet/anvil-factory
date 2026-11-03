@@ -1,11 +1,15 @@
-Spec revised. The Astra consumption spec has been updated to revision 2 with clarifications addressing all 6 loopback findings from gate round 2:
+Spec revision complete. The astra-consumption spec has been updated to incorporate all gate round 3 loopback findings:
 
-**Key changes:**
-- S2/S3 integration: Explicitly requires runner to call contact sheet assembler and scoped packet builder in the run path
-- Architectural placement: Scoped packet builder must be in anvil/runner.py or helper module, not importing from anvil/stations  
-- Provenance-based allowlist: Content blocks tagged with source paths; verification by tags, not pattern scanning
-- PNG security hardening: Size caps, CRC validation, bounds checks, path validation
-- Report visibility: Measurements must appear in actual report.json for real runs
-- Integration test: Verify S2/S3 wiring with a test design order execution
+**S2 (Evidence Image Policy)** now includes PNG security hardening: byte size and dimension caps, CRC verification, chunk length bounds checking, IDAT accumulation caps, bounded decompression, and path validation.
 
-Output: `runs/wo-gh-21/spec-writer.output.md`
+**S3 (Fresh Session Design Review)** now explicitly requires:
+- Provenance check execution in prepare_reviewer_design_step path
+- Content tagging with source paths at assembly time
+- Path boundary matching (not substring matching)
+- Layer constraint: runner must not import from .stations
+
+**Tests section** expanded with PNG security tests, provenance verification integration tests, and allowlist path boundary tests.
+
+**Scenarios** updated to explicitly state the integration and security requirements.
+
+The spec now provides clear, testable requirements for all gate round 3 findings.

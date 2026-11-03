@@ -1,1 +1,7 @@
-Review complete. I found one specification violation: the S3 allowlist verification by provenance is not called in the run path. The implementation builds the infrastructure (provenance tagging, allowlist declaration, verification function) but fails to execute the verification check that the spec requires. All other requirements (S1, S2, S4, S5, and loopback items 1, 2, 4, 5) are correctly implemented.
+{
+  "station": "reviewer-spec",
+  "verdict": "changes_requested",
+  "findings": [
+    "Spec S3 line 85-86 requires: 'prepare_reviewer_design_step itself is tested: a packet with out of allowlist content fails through the preparation path.' The test test_provenance_check_integration_fails_on_violation (tests/test_astra_consumption.py:1086-1145) does NOT satisfy this. It only calls verify_packet_allowlist_by_provenance directly (line 1139-1140), not through prepare_reviewer_design_step. To satisfy the spec: use unittest.mock.patch to make build_reviewer_design_packet return a packet with bad provenance tags, then call prepare_reviewer_design_step and verify it raises AllowlistViolation. The implementation is correct (anvil/runner.py:482 calls the verifier), but the required integration test is incomplete."
+  ]
+}

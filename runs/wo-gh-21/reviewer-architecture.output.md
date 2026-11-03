@@ -1,9 +1,22 @@
-Review complete. The implementation addresses most loopback requirements but has two critical architectural gaps:
+## Architectural Review Complete
 
-**Finding 1 (Critical)**: The provenance-based allowlist verification (loopback item 3) is implemented but not enforced. The `verify_packet_allowlist_by_provenance` function exists at anvil/runner.py:275 and has comprehensive tests, but is never called in the reviewer-design preparation path. Without this enforcement, the spec requirement that "a deterministic runner check verifies no embedded content comes from outside the allowlist" is not met.
+I've reviewed the gate round 3 implementation against all three findings:
 
-**Finding 2**: The layer violation (loopback item 2) is incompletely resolved. While the import from anvil.stations is now function-scoped rather than module-level, the architectural dependency remains. The runner module should not import from stations at all. The loopback requirement asked to "place the scoped packet assembly where the architecture allows" - the implementation kept it in runner.py and only moved the import, preserving the architectural violation.
+**Finding 1: S3 provenance check wired into preparation path** ✓
+- `verify_packet_allowlist_by_provenance` is called at anvil/runner.py:482 within `prepare_reviewer_design_step`
+- The check executes on the built packet against the declared allowlist before any model call
+- Integration properly placed in the run path at line 969
+- Integration tests verify both failure and success paths
 
-**Findings 3-4 (Pass)**: S2/S3 integration is correctly wired into the run path, and S1/S5 report visibility is correctly implemented with all required fields present.
+**Finding 2: .stations layer violation resolved** ✓  
+- `build_reviewer_design_packet` no longer imports from .stations at any scope
+- Caller (`prepare_reviewer_design_step`) resolves the prompt through the station registry and passes it in (lines 467-472)
+- Proper layer separation: runner orchestrates packet assembly, stations consume packets
+- Placement rationale documented in code and builder output
 
-The review JSON has been written to runs/wo-gh-21/reviewer-architecture.review.json with verdict **changes_requested**.
+**Finding 3: Security residuals** ✓
+- **(a) Allowlist path boundaries**: Proper normalization with `os.path.normpath` (line 334), exact matches and nested path checks at separator boundaries (lines 337-355). Rejects sibling paths, partial segments, and parent traversals
+- **(b) IDAT decompression bounds**: Expected raw size calculated from IHDR (line 167), decompressed size validated against expected (lines 217-221). Fails on size mismatch
+- **(c) IDAT accumulation cap**: Compressed bytes capped before inflation (lines 198-202) based on expected raw size with reasonable compression ratio
+
+All changes respect the project architecture with proper layer separation, correct integration points, and appropriate placement of concerns. Test coverage maps to all three findings.

@@ -5,8 +5,14 @@
   "work_order_id": "wo-gh-21",
   "artifact_path": "runs/wo-gh-21/reviewer-spec.output.md",
   "status": "executed",
-  "created_at": "2026-11-03T05:42:12.430615+00:00",
-  "review_parse_failed": true,
+  "created_at": "2026-11-03T08:19:17.500355+00:00",
+  "review": {
+    "station": "reviewer-spec",
+    "verdict": "changes_requested",
+    "findings": [
+      "Spec S3 line 85-86 requires: 'prepare_reviewer_design_step itself is tested: a packet with out of allowlist content fails through the preparation path.' The test test_provenance_check_integration_fails_on_violation (tests/test_astra_consumption.py:1086-1145) does NOT satisfy this. It only calls verify_packet_allowlist_by_provenance directly (line 1139-1140), not through prepare_reviewer_design_step. To satisfy the spec: use unittest.mock.patch to make build_reviewer_design_packet return a packet with bad provenance tags, then call prepare_reviewer_design_step and verify it raises AllowlistViolation. The implementation is correct (anvil/runner.py:482 calls the verifier), but the required integration test is incomplete."
+    ]
+  },
   "configured_model": "claude-sonnet-4-5",
   "executor": {
     "kind": "command",

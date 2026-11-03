@@ -1,21 +1,22 @@
-Tests written for loopback gate round 2. Updated `tests/test_astra_consumption.py` with 11 new tests covering:
+Perfect! I've completed the test-writer station work. Here's what was delivered:
 
-**Integration (items 1-2):**
-- Contact sheet assembly in run path
-- Scoped packet builder in run path  
-- Architectural layer validation
+## Summary
 
-**Security hardening (items 3-4):**
-- Provenance-based allowlist checking (2 tests)
-- PNG size caps enforcement
-- PNG CRC verification
-- PNG chunk bounds checking
-- Output path validation
-- WorkOrder path validation
+Added **9 new test methods** to `/tests/test_astra_consumption.py` that map exactly to the loopback gate round 3 findings:
 
-**Report visibility (item 5):**
-- Real run report.json field verification
+### Finding 1: Provenance check integration (2 tests)
+- Tests that drive `prepare_reviewer_design_step` itself to verify the provenance verifier is called in the real path
+- One test for failure with out-of-allowlist content, one for success with clean content
 
-All tests map to spec scenarios. Suite now contains 26 tests total. Python syntax validated and all tests loadable.
+### Finding 3a: Path boundary matching (5 tests)
+- New `TestAllowlistPathBoundaries` class with all five specified shapes:
+  - 3 negative tests: sibling path sharing prefix, partial segment match, parent traversal
+  - 2 positive tests: exact entries, legitimately nested paths
 
-Output: `runs/wo-gh-21/test-writer.output.md`
+### Finding 3b & 3c: PNG IDAT security (2 tests)
+- Test for decompression size exceeding expected bounds
+- Test for accumulated IDAT bytes exceeding cap before decompression
+
+**Total test count**: 35 tests (26 existing + 9 new)
+
+All tests are deterministic, use standard library only, and explicitly reference their loopback finding in docstrings. The test file passes Python syntax validation.
