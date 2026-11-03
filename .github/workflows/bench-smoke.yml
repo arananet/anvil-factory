@@ -1,10 +1,10 @@
 name: bench-smoke
 
-# Probe v2 for the model benchmark (wo-gh-22): provider endpoints on the
-# gateway host, using the gateway authorization header pattern the factory
-# workflows already use, one minimal text call and one minimal image call
-# per candidate model, plus the OpenAI style model listing with the
-# gateway header. Evidence is committed back to this scratch branch.
+# Probe v3 for the model benchmark (wo-gh-22): same provider endpoints as
+# v2, with the two parameter fixes the v2 evidence dictated (OpenAI arms
+# take max_completion_tokens; the Anthropic endpoint takes the dash form
+# model id the gateway itself suggested). Each call also carries a
+# benchmark metadata header so the gateway logs attribute it later.
 on:
   push:
     branches: [anvil/bench-smoke]
@@ -23,16 +23,16 @@ jobs:
       - name: Check out this branch
         uses: actions/checkout@v4
 
-      - name: Probe provider endpoints
+      - name: Probe provider endpoints v3
         run: |
-          mkdir -p smoke2
+          mkdir -p smoke3
           python3 - <<'PYEOF'
           import base64, json, os, struct, subprocess, zlib
           from pathlib import Path
 
           BASE = os.environ["GW_BASE"]
           TOKEN = os.environ["CF_AIG_TOKEN"]
-          out = Path("smoke2"); out.mkdir(exist_ok=True)
+          out = Path("smoke3"); out.mkdir(exist_ok=True)
 
           def png_solid(rgb, size=64):
               def chunk(typ, data):
@@ -50,6 +50,7 @@ jobs:
           teal_b64 = base64.b64encode(png_solid((14, 124, 102))).decode()
 
           def call(name, method, url, headers, body=None):
+              headers = {**headers, "cf-aig-metadata-benchmark": "wo-gh-22-smoke"}
               cmd = ["curl", "-sS", "-m", "120", "-X", method, "-w", "\n%{http_code}"]
               for k, v in headers.items():
                   cmd += ["-H", f"{k}: {v}"]
@@ -68,38 +69,37 @@ jobs:
               print(name, status)
               return rec
 
-          aig = {"cf-aig-authorization": f"Bearer {TOKEN}"}
-          both = {"Authorization": f"Bearer {TOKEN}", **aig}
-
-          call("models-openai-aig", "GET", f"{BASE}/openai/models", aig)
+          both = {"Authorization": f"Bearer {TOKEN}",
+                  "cf-aig-authorization": f"Bearer {TOKEN}"}
 
           for slug, bare in [("gpt-6-astra", "gpt-6-astra"), ("gpt-6.1-sol", "gpt-6.1-sol")]:
               call(f"text-{slug}", "POST", f"{BASE}/openai/chat/completions", both,
-                   {"model": bare, "max_tokens": 32,
+                   {"model": bare, "max_completion_tokens": 32,
                     "messages": [{"role": "user", "content": "Reply with exactly: GATEWAY_OK"}]})
               call(f"vision-{slug}", "POST", f"{BASE}/openai/chat/completions", both,
-                   {"model": bare, "max_tokens": 32,
+                   {"model": bare, "max_completion_tokens": 32,
                     "messages": [{"role": "user", "content": [
                         {"type": "text", "text": "What color is this square? Reply with the color name only."},
                         {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{teal_b64}"}}]}]})
 
-          ant_headers = {**aig, "x-api-key": TOKEN, "anthropic-version": "2023-06-01"}
+          ant_headers = {"cf-aig-authorization": f"Bearer {TOKEN}",
+                         "x-api-key": TOKEN, "anthropic-version": "2023-06-01"}
           call("text-claude-opus-5.5", "POST", f"{BASE}/anthropic/v1/messages", ant_headers,
-               {"model": "claude-opus-5.5", "max_tokens": 32,
+               {"model": "claude-opus-5-5", "max_tokens": 32,
                 "messages": [{"role": "user", "content": "Reply with exactly: GATEWAY_OK"}]})
           call("vision-claude-opus-5.5", "POST", f"{BASE}/anthropic/v1/messages", ant_headers,
-               {"model": "claude-opus-5.5", "max_tokens": 32,
+               {"model": "claude-opus-5-5", "max_tokens": 32,
                 "messages": [{"role": "user", "content": [
                     {"type": "text", "text": "What color is this square? Reply with the color name only."},
                     {"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": teal_b64}}]}]})
           PYEOF
-          ls -la smoke2/
+          ls -la smoke3/
 
       - name: Commit the probe evidence back to the branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add smoke2/
+          git add smoke3/
           if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
-          git commit -m "Gateway provider endpoint probe v2 evidence for the model benchmark"
+          git commit -m "Gateway provider endpoint probe v3 evidence for the model benchmark"
           git push origin "HEAD:${GITHUB_REF_NAME}"
