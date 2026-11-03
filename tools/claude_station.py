@@ -47,20 +47,37 @@ WRITE_STATIONS = {"builder", "test-writer"}
 NO_EDIT_TOOLS = "Edit,Write,NotebookEdit"
 TIMEOUT_SECONDS = 1500
 
-REVIEW_SUFFIX = (
-    "\n\n## Output contract\n\n"
-    "Answer with a single JSON object and nothing else, in exactly this shape:\n"
-    '{"station": "<your station id>", "verdict": "pass", "findings": ["..."]}\n'
-    "The verdict must be one of: pass, fail, changes_requested. "
-    "Findings must be concrete and checkable against the spec, the code and the tests.\n"
-)
-
 
 def station_of(packet_text):
     for line in packet_text.splitlines():
         if line.startswith("# Task packet:"):
             return line.split(":", 1)[1].strip()
     return "unknown"
+
+
+def work_order_id_of(packet_text):
+    """Extract work order id from packet content."""
+    for line in packet_text.splitlines():
+        line = line.strip()
+        if line.startswith("- id:"):
+            return line.split(":", 1)[1].strip()
+    return "unknown"
+
+
+def review_suffix(work_order_id, station_id):
+    """Build the canonical review contract wording, repeated word-for-word from anvil/runner.py.
+
+    This repetition is intentional: loopback round 1 evidence showed 4 of 5 reviewers
+    wrote prose when the contract was stated only in the packet. Repeating the canonical
+    wording at the wrapper level puts it at the END of the prompt - the last thing the
+    station sees before responding - which maximizes compliance likelihood.
+    """
+    return (
+        f"\n\n## Runtime reminder\n\n"
+        f"Your complete answer is exactly one review JSON object written to "
+        f"runs/{work_order_id}/{station_id}.review.json. The free output transcript "
+        f"stays as provenance and is never parsed for a review.\n"
+    )
 
 
 def main():
@@ -74,7 +91,8 @@ def main():
 
     prompt = packet_text
     if station.startswith("reviewer"):
-        prompt += REVIEW_SUFFIX
+        work_order_id = work_order_id_of(packet_text)
+        prompt += review_suffix(work_order_id, station)
 
     # Never let a previous run's output survive into this one: the executor
     # prefers a non-empty output file, so a stale file would be mistaken
