@@ -3,6 +3,9 @@ from dataclasses import dataclass, field
 
 KINDS = {"idea", "feature", "bug", "incident", "task", "content"}
 VERDICTS = {"pass", "fail", "changes_requested"}
+INTAKE_OUTCOMES = {"accepted", "rejected", "rescoped", "waiting_info"}
+RISK_LEVELS = {"low", "medium", "high"}
+SURFACES = {"ui", "security", "data", "payments", "deploy", "content", "api"}
 
 def slugify(text):
     text = text.strip().lower()
@@ -33,6 +36,77 @@ def validate_path_component(component, name):
         raise ValueError(f"{name} looks like an absolute path")
     return component
 
+class IntakeValidationError(ValueError):
+    """Raised when intake_outcome validation fails."""
+    pass
+
+class RiskValidationError(ValueError):
+    """Raised when risk validation fails."""
+    pass
+
+def _validate_intake_outcome(outcome_dict):
+    """Validate intake_outcome structure and required fields."""
+    if not outcome_dict:
+        return  # Empty dict is valid (no intake outcome yet)
+    
+    if not isinstance(outcome_dict, dict):
+        raise IntakeValidationError(f"intake_outcome must be a dict, got {type(outcome_dict).__name__}")
+    
+    if "outcome" not in outcome_dict:
+        raise IntakeValidationError("intake_outcome must have 'outcome' field")
+    
+    outcome = outcome_dict["outcome"]
+    if outcome not in INTAKE_OUTCOMES:
+        raise IntakeValidationError(
+            f"Invalid outcome value: {outcome}. Must be one of {sorted(INTAKE_OUTCOMES)}"
+        )
+    
+    # Validate required fields based on outcome
+    if outcome == "rejected":
+        if "reasons" not in outcome_dict:
+            raise IntakeValidationError("rejected outcome requires 'reasons' field")
+        if not isinstance(outcome_dict["reasons"], list) or not outcome_dict["reasons"]:
+            raise IntakeValidationError("rejected outcome 'reasons' must be a non-empty list")
+    
+    elif outcome == "rescoped":
+        if "rescoped_description" not in outcome_dict:
+            raise IntakeValidationError("rescoped outcome requires 'rescoped_description' field")
+        if not isinstance(outcome_dict["rescoped_description"], str) or not outcome_dict["rescoped_description"].strip():
+            raise IntakeValidationError("rescoped outcome 'rescoped_description' must be a non-empty string")
+    
+    elif outcome == "waiting_info":
+        if "questions" not in outcome_dict:
+            raise IntakeValidationError("waiting_info outcome requires 'questions' field")
+        if not isinstance(outcome_dict["questions"], list) or not outcome_dict["questions"]:
+            raise IntakeValidationError("waiting_info outcome 'questions' must be a non-empty list")
+
+def _validate_risk(risk_value):
+    """Validate risk field value."""
+    if risk_value is None:
+        return  # None is valid (no risk rating yet)
+    
+    if not isinstance(risk_value, str):
+        raise RiskValidationError(f"risk must be a string or None, got {type(risk_value).__name__}")
+    
+    if risk_value not in RISK_LEVELS:
+        raise RiskValidationError(
+            f"Invalid risk value: {risk_value}. Must be one of {sorted(RISK_LEVELS)} or None"
+        )
+
+def _validate_surfaces(surfaces_list):
+    """Validate surfaces field values."""
+    if not surfaces_list:
+        return  # Empty list is valid
+    
+    if not isinstance(surfaces_list, list):
+        raise ValueError(f"surfaces must be a list, got {type(surfaces_list).__name__}")
+    
+    invalid_surfaces = set(surfaces_list) - SURFACES
+    if invalid_surfaces:
+        raise ValueError(
+            f"Invalid surface values: {sorted(invalid_surfaces)}. Must be from {sorted(SURFACES)}"
+        )
+
 @dataclass
 class WorkOrder:
     id: str
@@ -42,19 +116,48 @@ class WorkOrder:
     description: str = ""
     risk_hints: list = field(default_factory=list)
     status: str = "new"
+    intake_outcome: dict = field(default_factory=dict)
+    risk: str = None
+    surfaces: list = field(default_factory=list)
+    
     def __post_init__(self):
         if self.kind not in KINDS:
             raise ValueError(f"Invalid work order kind: {self.kind}")
         # Validate work order ID to prevent path traversal (F3)
         validate_path_component(self.id, "work_order_id")
+        # Validate intake outcome, risk, and surfaces
+        _validate_intake_outcome(self.intake_outcome)
+        _validate_risk(self.risk)
+        _validate_surfaces(self.surfaces)
+    
+    def __setattr__(self, name, value):
+        # Validate fields on assignment to catch runtime modifications
+        if name == "intake_outcome":
+            _validate_intake_outcome(value)
+        elif name == "risk":
+            _validate_risk(value)
+        elif name == "surfaces":
+            _validate_surfaces(value)
+        super().__setattr__(name, value)
+    
     @classmethod
     def from_dict(cls, data):
         return cls(id=data["id"], kind=data["kind"], title=data["title"],
                    source=data.get("source", "manual"), description=data.get("description", ""),
-                   risk_hints=list(data.get("risk_hints", [])), status=data.get("status", "new"))
+                   risk_hints=list(data.get("risk_hints", [])), status=data.get("status", "new"),
+                   intake_outcome=dict(data.get("intake_outcome", {})),
+                   risk=data.get("risk"),
+                   surfaces=list(data.get("surfaces", [])))
     def to_dict(self):
-        return {"id": self.id, "kind": self.kind, "title": self.title, "source": self.source,
+        result = {"id": self.id, "kind": self.kind, "title": self.title, "source": self.source,
                 "description": self.description, "risk_hints": list(self.risk_hints), "status": self.status}
+        if self.intake_outcome:
+            result["intake_outcome"] = dict(self.intake_outcome)
+        if self.risk:
+            result["risk"] = self.risk
+        if self.surfaces:
+            result["surfaces"] = list(self.surfaces)
+        return result
 
 @dataclass
 class Review:

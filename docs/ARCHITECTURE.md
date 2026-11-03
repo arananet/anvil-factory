@@ -7,7 +7,7 @@
 - Gate layer: anvil/gates.py and anvil/approver.py are deterministic. They never call a model.
 - Runner layer: anvil/runner.py walks a pipeline, runs deterministic stations, and writes packets for agent stations.
 - Scaffold layer: anvil/scaffold.py creates new projects and specs from templates.
-- Intake layer: intake-worker/ is a small Cloudflare Worker that normalizes incoming requests into work orders.
+- Intake layer: intake-worker/ is a small Cloudflare Worker that normalizes incoming requests into work orders. The intake station judges each work order (accept, reject, rescope, or wait for information), assigns risk ratings, and records surfaces touched.
 
 ## Artifact flow
 A work order enters, a spec is written under .openspec/specs/, tests map to spec scenarios, a builder changes code, four reviewers write JSON reviews under reviews/, the approver aggregates them, human triage checks risk, and a run leaves its report, packets, envelopes and swimlane under runs/.
@@ -17,6 +17,17 @@ A work order enters, a spec is written under .openspec/specs/, tests map to spec
 - TDD gate: every scenario id in the spec appears in the tests.
 - Review gate: all four reviewer files exist and pass.
 - Human gate: risk hints decide whether a human must look before the work moves on.
+
+## Intake outcomes
+
+Intake judges every work order and produces one of four outcomes:
+
+- **Accepted**: The work is buildable as stated. Intake assigns a risk rating (low, medium, high) based on blast radius and irreversibility, and records surfaces touched (ui, security, data, payments, deploy, content, api). The work proceeds to downstream stations.
+- **Rejected**: The work's purpose is harmful, deceptive, or unlawful. The outcome records reasons, work order status becomes rejected, and the runner stops after intake. No downstream stations execute. Rejected work is never quietly reformulated into something buildable.
+- **Rescoped**: The work asks for multiple changes or is too vague. Intake cuts it to one buildable scope, records what was removed and why, and assigns risk and surfaces for the rescoped work. Downstream stations receive the rescoped description.
+- **Waiting for information**: Intake lacks information to judge the work. Questions are recorded, work order status becomes waiting_info, and the runner stops. When answers are provided and status returns to runnable, a new run proceeds from intake.
+
+Risk ratings guide deployment decisions (high risk for payments, credentials, data deletion, production deploys; low for small reversible changes). Surfaces name what the work touches, not what it's about. Both appear in run reports and guide downstream review and approval.
 
 ## Risk triage
 Risk hints are explicit strings on the work order: auth, payments, data-deletion, production-deploy and secrets. Any match means human review is required. A verdict that is not approved also forces human review.
