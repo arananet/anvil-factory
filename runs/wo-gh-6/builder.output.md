@@ -1,26 +1,50 @@
-Implementation complete. I've successfully implemented all the loopback round fixes for the checks gate:
+Perfect! The checks configuration runs the unittest suite which passes. Let me create a summary of the implementation:
 
-## Critical S4 Base Ref Enforcement Fix
+## Implementation Summary
 
-**Security issue resolved**: Configuration is now read from the git base ref, not the working tree. This prevents branches from modifying the checks they'll be judged by.
+I've successfully implemented the loopback round 2 changes for the checks gate protected path semantics clarification:
 
-- Added `resolve_base_ref_config()` in `anvil/gates.py` using `git show <base-ref>:anvil.json`
-- Updated `run_pipeline()` to accept and propagate `base_ref` parameter
-- Modified `_get_changed_files()` to compare against base ref with `git diff <base-ref>...HEAD`
-- Both S4 regression tests pass (uncommitted and committed mutations to config don't affect gate commands)
+### Changes Made:
 
-## Hygiene Fixes
+**1. Core Implementation (`anvil/gates.py`):**
+- Added `_get_base_ref_files()` function to determine which files existed in the base ref
+- Updated `checks_gate()` function with new parameters: `base_ref`, `basis`, `attempt`
+- Implemented logic to distinguish between:
+  - **Violations**: Builder modifying/deleting existing base ref files under protected paths
+  - **Observations**: Builder adding new files under protected paths (NOT violations)
+- Added `observed_additions` field to gate results
+- Added `basis` field to record what was judged (builder_delta with attempt number)
 
-1. **Documentation**: Created `docs/CHECKS-GATE.md` covering purpose, configuration, base ref rule, protected paths, two gate phases, shell command safety
-2. **CHANGELOG**: Added comprehensive entry in Unreleased section
-3. **Refactored gate logic**: Moved gate evaluation from `runner.py` to pure function `checks_gate()` in `anvil/gates.py` with signature `checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_id, timeout)`
-4. **Protected paths default**: Now references config file path dynamically instead of hardcoded `"anvil.json"`
-5. **Station kind**: Changed from `"gate"` to `"deterministic"` in `stations/checks-gate/station.json`
+**2. Runner Changes (`anvil/runner.py`):**
+- Added `_snapshot_working_tree()` and `_compute_delta()` helper functions
+- Added tracking for `builder_attempt` and `builder_delta`
+- Capture working tree snapshot before and after builder execution
+- Pass builder delta (not cumulative changes) to checks gate
+- Updated gate result recording to include new fields
 
-## Test Results
+**3. Documentation (`docs/CHECKS-GATE.md`):**
+- Updated Protected Paths section with clarified semantics
+- Added explanation of the threat model and rationale
+- Updated Run Report section to include new fields
+- Added description of basis field
 
-- All 137 tests pass including 18 checks gate tests and 8 gate pure function tests
-- All 8 pipelines validate successfully
-- S4 regression tests prove base ref enforcement works for both uncommitted and committed config mutations
+**4. CHANGELOG:**
+- Added entry documenting the protected path semantics clarification
 
-The implementation closes all round 1 findings while maintaining the full S1-S6 scenario coverage.
+**5. Tests (`tests/test_checks_gate.py`, `tests/test_gates.py`):**
+- Fixed test (5) to create base ref file before testing modification
+- Updated S3 test to use git repo with base ref
+- Updated pure function tests to match new signature and semantics
+- All 143 tests now pass
+
+### Verification:
+
+All regression tests pass, proving the clarified semantics work correctly:
+- Test (1): Test-writer adds/modifies tests while builder changes only source → gate passes ✓
+- Test (2): Builder modifies existing base ref test file → gate fails ✓
+- Test (3): Builder deletes test file → gate fails ✓
+- Test (4): Builder modifies checks config → gate fails, commands from base ref ✓
+- Test (5): First attempt touches protected file → fails; loopback doesn't → passes ✓
+- Test (6): Builder additions to protected paths → observed, not violations ✓
+
+The implementation maintains the threat model: what judges the work cannot be altered by the work under review. The suite stays green with 143 passing tests.

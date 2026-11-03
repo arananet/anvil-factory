@@ -131,14 +131,26 @@ class TestChecksGateProtectedPaths(unittest.TestCase):
             config["protected_paths"] = ["tests/", "anvil.json"]
             (proj / "anvil.json").write_text(json.dumps(config, indent=2))
 
-            # Simulate a change that touches a protected path
-            # This would be tracked by the runner's changed files list
-            (proj / "tests" / "test_new.py").write_text("# new test file")
+            # Set up git repo with base ref (for loopback round 2 semantics)
+            import subprocess
+            subprocess.run(["git", "init"], cwd=proj, check=True, capture_output=True)
+            subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=proj, check=True, capture_output=True)
+            subprocess.run(["git", "config", "user.name", "Test"], cwd=proj, check=True, capture_output=True)
+            # Create a test file in base ref
+            (proj / "tests" / "test_new.py").write_text("# original test")
+            subprocess.run(["git", "add", "."], cwd=proj, check=True, capture_output=True)
+            subprocess.run(["git", "commit", "-m", "Base ref"], cwd=proj, check=True, capture_output=True)
+            base_ref = subprocess.run(["git", "rev-parse", "HEAD"], cwd=proj,
+                                     capture_output=True, text=True, check=True).stdout.strip()
+
+            # Simulate a change that modifies a protected path
+            # Per loopback round 2: modifying an existing base ref file in protected path is a violation
+            (proj / "tests" / "test_new.py").write_text("# modified test file - violation")
 
             reg = load_registry(ROOT / "stations")
             wo = WorkOrder(id="wo-gate-003", kind="feature", title="Protected path test")
             report = run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
-                                  executor=command_executor(tmp, "pass"))
+                                  executor=command_executor(tmp, "pass"), base_ref=base_ref)
 
             # Gate should fail with protected path finding
             gate_steps = [s for s in report.steps if s.get("station") == "checks-gate"]
@@ -613,6 +625,369 @@ class TestChecksGateStationKind(unittest.TestCase):
                 arch_content = arch_doc.read_text()
                 self.assertIn("checks-gate", arch_content.lower(),
                             "checks-gate kind must be documented in ARCHITECTURE.md")
+
+class TestChecksGateBuilderDeltaSemantics(unittest.TestCase):
+    """Loopback round 2 regression tests: gate judges only builder's delta, not test-writer output"""
+
+    def test_test_writer_adds_tests_builder_changes_source_gate_passes(self):
+        """Loopback round 2 (1): test-writer adds/modifies tests, builder changes only source → gate passes, reviewers spawn"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+
+            # Initialize git repo and create base ref state
+            import subprocess
+            subprocess.run(["git", "init"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.name", "Test"], cwd=proj, check=True)
+
+            # Set up base ref with checks and protected paths
+            config = json.loads((proj / "anvil.json").read_text())
+            config["checks"] = ["echo 'test passed'", "exit 0"]
+            config["protected_paths"] = ["tests/", "anvil.json"]
+            (proj / "anvil.json").write_text(json.dumps(config, indent=2))
+
+            # Create initial test file
+            (proj / "tests" / "test_existing.py").write_text("# existing test")
+
+            # Commit to establish base ref
+            subprocess.run(["git", "add", "."], cwd=proj, check=True)
+            subprocess.run(["git", "commit", "-m", "Base ref state"], cwd=proj, check=True)
+            base_ref = subprocess.run(["git", "rev-parse", "HEAD"], cwd=proj,
+                                     capture_output=True, text=True, check=True).stdout.strip()
+
+            # Create work branch
+            subprocess.run(["git", "checkout", "-b", "work-branch"], cwd=proj, check=True)
+
+            # Simulate test-writer adding/modifying test files
+            (proj / "tests" / "test_new_scenario.py").write_text("# new scenario test from spec")
+            (proj / "tests" / "test_existing.py").write_text("# existing test - modified by test-writer")
+
+            # Simulate builder changing only source files (not protected paths)
+            (proj / "src" / "feature.py").parent.mkdir(exist_ok=True)
+            (proj / "src" / "feature.py").write_text("# builder implementation")
+
+            # Gate should evaluate only builder's delta (src/feature.py), not test-writer's writes
+            # Since builder didn't touch protected paths, gate should pass
+            reg = load_registry(ROOT / "stations")
+            wo = WorkOrder(id="wo-lb2-001", kind="feature",
+                          title="Loopback round 2 regression 1")
+
+            # For this test, we need to simulate the gate receiving only builder's delta
+            # This would be tracked by the runner
+            builder_changed_files = ["src/feature.py"]  # Only builder's changes
+
+            from anvil.gates import checks_gate
+            result = checks_gate(
+                phase="pre-review",
+                base_ref_config=config,
+                changed_files=builder_changed_files,
+                project_dir=proj,
+                work_order_id=wo.id,
+                timeout=60
+            )
+
+            # Gate should pass - builder didn't touch protected paths
+            self.assertEqual(result["gate_verdict"], "pass")
+            self.assertEqual(result["status"], "passed")
+            self.assertEqual(result["protected_path_verdict"], "pass")
+
+            # Verify gate output records the basis judged
+            self.assertIn("basis", result)
+            self.assertIn("builder_delta", result["basis"])
+
+    def test_builder_modifies_existing_base_ref_test_file_gate_fails(self):
+        """Loopback round 2 (2): builder modifies existing base ref test file → gate fails, no reviewers spawn"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+
+            # Initialize git repo and create base ref state
+            import subprocess
+            subprocess.run(["git", "init"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.name", "Test"], cwd=proj, check=True)
+
+            # Set up base ref with checks and protected paths
+            config = json.loads((proj / "anvil.json").read_text())
+            config["checks"] = ["exit 0"]
+            config["protected_paths"] = ["tests/", "anvil.json"]
+            (proj / "anvil.json").write_text(json.dumps(config, indent=2))
+
+            # Create test file in base ref
+            (proj / "tests" / "test_existing.py").write_text("# existing test in base ref")
+
+            # Commit to establish base ref
+            subprocess.run(["git", "add", "."], cwd=proj, check=True)
+            subprocess.run(["git", "commit", "-m", "Base ref state"], cwd=proj, check=True)
+            base_ref = subprocess.run(["git", "rev-parse", "HEAD"], cwd=proj,
+                                     capture_output=True, text=True, check=True).stdout.strip()
+
+            # Create work branch
+            subprocess.run(["git", "checkout", "-b", "work-branch"], cwd=proj, check=True)
+
+            # Simulate builder modifying the existing test file (protected path violation)
+            (proj / "tests" / "test_existing.py").write_text("# builder modified this test - violation")
+
+            # Gate should detect builder's modification of protected base ref file
+            builder_changed_files = ["tests/test_existing.py"]  # Builder modified protected file
+
+            from anvil.gates import checks_gate
+            result = checks_gate(
+                phase="pre-review",
+                base_ref_config=config,
+                changed_files=builder_changed_files,
+                project_dir=proj,
+                work_order_id="wo-lb2-002",
+                timeout=60
+            )
+
+            # Gate should fail - builder modified protected path
+            self.assertEqual(result["gate_verdict"], "fail")
+            self.assertEqual(result["status"], "failed")
+            self.assertEqual(result["protected_path_verdict"], "fail")
+            self.assertIn("protected_path_findings", result)
+
+            # Finding should name the specific path
+            findings = result["protected_path_findings"]
+            self.assertTrue(any("test_existing.py" in str(f) for f in findings))
+
+    def test_builder_deletes_test_file_gate_fails(self):
+        """Loopback round 2 (3): builder deletes a test file → gate fails"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+
+            # Initialize git repo and create base ref state
+            import subprocess
+            subprocess.run(["git", "init"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.name", "Test"], cwd=proj, check=True)
+
+            # Set up base ref with checks and protected paths
+            config = json.loads((proj / "anvil.json").read_text())
+            config["checks"] = ["exit 0"]
+            config["protected_paths"] = ["tests/", "anvil.json"]
+            (proj / "anvil.json").write_text(json.dumps(config, indent=2))
+
+            # Create test file in base ref
+            (proj / "tests" / "test_to_delete.py").write_text("# test that will be deleted")
+
+            # Commit to establish base ref
+            subprocess.run(["git", "add", "."], cwd=proj, check=True)
+            subprocess.run(["git", "commit", "-m", "Base ref state"], cwd=proj, check=True)
+            base_ref = subprocess.run(["git", "rev-parse", "HEAD"], cwd=proj,
+                                     capture_output=True, text=True, check=True).stdout.strip()
+
+            # Create work branch
+            subprocess.run(["git", "checkout", "-b", "work-branch"], cwd=proj, check=True)
+
+            # Simulate builder deleting the test file
+            (proj / "tests" / "test_to_delete.py").unlink()
+
+            # Gate should detect builder's deletion of protected file
+            # Deletion counts as touching per S3
+            builder_changed_files = ["tests/test_to_delete.py"]  # Tracked as deleted
+
+            from anvil.gates import checks_gate
+            result = checks_gate(
+                phase="pre-review",
+                base_ref_config=config,
+                changed_files=builder_changed_files,
+                project_dir=proj,
+                work_order_id="wo-lb2-003",
+                timeout=60
+            )
+
+            # Gate should fail - builder deleted protected file
+            self.assertEqual(result["gate_verdict"], "fail")
+            self.assertEqual(result["status"], "failed")
+            self.assertEqual(result["protected_path_verdict"], "fail")
+            self.assertIn("protected_path_findings", result)
+
+            # Finding should reference the deleted file
+            findings = result["protected_path_findings"]
+            self.assertTrue(any("test_to_delete.py" in str(f) for f in findings))
+
+    def test_builder_modifies_checks_config_gate_fails_commands_from_base_ref(self):
+        """Loopback round 2 (4): builder modifies checks config → gate fails, commands still resolve from base ref"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+
+            # Initialize git repo and create base ref state
+            import subprocess
+            subprocess.run(["git", "init"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.name", "Test"], cwd=proj, check=True)
+
+            # Set up base ref checks configuration
+            config = json.loads((proj / "anvil.json").read_text())
+            config["checks"] = ["echo 'base ref check command'", "exit 0"]
+            config["protected_paths"] = ["anvil.json", "tests/"]
+            (proj / "anvil.json").write_text(json.dumps(config, indent=2))
+
+            # Commit to establish base ref
+            subprocess.run(["git", "add", "."], cwd=proj, check=True)
+            subprocess.run(["git", "commit", "-m", "Base ref state"], cwd=proj, check=True)
+            base_ref = subprocess.run(["git", "rev-parse", "HEAD"], cwd=proj,
+                                     capture_output=True, text=True, check=True).stdout.strip()
+
+            # Create work branch
+            subprocess.run(["git", "checkout", "-b", "work-branch"], cwd=proj, check=True)
+
+            # Simulate builder modifying checks configuration
+            modified_config = json.loads((proj / "anvil.json").read_text())
+            modified_config["checks"] = ["echo 'modified malicious check'", "exit 0"]
+            (proj / "anvil.json").write_text(json.dumps(modified_config, indent=2))
+
+            # Gate should:
+            # 1. Detect protected path violation (anvil.json modified)
+            # 2. Still run commands from base ref, not modified config
+            builder_changed_files = ["anvil.json"]
+
+            from anvil.gates import checks_gate
+            result = checks_gate(
+                phase="pre-review",
+                base_ref_config=config,  # Base ref config passed in
+                changed_files=builder_changed_files,
+                project_dir=proj,
+                work_order_id="wo-lb2-004",
+                timeout=60
+            )
+
+            # Gate should fail - builder modified protected config file
+            self.assertEqual(result["gate_verdict"], "fail")
+            self.assertEqual(result["status"], "failed")
+            self.assertEqual(result["protected_path_verdict"], "fail")
+
+            # Commands run should be from base ref
+            self.assertIn("commands", result)
+            commands = result["commands"]
+            self.assertIn("base ref check command", commands[0])
+            self.assertNotIn("malicious", commands[0])
+
+            # Protected path finding should name anvil.json
+            findings = result["protected_path_findings"]
+            self.assertTrue(any("anvil.json" in str(f) for f in findings))
+
+    def test_loopback_attempt_judged_on_own_delta(self):
+        """Loopback round 2 (5): first attempt touches protected → fails; loopback attempt doesn't → passes on its own delta"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+
+            # Initialize git repo and create base ref state
+            import subprocess
+            subprocess.run(["git", "init"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.name", "Test"], cwd=proj, check=True)
+
+            # Set up base ref with checks and protected paths
+            config = json.loads((proj / "anvil.json").read_text())
+            config["checks"] = ["exit 0"]
+            config["protected_paths"] = ["tests/", "anvil.json"]
+            (proj / "anvil.json").write_text(json.dumps(config, indent=2))
+
+            # Create a test file in base ref so attempt 1 can modify it (violation)
+            (proj / "tests" / "test_bad.py").write_text("# original test in base ref")
+
+            # Commit to establish base ref
+            subprocess.run(["git", "add", "."], cwd=proj, check=True)
+            subprocess.run(["git", "commit", "-m", "Base ref state"], cwd=proj, check=True)
+            base_ref = subprocess.run(["git", "rev-parse", "HEAD"], cwd=proj,
+                                     capture_output=True, text=True, check=True).stdout.strip()
+
+            # Create work branch
+            subprocess.run(["git", "checkout", "-b", "work-branch"], cwd=proj, check=True)
+
+            # ATTEMPT 1: builder touches protected path
+            attempt1_changed_files = ["tests/test_bad.py", "src/feature.py"]
+
+            from anvil.gates import checks_gate
+            result1 = checks_gate(
+                phase="pre-review",
+                base_ref_config=config,
+                changed_files=attempt1_changed_files,
+                project_dir=proj,
+                work_order_id="wo-lb2-005",
+                timeout=60
+            )
+
+            # Attempt 1 should fail - builder touched protected path
+            self.assertEqual(result1["gate_verdict"], "fail")
+            self.assertEqual(result1["status"], "failed")
+            self.assertEqual(result1["protected_path_verdict"], "fail")
+
+            # ATTEMPT 2 (loopback): builder changes only source, doesn't touch protected paths
+            # This attempt is judged on its OWN delta, not cumulative changes
+            attempt2_changed_files = ["src/feature.py"]  # Only source change, no protected paths
+
+            result2 = checks_gate(
+                phase="pre-review",
+                base_ref_config=config,
+                changed_files=attempt2_changed_files,
+                project_dir=proj,
+                work_order_id="wo-lb2-005",
+                timeout=60
+            )
+
+            # Attempt 2 should pass - judged only on its own delta
+            self.assertEqual(result2["gate_verdict"], "pass")
+            self.assertEqual(result2["status"], "passed")
+            self.assertEqual(result2["protected_path_verdict"], "pass")
+
+            # Verify gate output records which attempt was judged
+            self.assertIn("basis", result2)
+
+    def test_builder_additions_to_protected_paths_recorded_not_violations(self):
+        """Loopback round 2 clarification: builder additions to protected paths are observed, not violations"""
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+
+            # Initialize git repo and create base ref state
+            import subprocess
+            subprocess.run(["git", "init"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=proj, check=True)
+            subprocess.run(["git", "config", "user.name", "Test"], cwd=proj, check=True)
+
+            # Set up base ref with checks and protected paths
+            config = json.loads((proj / "anvil.json").read_text())
+            config["checks"] = ["exit 0"]
+            config["protected_paths"] = ["tests/", "anvil.json"]
+            (proj / "anvil.json").write_text(json.dumps(config, indent=2))
+
+            # Commit to establish base ref (no tests/ directory exists yet)
+            subprocess.run(["git", "add", "."], cwd=proj, check=True)
+            subprocess.run(["git", "commit", "-m", "Base ref state"], cwd=proj, check=True)
+            base_ref = subprocess.run(["git", "rev-parse", "HEAD"], cwd=proj,
+                                     capture_output=True, text=True, check=True).stdout.strip()
+
+            # Create work branch
+            subprocess.run(["git", "checkout", "-b", "work-branch"], cwd=proj, check=True)
+
+            # Simulate builder ADDING a new test file (not modifying/deleting existing one)
+            (proj / "tests").mkdir(exist_ok=True)
+            (proj / "tests" / "test_new_from_builder.py").write_text("# new test added by builder")
+
+            # Gate should record this as an observed addition, not a violation
+            # Per loopback round 2: modifications/deletions of base ref protected files are violations,
+            # but additions are just recorded
+            builder_changed_files = ["tests/test_new_from_builder.py"]
+
+            from anvil.gates import checks_gate
+            result = checks_gate(
+                phase="pre-review",
+                base_ref_config=config,
+                changed_files=builder_changed_files,
+                project_dir=proj,
+                work_order_id="wo-lb2-006",
+                timeout=60
+            )
+
+            # Gate should pass - addition is not a violation
+            self.assertEqual(result["gate_verdict"], "pass")
+            self.assertEqual(result["status"], "passed")
+
+            # But the addition should be recorded as an observation
+            self.assertIn("observed_additions", result)
+            additions = result["observed_additions"]
+            self.assertTrue(any("test_new_from_builder.py" in str(a) for a in additions))
 
 if __name__ == "__main__":
     unittest.main()

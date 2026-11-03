@@ -35,7 +35,7 @@ All commands must exit with code 0 for the gate to pass.
 
 ### Protected Paths
 
-The `protected_paths` field is a list of path prefixes (relative to project root) that are protected from modification during a run. Any change to a file matching a protected path causes the gate to fail automatically, regardless of check command results.
+The `protected_paths` field is a list of path prefixes (relative to project root) that are protected from modification during a run. The gate judges only the **builder station's changes** for the current attempt, not the cumulative changes from all stations.
 
 **Default protected paths** (when not explicitly configured):
 - `tests/` - the project's test directory
@@ -43,7 +43,26 @@ The `protected_paths` field is a list of path prefixes (relative to project root
 
 Projects can extend or replace the defaults by setting `protected_paths` in their configuration.
 
-**Protected path matching**: Paths are matched as prefixes. A protected path of `tests/` matches `tests/test_foo.py`, `tests/unit/bar.py`, etc. Deleting a protected file counts as touching it.
+**Protected path semantics** (clarified in loopback round 2):
+
+The gate judges the working tree delta across the builder station's execution. This means:
+
+- **Violations** (gate fails):
+  - Builder **modifies** an existing base ref file under a protected prefix
+  - Builder **deletes** a base ref file under a protected prefix
+  
+- **Observations** (recorded, not violations):
+  - Builder **adds** a new file under a protected prefix (e.g., creates a new test file)
+  
+- **Not judged**:
+  - Test-writer station output (test files written from the spec before the builder runs)
+  - Changes from other non-builder stations
+
+**Rationale**: The test-writer writes scenario tests from the spec before the builder executes. These tests are part of the judging apparatus (validated by reviewer-tests), not the work under review. The threat model is unchanged: what judges the work cannot be altered by the work under review. The builder still fails the gate if it modifies or deletes an existing test, the checks configuration, or a pipeline definition.
+
+**Per-attempt judgment**: Each builder attempt is judged on its own delta. A loopback attempt is not failed by an earlier attempt's protected path violations - only by its own changes.
+
+**Path matching**: Paths are matched as prefixes. A protected path of `tests/` matches `tests/test_foo.py`, `tests/unit/bar.py`, etc.
 
 ## Base Ref Resolution
 
@@ -101,10 +120,18 @@ Every gate run is recorded in the run report with:
 - **protected_paths**: The protected paths list from base ref config
 - **protected_path_verdict**: `pass` or `fail`
 - **protected_path_findings**: List of protected path violations (if any)
+- **observed_additions**: List of builder additions to protected paths (recorded, not violations)
+- **basis**: What files were judged (description and attempt number)
 - **gate_verdict**: Overall verdict (`pass`, `fail`, or `not_configured`)
 - **output**: Full output from all check commands
 
 The gate appears as its own step in the swimlane, making failures visible without opening the report JSON.
+
+The **basis** field records what was judged:
+- For pre-review phase: `builder_delta` with the attempt number
+- For pre-deploy phase: `builder_delta` (same basis as pre-review)
+
+This makes it clear in the report that each gate run judged only the builder's changes for that specific attempt, not the cumulative changes from all stations.
 
 ## Dogfooding
 

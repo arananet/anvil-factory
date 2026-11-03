@@ -153,20 +153,80 @@ def resolve_base_ref_config(project_dir, base_ref=None, config_filename="anvil.j
     return {}
 
 
-def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_id, timeout=300):
+def _get_base_ref_files(project_dir, base_ref):
+    """Get set of files that existed in the base ref.
+
+    Args:
+        project_dir: Path to project directory
+        base_ref: Git ref to resolve from (if None, tries to infer from git)
+
+    Returns:
+        Set of file paths that existed in base ref, or empty set if can't determine.
+    """
+    try:
+        # Check if this is a git repo
+        result = subprocess.run(
+            ["git", "rev-parse", "--git-dir"],
+            cwd=str(project_dir),
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        if result.returncode == 0:
+            # If no base_ref provided, try to infer it
+            ref_to_use = base_ref
+            if not ref_to_use:
+                # Try HEAD (last commit on current branch)
+                result = subprocess.run(
+                    ["git", "rev-parse", "HEAD"],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                if result.returncode == 0:
+                    ref_to_use = result.stdout.strip()
+
+            if ref_to_use:
+                # Get list of files in base ref
+                result = subprocess.run(
+                    ["git", "ls-tree", "-r", "--name-only", ref_to_use],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                if result.returncode == 0:
+                    return {line.strip() for line in result.stdout.split('\n') if line.strip()}
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        pass
+
+    return set()
+
+
+def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_id, timeout=300, base_ref=None, basis="builder_delta", attempt=None):
     """Run the checks gate: execute check commands and validate protected paths.
+
+    Loopback round 2 semantics: The protected path check judges only the builder
+    station's changes for the current attempt (the working tree delta across the
+    builder execution). A violation is the builder modifying or deleting a base ref
+    file under a protected prefix. Builder additions are recorded as observed
+    additions, not violations. Each attempt is judged on its own delta.
 
     Args:
         phase: "pre-review" or "pre-deploy"
         base_ref_config: Configuration dict resolved from base ref
-        changed_files: Set of changed file paths relative to project root
+        changed_files: Set of changed file paths relative to project root (builder's delta)
         project_dir: Path to project directory
         work_order_id: Work order ID for logging
         timeout: Timeout in seconds for each check command
+        base_ref: Git ref that the work branched from (for determining base ref files)
+        basis: Description of what files are being judged (e.g., "builder_delta")
+        attempt: Attempt number being judged (optional)
 
     Returns:
         Dict with gate results including status, commands, exit_codes,
-        protected_path_verdict, gate_verdict, and output.
+        protected_path_verdict, gate_verdict, basis, observed_additions, and output.
     """
     checks = base_ref_config.get("checks", [])
 
@@ -180,6 +240,9 @@ def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_i
         config_file_name = "anvil.json"  # Standard config file name
         protected_paths = ["tests/", config_file_name]
 
+    # Build basis description
+    basis_str = f"{basis}" + (f" (attempt {attempt})" if attempt else "")
+
     # If no checks configured (S6)
     if not checks:
         return {
@@ -191,18 +254,41 @@ def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_i
             "protected_paths": protected_paths,
             "protected_path_verdict": "pass",
             "protected_path_findings": [],
+            "observed_additions": [],
             "gate_verdict": "not_configured",
+            "basis": basis_str,
             "output": ""
         }
 
-    # Check for protected path violations (S3)
+    # Get base ref files to distinguish additions from modifications/deletions
+    base_ref_files = _get_base_ref_files(project_dir, base_ref)
+
+    # Check for protected path violations (Loopback round 2)
+    # Violations: builder modifying or deleting a base ref file under a protected path
+    # Observed: builder adding a new file under a protected path (not a violation)
     protected_path_findings = []
+    observed_additions = []
+
     for changed_file in changed_files:
+        # Check if file is under a protected path
+        is_protected = False
+        matched_prefix = None
         for protected_path in protected_paths:
             if changed_file.startswith(protected_path):
-                protected_path_findings.append(
-                    f"Protected path touched: {changed_file} (matches {protected_path})")
+                is_protected = True
+                matched_prefix = protected_path
                 break
+
+        if is_protected:
+            # Determine if this is an addition or modification/deletion
+            if changed_file in base_ref_files:
+                # Modification or deletion of existing base ref file -> VIOLATION
+                protected_path_findings.append(
+                    f"Protected path violation: {changed_file} (base ref file modified/deleted, matches {matched_prefix})")
+            else:
+                # Addition of new file -> OBSERVED, not a violation
+                observed_additions.append(
+                    f"Protected path addition (observed): {changed_file} (matches {matched_prefix})")
 
     protected_path_verdict = "fail" if protected_path_findings else "pass"
 
@@ -232,9 +318,20 @@ def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_i
 
     # Build output summary
     output_lines = []
+    output_lines.append(f"# Checks Gate: {phase}")
+    output_lines.append(f"Basis: {basis}")
+    if attempt is not None:
+        output_lines.append(f"Attempt: {attempt}")
+    output_lines.append("")
+
     if protected_path_findings:
         output_lines.append("# Protected Path Violations")
         output_lines.extend(protected_path_findings)
+        output_lines.append("")
+
+    if observed_additions:
+        output_lines.append("# Protected Path Additions (Observed, Not Violations)")
+        output_lines.extend(observed_additions)
         output_lines.append("")
 
     output_lines.append("# Check Commands")
@@ -256,6 +353,8 @@ def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_i
         "protected_paths": protected_paths,
         "protected_path_verdict": protected_path_verdict,
         "protected_path_findings": protected_path_findings,
+        "observed_additions": observed_additions,
         "gate_verdict": gate_verdict,
+        "basis": basis_str,
         "output": "\n".join(output_lines)
     }

@@ -1,19 +1,19 @@
-Tests complete. I've written comprehensive tests for the loopback round:
+Perfect! The tests are complete. I've added 6 regression tests to `tests/test_checks_gate.py` for loopback round 2:
 
-**Critical S4 Regression Tests** (2 tests in `tests/test_checks_gate.py`):
-- Uncommitted mutation: proves gate uses base ref commands when config mutated in working tree
-- Committed mutation: proves gate uses base ref commands when config mutated in committed work branch
+## Tests Written
 
-**Station Kind Test** (1 test in `tests/test_checks_gate.py`):
-- Verifies checks-gate has kind='deterministic' or is documented in ARCHITECTURE.md
+**Test Class: `TestChecksGateBuilderDeltaSemantics`**
 
-**Pure Function Tests** (8 tests in new `tests/test_gates.py`):
-- Function signature verification
-- Pass/fail verdicts
-- Protected path detection
-- Not configured status
-- Phase recording
-- Prefix matching
-- Function purity
+1. **test_test_writer_adds_tests_builder_changes_source_gate_passes** - Verifies that when test-writer adds/modifies test files but builder changes only source files, the gate passes and reviewers spawn (requirement 1)
 
-All tests map to spec scenarios S1-S6 with focus on the S4 security finding. Output written to `runs/wo-gh-6/test-writer.output.md`.
+2. **test_builder_modifies_existing_base_ref_test_file_gate_fails** - Proves builder modification of an existing base ref test file triggers gate failure with protected path finding (requirement 2)
+
+3. **test_builder_deletes_test_file_gate_fails** - Confirms builder deletion of a test file fails the gate (requirement 3)
+
+4. **test_builder_modifies_checks_config_gate_fails_commands_from_base_ref** - Validates that builder modification of checks config fails the gate while commands still resolve from base ref (requirement 4)
+
+5. **test_loopback_attempt_judged_on_own_delta** - Demonstrates that each attempt is judged on its own builder delta, not cumulative changes (requirement 5)
+
+6. **test_builder_additions_to_protected_paths_recorded_not_violations** - Verifies that builder additions to protected paths are recorded as observations, not violations (clarified semantics)
+
+All tests follow the factory suite style with git repo setup, direct calls to the `checks_gate` pure function from `anvil/gates.py`, and clear assertions verifying the loopback round 2 clarified semantics: the gate judges only the builder station's delta, not test-writer output.

@@ -1,7 +1,3 @@
-## Observer Report Complete
+Observer output created. The observer station requires a release record from the deployer as input, but the deployer hasn't executed yet (status: `packet_ready`). Following station rules, the output notes the missing input rather than guessing.
 
-Created observation report at `runs/wo-gh-6/observer.output.md`.
-
-**Status**: Cannot observe - no release has occurred yet.
-
-The observer station requires a release record from the deployer as input. The deployer is currently at `packet_ready` status but hasn't executed. Without a release, there's nothing to observe. The deployer must complete first and produce a release record before observation can proceed.
+The file is at `runs/wo-gh-6/observer.output.md`.

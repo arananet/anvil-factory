@@ -125,6 +125,55 @@ def _executor_provenance(executor, output_text=""):
     return {"kind": str(kind), "detail": getattr(executor, "name", str(kind))}, None
 
 
+def _snapshot_working_tree(project_dir):
+    """Capture current state of working tree files.
+
+    Args:
+        project_dir: Path to project directory
+
+    Returns:
+        Dict mapping relative file paths to their content hash (or None for deleted/new).
+    """
+    project_path = Path(project_dir)
+    snapshot = {}
+
+    for p in project_path.rglob("*"):
+        if p.is_file() and ".git" not in p.parts and "runs" not in p.parts:
+            try:
+                rel_path = str(p.relative_to(project_path))
+                # Use file modification time as a simple hash
+                snapshot[rel_path] = p.stat().st_mtime
+            except (ValueError, OSError):
+                pass
+
+    return snapshot
+
+
+def _compute_delta(before_snapshot, after_snapshot):
+    """Compute the delta between two working tree snapshots.
+
+    Args:
+        before_snapshot: Dict from _snapshot_working_tree (before state)
+        after_snapshot: Dict from _snapshot_working_tree (after state)
+
+    Returns:
+        Set of file paths that were added, modified, or deleted.
+    """
+    delta = set()
+
+    # Files added or modified
+    for file_path, mtime in after_snapshot.items():
+        if file_path not in before_snapshot or before_snapshot[file_path] != mtime:
+            delta.add(file_path)
+
+    # Files deleted
+    for file_path in before_snapshot:
+        if file_path not in after_snapshot:
+            delta.add(file_path)
+
+    return delta
+
+
 def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None, base_ref=None):
     """Get list of changed files relative to base ref.
 
@@ -307,6 +356,12 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     # Track gate state
     gate_failed = False
 
+    # Track builder delta for protected path checking (Loopback round 2)
+    # Each builder attempt is judged on its own delta
+    builder_attempt = 0
+    builder_delta = set()
+    builder_snapshot_before = None
+
     # Check for design system and prepare warnings
     warnings = []
     has_design_system = load_design_system(project) is not None
@@ -386,11 +441,21 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             else:
                 phase = "pre-deploy"
 
-            # Get changed files at gate time
-            current_changed_files = _get_changed_files(project, initial_files, work_output_dirs, base_ref)
+            # Loopback round 2: Use builder delta for protected path checking
+            # The gate judges only the builder station's changes for the current attempt
+            if phase == "pre-review" and builder_delta:
+                gate_changed_files = builder_delta
+                gate_basis = "builder_delta"
+                gate_attempt = builder_attempt
+            else:
+                # For pre-deploy or when builder delta not available, use cumulative changes
+                gate_changed_files = _get_changed_files(project, initial_files, work_output_dirs, base_ref)
+                gate_basis = "cumulative_changes" if phase == "pre-deploy" else "builder_delta"
+                gate_attempt = builder_attempt if phase == "pre-review" else None
 
             # Run the gate
-            gate_result = checks_gate(phase, base_ref_config, current_changed_files, project, work_order.id)
+            gate_result = checks_gate(phase, base_ref_config, gate_changed_files, project, work_order.id,
+                                     base_ref=base_ref, basis=gate_basis, attempt=gate_attempt)
             status = gate_result["status"]
             detail = gate_result["detail"]
 
@@ -407,6 +472,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 "protected_paths": gate_result["protected_paths"],
                 "protected_path_verdict": gate_result["protected_path_verdict"],
                 "protected_path_findings": gate_result["protected_path_findings"],
+                "observed_additions": gate_result.get("observed_additions", []),
+                "basis": gate_result.get("basis", ""),
                 "gate_verdict": gate_result["gate_verdict"]
             }
 
@@ -428,8 +495,13 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             deferred_pre_deploy_gate = None
             if verdict == "approved" and not blocked and not gate_failed:
                 gate_started = time.perf_counter()
-                current_changed_files = _get_changed_files(project, initial_files, work_output_dirs, base_ref)
-                gate_result = checks_gate("pre-deploy", base_ref_config, current_changed_files, project, work_order.id)
+                # Use builder delta for pre-deploy as well (same basis as pre-review)
+                if builder_delta:
+                    gate_changed_files = builder_delta
+                else:
+                    gate_changed_files = _get_changed_files(project, initial_files, work_output_dirs, base_ref)
+                gate_result = checks_gate("pre-deploy", base_ref_config, gate_changed_files, project, work_order.id,
+                                         base_ref=base_ref, basis="builder_delta", attempt=builder_attempt)
 
                 gate_output_file = run_dir / "checks-gate.pre-deploy.output.md"
                 gate_output_file.write_text(gate_result["output"], encoding="utf-8")
@@ -450,6 +522,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     "protected_paths": gate_result["protected_paths"],
                     "protected_path_verdict": gate_result["protected_path_verdict"],
                     "protected_path_findings": gate_result["protected_path_findings"],
+                    "observed_additions": gate_result.get("observed_additions", []),
+                    "basis": gate_result.get("basis", ""),
                     "gate_verdict": gate_result["gate_verdict"]
                 }
                 deferred_pre_deploy_gate = gate_step
@@ -532,6 +606,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 packet = packet_step(station, station_id)
                 artifact = str(packet)
             else:
+                # Capture builder delta (Loopback round 2)
+                if station_id == "builder":
+                    builder_attempt += 1
+                    builder_snapshot_before = _snapshot_working_tree(project)
+
                 packet = packet_step(station, station_id)
                 packet_text = packet.read_text(encoding="utf-8")
                 output_file = run_dir / f"{station_id}.output.md"
@@ -577,12 +656,12 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                             extra_envelope["review_parse_failed"] = True
                             detail += "; review output did not parse as a review JSON"
 
-                    # Track changed files for builder and other stations that modify files
-                    if station_id == "builder":
-                        # Track any files modified by the builder
-                        # In a real implementation, this would compare with base ref
-                        # For now, we'll track based on what exists in the project
-                        pass
+                    # Track builder delta for protected path checking (Loopback round 2)
+                    if station_id == "builder" and builder_snapshot_before is not None:
+                        # Capture working tree state after builder execution
+                        builder_snapshot_after = _snapshot_working_tree(project)
+                        # Compute delta: files added, modified, or deleted by this builder attempt
+                        builder_delta = _compute_delta(builder_snapshot_before, builder_snapshot_after)
                 except ExecutorError as exc:
                     status = "failed"
                     detail = f"Executor failed: {exc}"
