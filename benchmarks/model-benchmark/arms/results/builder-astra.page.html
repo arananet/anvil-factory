@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#FAFAF6">
+  <title>Meridian Patch</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 32px;
+      background: #FAFAF6;
+      color: #14201B;
+      font-family: "Inter", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    #page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0;
+      border: 1px solid #E3E6DF;
+      border-radius: 16px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 144px;
+      align-items: start;
+      gap: 24px 48px;
+      padding: 64px;
+      border-bottom: 1px solid #E3E6DF;
+    }
+
+    #hero-title {
+      grid-column: 1;
+      margin: 0;
+      color: #14201B;
+      font-family: "Space Grotesk", Arial, sans-serif;
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    #hero-sub {
+      grid-column: 1;
+      margin: 0;
+      color: #53685C;
+      font-family: "Inter", Arial, sans-serif;
+      font-size: 20px;
+      line-height: 1.5;
+    }
+
+    #cta-primary {
+      grid-column: 1;
+      justify-self: start;
+      margin: 8px 0 0;
+      padding: 16px 32px;
+      border: 2px solid #0E7C66;
+      border-radius: 8px;
+      background: #0E7C66;
+      color: #FAFAF6;
+      font-family: "Inter", Arial, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.5;
+      cursor: pointer;
+    }
+
+    #cta-primary:hover {
+      background: #14201B;
+      border-color: #14201B;
+    }
+
+    #price-badge {
+      grid-column: 2;
+      grid-row: 1 / 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 144px;
+      height: 144px;
+      margin: 0;
+      padding: 24px;
+      border-radius: 999px;
+      background: #FF6B4A;
+      color: #14201B;
+      font-family: "Inter", Arial, sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    #section {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+      align-items: start;
+      gap: 24px 48px;
+      margin: 0;
+      padding: 64px;
+    }
+
+    #heading-2 {
+      grid-column: 1;
+      margin: 0;
+      color: #14201B;
+      font-family: "Space Grotesk", Arial, sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    #body-text {
+      grid-column: 1;
+      margin: 0;
+      color: #14201B;
+      font-family: "Inter", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    #caption {
+      grid-column: 1;
+      margin: 0;
+      padding: 0 0 0 16px;
+      border-left: 2px solid #53685C;
+      color: #53685C;
+      font-family: "Inter", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    #link-inline {
+      grid-column: 1;
+      justify-self: start;
+      margin: 0;
+      color: #0E7C66;
+      font-family: "Inter", Arial, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.5;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    #link-inline:hover {
+      color: #14201B;
+    }
+
+    #cta-primary:focus-visible,
+    #link-inline:focus-visible {
+      outline: 2px solid #0E7C66;
+      outline-offset: 2px;
+    }
+
+    #card {
+      grid-column: 2;
+      grid-row: 1 / 5;
+      margin: 0;
+      padding: 32px;
+      border: 1px solid #E3E6DF;
+      border-top: 4px solid #0E7C66;
+      border-radius: 12px;
+      background: #FAFAF6;
+      color: #14201B;
+      font-family: "Inter", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    #card h3 {
+      margin: 0 0 24px;
+      font-family: "Space Grotesk", Arial, sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    #card ul {
+      margin: 0;
+      padding: 0 0 0 24px;
+    }
+
+    #card li {
+      margin: 0;
+      padding: 0 0 0 8px;
+    }
+
+    #card li + li {
+      margin-top: 16px;
+    }
+
+    #card li::marker {
+      color: #0E7C66;
+    }
+
+    @media (max-width: 900px) {
+      header {
+        padding: 40px;
+        gap: 24px 32px;
+      }
+
+      #hero-title {
+        font-size: 56px;
+      }
+
+      #section {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 40px;
+      }
+
+      #card {
+        grid-column: 1;
+        grid-row: auto;
+        margin-top: 8px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 8px;
+      }
+
+      header {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 32px 16px;
+      }
+
+      #price-badge {
+        grid-column: 1;
+        grid-row: auto;
+        width: 112px;
+        height: 112px;
+        padding: 16px;
+      }
+
+      #section {
+        padding: 32px 16px;
+      }
+
+      #card {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="page">
+    <header>
+      <h1 id="hero-title">Transform Your Health with Meridian Patch</h1>
+      <p id="hero-sub">Advanced biosensor technology meets elegant design</p>
+      <button id="cta-primary" type="button">Start Your Journey</button>
+      <span id="price-badge">$199</span>
+    </header>
+    <section id="section">
+      <h2 id="heading-2">Why Meridian Patch?</h2>
+      <p id="body-text">The Meridian Patch combines cutting-edge health monitoring with seamless daily wear. Our proprietary biosensor array tracks your vital signs in real-time, providing actionable insights through our companion app. Designed for comfort and accuracy, the Meridian Patch represents the future of personal health technology.</p>
+      <p id="caption">Clinical validation pending FDA review</p>
+      <a id="link-inline" href="#">Learn more about our technology</a>
+      <div id="card">
+        <h3>What's Included</h3>
+        <ul>
+          <li>30-day supply of Meridian Patches</li>
+          <li>Premium companion app access</li>
+          <li>24/7 health insights dashboard</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

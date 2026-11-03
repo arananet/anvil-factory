@@ -1,0 +1,16 @@
+{
+  "station": "reviewer-design",
+  "verdict": "changes_requested",
+  "findings": [
+    "Typography — src/page.html #hero-title uses 48px, which is outside the type scale and below the 56px hero minimum. Use 56px or 64px.",
+    "Color usage — #hero-sub uses undocumented #5C6F66. Replace it with the secondary-text token pine (#53685C).",
+    "Typography — #heading-2 starts its font stack with Arial. Every heading stack must start with \"Space Grotesk\".",
+    "Typography — #body-text uses 15px, which is outside the type scale and below the 16px body minimum. Use at least 16px from the documented scale.",
+    "Typography — #body-text uses line-height: 1.33 instead of 1.5. The body also lacks the required 1.5 baseline, leaving #link-inline with normal line height. Set body line-height to 1.5 and remove or correct the paragraph override.",
+    "Spacing — #section uses padding-top: 30px, violating the multiple-of-8 rule. Change it to a documented-rhythm value such as 32px.",
+    "Border radius — #card uses 10px, which is not a radius token. Use 4px, 8px, 12px, 16px, or 999px.",
+    "Color usage and contrast — #caption uses line (#E3E6DF) as text on paper (#FAFAF6), failing the required 4.5:1 contrast and appearing nearly invisible in the capture. Use pine (#53685C), the documented caption color.",
+    "Color usage and contrast — #link-inline uses coral (#FF6B4A), which is reserved exclusively for the price badge and fails 4.5:1 contrast on paper. Use a permitted palette color that meets the contrast requirement, such as teal (#0E7C66).",
+    "Focus states — #cta-primary and #link-inline have no :focus-visible styling implementing the required outline. Add a 2px solid #0E7C66 outline with a 2px outline-offset to both controls."
+  ]
+}

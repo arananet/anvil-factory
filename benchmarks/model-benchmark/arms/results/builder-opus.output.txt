@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meridian Patch</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    background-color: #FAFAF6;
+    color: #14201B;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  #page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 64px 32px;
+    background-color: #FAFAF6;
+  }
+  header {
+    margin: 0 0 64px 0;
+    padding: 0 0 48px 0;
+    border-bottom: 1px solid #E3E6DF;
+  }
+  #hero-title {
+    margin: 0 0 24px 0;
+    padding: 0;
+    font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+    font-size: 56px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #14201B;
+  }
+  #hero-sub {
+    margin: 0 0 32px 0;
+    padding: 0;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 20px;
+    line-height: 1.5;
+    color: #53685C;
+  }
+  #cta-primary {
+    margin: 0 16px 0 0;
+    padding: 16px 32px;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 600;
+    color: #FAFAF6;
+    background-color: #0E7C66;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    vertical-align: middle;
+  }
+  #cta-primary:focus-visible {
+    outline: 2px solid #0E7C66;
+    outline-offset: 2px;
+  }
+  #price-badge {
+    display: inline-block;
+    margin: 0;
+    padding: 8px 16px;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 700;
+    color: #14201B;
+    background-color: #FF6B4A;
+    border-radius: 999px;
+    vertical-align: middle;
+  }
+  #section {
+    margin: 0;
+    padding: 0;
+  }
+  #heading-2 {
+    margin: 0 0 24px 0;
+    padding: 0;
+    font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+    font-size: 32px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #14201B;
+  }
+  #body-text {
+    margin: 0 0 16px 0;
+    padding: 0;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #14201B;
+    max-width: 720px;
+  }
+  #caption {
+    margin: 0 0 24px 0;
+    padding: 0;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #53685C;
+  }
+  #link-inline {
+    display: inline-block;
+    margin: 0 0 40px 0;
+    padding: 0;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 600;
+    color: #0E7C66;
+    text-decoration: underline;
+  }
+  #link-inline:focus-visible {
+    outline: 2px solid #0E7C66;
+    outline-offset: 2px;
+  }
+  #card {
+    margin: 0;
+    padding: 32px;
+    background-color: #FAFAF6;
+    border: 1px solid #E3E6DF;
+    border-radius: 12px;
+    max-width: 480px;
+  }
+  #card h3 {
+    margin: 0 0 16px 0;
+    padding: 0;
+    font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+    font-size: 24px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #14201B;
+  }
+  #card ul {
+    margin: 0;
+    padding: 0 0 0 24px;
+  }
+  #card li {
+    margin: 0 0 8px 0;
+    padding: 0;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #14201B;
+  }
+  #card li:last-child {
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+  <div id="page">
+    <header>
+      <h1 id="hero-title">Transform Your Health with Meridian Patch</h1>
+      <p id="hero-sub">Advanced biosensor technology meets elegant design</p>
+      <button id="cta-primary" type="button">Start Your Journey</button>
+      <span id="price-badge">$199</span>
+    </header>
+    <section id="section">
+      <h2 id="heading-2">Why Meridian Patch?</h2>
+      <p id="body-text">The Meridian Patch combines cutting-edge health monitoring with seamless daily wear. Our proprietary biosensor array tracks your vital signs in real-time, providing actionable insights through our companion app. Designed for comfort and accuracy, the Meridian Patch represents the future of personal health technology.</p>
+      <p id="caption">Clinical validation pending FDA review</p>
+      <a id="link-inline" href="#">Learn more about our technology</a>
+      <div id="card">
+        <h3>What's Included</h3>
+        <ul>
+          <li>30-day supply of Meridian Patches</li>
+          <li>Premium companion app access</li>
+          <li>24/7 health insights dashboard</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

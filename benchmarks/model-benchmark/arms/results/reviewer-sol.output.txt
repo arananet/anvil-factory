@@ -1,0 +1,16 @@
+{
+  "station": "reviewer-design",
+  "verdict": "changes_requested",
+  "findings": [
+    "Typography: #hero-title uses 48px, which is outside the documented type scale and below the 56px hero minimum. Use 56px or 64px.",
+    "Color usage: #hero-sub uses undocumented color #5C6F66. Replace it with the secondary-text token pine (#53685C).",
+    "Typography: #heading-2 starts its font stack with Arial. Every heading stack must start with Space Grotesk.",
+    "Typography: #body-text uses 15px and line-height 1.33. Use a documented size of at least 16px and body line-height 1.5.",
+    "Typography: #cta-primary, #price-badge and #link-inline have no specified or inherited line-height of 1.5. Set the required body line-height on these elements or through appropriate inheritance.",
+    "Spacing: #section uses padding-top: 30px, violating the requirement that all padding values be multiples of 8. Use a compliant value such as 32px.",
+    "Color usage and accessibility: #link-inline uses coral (#FF6B4A), which is reserved exclusively for the price badge, and its text fails the required 4.5:1 contrast against paper. Use a permitted palette color that meets the contrast requirement.",
+    "Accessibility: #caption uses line (#E3E6DF) as text on paper (#FAFAF6), failing the required 4.5:1 contrast. Use a compliant text color such as pine.",
+    "Border radius: #card uses 10px, which is not a documented radius token. Use 4px, 8px, 12px, 16px or 999px.",
+    "Focus states: #cta-primary and #link-inline lack the required :focus-visible styling. Add a 2px solid teal (#0E7C66) outline with a 2px offset."
+  ]
+}
