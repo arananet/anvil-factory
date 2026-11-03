@@ -1,0 +1,8 @@
+{
+  "name": "text-gpt-6.1-sol",
+  "method": "POST",
+  "url_path": "",
+  "http_status": "400",
+  "curl_stderr": "",
+  "response_body": "{\"success\":false,\"result\":[],\"messages\":[],\"error\":[{\"code\":2008,\"message\":\"Invalid provider\"}],\"name\":\"AiGatewayError\",\"httpCode\":400,\"internalCode\":2008,\"message\":\"Invalid provider\",\"description\":\"Invalid provider\"}"
+}
