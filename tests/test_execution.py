@@ -14,22 +14,35 @@ ROOT = Path(__file__).resolve().parent.parent
 
 FAKE_EXECUTOR = '''
 import json, sys
+from pathlib import Path
 packet_path = sys.argv[1]
 mode = sys.argv[2] if len(sys.argv) > 2 else "pass"
 station = ""
+work_order_id = ""
 for line in open(packet_path, encoding="utf-8"):
     if line.startswith("# Task packet:"):
         station = line.split(":", 1)[1].strip()
-        break
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
 if mode == "boom":
     print("executor exploded", file=sys.stderr)
     sys.exit(3)
 if station.startswith("reviewer"):
-    verdict = "pass" if mode == "pass" else "fail"
-    print(json.dumps({"station": station, "verdict": verdict,
-                      "findings": ["Fake executor review for " + station]}))
-elif mode == "garbage" and station.startswith("reviewer"):
-    print("no json here at all")
+    if mode == "garbage":
+        # Write garbage to review file instead of stdout
+        review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+        review_path.parent.mkdir(parents=True, exist_ok=True)
+        review_path.write_text("no json here at all")
+        print("Wrote garbage to review file")
+    else:
+        verdict = "pass" if mode == "pass" else "fail"
+        review_obj = {"station": station, "verdict": verdict,
+                      "findings": ["Fake executor review for " + station]}
+        # Write review to file (new producer expects this)
+        review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+        review_path.parent.mkdir(parents=True, exist_ok=True)
+        review_path.write_text(json.dumps(review_obj))
+        print("Wrote review to file")
 else:
     print("Executed " + station)
 '''
@@ -106,7 +119,24 @@ class TestCommandExecution(unittest.TestCase):
             proj = make_project(tmp)
             reg = load_registry(ROOT / "stations")
             script = Path(tmp) / "garbage.py"
-            script.write_text('import sys\nprint("plain text, no review json")\n')
+            # Write garbage to review file (new producer reads from file, not stdout)
+            script.write_text('''
+import sys
+from pathlib import Path
+packet_path = sys.argv[1]
+station = ""
+work_order_id = ""
+for line in open(packet_path, encoding="utf-8"):
+    if line.startswith("# Task packet:"):
+        station = line.split(":", 1)[1].strip()
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
+if station.startswith("reviewer"):
+    review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+    review_path.parent.mkdir(parents=True, exist_ok=True)
+    review_path.write_text("plain text, no review json")
+print("Wrote garbage to review file")
+''')
             executor = create_executor({"kind": "command",
                                         "command": f"{sys.executable} {script} {{packet}}",
                                         "timeout_seconds": 60})
