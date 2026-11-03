@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "completed",
       "detail": "Work order normalized",
-      "duration_ms": 0.01,
+      "duration_ms": 0.019,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/report.json"
@@ -21,7 +21,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-6/spec-writer.output.md",
-      "duration_ms": 66240.686,
+      "duration_ms": 76046.596,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/spec-writer.output.md"
@@ -37,7 +37,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-6/test-writer.output.md",
-      "duration_ms": 127757.17,
+      "duration_ms": 116170.182,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/test-writer.output.md"
@@ -53,7 +53,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-6/builder.output.md",
-      "duration_ms": 167067.826,
+      "duration_ms": 156550.487,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/builder.output.md"
@@ -69,7 +69,7 @@
       "station": "checks-gate",
       "status": "passed",
       "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 5538.333,
+      "duration_ms": 7682.744,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/checks-gate.pre-review.output.md"
@@ -96,8 +96,8 @@
     {
       "station": "reviewer-spec",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-spec.output.md; review output did not parse as a review JSON",
-      "duration_ms": 89332.66,
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-spec.output.md",
+      "duration_ms": 185573.361,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/reviewer-spec.output.md"
@@ -112,8 +112,8 @@
     {
       "station": "reviewer-security",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-security.output.md; review output did not parse as a review JSON",
-      "duration_ms": 135885.176,
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-security.output.md",
+      "duration_ms": 150210.81,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/reviewer-security.output.md"
@@ -128,8 +128,8 @@
     {
       "station": "reviewer-tests",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-tests.output.md; review output did not parse as a review JSON",
-      "duration_ms": 85378.268,
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-tests.output.md",
+      "duration_ms": 90696.925,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/reviewer-tests.output.md"
@@ -144,8 +144,8 @@
     {
       "station": "reviewer-architecture",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-architecture.output.md; review output did not parse as a review JSON",
-      "duration_ms": 142242.739,
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-architecture.output.md",
+      "duration_ms": 119272.743,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/reviewer-architecture.output.md"
@@ -160,8 +160,8 @@
     {
       "station": "reviewer-design",
       "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-design.output.md; review output did not parse as a review JSON",
-      "duration_ms": 59958.646,
+      "detail": "Executed by command; output written to runs/wo-gh-6/reviewer-design.output.md",
+      "duration_ms": 56277.328,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/reviewer-design.output.md"
@@ -176,8 +176,8 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.023,
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.051,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/report.json"
@@ -189,8 +189,8 @@
     {
       "station": "triage-human",
       "status": "completed",
-      "detail": "Human review: required",
-      "duration_ms": 0.007,
+      "detail": "Human review: not_required",
+      "duration_ms": 0.015,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -201,7 +201,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-6/deployer.packet.md",
-      "duration_ms": 0.241,
+      "duration_ms": 0.165,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/deployer.packet.md"
@@ -214,7 +214,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-6/observer.output.md",
-      "duration_ms": 39917.111,
+      "duration_ms": 54043.233,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-6/observer.output.md"
@@ -227,8 +227,8 @@
       }
     }
   ],
-  "verdict": "no_reviews",
-  "human_required": true,
+  "verdict": "approved",
+  "human_required": false,
   "max_loopbacks": 2,
   "loopbacks": 0,
   "deployment_status": null,
@@ -236,7 +236,28 @@
   "risk_hints": [],
   "decision": {
     "approver": {
-      "reviews_counted": [],
+      "reviews_counted": [
+        {
+          "station": "reviewer-spec",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-security",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-architecture",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "pass"
+        }
+      ],
       "reviews_expected": [
         "reviewer-spec",
         "reviewer-security",
@@ -244,14 +265,14 @@
         "reviewer-architecture",
         "reviewer-design"
       ],
-      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)"
+      "rule": "All counted reviews passed."
     },
     "human_gate": {
-      "required": true,
-      "rule": "Verdict is no_reviews, not approved, so a human is required.",
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
       "hints_matched": []
     }
   },
   "warnings": [],
-  "base_ref": "71bd3ecce8479407e725ea5194a08b7b067d6006"
+  "base_ref": "36f9d7249100d48e10b40b26d33440b390378e9e"
 }

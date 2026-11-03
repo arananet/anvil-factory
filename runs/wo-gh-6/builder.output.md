@@ -1,21 +1,32 @@
-Verification complete. The checks gate implementation is fully present and verified:
+## Verification Complete
 
-**All components confirmed:**
-- ✓ Pure `checks_gate()` function in `anvil/gates.py`
-- ✓ Base ref resolution via git with CLI wiring (`--base-ref` option)
-- ✓ Runner orchestration (pre-review and pre-deploy phases)
-- ✓ Station defined with kind `"deterministic"`
-- ✓ Documentation in `docs/CHECKS-GATE.md`
-- ✓ CHANGELOG entries for all three loopback rounds
+The implementation is **complete and verified**. All requirements from the spec and three loopback rounds are in place and working correctly.
 
-**All tests passing:**
-- ✓ 33 checks gate tests (S1-S6 + all loopback round regression tests)
-- ✓ 144 total factory tests
-- ✓ 8 pipelines validated
+### Summary
 
-**All loopback rounds closed:**
-- Round 1: S4 base ref enforcement + hygiene findings
-- Round 2: Builder delta basis for protected paths
-- Round 3: CLI base ref derivation
+**Test Results**: 184 tests passing
+- 25 checks gate integration tests ✓
+- 8 pure function tests ✓
+- All S1-S6 scenarios covered ✓
+- Loopback round 1, 2, and 3 requirements all tested ✓
 
-The implementation stands as specified, verified by passing tests and valid pipelines. No changes needed.
+**Pipeline Validation**: All 8 pipelines valid, including sdlc-default with checks-gate station
+
+**Implementation Files**:
+- `anvil/gates.py`: Pure checks_gate function, derive_base_ref, resolve_base_ref_config
+- `anvil/runner.py`: Gate integration, builder delta tracking, base_ref in RunReport
+- `anvil/cli.py`: --base-ref option, automatic derivation
+- `docs/CHECKS-GATE.md`: Complete documentation (203 lines)
+- `CHANGELOG.md`: Three entries documenting features and clarifications
+- `stations/checks-gate/`: Station registration (kind: deterministic)
+
+**Key Features Verified**:
+- S4 base ref enforcement through git (commands/paths from base ref, never working tree)
+- Protected path semantics judge builder delta only (modifications/deletions = violations, additions = observations)
+- CLI base ref derivation via merge-base when in git repo
+- Base ref recorded in run report for audit trail
+- Pre-review and pre-deploy gate phases
+- Loopback on gate failure
+- Factory dogfoods its own checks gate
+
+No modifications needed. The implementation stands as verified by this closing verification run.

@@ -1,11 +1,23 @@
-Review complete. The implementation satisfies all requirements:
+## Review Complete
 
-**Scenarios S1-S6:** All implemented correctly with comprehensive test coverage covering passing checks, failing checks, protected path violations, base ref resolution, pre-deploy gate, and not-configured state.
+The implementation is **verified and passes** all spec requirements.
 
-**Loopback Round 1:** All hygiene items addressed - docs/CHECKS-GATE.md is comprehensive, CHANGELOG entry present, pure checks_gate function extracted to anvil/gates.py with correct signature, protected paths default correctly references the config file, and station kind is "deterministic" per station.json.
+**Verification Summary**:
+- ✅ All 6 original scenarios (S1-S6) implemented and tested
+- ✅ Loopback Round 1: All 5 findings addressed (S4 regression tests, docs, CHANGELOG, pure function, protected paths, station kind)
+- ✅ Loopback Round 2: Protected path semantics clarified, regression tests added
+- ✅ Loopback Round 3: CLI base ref wiring complete with regression test
+- ✅ 184 tests passing across the full suite
+- ✅ All 8 pipelines valid
 
-**Loopback Round 2:** Builder delta semantics correctly implemented - gate judges only builder's working tree delta (tracked via before/after snapshots), modifications/deletions of base ref protected files are violations, additions are observations, all 5 regression tests present and passing.
+**Key Implementation Points Confirmed**:
+- Pure `checks_gate` function in `anvil/gates.py` with correct signature
+- Base ref resolution through git (`derive_base_ref`, `resolve_base_ref_config`)
+- CLI `--base-ref` option with automatic merge-base derivation
+- Base ref recorded in run report for audit trail
+- Station kind: `deterministic` (verified in `stations/checks-gate/station.json`)
+- Protected path semantics: builder delta only (modifications/deletions = violations, additions = observations)
+- Documentation: `docs/CHECKS-GATE.md` (203 lines covering all requirements)
+- CHANGELOG: Three entries documenting the feature and clarifications
 
-**Loopback Round 3:** S4 control fully wired through CLI - --base-ref option present, derive_base_ref function implemented with merge-base logic, automatic derivation from base branch, base ref recorded in report, CLI regression test verifies both uncommitted and committed config mutations are blocked.
-
-**Verification:** All 144 tests pass, no implementation defects found. The standing implementation is correct.
+The review has been written to `runs/wo-gh-6/reviewer-spec.review.json`.
