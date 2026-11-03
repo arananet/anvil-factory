@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "completed",
       "detail": "Work order normalized",
-      "duration_ms": 0.019,
+      "duration_ms": 0.02,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/report.json"
@@ -21,7 +21,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-16/spec-writer.output.md",
-      "duration_ms": 75864.217,
+      "duration_ms": 101648.477,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/spec-writer.output.md"
@@ -37,7 +37,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-16/test-writer.output.md",
-      "duration_ms": 155787.284,
+      "duration_ms": 232398.687,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/test-writer.output.md"
@@ -51,12 +51,12 @@
     },
     {
       "station": "builder",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station builder: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.20. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
-      "duration_ms": 115690.306,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/builder.output.md",
+      "duration_ms": 313117.457,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-16/builder.packet.md"
+        "runs/wo-gh-16/builder.output.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
@@ -67,12 +67,12 @@
     },
     {
       "station": "reviewer-spec",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-spec: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.48. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
-      "duration_ms": 90354.402,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-spec.output.md; review output did not parse as a review JSON",
+      "duration_ms": 148994.868,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-16/reviewer-spec.packet.md"
+        "runs/wo-gh-16/reviewer-spec.output.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
@@ -83,12 +83,12 @@
     },
     {
       "station": "reviewer-security",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-security: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.31. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
-      "duration_ms": 10225.338,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-security.output.md",
+      "duration_ms": 114642.591,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-16/reviewer-security.packet.md"
+        "runs/wo-gh-16/reviewer-security.output.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
@@ -99,12 +99,12 @@
     },
     {
       "station": "reviewer-tests",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-tests: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.31. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
-      "duration_ms": 629.334,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-tests.output.md; review output did not parse as a review JSON",
+      "duration_ms": 88345.1,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-16/reviewer-tests.packet.md"
+        "runs/wo-gh-16/reviewer-tests.output.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
@@ -115,12 +115,12 @@
     },
     {
       "station": "reviewer-architecture",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-architecture: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.52. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
-      "duration_ms": 49889.005,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-architecture.output.md; review output did not parse as a review JSON",
+      "duration_ms": 120502.15,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-16/reviewer-architecture.packet.md"
+        "runs/wo-gh-16/reviewer-architecture.output.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
@@ -131,12 +131,12 @@
     },
     {
       "station": "reviewer-design",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-design: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.15. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
-      "duration_ms": 27995.673,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/reviewer-design.output.md; review output did not parse as a review JSON",
+      "duration_ms": 64587.547,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-16/reviewer-design.packet.md"
+        "runs/wo-gh-16/reviewer-design.output.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
@@ -148,13 +148,26 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.034,
+      "detail": "Approver verdict: changes_requested",
+      "duration_ms": 0.046,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/report.json"
       ],
       "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "approver",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: L2 incomplete: tools/claude_station.py REVIEW_SUFFIX defers to the packet ('The output contract is stated in the packet above') but then restates contract terms ('Your complete answer is exactly one review JSON object in this shape'). Per loopback spec L2, the wrapper must either repeat the canonical wording from anvil/runner.py word-for-word OR defer without restating. Currently it does both, creating divergent contract statements. Fix: either remove the restatement (keep only 'The output contract is stated in the packet above.') or repeat the canonical file path wording verbatim from anvil/runner.py lines 150-153.; Security posture is sound: The parse_review function implements fail-closed semantics (malformed reviews contribute zero, never guessed), uses strict validation (station ID match, verdict whitelist, findings type check), employs safe JSON parsing via stdlib json module, and maintains proper authorization boundaries (reviewer stations have Edit/Write/NotebookEdit disallowed per tools/claude_station.py lines 47-94). No unsafe defaults or injection risks detected.",
+      "reason": "L2 incomplete: tools/claude_station.py REVIEW_SUFFIX defers to the packet ('The output contract is stated in the packet above') but then restates contract terms ('Your complete answer is exactly one review JSON object in this shape'). Per loopback spec L2, the wrapper must either repeat the canonical wording from anvil/runner.py word-for-word OR defer without restating. Currently it does both, creating divergent contract statements. Fix: either remove the restatement (keep only 'The output contract is stated in the packet above.') or repeat the canonical file path wording verbatim from anvil/runner.py lines 150-153.; Security posture is sound: The parse_review function implements fail-closed semantics (malformed reviews contribute zero, never guessed), uses strict validation (station ID match, verdict whitelist, findings type check), employs safe JSON parsing via stdlib json module, and maintains proper authorization boundaries (reviewer stations have Edit/Write/NotebookEdit disallowed per tools/claude_station.py lines 47-94). No unsafe defaults or injection risks detected.",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
       "executed_model": null,
       "executor": null
     },
@@ -173,7 +186,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-16/deployer.packet.md",
-      "duration_ms": 0.19,
+      "duration_ms": 0.197,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-16/deployer.packet.md"
@@ -184,12 +197,12 @@
     },
     {
       "station": "observer",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station observer: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.15. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
-      "duration_ms": 626.402,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-16/observer.output.md",
+      "duration_ms": 110182.218,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-16/observer.packet.md"
+        "runs/wo-gh-16/observer.output.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
@@ -199,16 +212,21 @@
       }
     }
   ],
-  "verdict": "no_reviews",
+  "verdict": "changes_requested",
   "human_required": true,
   "max_loopbacks": 2,
-  "loopbacks": 0,
+  "loopbacks": 1,
   "deployment_status": null,
   "verify_results": [],
   "risk_hints": [],
   "decision": {
     "approver": {
-      "reviews_counted": [],
+      "reviews_counted": [
+        {
+          "station": "reviewer-security",
+          "verdict": "changes_requested"
+        }
+      ],
       "reviews_expected": [
         "reviewer-spec",
         "reviewer-security",
@@ -216,11 +234,11 @@
         "reviewer-architecture",
         "reviewer-design"
       ],
-      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)"
+      "rule": "Reviewer reviewer-security requested changes. (Counted 1 reviews, expected 5.)"
     },
     "human_gate": {
       "required": true,
-      "rule": "Verdict is no_reviews, not approved, so a human is required.",
+      "rule": "Verdict is changes_requested, not approved, so a human is required.",
       "hints_matched": []
     }
   },

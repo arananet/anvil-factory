@@ -530,6 +530,7 @@ class TestPacketAndPromptContract(unittest.TestCase):
     def test_all_reviewer_prompts_have_output_format_section_loopback_l1(self):
         """Loopback L1: All 9 reviewer prompts carry the same output contract section"""
         stations_dir = ROOT / "stations"
+        import re
 
         # All 9 reviewer stations
         expected_reviewers = [
@@ -544,7 +545,8 @@ class TestPacketAndPromptContract(unittest.TestCase):
             "reviewer-voice"
         ]
 
-        # Check that all prompts have the Output Format section
+        # Extract Output Format sections from all prompts
+        sections = {}
         for station_name in expected_reviewers:
             with self.subTest(station=station_name):
                 prompt_file = stations_dir / station_name / "PROMPT.md"
@@ -557,26 +559,61 @@ class TestPacketAndPromptContract(unittest.TestCase):
                 self.assertIn("## Output Format", prompt_text,
                             f"{station_name}/PROMPT.md should have '## Output Format' section")
 
+                # Extract the Output Format section (from ## Output Format to next ## or end)
+                section_match = re.search(
+                    r'## Output Format\n(.*?)(?=\n## |\Z)',
+                    prompt_text,
+                    re.DOTALL
+                )
+                self.assertIsNotNone(section_match,
+                                   f"{station_name}/PROMPT.md should have extractable Output Format section")
+
+                section_text = section_match.group(1).strip()
+                sections[station_name] = section_text
+
                 # Check for key elements of the contract
-                self.assertIn('"station":', prompt_text,
-                            f"{station_name}/PROMPT.md should specify station field")
-                self.assertIn('"verdict":', prompt_text,
-                            f"{station_name}/PROMPT.md should specify verdict field")
-                self.assertIn('"findings":', prompt_text,
-                            f"{station_name}/PROMPT.md should specify findings field")
+                self.assertIn('"station":', section_text,
+                            f"{station_name}/PROMPT.md should specify station field in Output Format")
+                self.assertIn('"verdict":', section_text,
+                            f"{station_name}/PROMPT.md should specify verdict field in Output Format")
+                self.assertIn('"findings":', section_text,
+                            f"{station_name}/PROMPT.md should specify findings field in Output Format")
 
                 # Check for correct verdict vocabulary
-                self.assertIn("pass", prompt_text,
-                            f"{station_name}/PROMPT.md should mention 'pass' verdict")
-                self.assertIn("fail", prompt_text,
-                            f"{station_name}/PROMPT.md should mention 'fail' verdict")
-                self.assertIn("changes_requested", prompt_text,
-                            f"{station_name}/PROMPT.md should mention 'changes_requested' verdict")
+                self.assertIn("pass", section_text,
+                            f"{station_name}/PROMPT.md should mention 'pass' verdict in Output Format")
+                self.assertIn("fail", section_text,
+                            f"{station_name}/PROMPT.md should mention 'fail' verdict in Output Format")
+                self.assertIn("changes_requested", section_text,
+                            f"{station_name}/PROMPT.md should mention 'changes_requested' verdict in Output Format")
 
                 # Verify the station name appears in the output format section
-                # (each prompt should show its own station id)
-                self.assertIn(f'"{station_name}"', prompt_text,
-                            f"{station_name}/PROMPT.md should reference its own station id in output format")
+                self.assertIn(f'"{station_name}"', section_text,
+                            f"{station_name}/PROMPT.md should reference its own station id in Output Format")
+
+        # Loopback L1 enhancement: Verify sections are identical (modulo station id)
+        # Normalize each section by replacing the station-specific name with a placeholder
+        normalized_sections = {}
+        for station_name, section_text in sections.items():
+            # Replace the station name with a placeholder
+            normalized = section_text.replace(f'"{station_name}"', '"STATION_ID"')
+            normalized = normalized.replace(station_name, "STATION_ID")
+            normalized_sections[station_name] = normalized
+
+        # All normalized sections should be identical
+        normalized_values = list(normalized_sections.values())
+        reference_section = normalized_values[0]
+        reference_station = expected_reviewers[0]
+
+        for i, station_name in enumerate(expected_reviewers[1:], 1):
+            self.assertEqual(
+                normalized_values[i],
+                reference_section,
+                f"{station_name}/PROMPT.md Output Format section should be identical to "
+                f"{reference_station}/PROMPT.md (except for station id). "
+                f"Loopback L1 requires 'the same section text and structure, with only the "
+                f"station id changed where the section names it.'"
+            )
 
     def test_wrapper_restatement_matches_or_defers_to_canonical_packet_loopback_l2(self):
         """Loopback L2: Wrapper restatement matches canonical packet wording or defers to it"""

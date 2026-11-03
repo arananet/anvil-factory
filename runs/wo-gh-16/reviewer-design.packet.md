@@ -98,11 +98,11 @@ Extend the S5 catalog tests so the suite asserts both items: every reviewer prom
 - intake: completed
 - spec-writer: executed
 - test-writer: executed
-- builder: failed
-- reviewer-spec: failed
-- reviewer-security: failed
-- reviewer-tests: failed
-- reviewer-architecture: failed
+- builder: executed
+- reviewer-spec: executed
+- reviewer-security: executed
+- reviewer-tests: executed
+- reviewer-architecture: executed
 
 ## Project design
 
