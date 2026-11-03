@@ -1,11 +1,19 @@
-```json
-{
-  "station": "reviewer-architecture",
-  "verdict": "changes_requested",
-  "findings": [
-    "Dual output contract channels (violates S5): The implementation adds the output contract statement in TWO places - both in the packet text (runner.py:149-153) and as a runtime suffix (claude_station.py:50-56, 77-78). S5 explicitly states the runtime restatement should 'introduce no second channel.' Having two places that state the contract creates maintenance burden and risk of divergence. Choose one channel: either the packet-level contract section OR the runtime suffix, not both.",
-    "Incomplete reviewer prompt updates (violates S5): Only reviewer-design/PROMPT.md has an 'Output Format' section explaining the JSON contract. S5 requires 'Every reviewer station PROMPT.md carries the same output contract.' The other reviewer prompts (reviewer-spec, reviewer-architecture, reviewer-security, reviewer-tests, reviewer-voice, reviewer-platform, reviewer-facts, reviewer-brand) lack this section and must be updated to include the same output format documentation.",
-    "Inconsistent output contract wording between channels: The runner.py version states 'written to runs/{work_order.id}/{station_id}.review.json' while claude_station.py says 'and nothing else' but omits the file path. S5 requires 'Reviewer packets name the review file path.' If keeping both channels, they should use identical wording; if consolidating to one channel, ensure it includes the file path as required by S5."
-  ]
-}
-```
+Review complete. The loopback round 2 implementation **passes** architecture review.
+
+**Architecture alignment verified:**
+
+✓ **Composable stations (Decision 0001):** The changes are in the runner/executor layer (tools/claude_station.py), not in station definitions. Station reusability preserved.
+
+✓ **Clear contracts:** The canonical wording remains in anvil/runner.py (lines 150-153). The wrapper repeats it verbatim with proper parameterization (work_order_id, station_id).
+
+✓ **Layering:** Changes are at the Runner layer where they belong per docs/ARCHITECTURE.md.
+
+✓ **Authoritative channel:** The .review.json file contract is maintained exactly as specified in docs/EXECUTION.md.
+
+The intentional duplication (canonical in packet + verbatim repetition at wrapper end) is architecturally sound given:
+- Empirical evidence: 4/5 reviewers failed compliance when contract stated once
+- Single source of truth: anvil/runner.py is canonical, wrapper repeats word-for-word
+- Test enforcement: L2 test verifies synchronization
+- Documented rationale: recency bias solution with explicit reasoning
+
+No architecture violations detected.

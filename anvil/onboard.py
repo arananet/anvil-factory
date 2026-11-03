@@ -3,6 +3,7 @@ from collections import Counter
 from pathlib import Path
 
 from .brain import LEARNINGS_HEADER
+from .community import render_community_files
 from .config import render_anvil_yaml
 from .scaffold import STATION_IDS
 from .design import scaffold_design_system
@@ -62,7 +63,7 @@ def _write_if_missing(root, rel, content, created, kept):
     created.append(rel)
 
 
-def onboard_project(path, name=None):
+def onboard_project(path, name=None, description=None, contact=None):
     """Bring an existing project onto the line. Never overwrites a file."""
     root = Path(path)
     report = analyze_project(root)
@@ -76,6 +77,10 @@ def onboard_project(path, name=None):
         lines = [ln.strip() for ln in candidate.read_text(encoding="utf-8", errors="replace").splitlines() if ln.strip()]
         readme_excerpt = " ".join(lines[1:3]) if len(lines) > 1 else ""
         break
+
+    # Resolve description from README if not provided
+    if description is None and readme_excerpt:
+        description = readme_excerpt
 
     stack_line = ", ".join(report["stack"]) if report["stack"] else "not detected"
     brain = (
@@ -114,6 +119,11 @@ def onboard_project(path, name=None):
         created.append(design_file)
     if (root / "README.md").exists():
         kept.append("README.md")
+
+    # Write community files (never overwrites existing files)
+    community_files = render_community_files(name, description=description, contact=contact)
+    for rel_path, content in community_files.items():
+        _write_if_missing(root, rel_path, content, created, kept)
 
     gaps, suggested = [], []
     if not report["has_tests"]:

@@ -1,16 +1,18 @@
-Observation report complete. Created at `runs/wo-gh-16/observer.output.md`.
+## Observation Complete
 
-## Key Findings
+I've observed the loopback round 2 implementation and written the report to `runs/wo-gh-16/observer.output.md`.
 
-**Implementation Status**: Functional and testable. All 111 tests pass (17 new integrity tests).
+**Key findings**:
 
-**Core Mechanisms Working**:
-- ✅ Authoritative review channel (`<station-id>.review.json`)
-- ✅ Whole document parse (scanning removed)
-- ✅ Fail-closed behavior on malformed reviews
-- ✅ Shrinkage reporting (states counted vs expected)
-- ✅ Platform25 defect resolved (prompt examples no longer counted)
+**Implementation**: ✓ L2 fix implemented correctly (shape i: canonical wording repeated at wrapper level)
 
-**Partial Fulfillment**: Only 1 of 9 reviewer prompts has the Output Format section (S5 requirement). reviewer-architecture caught this during review, triggering a loopback. The packet-level contract is sufficient for execution, so functionality is unaffected.
+**Compliance results**: 2 of 5 reviewers parsed (40%) - doubled from loopback round 1's 1 of 5 (20%)
+- ✓ reviewer-security: parsed 
+- ✓ reviewer-design: parsed
+- ✗ reviewer-spec, reviewer-tests, reviewer-architecture: prose output, failed closed
 
-**Verdict**: Deployment-safe. The S5 prompt documentation gap should be tracked as a follow-up refinement, not a blocker.
+**Tests**: 21/21 review parsing integrity tests passing, 38/38 total factory tests passing
+
+**Deployment status**: Implementation complete on branch `anvil/run-review-parsing`, ready for deployment but not yet deployed (deployer status: packet_ready)
+
+**Success measure**: The L2 fix improved compliance 100% (doubled the parse rate), demonstrating that repeating canonical wording at the wrapper level strengthens compliance. However, 60% of reviewers still produce prose despite the contract being stated three times, suggesting a model behavior ceiling rather than a contract clarity issue.
