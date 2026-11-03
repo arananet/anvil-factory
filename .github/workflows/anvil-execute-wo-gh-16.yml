@@ -1,0 +1,206 @@
+name: anvil-execute-wo-gh-16
+
+# Execute mode run of the ANVIL line against the factory repository itself,
+# for one known work order (issue 16, review parsing integrity). It mirrors
+# anvil-execute.yml in this repo (the wo-gh-1 run), with the same honest
+# differences that come from this repo being both the line and the project:
+#
+# - No second checkout: the factory is the project under change, so the CLI
+#   runs from this checkout (PYTHONPATH=.) with the project's own pipeline,
+#   pipelines/sdlc-default.json from anvil.json.
+# - There is no deploy config in anvil.yaml, so the deployer station stays
+#   a packet in this run and the report carries no deployment status.
+# - This repo's .gitignore ignores runs/, so the commit back step force adds
+#   the run evidence for this work order.
+# - One extra step posts the platform25 evidence comment on issue 2. The
+#   operator's vault PAT cannot create issue comments (GitHub answers 403),
+#   so the comment rides on this workflow's GITHUB_TOKEN instead, guarded so
+#   a rerun does not post it twice.
+#
+# Trigger: the vault PAT cannot dispatch workflows or apply labels, so for
+# this run the trigger is a push to the anvil/run-review-parsing branch. The
+# commit this workflow pushes back uses GITHUB_TOKEN, which does not
+# retrigger workflows, so the run cannot loop on its own push.
+on:
+  push:
+    branches: [anvil/run-review-parsing]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: anvil-execute-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  anvil-execute:
+    name: Run the ANVIL line with Claude Code executing the stations
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      ANTHROPIC_BASE_URL: https://gateway.ai.cloudflare.com/v1/693ae9c587f1f2c34328bb47447366b0/arananet-ai-gateway/anthropic
+      ANTHROPIC_API_KEY: ${{ secrets.CF_AIG_TOKEN }}
+      ANTHROPIC_CUSTOM_HEADERS: "cf-aig-authorization: Bearer ${{ secrets.CF_AIG_TOKEN }}"
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+    steps:
+      - name: Check out this repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Claude Code
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude --version
+
+      - name: Gateway smoke test
+        id: smoke
+        run: |
+          REPLY=$(claude -p "Reply with exactly: GATEWAY_OK" --model claude-sonnet-4-5 --output-format text)
+          echo "Gateway reply: ${REPLY}"
+          CLEAN=$(printf '%s' "${REPLY}" | tr -d '[:space:]')
+          if [ "${CLEAN}" != "GATEWAY_OK" ]; then
+            echo "Gateway smoke failed: expected GATEWAY_OK and got the reply above. Stopping before the line runs."
+            exit 1
+          fi
+          echo "Gateway smoke passed: the gateway answered through the Anthropic endpoint."
+
+      - name: Post the platform25 evidence comment on issue 2
+        if: steps.smoke.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh issue view 2 --json comments --jq '.comments[].body' | grep -q "arananet/platform25 run wo-gh-1"; then
+            echo "The platform25 evidence comment is already on issue 2; not posting a duplicate."
+            exit 0
+          fi
+          cat > comment-issue-2.md <<'MDEOF'
+          New evidence, 2026-10-30, from arananet/platform25 run wo-gh-1 (asset factory), round 2, Actions run 41055025579.
+
+          The defect in this issue has a sharper mechanism than the original report, and it inverted a verdict. The review parser (anvil/runner.py, parse_review) scans the executor output and returns the FIRST object that parses with a verdict key. Reviewer station prompts ship worked examples containing exactly such objects: stations/reviewer-design/PROMPT.md carries Example 1, a changes_requested review whose finding states that no design system exists for the project.
+
+          In platform25 wo-gh-1 round 2, reviewer-design actually answered pass with no findings; its real output is on disk in the run evidence and in its station transcript. The parser counted the prompt example instead. The approver therefore produced verdict changes_requested on a single finding that is false against the run own tree: design/DESIGN.md and design/tokens.json exist in that tree, authored in the loopback round and verified value by value by reviewer-architecture, which passed.
+
+          So the counted review set was wrong in content, not only smaller than expected: 5 of 5 appeared counted, but one of the five was the prompt example, not the station answer. The same mechanism can ingest a pass example and approve work nobody approved. The counted vs expected decision fields cannot detect this, because the count looks complete.
+
+          The fix is filed as issue 16 with its own spec (.openspec/specs/review-parsing-integrity/spec.md): reviewers emit through one authoritative review file per station, the parser reads only that file as one whole JSON document and never scans free executor output, prompt examples are removed or rendered non JSON, and a missing or malformed review fails closed as uncounted and reported, never as a guessed verdict.
+
+          Posting note: this comment was posted by the anvil-execute-wo-gh-16 workflow with the workflow token, because the operator vault PAT cannot create issue comments (GitHub answers 403). The text is the operator's, unedited.
+          MDEOF
+          gh issue comment 2 --body-file comment-issue-2.md
+
+      - name: Run the ANVIL sdlc-default line in execute mode
+        id: line
+        run: |
+          PYTHONPATH=. python3 -m anvil.cli run . \
+            --pipeline pipelines/sdlc-default.json \
+            --work-order work-orders/issue-16.json \
+            --execute
+
+      - name: Commit the run evidence and the station change back to the branch
+        if: always() && steps.smoke.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git add -f runs/ 2>/dev/null || true
+          git diff --cached --stat > run-diff.txt || true
+          if git diff --cached --quiet; then
+            echo "The run produced no file changes to commit."
+            exit 0
+          fi
+          VERDICT=$(python3 -c "import json; print(json.load(open('runs/wo-gh-16/report.json'))['verdict'])" 2>/dev/null || echo "no-report")
+          git commit -m "ANVIL execute run wo-gh-16 (issue 16): verdict ${VERDICT}" -m "Stations executed by Claude Code (claude-sonnet-4-5) through the Cloudflare AI Gateway. Builder change and run evidence included; see runs/wo-gh-16/."
+          git fetch origin "${GITHUB_REF_NAME}"
+          git rebase "origin/${GITHUB_REF_NAME}" || { git rebase --abort; echo "Rebase onto the branch tip failed; pushing as is not attempted."; exit 1; }
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Comment the run report on issue 16
+        if: always() && steps.smoke.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          python3 - <<'PYEOF'
+          import json, os
+          from pathlib import Path
+          run_url = os.environ["RUN_URL"]
+          branch = os.environ["BRANCH"]
+          report_path = Path("runs/wo-gh-16/report.json")
+          if not report_path.exists():
+              lines = [
+                  "## ANVIL execute run report",
+                  "",
+                  "The executed run did not produce a report.json, so there is no verdict to report. "
+                  f"See the workflow run for the failure: {run_url}",
+              ]
+              Path("comment.md").write_text("\n".join(lines) + "\n")
+              raise SystemExit(0)
+          report = json.loads(report_path.read_text())
+          decision = report.get("decision", {})
+          lines = [
+              "## ANVIL execute run report",
+              "",
+              f"Work order: {report['work_order_id']}",
+              f"Pipeline: {report['pipeline']}",
+              f"Approver verdict: {report['verdict']}",
+              f"Human review required: {report['human_required']}",
+              f"Deployment status: {report.get('deployment_status')}",
+              "",
+              "Decision record:",
+              f"- Approver: {decision.get('approver', {}).get('rule', '')}",
+              f"- Human gate: {decision.get('human_gate', {}).get('rule', '')}",
+              "",
+              "| Station | Status | Configured model | Executed model |",
+              "|---|---|---|---|",
+          ]
+          for step in report.get("steps", []):
+              lines.append(
+                  f"| {step['station']} | {step['status']} | "
+                  f"{step.get('configured_model')} | {step.get('executed_model')} |"
+              )
+          warnings = report.get("warnings") or []
+          if warnings:
+              lines += ["", "Warnings recorded by the run:"] + [f"- {w}" for w in warnings]
+          diff_path = Path("run-diff.txt")
+          if diff_path.exists() and diff_path.read_text().strip():
+              lines += ["", "Files changed by the run (committed to "
+                        f"`{branch}`):", "", "```", diff_path.read_text().strip(), "```"]
+          lines += [
+              "",
+              "Honest note: this run EXECUTED its agent stations. Claude Code "
+              "(claude-sonnet-4-5), routed through the Cloudflare AI Gateway, "
+              "received each station packet via tools/claude_station.py: the "
+              "builder edited the working tree, the reviewers answered with "
+              "review output that the approver aggregated for this run only. "
+              "One limit is structural and worth naming here: this run changes "
+              "the very code that counts reviews, and the pipeline and parser "
+              "are loaded when the run starts, so this run's own reviews were "
+              "counted by the parser as it existed at run start. The fix is "
+              "proven by the regression tests in the suite and governs the "
+              "next run; read this verdict knowing which parser counted it.",
+              f"Workflow run: {run_url}",
+          ]
+          Path("comment.md").write_text("\n".join(lines) + "\n")
+          print(f"Verdict: {report['verdict']}")
+          PYEOF
+          gh issue comment 16 --body-file comment.md
+
+      - name: Upload the run directory
+        if: always() && steps.smoke.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: anvil-execute-run-wo-gh-16
+          path: runs/
+          if-no-files-found: ignore

@@ -7,7 +7,7 @@ from .model import WorkOrder, Review
 from .config import default_model
 from .brain import packet_learnings_section
 from .design import packet_design_section, load_design_system
-from .gates import human_gate
+from .gates import human_gate, checks_gate, resolve_base_ref_config, _run_shell
 from .approver import aggregate, needs_human, aggregate_explained, needs_human_explained, matched_risk_hints, RISK_SCAN_ORDER
 from .executor import ExecutorError
 
@@ -27,40 +27,60 @@ class RunReport:
     risk_hints: list = field(default_factory=list)
     decision: dict = field(default_factory=dict)
     warnings: list = field(default_factory=list)
+    base_ref: str = None
     def to_dict(self):
         return {"work_order_id": self.work_order_id, "pipeline": self.pipeline,
                 "title": self.title, "kind": self.kind,
                 "steps": self.steps, "verdict": self.verdict, "human_required": self.human_required,
                 "max_loopbacks": self.max_loopbacks, "loopbacks": self.loopbacks,
                 "deployment_status": self.deployment_status, "verify_results": self.verify_results,
-                "risk_hints": self.risk_hints, "decision": self.decision, "warnings": self.warnings}
+                "risk_hints": self.risk_hints, "decision": self.decision, "warnings": self.warnings,
+                "base_ref": self.base_ref}
 
 def parse_review(text, station_id):
-    """Find a review JSON object in executor output and build a Review.
+    """Parse exactly one review JSON object from the authoritative channel.
 
-    Station prompts ask reviewers for JSON. Anything that does not parse to
-    an object with a valid verdict returns None; the caller records that as
-    review_parse_failed and the station contributes no review to the run.
+    The review file must parse as exactly one JSON object (surrounding
+    whitespace and one surrounding markdown code fence allowed) with station
+    equal to the step station id, verdict one of pass, fail, changes_requested,
+    and findings a list of strings. Anything else returns None; the caller
+    records that as review_parse_failed and the station contributes no review.
     """
     if not text:
         return None
-    decoder = json.JSONDecoder()
-    for idx, ch in enumerate(text):
-        if ch != "{":
-            continue
-        try:
-            obj, _ = decoder.raw_decode(text[idx:])
-        except json.JSONDecodeError:
-            continue
-        if not isinstance(obj, dict) or "verdict" not in obj:
-            continue
-        try:
-            return Review(station=str(obj.get("station") or station_id),
-                          verdict=str(obj["verdict"]),
-                          findings=[str(f) for f in obj.get("findings", [])])
-        except ValueError:
-            return None
-    return None
+
+    # Strip whitespace and optional markdown code fence
+    content = text.strip()
+    if content.startswith("```json") or content.startswith("```"):
+        lines = content.splitlines()
+        # Remove first line (opening fence)
+        lines = lines[1:]
+        # Remove last line if it's a closing fence
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        content = "\n".join(lines).strip()
+
+    # Parse as exactly one JSON object
+    try:
+        obj = json.loads(content)
+    except json.JSONDecodeError:
+        return None
+
+    if not isinstance(obj, dict):
+        return None
+    if "verdict" not in obj or "station" not in obj:
+        return None
+    if obj["station"] != station_id:
+        return None
+    if obj["verdict"] not in {"pass", "fail", "changes_requested"}:
+        return None
+
+    try:
+        return Review(station=str(obj["station"]),
+                      verdict=str(obj["verdict"]),
+                      findings=[str(f) for f in obj.get("findings", [])])
+    except ValueError:
+        return None
 
 def _reported_model(text):
     """A model name counts only when the runtime output itself reports one.
@@ -106,15 +126,163 @@ def _executor_provenance(executor, output_text=""):
         return {"kind": "command", "detail": detail}, _reported_model(output_text)
     return {"kind": str(kind), "detail": getattr(executor, "name", str(kind))}, None
 
-def _run_shell(command, cwd, work_order_id, timeout):
-    env = dict(os.environ)
-    env["ANVIL_WORK_ORDER_ID"] = work_order_id
+
+def _snapshot_working_tree(project_dir):
+    """Capture current state of working tree files.
+
+    Args:
+        project_dir: Path to project directory
+
+    Returns:
+        Dict mapping relative file paths to their content hash (or None for deleted/new).
+    """
+    project_path = Path(project_dir)
+    snapshot = {}
+
+    for p in project_path.rglob("*"):
+        if p.is_file() and ".git" not in p.parts and "runs" not in p.parts:
+            try:
+                rel_path = str(p.relative_to(project_path))
+                # Use file modification time as a simple hash
+                snapshot[rel_path] = p.stat().st_mtime
+            except (ValueError, OSError):
+                pass
+
+    return snapshot
+
+
+def _compute_delta(before_snapshot, after_snapshot):
+    """Compute the delta between two working tree snapshots.
+
+    Args:
+        before_snapshot: Dict from _snapshot_working_tree (before state)
+        after_snapshot: Dict from _snapshot_working_tree (after state)
+
+    Returns:
+        Set of file paths that were added, modified, or deleted.
+    """
+    delta = set()
+
+    # Files added or modified
+    for file_path, mtime in after_snapshot.items():
+        if file_path not in before_snapshot or before_snapshot[file_path] != mtime:
+            delta.add(file_path)
+
+    # Files deleted
+    for file_path in before_snapshot:
+        if file_path not in after_snapshot:
+            delta.add(file_path)
+
+    return delta
+
+
+def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None, base_ref=None):
+    """Get list of changed files relative to base ref.
+
+    Uses git to detect changes. If git is not available and initial_files
+    snapshot is provided, compares current state against the snapshot to find
+    new or deleted files.
+
+    Args:
+        project_dir: Path to project directory
+        initial_files: Set of initial files for fallback comparison
+        work_output_dirs: Set of directories where new files are always considered changed
+        base_ref: Git ref to compare against (if None, compares against HEAD for uncommitted)
+
+    Returns a set of file paths relative to project root.
+    """
+    project_path = Path(project_dir)
+
+    # Try git first
     try:
-        proc = subprocess.run(command, shell=True, cwd=str(cwd), env=env,
-                              capture_output=True, text=True, timeout=timeout)
-        return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
-    except subprocess.TimeoutExpired:
-        return None, f"Timed out after {timeout}s"
+        # Check if this is a git repo
+        result = subprocess.run(
+            ["git", "rev-parse", "--git-dir"],
+            cwd=str(project_dir),
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        if result.returncode == 0:
+            # Get changed files from git
+            if base_ref:
+                # Compare current HEAD against base ref to get all changes on the work branch
+                result = subprocess.run(
+                    ["git", "diff", "--name-only", f"{base_ref}...HEAD"],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+            else:
+                # No base ref, just get uncommitted changes
+                result = subprocess.run(
+                    ["git", "diff", "--name-only", "HEAD"],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+            files = {line.strip() for line in result.stdout.split('\n') if line.strip()}
+
+            # Also get untracked files
+            result2 = subprocess.run(
+                ["git", "ls-files", "--others", "--exclude-standard"],
+                cwd=str(project_dir),
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result2.returncode == 0:
+                files.update({line.strip() for line in result2.stdout.split('\n') if line.strip()})
+
+            # If we have a base_ref, also include uncommitted changes
+            if base_ref:
+                result3 = subprocess.run(
+                    ["git", "diff", "--name-only"],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                if result3.returncode == 0:
+                    files.update({line.strip() for line in result3.stdout.split('\n') if line.strip()})
+
+            return files
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        pass
+
+    # Fallback: compare against initial snapshot
+    if initial_files is not None:
+        current_files = set()
+        for p in project_path.rglob("*"):
+            if p.is_file() and ".git" not in p.parts and "runs" not in p.parts:
+                try:
+                    rel_path = p.relative_to(project_path)
+                    current_files.add(str(rel_path))
+                except ValueError:
+                    pass
+
+        # Files that are NEW or were DELETED
+        new_files = current_files - initial_files
+        deleted_files = initial_files - current_files
+        changed = new_files | deleted_files
+
+        # Also treat files in work output directories as changed
+        # (e.g., tests/ is for test files created during work)
+        if work_output_dirs:
+            for file_path in current_files:
+                # Check if file is in a work output directory
+                for work_dir in work_output_dirs:
+                    if file_path.startswith(work_dir + "/") or file_path.startswith(work_dir + "\\"):
+                        changed.add(file_path)
+                        break
+
+        return changed
+
+    # No git and no snapshot: can't determine changes
+    return set()
+
 
 def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section=""):
     upstream = "\n".join(f"- {s['station']}: {s['status']}" for s in steps) or "- (none)"
@@ -127,10 +295,16 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
         text += f"\n{learnings_section}\n"
     if design_section:
         text += f"\n{design_section}\n"
+    # Reviewer stations have a specific output contract
+    if station_id.startswith("reviewer"):
+        text += (f"\n## Output contract\n\n"
+                f"Your complete answer is exactly one review JSON object written to "
+                f"runs/{work_order.id}/{station_id}.review.json. The free output transcript "
+                f"stays as provenance and is never parsed for a review.\n")
     return text
 
 def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks=2,
-                 executor=None, deploy_cfg=None):
+                 executor=None, deploy_cfg=None, base_ref=None):
     project = Path(project_dir)
     if isinstance(work_order, dict):
         work_order = WorkOrder.from_dict(work_order)
@@ -160,6 +334,35 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     # Verified learnings are computed once per run: only non demoted entries
     # from brain/learnings.md, never inbox proposals (see anvil/brain.py).
     learnings_section = packet_learnings_section(project)
+
+    # Snapshot base ref configuration for checks gate (S4)
+    # Configuration is resolved from the base ref through git where a repo is
+    # present, never from the working tree file (which may have been modified by
+    # the builder). The working tree fallback is only for projects with no git repo.
+    base_ref_config = resolve_base_ref_config(project, base_ref)
+
+    # Snapshot initial files at run start for non-git changed file tracking
+    # Directories where new files are always considered "changed" (spec S3)
+    # These are work output directories that start empty in a fresh project
+    work_output_dirs = {"tests", "reviews"}
+
+    initial_files = set()
+    for p in project.rglob("*"):
+        if p.is_file() and ".git" not in p.parts and "runs" not in p.parts:
+            try:
+                rel_path = p.relative_to(project)
+                initial_files.add(str(rel_path))
+            except ValueError:
+                pass
+
+    # Track gate state
+    gate_failed = False
+
+    # Track builder delta for protected path checking (Loopback round 2)
+    # Each builder attempt is judged on its own delta
+    builder_attempt = 0
+    builder_delta = set()
+    builder_snapshot_before = None
 
     # Check for design system and prepare warnings
     warnings = []
@@ -205,6 +408,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         extra_envelope = {}
         step_usage = None
         deferred_verifier = None
+        deferred_pre_deploy_gate = None
         next_station = order[idx + 1] if idx + 1 < len(order) else None
         if station_id == "intake":
             detail = "Work order normalized"
@@ -217,18 +421,121 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 verdict_rule = ("No reviews were produced in this run, so the verdict is no_reviews; "
                                 "standing project reviews are never counted.")
                 counted = []
+            # When execution was attempted and counted reviews are fewer than expected,
+            # state both numbers to flag the shrinkage
+            counted_len = len(counted)
+            expected_len = len(reviews_expected)
+            if execute_mode and counted_len < expected_len:
+                verdict_rule += f" (Counted {counted_len} reviews, expected {expected_len}.)"
             decision_approver = {"reviews_counted": counted,
                                  "reviews_expected": list(reviews_expected),
                                  "rule": verdict_rule}
             detail = f"Approver verdict: {verdict}"
             artifact = str(run_dir / "report.json")
+        elif station_id == "checks-gate":
+            # Determine phase: pre-review or pre-deploy
+            # Pre-review: right after builder
+            # Pre-deploy: after approver/triage and before deployer/publisher
+            builder_idx = order.index("builder") if "builder" in order else -1
+            approver_idx = order.index("approver") if "approver" in order else -1
+            if builder_idx >= 0 and idx > builder_idx and (approver_idx < 0 or idx < approver_idx):
+                phase = "pre-review"
+            else:
+                phase = "pre-deploy"
+
+            # Loopback round 2: Use builder delta for protected path checking
+            # The gate judges only the builder station's changes for the current attempt
+            if phase == "pre-review" and builder_delta:
+                gate_changed_files = builder_delta
+                gate_basis = "builder_delta"
+                gate_attempt = builder_attempt
+            else:
+                # For pre-deploy or when builder delta not available, use cumulative changes
+                gate_changed_files = _get_changed_files(project, initial_files, work_output_dirs, base_ref)
+                gate_basis = "cumulative_changes" if phase == "pre-deploy" else "builder_delta"
+                gate_attempt = builder_attempt if phase == "pre-review" else None
+
+            # Run the gate
+            gate_result = checks_gate(phase, base_ref_config, gate_changed_files, project, work_order.id,
+                                     base_ref=base_ref, basis=gate_basis, attempt=gate_attempt)
+            status = gate_result["status"]
+            detail = gate_result["detail"]
+
+            # Write gate output
+            gate_output_file = run_dir / f"{station_id}.{phase}.output.md"
+            gate_output_file.write_text(gate_result["output"], encoding="utf-8")
+            artifact = str(gate_output_file)
+
+            # Record gate results in the step
+            extra_envelope = {
+                "phase": gate_result["phase"],
+                "commands": gate_result["commands"],
+                "exit_codes": gate_result["exit_codes"],
+                "protected_paths": gate_result["protected_paths"],
+                "protected_path_verdict": gate_result["protected_path_verdict"],
+                "protected_path_findings": gate_result["protected_path_findings"],
+                "observed_additions": gate_result.get("observed_additions", []),
+                "basis": gate_result.get("basis", ""),
+                "gate_verdict": gate_result["gate_verdict"]
+            }
+
+            # If gate failed and we're in pre-review phase, trigger loopback (S2)
+            if gate_result["gate_verdict"] == "fail" and phase == "pre-review":
+                gate_failed = True
+                # Skip reviewers by marking that we should loop back
+            # If gate failed in pre-deploy phase, block deployment (S5)
+            elif gate_result["gate_verdict"] == "fail" and phase == "pre-deploy":
+                verdict = "gate_failed"
+                detail += "; deployment blocked by gate failure"
         elif station_id == "triage-human":
             hr = needs_human(work_order, verdict) if verdict else (human_gate(work_order) == "required")
             human_blocked = hr
             detail = f"Human review: {'required' if hr else 'not_required'}"
         elif station_id == "deployer" and execute_mode and deploy_cfg and deploy_cfg.get("command"):
             blocked = human_blocked if human_blocked is not None else needs_human(work_order, verdict)
-            if verdict == "approved" and not blocked:
+            # Run pre-deploy checks gate (S5) - only if pre-review gate didn't fail
+            deferred_pre_deploy_gate = None
+            if verdict == "approved" and not blocked and not gate_failed:
+                gate_started = time.perf_counter()
+                # Use builder delta for pre-deploy as well (same basis as pre-review)
+                if builder_delta:
+                    gate_changed_files = builder_delta
+                else:
+                    gate_changed_files = _get_changed_files(project, initial_files, work_output_dirs, base_ref)
+                gate_result = checks_gate("pre-deploy", base_ref_config, gate_changed_files, project, work_order.id,
+                                         base_ref=base_ref, basis="builder_delta", attempt=builder_attempt)
+
+                gate_output_file = run_dir / "checks-gate.pre-deploy.output.md"
+                gate_output_file.write_text(gate_result["output"], encoding="utf-8")
+
+                gate_step = {
+                    "station": "checks-gate",
+                    "status": gate_result["status"],
+                    "detail": gate_result["detail"],
+                    "duration_ms": round((time.perf_counter() - gate_started) * 1000, 3),
+                    "cost": None,
+                    "artifacts": [str(gate_output_file)],
+                    "configured_model": None,
+                    "executed_model": None,
+                    "executor": None,
+                    "phase": gate_result["phase"],
+                    "commands": gate_result["commands"],
+                    "exit_codes": gate_result["exit_codes"],
+                    "protected_paths": gate_result["protected_paths"],
+                    "protected_path_verdict": gate_result["protected_path_verdict"],
+                    "protected_path_findings": gate_result["protected_path_findings"],
+                    "observed_additions": gate_result.get("observed_additions", []),
+                    "basis": gate_result.get("basis", ""),
+                    "gate_verdict": gate_result["gate_verdict"]
+                }
+                deferred_pre_deploy_gate = gate_step
+
+                # If pre-deploy gate fails, block deployment (S5)
+                if gate_result["gate_verdict"] == "fail":
+                    verdict = "gate_failed"
+                    blocked = True
+
+            if verdict == "approved" and not blocked and verdict != "gate_failed":
                 timeout = int(deploy_cfg.get("timeout_seconds", 600))
                 code, out = _run_shell(str(deploy_cfg.get("command", "")), project, work_order.id, timeout)
                 out_file = run_dir / "deployer.output.md"
@@ -294,51 +601,104 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             detail = f"Packet written to {packet}"
             artifact = str(packet)
         elif execute_mode:
-            packet = packet_step(station, station_id)
-            packet_text = packet.read_text(encoding="utf-8")
-            output_file = run_dir / f"{station_id}.output.md"
-            try:
-                result = executor.execute(packet_text, station_id, packet_path=packet,
-                                          output_path=output_file, cwd=project)
-                output_text = result.get("output", "") if isinstance(result, dict) else str(result)
-                usage = result.get("usage") if isinstance(result, dict) else None
-                output_file.write_text(output_text, encoding="utf-8")
-                status = "executed"
-                detail = f"Executed by {executor.name}; output written to {output_file}"
-                artifact = str(output_file)
-                step_executor, step_executed_model = _executor_provenance(executor, output_text)
-                extra_envelope = {}
-                if isinstance(usage, dict):
-                    step_usage = usage
-                    extra_envelope["usage"] = usage
-                    tokens = {k: usage[k] for k in usage if "token" in k}
-                    if tokens:
-                        extra_envelope["tokens"] = tokens
-                if station_id.startswith("reviewer"):
-                    review = parse_review(output_text, station_id)
-                    # Special handling for reviewer-design when no design system exists
-                    if station_id == "reviewer-design" and not has_design_system:
-                        # Force a changes_requested verdict with a finding about missing design system
-                        review = Review(
-                            station="reviewer-design",
-                            verdict="changes_requested",
-                            findings=["No design system exists for this project. The project must define "
-                                     "design/DESIGN.md and design/tokens.json before interface output can be "
-                                     "reviewed against design standards."]
-                        )
-                    if review is not None:
-                        run_reviews.append(review)
-                        run_findings.extend(review.findings)
-                        extra_envelope["review"] = review.to_dict()
-                    else:
-                        extra_envelope["review_parse_failed"] = True
-                        detail += "; review output did not parse as a review JSON"
-            except ExecutorError as exc:
-                status = "failed"
-                detail = f"Executor failed: {exc}"
+            # Skip reviewers if gate failed (S2)
+            if gate_failed and station_id.startswith("reviewer"):
+                status = "skipped"
+                detail = "Skipped due to gate failure"
+                packet = packet_step(station, station_id)
                 artifact = str(packet)
-                step_executor, step_executed_model = _executor_provenance(executor)
-                extra_envelope = {"error": str(exc)}
+            else:
+                # Capture builder delta (Loopback round 2)
+                if station_id == "builder":
+                    builder_attempt += 1
+                    builder_snapshot_before = _snapshot_working_tree(project)
+
+                packet = packet_step(station, station_id)
+                packet_text = packet.read_text(encoding="utf-8")
+                output_file = run_dir / f"{station_id}.output.md"
+
+                # For reviewer stations, remove any pre-existing review file before execution (S3)
+                if station_id.startswith("reviewer"):
+                    review_file = run_dir / f"{station_id}.review.json"
+                    try:
+                        review_file.unlink()
+                    except FileNotFoundError:
+                        pass
+
+                try:
+                    result = executor.execute(packet_text, station_id, packet_path=packet,
+                                              output_path=output_file, cwd=project)
+                    output_text = result.get("output", "") if isinstance(result, dict) else str(result)
+                    usage = result.get("usage") if isinstance(result, dict) else None
+                    output_file.write_text(output_text, encoding="utf-8")
+                    status = "executed"
+                    detail = f"Executed by {executor.name}; output written to {output_file}"
+                    artifact = str(output_file)
+                    step_executor, step_executed_model = _executor_provenance(executor, output_text)
+                    extra_envelope = {}
+                    if isinstance(usage, dict):
+                        step_usage = usage
+                        extra_envelope["usage"] = usage
+                        tokens = {k: usage[k] for k in usage if "token" in k}
+                        if tokens:
+                            extra_envelope["tokens"] = tokens
+                    if station_id.startswith("reviewer"):
+                        # S2: Read review from the file the reviewer wrote, never from stdout
+                        review_file = run_dir / f"{station_id}.review.json"
+                        review = None
+                        review_file_text = None
+
+                        # Check if correction metadata exists
+                        correction_meta_path = run_dir / f"{station_id}.correction.json"
+                        if correction_meta_path.exists():
+                            extra_envelope["correction_used"] = True
+
+                        if review_file.exists():
+                            try:
+                                review_file_text = review_file.read_text(encoding="utf-8")
+                                review = parse_review(review_file_text, station_id)
+                            except Exception as e:
+                                # File exists but couldn't be read or parsed
+                                review = None
+
+                        # Special handling for reviewer-design when no design system exists
+                        if station_id == "reviewer-design" and not has_design_system:
+                            review = Review(
+                                station="reviewer-design",
+                                verdict="changes_requested",
+                                findings=["No design system exists for this project. The project must define "
+                                         "design/DESIGN.md and design/tokens.json before interface output can be "
+                                         "reviewed against design standards."]
+                            )
+                        elif review is not None:
+                            # Valid review parsed from file
+                            pass
+                        elif review_file.exists():
+                            # File exists but failed to parse (S3)
+                            extra_envelope["review_parse_failed"] = True
+                            detail += "; review file exists but did not parse as valid review JSON"
+                        else:
+                            # File does not exist (S3)
+                            extra_envelope["review_file_missing"] = True
+                            detail += "; review file was not written by the station"
+
+                        if review is not None:
+                            run_reviews.append(review)
+                            run_findings.extend(review.findings)
+                            extra_envelope["review"] = review.to_dict()
+
+                    # Track builder delta for protected path checking (Loopback round 2)
+                    if station_id == "builder" and builder_snapshot_before is not None:
+                        # Capture working tree state after builder execution
+                        builder_snapshot_after = _snapshot_working_tree(project)
+                        # Compute delta: files added, modified, or deleted by this builder attempt
+                        builder_delta = _compute_delta(builder_snapshot_before, builder_snapshot_after)
+                except ExecutorError as exc:
+                    status = "failed"
+                    detail = f"Executor failed: {exc}"
+                    artifact = str(packet)
+                    step_executor, step_executed_model = _executor_provenance(executor)
+                    extra_envelope = {"error": str(exc)}
         else:
             packet = packet_step(station, station_id)
             status = "packet_ready"
@@ -353,6 +713,12 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             step["usage"] = step_usage
             if isinstance(step_usage.get("cost"), (int, float)):
                 step["cost"] = step_usage["cost"]
+        # Add extra fields from checks-gate to the step itself
+        if station_id == "checks-gate" and extra_envelope:
+            for key in ["phase", "commands", "exit_codes", "protected_paths",
+                       "protected_path_verdict", "protected_path_findings", "gate_verdict"]:
+                if key in extra_envelope:
+                    step[key] = extra_envelope[key]
         steps.append(step)
         env_extra = dict(extra_envelope)
         env_extra["configured_model"] = configured_model
@@ -360,13 +726,33 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             env_extra["executor"] = step_executor
             env_extra["executed_model"] = step_executed_model
         write_envelope(station_id, next_station, artifact or str(run_dir / "report.json"), status, env_extra)
+        # Insert pre-deploy gate before deployer (S5)
+        if deferred_pre_deploy_gate is not None:
+            steps.append(deferred_pre_deploy_gate)
+            write_envelope("checks-gate", station_id,
+                           deferred_pre_deploy_gate["artifacts"][0] if deferred_pre_deploy_gate["artifacts"] else str(run_dir / "report.json"),
+                           deferred_pre_deploy_gate["status"],
+                           {k: v for k, v in deferred_pre_deploy_gate.items()
+                            if k in ["phase", "commands", "exit_codes", "protected_paths",
+                                   "protected_path_verdict", "protected_path_findings", "gate_verdict"]})
         if deferred_verifier is not None:
             steps.append(deferred_verifier)
             write_envelope("verifier", next_station,
                            deferred_verifier["artifacts"][0] if deferred_verifier["artifacts"] else str(run_dir / "report.json"),
                            deferred_verifier["status"], {"configured_model": None})
+        # Loopback after checks-gate failure (S2)
+        if station_id == "checks-gate" and gate_failed and loopbacks < max_loopbacks:
+            loopbacks += 1
+            return_to = "builder"
+            reason = f"Gate failure: {'; '.join(extra_envelope.get('protected_path_findings', [])[:3])}" if extra_envelope.get('protected_path_findings') else "Gate checks failed"
+            steps.append({"station": "loopback", "status": "loopback", "return_to": return_to,
+                          "detail": f"Loopback to {return_to}: {reason}", "reason": reason,
+                          "duration_ms": 0.0, "cost": None, "artifacts": [],
+                          "configured_model": None, "executed_model": None, "executor": None,
+                          "feedback": extra_envelope.get("output", ""),
+                          "from_station": "checks-gate"})
         # Loopback right after approver when aggregation fails
-        if station_id == "approver" and verdict in {"rejected", "changes_requested"} and loopbacks < max_loopbacks:
+        elif station_id == "approver" and verdict in {"rejected", "changes_requested"} and loopbacks < max_loopbacks:
             loopbacks += 1
             # Spec failures return to spec-writer, implementation failures to builder.
             return_to = "spec-writer" if any("spec" in str(f).lower() and "missing" in str(f).lower() for f in run_findings) else "builder"
@@ -405,7 +791,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                        title=work_order.title, kind=work_order.kind,
                        human_required=human_required, max_loopbacks=max_loopbacks, loopbacks=loopbacks,
                        deployment_status=deployment_status, verify_results=verify_results,
-                       risk_hints=list(work_order.risk_hints or []), decision=decision, warnings=warnings)
+                       risk_hints=list(work_order.risk_hints or []), decision=decision, warnings=warnings,
+                       base_ref=base_ref)
     (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
     # Swimlane
     lines = ["# Swimlane", "", "Cost is reported as null here. Model runtimes report cost when they run a station; ANVIL never invents a number.", "",
