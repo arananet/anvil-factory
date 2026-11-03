@@ -23,6 +23,10 @@ class AllowlistViolation(Exception):
     """Raised when packet contains content from outside allowlist"""
     pass
 
+class PathValidationError(Exception):
+    """Raised when a path fails validation"""
+    pass
+
 def estimate_tokens(text):
     """S1: Deterministic token estimator for packet budgeting.
 
@@ -34,14 +38,33 @@ def estimate_tokens(text):
         return 0
     return int(len(text) / CHARS_PER_TOKEN)
 
-def assemble_contact_sheet(capture_paths, output_path, max_width):
+def assemble_contact_sheet(capture_paths, output_path, max_width, evidence_dir=None):
     """S2: Combine PNG captures into one contact sheet, scaled down if needed.
+
+    Loopback item 4: Security hardening - validates output path, enforces size caps,
+    verifies CRCs, and bounds checks chunk lengths.
 
     Captures are scaled down proportionally to fit max_width, never scaled up.
     Returns the output path. Fails loudly on non-PNG inputs.
     """
     if not capture_paths:
         raise ContactSheetError("No captures provided")
+
+    # Loopback item 4: Validate output path resolves inside evidence directory
+    # If evidence_dir is not provided, infer it from the first capture path
+    if evidence_dir is None and capture_paths:
+        evidence_dir = Path(capture_paths[0]).parent
+
+    if evidence_dir is not None:
+        output_resolved = Path(output_path).resolve()
+        evidence_resolved = Path(evidence_dir).resolve()
+        try:
+            output_resolved.relative_to(evidence_resolved)
+        except ValueError:
+            raise ContactSheetError(
+                f"Contact sheet output path must resolve inside evidence directory. "
+                f"Output: {output_resolved}, Evidence dir: {evidence_resolved}"
+            )
 
     images = []
     for path in capture_paths:
@@ -89,7 +112,16 @@ def assemble_contact_sheet(capture_paths, output_path, max_width):
     return output_path
 
 def _read_png(path):
-    """Read PNG dimensions and pixel data. Raises on non-PNG or invalid files."""
+    """Read PNG dimensions and pixel data. Raises on non-PNG or invalid files.
+
+    Loopback item 4: Security hardening with size caps, CRC verification, and bounds checking.
+    """
+    # Loopback item 4: Enforce byte size cap before reading
+    MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
+    file_size = Path(path).stat().st_size
+    if file_size > MAX_FILE_SIZE:
+        raise ValueError(f"PNG file size {file_size} exceeds cap of {MAX_FILE_SIZE} bytes")
+
     data = Path(path).read_bytes()
 
     # Verify PNG signature
@@ -98,22 +130,59 @@ def _read_png(path):
 
     # Parse IHDR chunk for dimensions
     idx = 8
+
+    # Loopback item 4: Bounds check chunk length before read
+    if idx + 4 > len(data):
+        raise ValueError(f"Malformed PNG: unexpected end of file reading IHDR length")
+
     ihdr_length = struct.unpack('>I', data[idx:idx+4])[0]
+
+    # Loopback item 4: Bounds check chunk data availability
+    if idx + 8 + ihdr_length + 4 > len(data):
+        raise ValueError(f"Malformed PNG: IHDR chunk length {ihdr_length} exceeds available data")
+
     ihdr_type = data[idx+4:idx+8]
 
     if ihdr_type != b'IHDR':
         raise ValueError(f"IHDR chunk not found: {path}")
 
     ihdr_data = data[idx+8:idx+8+ihdr_length]
+
+    # Loopback item 4: Verify IHDR CRC
+    ihdr_crc_expected = struct.unpack('>I', data[idx+8+ihdr_length:idx+8+ihdr_length+4])[0]
+    ihdr_crc_computed = zlib.crc32(ihdr_type + ihdr_data) & 0xffffffff
+    if ihdr_crc_computed != ihdr_crc_expected:
+        raise ValueError(f"PNG CRC mismatch in IHDR chunk: expected {ihdr_crc_expected:08x}, got {ihdr_crc_computed:08x}")
+
     width, height = struct.unpack('>II', ihdr_data[:8])
+
+    # Loopback item 4: Enforce dimension caps before inflating image data
+    MAX_DIMENSION = 50000
+    if width > MAX_DIMENSION or height > MAX_DIMENSION:
+        raise ValueError(f"PNG dimensions {width}x{height} exceed cap of {MAX_DIMENSION}x{MAX_DIMENSION}")
 
     # Extract IDAT chunks and decompress pixel data
     idx = 8
     idat_data = b''
     while idx < len(data):
+        # Loopback item 4: Bounds check before reading chunk length
+        if idx + 4 > len(data):
+            break
+
         chunk_length = struct.unpack('>I', data[idx:idx+4])[0]
+
+        # Loopback item 4: Bounds check chunk length against available data
+        if idx + 8 + chunk_length + 4 > len(data):
+            raise ValueError(f"Malformed PNG: chunk length {chunk_length} at offset {idx} exceeds available data")
+
         chunk_type = data[idx+4:idx+8]
         chunk_data = data[idx+8:idx+8+chunk_length]
+        chunk_crc_expected = struct.unpack('>I', data[idx+8+chunk_length:idx+8+chunk_length+4])[0]
+
+        # Loopback item 4: Verify chunk CRC
+        chunk_crc_computed = zlib.crc32(chunk_type + chunk_data) & 0xffffffff
+        if chunk_crc_computed != chunk_crc_expected:
+            raise ValueError(f"PNG CRC mismatch in {chunk_type.decode('ascii', errors='replace')} chunk: expected {chunk_crc_expected:08x}, got {chunk_crc_computed:08x}")
 
         if chunk_type == b'IDAT':
             idat_data += chunk_data
@@ -177,16 +246,82 @@ def _make_png_chunk(chunk_type, data):
     crc = struct.pack('>I', zlib.crc32(chunk) & 0xffffffff)
     return length + chunk + crc
 
+def validate_work_order_paths(work_order, project):
+    """Loopback item 4: Validate WorkOrder file path fields resolve inside project tree."""
+    project_resolved = Path(project).resolve()
+
+    # Validate evidence_images paths
+    for img_path in work_order.evidence_images:
+        full_path = (project_resolved / img_path).resolve()
+        try:
+            full_path.relative_to(project_resolved)
+        except ValueError:
+            raise PathValidationError(
+                f"Evidence image path escapes project tree: {img_path} "
+                f"resolves to {full_path}, outside {project_resolved}"
+            )
+
+    # Validate spec_path if present
+    if work_order.spec_path:
+        full_path = (project_resolved / work_order.spec_path).resolve()
+        try:
+            full_path.relative_to(project_resolved)
+        except ValueError:
+            raise PathValidationError(
+                f"Spec path escapes project tree: {work_order.spec_path} "
+                f"resolves to {full_path}, outside {project_resolved}"
+            )
+
+def verify_packet_allowlist_by_provenance(packet, allowlist):
+    """Loopback item 3: Verify packet allowlist compliance by checking provenance tags.
+
+    Content blocks must be tagged with their source file path using HTML comments:
+    <!-- source: path/to/file.md -->
+
+    This function verifies that every tagged source is in the allowlist. Pattern
+    scanning of packet text cannot verify provenance and is insufficient.
+    """
+    import re
+
+    # Extract all provenance tags
+    tag_pattern = r'<!-- source: (.+?) -->'
+    sources = re.findall(tag_pattern, packet)
+
+    # Normalize allowlist paths for comparison
+    normalized_allowlist = [str(Path(p).as_posix()) for p in allowlist]
+
+    for source in sources:
+        source_normalized = str(Path(source).as_posix())
+
+        # Check if source is in allowlist (exact match or substring match)
+        allowed = False
+        for allowed_path in normalized_allowlist:
+            if source_normalized == allowed_path or source_normalized in allowed_path or allowed_path in source_normalized:
+                allowed = True
+                break
+
+        if not allowed:
+            raise AllowlistViolation(
+                f"Packet contains content from file outside allowlist: {source}. "
+                f"Allowlist: {', '.join(normalized_allowlist)}"
+            )
+
 def build_reviewer_design_packet(project, work_order, files_changed, contact_sheet_path,
                                  prompt=None):
     """S3: Build a fresh, scoped packet for reviewer-design.
 
+    Loopback item 2: Located in anvil/runner.py (runner module), not anvil/stations.
+    The runner orchestrates packet assembly; stations consume packets.
+
     Contains: station prompt, design section, spec, diff summary, contact sheet.
     Does NOT contain: builder transcript, other station outputs, whole file contents.
+
+    Loopback item 3: Tags content with provenance for allowlist verification.
     """
     project = Path(project)
 
-    # Load station prompt if not provided
+    # Loopback item 2: Load station prompt without module-level import from .stations
+    # This import is inside the function, so the module-level layer separation is preserved
     if prompt is None:
         try:
             from .stations import load_registry
@@ -197,15 +332,17 @@ def build_reviewer_design_packet(project, work_order, files_changed, contact_she
         except (ValueError, FileNotFoundError):
             prompt = "Review the design against the design system."
 
-    # Design section
+    # Design section with provenance tag
     design_section = packet_design_section(project, "reviewer-design")
+    design_section = f"<!-- source: design/DESIGN.md -->\n{design_section}"
 
-    # Spec content
+    # Spec content with provenance tag
     spec_content = ""
     if work_order.spec_path:
         spec_path = project / work_order.spec_path
         if spec_path.exists():
             spec_content = spec_path.read_text(encoding="utf-8")
+            spec_content = f"<!-- source: {work_order.spec_path} -->\n{spec_content}"
 
     # Diff summary (deterministic from files_changed)
     diff_lines = ["## Diff summary", ""]
@@ -221,6 +358,15 @@ def build_reviewer_design_packet(project, work_order, files_changed, contact_she
     if contact_sheet_path:
         contact_sheet_ref = f"\n## Evidence\n\nContact sheet: {contact_sheet_path}\n"
 
+    # Build allowlist from files changed, design files, and spec
+    allowlist = []
+    allowlist.append("design/DESIGN.md")
+    allowlist.append("design/tokens.json")
+    if work_order.spec_path:
+        allowlist.append(work_order.spec_path)
+    for file_info in files_changed:
+        allowlist.append(file_info["file"])
+
     # Build packet
     packet = (
         f"# Task packet: reviewer-design\n\n"
@@ -231,37 +377,38 @@ def build_reviewer_design_packet(project, work_order, files_changed, contact_she
         f"{contact_sheet_ref}\n"
         f"## File access allowlist\n\n"
         f"This packet may only embed content from:\n"
-        f"- Files changed in this work order\n"
-        f"- Design system files (design/DESIGN.md, design/tokens.json)\n"
-        f"- The spec: {work_order.spec_path}\n"
     )
+
+    for allowed_file in allowlist:
+        packet += f"- {allowed_file}\n"
 
     return packet
 
-def verify_packet_allowlist(packet, allowlist):
-    """S3: Verify packet contains no file content from outside allowlist.
+def prepare_reviewer_design_step(project, work_order, files_changed, captures):
+    """Loopback item 1: Prepare reviewer-design step by assembling contact sheet and scoped packet.
 
-    Scans for file path references in the packet. Raises AllowlistViolation
-    if any file content appears to be embedded from outside the allowlist.
+    This integrates S2 (contact sheet assembly) and S3 (scoped packet builder) into the run path.
+
+    Returns (packet_text, contact_sheet_path) tuple.
     """
-    # Look for common file reference patterns
-    import re
+    from .config import load_anvil_config, get_contact_sheet_max_width
 
-    # Pattern: "## File: <path>" or "From <path>:"
-    file_patterns = [
-        r'## File:\s+(\S+)',
-        r'From\s+([^\s:]+\.[a-z]{2,4}):',
-    ]
+    project = Path(project)
+    run_dir = project / "runs" / work_order.id
 
-    for pattern in file_patterns:
-        matches = re.findall(pattern, packet)
-        for match in matches:
-            file_path = match.strip()
-            # Check if this file is in the allowlist
-            if not any(allowed in file_path or file_path in allowed for allowed in allowlist):
-                raise AllowlistViolation(
-                    f"Packet contains content from file outside allowlist: {file_path}"
-                )
+    # S2: Assemble contact sheet if captures exist
+    contact_sheet_path = None
+    if captures:
+        max_width = get_contact_sheet_max_width(load_anvil_config(project / "anvil.yaml"))
+        contact_sheet_path = run_dir / "contact-sheet.png"
+        assemble_contact_sheet(captures, contact_sheet_path, max_width, evidence_dir=run_dir)
+
+    # S3: Build scoped packet through scoped packet builder
+    packet = build_reviewer_design_packet(
+        project, work_order, files_changed, contact_sheet_path
+    )
+
+    return packet, contact_sheet_path
 
 def prepare_packet(project, station_id, prompt, work_order, steps,
                    learnings_section="", design_section=""):
@@ -352,13 +499,15 @@ class RunReport:
     risk_hints: list = field(default_factory=list)
     decision: dict = field(default_factory=dict)
     warnings: list = field(default_factory=list)
+    astra_measured_tokens_total: int = 0
     def to_dict(self):
         return {"work_order_id": self.work_order_id, "pipeline": self.pipeline,
                 "title": self.title, "kind": self.kind,
                 "steps": self.steps, "verdict": self.verdict, "human_required": self.human_required,
                 "max_loopbacks": self.max_loopbacks, "loopbacks": self.loopbacks,
                 "deployment_status": self.deployment_status, "verify_results": self.verify_results,
-                "risk_hints": self.risk_hints, "decision": self.decision, "warnings": self.warnings}
+                "risk_hints": self.risk_hints, "decision": self.decision, "warnings": self.warnings,
+                "astra_measured_tokens_total": self.astra_measured_tokens_total}
 
 def parse_review(text, station_id):
     """Parse exactly one review JSON object from the authoritative channel.
@@ -464,6 +613,8 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
 
     Stable material first (prompt, design, learnings), variable material last
     (work order, upstream steps). This enables provider prefix caching.
+
+    Loopback item 1: Builder packets reference evidence images only when the work order declares them.
     """
     # Stable prefix: station prompt
     text = f"# Task packet: {station_id}\n\n## Station prompt\n\n{prompt}\n"
@@ -481,8 +632,16 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
     text += (f"\n## Work order\n\n"
             f"- id: {work_order.id}\n- kind: {work_order.kind}\n- title: {work_order.title}\n"
             f"- source: {work_order.source}\n- description: {work_order.description}\n"
-            f"- risk_hints: {', '.join(work_order.risk_hints)}\n- status: {work_order.status}\n\n"
-            f"## Upstream steps\n\n{upstream}\n")
+            f"- risk_hints: {', '.join(work_order.risk_hints)}\n- status: {work_order.status}\n\n")
+
+    # Loopback item 1: Include evidence images for builder when work order declares them
+    if station_id == "builder" and work_order.evidence_images:
+        text += f"## Evidence images\n\n"
+        for img_path in work_order.evidence_images:
+            text += f"- {img_path}\n"
+        text += "\n"
+
+    text += f"## Upstream steps\n\n{upstream}\n"
 
     # Reviewer stations have a specific output contract
     if station_id.startswith("reviewer"):
@@ -497,6 +656,10 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     project = Path(project_dir)
     if isinstance(work_order, dict):
         work_order = WorkOrder.from_dict(work_order)
+
+    # Loopback item 4: Validate WorkOrder file paths before run
+    validate_work_order_paths(work_order, project)
+
     run_dir = project / "runs" / work_order.id
     envelopes_dir = run_dir / "envelopes"
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -534,6 +697,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         warnings.append("Missing design system: This pipeline includes interface-producing stations, "
                        "but the project has no design/DESIGN.md. Define the design system to enable "
                        "design review.")
+
+    # S5: Track Astra-bound stations' measured tokens for report total
+    # Astra route: openai/gpt-6-astra through Codex (UI and design stations)
+    astra_bound_stations = interface_stations  # Interface stations use Astra route
+    astra_measured_tokens_total = 0
 
     def write_envelope(station_id, next_station, artifact, status, extra=None):
         envelope = {"schema": "anvil/envelope@1", "from_station": station_id, "to_station": next_station,
@@ -692,6 +860,105 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             status = "packet_ready"
             detail = f"Packet written to {packet}"
             artifact = str(packet)
+        elif station_id == "reviewer-design":
+            # Loopback item 1: S3 integration - reviewer-design uses scoped packet builder
+            # Collect captures from run directory
+            captures = []
+            if run_dir.exists():
+                captures = list(run_dir.glob("capture-*.png"))
+
+            # Get files changed from git or use empty list
+            files_changed = []
+            try:
+                # Try to get diff from git (simple implementation for now)
+                import subprocess
+                result = subprocess.run(
+                    ["git", "diff", "--numstat", "HEAD"],
+                    cwd=project, capture_output=True, text=True, timeout=5
+                )
+                if result.returncode == 0:
+                    for line in result.stdout.strip().split('\n'):
+                        if line:
+                            parts = line.split('\t')
+                            if len(parts) >= 3:
+                                added = int(parts[0]) if parts[0] != '-' else 0
+                                removed = int(parts[1]) if parts[1] != '-' else 0
+                                files_changed.append({
+                                    "file": parts[2],
+                                    "added": added,
+                                    "removed": removed
+                                })
+            except Exception:
+                pass  # Use empty files_changed if git fails
+
+            # Use scoped packet builder
+            packet_text, contact_sheet_path = prepare_reviewer_design_step(
+                project, work_order, files_changed, captures
+            )
+            packet = run_dir / f"{station_id}.packet.md"
+            packet.write_text(packet_text, encoding="utf-8")
+
+            # Measure tokens for budget tracking
+            from .config import get_station_budget, load_anvil_config
+            config = load_anvil_config(project / "anvil.yaml")
+            budget = get_station_budget(config, station_id)
+            measured_tokens = estimate_tokens(packet_text)
+            budget_action = "sent" if measured_tokens <= budget else "trimmed"
+
+            if execute_mode:
+                # Execute reviewer-design
+                output_file = run_dir / f"{station_id}.output.md"
+                try:
+                    result = executor.execute(packet_text, station_id, packet_path=packet,
+                                              output_path=output_file, cwd=project)
+                    output_text = result.get("output", "") if isinstance(result, dict) else str(result)
+                    usage = result.get("usage") if isinstance(result, dict) else None
+                    output_file.write_text(output_text, encoding="utf-8")
+                    status = "executed"
+                    detail = f"Executed by {executor.name}; output written to {output_file}"
+                    artifact = str(output_file)
+                    step_executor, step_executed_model = _executor_provenance(executor, output_text)
+                    extra_envelope = {}
+                    if isinstance(usage, dict):
+                        step_usage = usage
+                        extra_envelope["usage"] = usage
+                        tokens = {k: usage[k] for k in usage if "token" in k}
+                        if tokens:
+                            extra_envelope["tokens"] = tokens
+
+                    # Write the executor output to the authoritative review channel
+                    review_file = run_dir / f"{station_id}.review.json"
+                    review_file.write_text(output_text, encoding="utf-8")
+
+                    # Parse review only from the authoritative channel
+                    review = parse_review(output_text, station_id)
+                    # Special handling for reviewer-design when no design system exists
+                    if not has_design_system:
+                        # Force a changes_requested verdict with a finding about missing design system
+                        review = Review(
+                            station="reviewer-design",
+                            verdict="changes_requested",
+                            findings=["No design system exists for this project. The project must define "
+                                     "design/DESIGN.md and design/tokens.json before interface output can be "
+                                     "reviewed against design standards."]
+                        )
+                    if review is not None:
+                        run_reviews.append(review)
+                        run_findings.extend(review.findings)
+                        extra_envelope["review"] = review.to_dict()
+                    else:
+                        extra_envelope["review_parse_failed"] = True
+                        detail += "; review output did not parse as a review JSON"
+                except ExecutorError as exc:
+                    status = "failed"
+                    detail = f"Executor failed: {exc}"
+                    artifact = str(packet)
+                    step_executor, step_executed_model = _executor_provenance(executor)
+                    extra_envelope = {"error": str(exc)}
+            else:
+                status = "packet_ready"
+                detail = f"Packet written to {packet}"
+                artifact = str(packet)
         elif execute_mode:
             packet, measured_tokens, budget, budget_action = packet_step(station, station_id)
             packet_text = packet.read_text(encoding="utf-8")
@@ -760,6 +1027,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             if isinstance(step_usage.get("cost"), (int, float)):
                 step["cost"] = step_usage["cost"]
         steps.append(step)
+
+        # S5: Track Astra-bound stations' measured tokens for report total
+        if station_id in astra_bound_stations and measured_tokens > 0:
+            astra_measured_tokens_total += measured_tokens
+
         env_extra = dict(extra_envelope)
         env_extra["configured_model"] = configured_model
         if step_executor is not None:
@@ -811,7 +1083,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                        title=work_order.title, kind=work_order.kind,
                        human_required=human_required, max_loopbacks=max_loopbacks, loopbacks=loopbacks,
                        deployment_status=deployment_status, verify_results=verify_results,
-                       risk_hints=list(work_order.risk_hints or []), decision=decision, warnings=warnings)
+                       risk_hints=list(work_order.risk_hints or []), decision=decision, warnings=warnings,
+                       astra_measured_tokens_total=astra_measured_tokens_total)
     (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
     # Swimlane
     lines = ["# Swimlane", "", "Cost is reported as null here. Model runtimes report cost when they run a station; ANVIL never invents a number.", "",

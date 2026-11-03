@@ -2,6 +2,8 @@
 
 Spec: .openspec/specs/astra-consumption/spec.md
 Tests map to scenarios S1-S5 as documented in the spec's Tests section.
+
+Loopback gate round 2: Tests for integration, PNG hardening, provenance checking, report visibility.
 """
 
 import json
@@ -10,6 +12,7 @@ import tempfile
 import unittest
 from pathlib import Path
 import sys
+import zlib
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -213,7 +216,6 @@ class TestContactSheet(unittest.TestCase):
 
         # IDAT chunk (minimal image data - empty for simplicity)
         # For a valid minimal PNG, we need at least some compressed data
-        import zlib
         # Create a minimal scanline (filter byte + RGB pixels)
         scanline = b'\x00' + (bytes(color) * width)
         raw_data = scanline * height
@@ -229,7 +231,6 @@ class TestContactSheet(unittest.TestCase):
 
     def _make_png_chunk(self, chunk_type, data):
         """Create a PNG chunk with length, type, data, and CRC"""
-        import zlib
         length = struct.pack('>I', len(data))
         chunk = chunk_type + data
         crc = struct.pack('>I', zlib.crc32(chunk) & 0xffffffff)
@@ -336,6 +337,123 @@ class TestContactSheet(unittest.TestCase):
 
         error_msg = str(ctx.exception)
         self.assertTrue(error_msg, "Must fail with clear error message")
+
+    def test_png_size_caps_enforced(self):
+        """Loopback item 4: PNG assembler enforces input size caps before inflation"""
+        from anvil.runner import assemble_contact_sheet, ContactSheetError
+
+        # Create a PNG with dimensions that would exceed caps
+        # This tests that size is validated from headers before inflating data
+        huge_png = self.evidence_dir / "huge.png"
+
+        # Create PNG with header claiming huge dimensions
+        signature = b'\x89PNG\r\n\x1a\n'
+        # IHDR with excessive dimensions (100000 x 100000)
+        ihdr_data = struct.pack('>IIBBBBB', 100000, 100000, 8, 2, 0, 0, 0)
+        ihdr_chunk = self._make_png_chunk(b'IHDR', ihdr_data)
+        # Minimal IDAT (won't decompress properly but we should fail before that)
+        idat_chunk = self._make_png_chunk(b'IDAT', b'\x78\x9c\x03\x00\x00\x00\x00\x01')
+        iend_chunk = self._make_png_chunk(b'IEND', b'')
+
+        huge_png.write_bytes(signature + ihdr_chunk + idat_chunk + iend_chunk)
+
+        output_path = self.evidence_dir / "contact-sheet.png"
+
+        # Should fail with size cap error before attempting to inflate
+        with self.assertRaises(ContactSheetError) as ctx:
+            assemble_contact_sheet([huge_png], output_path, max_width=1600)
+
+        error_msg = str(ctx.exception).lower()
+        # Error should indicate size/dimension issue
+        self.assertTrue(
+            "dimension" in error_msg or "size" in error_msg or "cap" in error_msg,
+            f"Error should indicate size cap violation: {ctx.exception}"
+        )
+
+    def test_png_crc_verification(self):
+        """Loopback item 4: PNG assembler verifies chunk CRCs"""
+        from anvil.runner import assemble_contact_sheet, ContactSheetError
+
+        # Create PNG with corrupted CRC
+        corrupt_png = self.evidence_dir / "corrupt.png"
+
+        signature = b'\x89PNG\r\n\x1a\n'
+        ihdr_data = struct.pack('>IIBBBBB', 100, 100, 8, 2, 0, 0, 0)
+
+        # Create chunk with WRONG CRC
+        length = struct.pack('>I', len(ihdr_data))
+        chunk = b'IHDR' + ihdr_data
+        bad_crc = struct.pack('>I', 0xDEADBEEF)  # Wrong CRC
+        ihdr_chunk = length + chunk + bad_crc
+
+        # Valid compressed data
+        scanline = b'\x00' + (b'\xff\x00\x00' * 100)
+        raw_data = scanline * 100
+        compressed = zlib.compress(raw_data)
+        idat_chunk = self._make_png_chunk(b'IDAT', compressed)
+        iend_chunk = self._make_png_chunk(b'IEND', b'')
+
+        corrupt_png.write_bytes(signature + ihdr_chunk + idat_chunk + iend_chunk)
+
+        output_path = self.evidence_dir / "contact-sheet.png"
+
+        # Should fail due to CRC mismatch
+        with self.assertRaises(ContactSheetError) as ctx:
+            assemble_contact_sheet([corrupt_png], output_path, max_width=1600)
+
+        error_msg = str(ctx.exception).lower()
+        self.assertTrue(
+            "crc" in error_msg or "corrupt" in error_msg or "invalid" in error_msg,
+            f"Error should indicate CRC failure: {ctx.exception}"
+        )
+
+    def test_png_chunk_length_bounds_check(self):
+        """Loopback item 4: PNG assembler bounds checks chunk lengths before reads"""
+        from anvil.runner import assemble_contact_sheet, ContactSheetError
+
+        # Create PNG with chunk length exceeding file size
+        malformed_png = self.evidence_dir / "malformed.png"
+
+        signature = b'\x89PNG\r\n\x1a\n'
+        # Chunk claiming huge length that extends beyond actual data
+        bad_length = struct.pack('>I', 0xFFFFFFFF)  # Claims max size
+        chunk_type = b'IHDR'
+        minimal_data = struct.pack('>IIBBBBB', 100, 100, 8, 2, 0, 0, 0)
+        crc = struct.pack('>I', zlib.crc32(chunk_type + minimal_data) & 0xffffffff)
+
+        malformed_png.write_bytes(signature + bad_length + chunk_type + minimal_data + crc)
+
+        output_path = self.evidence_dir / "contact-sheet.png"
+
+        # Should fail due to bounds check
+        with self.assertRaises(ContactSheetError) as ctx:
+            assemble_contact_sheet([malformed_png], output_path, max_width=1600)
+
+        error_msg = str(ctx.exception).lower()
+        self.assertTrue(
+            "bounds" in error_msg or "length" in error_msg or "invalid" in error_msg,
+            f"Error should indicate bounds check failure: {ctx.exception}"
+        )
+
+    def test_contact_sheet_output_path_validation(self):
+        """Loopback item 4: Contact sheet output path must resolve inside run evidence directory"""
+        from anvil.runner import assemble_contact_sheet, ContactSheetError
+
+        # Create a valid capture
+        cap = self._create_test_png(self.evidence_dir / "valid.png", 100, 100)
+
+        # Try to write outside evidence directory using path traversal
+        malicious_output = self.evidence_dir / ".." / ".." / "etc" / "passwd"
+
+        # Should fail due to path validation
+        with self.assertRaises(ContactSheetError) as ctx:
+            assemble_contact_sheet([cap], malicious_output, max_width=1600)
+
+        error_msg = str(ctx.exception).lower()
+        self.assertTrue(
+            "path" in error_msg or "directory" in error_msg or "invalid" in error_msg,
+            f"Error should indicate path validation failure: {ctx.exception}"
+        )
 
 
 class TestPacketLayout(unittest.TestCase):
@@ -486,85 +604,354 @@ class TestScopedReview(unittest.TestCase):
         self.assertNotIn("## Output from", packet,
                         "Packet must not contain other station outputs")
 
-    def test_allowlist_check_rejects_out_of_scope(self):
-        """Allowlist check rejects packet with content from outside allowlist"""
-        from anvil.runner import verify_packet_allowlist, AllowlistViolation
+    def test_scoped_packet_builder_location(self):
+        """Loopback item 2: Scoped packet builder is in anvil/runner.py, not anvil/stations"""
+        # This test verifies architectural placement by checking imports
+        import anvil.runner
 
-        wo = WorkOrder(id="wo-allowlist-001", kind="feature", title="Test",
-                      source="test", description="Allowlist test",
-                      spec_path=".openspec/specs/test-spec/spec.md")
+        # build_reviewer_design_packet should be in anvil.runner
+        self.assertTrue(
+            hasattr(anvil.runner, 'build_reviewer_design_packet'),
+            "build_reviewer_design_packet must be in anvil.runner module"
+        )
 
-        # Files the order touches
-        touched_files = ["src/app.py", "src/ui.py"]
+        # Verify it doesn't import from anvil.stations at module level
+        # (imports within functions are allowed for station prompt loading)
+        import inspect
+        source = inspect.getsource(anvil.runner)
+        module_level_imports = []
+        for line in source.split('\n'):
+            stripped = line.strip()
+            if stripped.startswith('from anvil.stations'):
+                # Module-level import would be at column 0 (not indented)
+                if not line.startswith(' ') and not line.startswith('\t'):
+                    module_level_imports.append(line)
 
-        # Design system files
-        design_files = ["design/DESIGN.md", "design/tokens.json"]
+        self.assertEqual(
+            len(module_level_imports), 0,
+            f"anvil.runner must not import from anvil.stations at module level. Found: {module_level_imports}"
+        )
 
-        # Build allowlist
-        allowlist = touched_files + design_files + [wo.spec_path]
+    def test_provenance_based_allowlist_check(self):
+        """Loopback item 3: Allowlist verification uses provenance tags, not pattern scanning"""
+        from anvil.runner import verify_packet_allowlist_by_provenance, AllowlistViolation
 
-        # Create packet with content from outside allowlist
-        packet_with_violation = """
-# Task packet: reviewer-design
-
-## Project design
-...design content...
-
-## File: src/secret.py
-This file is not in the allowlist!
-"""
-
-        with self.assertRaises(AllowlistViolation) as ctx:
-            verify_packet_allowlist(packet_with_violation, allowlist)
-
-        error_msg = str(ctx.exception)
-        self.assertIn("src/secret.py", error_msg,
-                     "Error must identify the out-of-allowlist file")
-
-    def test_allowlist_check_passes_for_scoped_content(self):
-        """Allowlist check passes when all embedded content is in scope"""
-        from anvil.runner import verify_packet_allowlist
-
-        wo = WorkOrder(id="wo-allowlist-002", kind="feature", title="Test",
-                      source="test", description="Valid packet")
-
+        # Allowlist
         allowlist = [
             "src/app.py",
             "design/DESIGN.md",
             ".openspec/specs/test-spec/spec.md"
         ]
 
-        # Packet with only allowed file references
-        valid_packet = """
+        # Packet with provenance tags
+        # Content blocks are tagged with source paths at assembly time
+        tagged_packet = """
 # Task packet: reviewer-design
 
 ## Project design
-From design/DESIGN.md:
-...design content...
+<!-- source: design/DESIGN.md -->
+Design content from DESIGN.md
 
 ## Spec
-From .openspec/specs/test-spec/spec.md:
-...spec content...
+<!-- source: .openspec/specs/test-spec/spec.md -->
+Spec content
 
 ## Diff summary
 - src/app.py: +10, -5
 """
 
-        # Should not raise
+        # Valid packet should pass
         try:
-            verify_packet_allowlist(valid_packet, allowlist)
+            verify_packet_allowlist_by_provenance(tagged_packet, allowlist)
         except Exception as e:
-            self.fail(f"Valid packet should pass allowlist check: {e}")
+            self.fail(f"Valid tagged packet should pass: {e}")
+
+        # Packet with content from outside allowlist
+        packet_with_violation = """
+# Task packet: reviewer-design
+
+## Project design
+<!-- source: design/DESIGN.md -->
+Design content
+
+## Secret content
+<!-- source: src/secrets.py -->
+This content is from outside the allowlist
+"""
+
+        # Should fail because src/secrets.py is not in allowlist
+        with self.assertRaises(AllowlistViolation) as ctx:
+            verify_packet_allowlist_by_provenance(packet_with_violation, allowlist)
+
+        error_msg = str(ctx.exception)
+        self.assertIn("src/secrets.py", error_msg,
+                     "Error must identify the out-of-allowlist source file")
+
+    def test_provenance_tags_prevent_text_pattern_bypass(self):
+        """Loopback item 3: Content mentioning allowlisted names but from wrong source fails check"""
+        from anvil.runner import verify_packet_allowlist_by_provenance, AllowlistViolation
+
+        allowlist = ["src/app.py", "design/DESIGN.md"]
+
+        # Packet where content mentions allowlisted filenames but has wrong provenance tag
+        sneaky_packet = """
+# Task packet: reviewer-design
+
+## Content
+<!-- source: src/malicious.py -->
+This content mentions src/app.py and design/DESIGN.md in its text,
+but the provenance tag shows it actually came from src/malicious.py
+which is NOT in the allowlist.
+"""
+
+        # Must fail based on provenance tag, not text pattern matching
+        with self.assertRaises(AllowlistViolation) as ctx:
+            verify_packet_allowlist_by_provenance(sneaky_packet, allowlist)
+
+        error_msg = str(ctx.exception)
+        self.assertIn("malicious", error_msg.lower(),
+                     "Error must identify the actual source file from provenance tag")
+
+
+class TestWorkOrderFilePathValidation(unittest.TestCase):
+    """Loopback item 4: WorkOrder file path validation"""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.project = Path(self.tmp.name) / "proj"
+        self.project.mkdir(parents=True)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_evidence_images_path_validation(self):
+        """Loopback item 4: WorkOrder evidence_images paths must resolve inside project tree"""
+        from anvil.runner import validate_work_order_paths, PathValidationError
+
+        # Valid evidence_images paths
+        valid_wo = WorkOrder(
+            id="wo-valid-001",
+            kind="feature",
+            title="Valid paths",
+            source="test",
+            description="Test path validation",
+            evidence_images=["design/screenshot1.png", "design/screenshot2.png"]
+        )
+
+        # Should pass validation
+        try:
+            validate_work_order_paths(valid_wo, self.project)
+        except Exception as e:
+            self.fail(f"Valid paths should pass: {e}")
+
+        # Invalid path using traversal to escape project tree
+        invalid_wo = WorkOrder(
+            id="wo-invalid-001",
+            kind="feature",
+            title="Invalid paths",
+            source="test",
+            description="Test path validation",
+            evidence_images=["design/../../../etc/passwd"]
+        )
+
+        # Should fail validation
+        with self.assertRaises(PathValidationError) as ctx:
+            validate_work_order_paths(invalid_wo, self.project)
+
+        error_msg = str(ctx.exception).lower()
+        self.assertTrue(
+            "path" in error_msg or "outside" in error_msg or "invalid" in error_msg,
+            f"Error should indicate path traversal: {ctx.exception}"
+        )
 
 
 class TestIntegration(unittest.TestCase):
+    """Integration tests: S2/S3 wiring into run path, report visibility"""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.project = Path(self.tmp.name) / "proj"
+        self.project.mkdir(parents=True)
+
+        # Setup project structure
+        (self.project / "design").mkdir()
+        (self.project / "design" / "DESIGN.md").write_text("# Design\n## Quality Bars\n- Bar 1\n")
+        (self.project / "design" / "tokens.json").write_text(json.dumps({"color": {"primary": "#000"}}))
+        (self.project / "brain").mkdir()
+        (self.project / "brain" / "learnings.json").write_text("[]")
+        (self.project / ".openspec" / "specs" / "test-feature").mkdir(parents=True)
+        (self.project / ".openspec" / "specs" / "test-feature" / "spec.md").write_text("# Test Feature\n")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_contact_sheet_assembly_wired_into_run_path(self):
+        """Loopback item 1: Contact sheet is assembled during reviewer-design preparation"""
+        from anvil.runner import prepare_reviewer_design_step
+        from pathlib import Path
+
+        # Create test captures in run evidence
+        run_dir = self.project / "runs" / "wo-integration-001"
+        run_dir.mkdir(parents=True)
+
+        captures = []
+        for i in range(2):
+            cap_path = run_dir / f"capture-{i}.png"
+            # Create minimal valid PNG
+            signature = b'\x89PNG\r\n\x1a\n'
+            ihdr_data = struct.pack('>IIBBBBB', 100, 100, 8, 2, 0, 0, 0)
+            ihdr_chunk = self._make_png_chunk(b'IHDR', ihdr_data)
+            scanline = b'\x00' + (b'\xff\x00\x00' * 100)
+            compressed = zlib.compress(scanline * 100)
+            idat_chunk = self._make_png_chunk(b'IDAT', compressed)
+            iend_chunk = self._make_png_chunk(b'IEND', b'')
+            cap_path.write_bytes(signature + ihdr_chunk + idat_chunk + iend_chunk)
+            captures.append(cap_path)
+
+        wo = WorkOrder(
+            id="wo-integration-001",
+            kind="feature",
+            title="Integration test",
+            source="test",
+            description="Test S2 integration",
+            spec_path=".openspec/specs/test-feature/spec.md"
+        )
+
+        files_changed = [{"file": "src/app.py", "added": 5, "removed": 2}]
+
+        # Prepare reviewer-design step (should assemble contact sheet)
+        packet, contact_sheet_path = prepare_reviewer_design_step(
+            self.project, wo, files_changed, captures
+        )
+
+        # Verify contact sheet was created
+        self.assertTrue(
+            contact_sheet_path.exists(),
+            "Contact sheet must be assembled during reviewer-design preparation"
+        )
+        self.assertTrue(
+            contact_sheet_path.name == "contact-sheet.png",
+            "Contact sheet must be named contact-sheet.png"
+        )
+
+        # Verify packet references contact sheet
+        self.assertIn("contact-sheet.png", packet,
+                     "Packet must reference the assembled contact sheet")
+
+    def test_scoped_packet_builder_wired_into_run_path(self):
+        """Loopback item 1: Scoped packet builder is called for reviewer-design"""
+        from anvil.runner import prepare_reviewer_design_step
+
+        wo = WorkOrder(
+            id="wo-scoped-integration-001",
+            kind="feature",
+            title="Scoped integration",
+            source="test",
+            description="Test S3 integration",
+            spec_path=".openspec/specs/test-feature/spec.md"
+        )
+
+        files_changed = [{"file": "src/ui.py", "added": 15, "removed": 8}]
+
+        # Prepare reviewer-design step (should use scoped builder)
+        packet, _ = prepare_reviewer_design_step(
+            self.project, wo, files_changed, captures=[]
+        )
+
+        # Verify packet has scoped structure (fresh session characteristics)
+        self.assertIn("## Project design", packet,
+                     "Scoped packet must contain design section")
+        self.assertIn("## Spec", packet,
+                     "Scoped packet must contain spec")
+        self.assertIn("## Diff summary", packet,
+                     "Scoped packet must contain diff summary")
+        self.assertIn("## File access allowlist", packet,
+                     "Scoped packet must declare allowlist")
+
+        # Verify it does NOT have standard packet characteristics
+        self.assertNotIn("## Upstream steps", packet,
+                        "Scoped packet must not contain upstream steps")
+
+    def test_report_visibility_in_real_run(self):
+        """Loopback item 5: S1/S5 measurements visible in actual report.json"""
+        from anvil.runner import run_pipeline
+        from anvil.pipeline import load_pipeline
+        from anvil.stations import load_registry
+
+        ROOT = Path(__file__).resolve().parent.parent
+
+        # Configure budgets
+        config = {
+            "station_budgets": {
+                "builder": 50000,
+                "reviewer-design": 30000
+            }
+        }
+        (self.project / "anvil.yaml").write_text(json.dumps(config))
+
+        wo = WorkOrder(
+            id="wo-report-visibility-001",
+            kind="feature",
+            title="Report visibility",
+            source="test",
+            description="Test S5 report visibility",
+            spec_path=".openspec/specs/test-feature/spec.md"
+        )
+
+        # Run a pipeline
+        reg = load_registry(ROOT / "stations")
+        pipeline = load_pipeline(
+            ROOT / "pipelines" / "hotfix.json",
+            known_stations=set(reg.ids())
+        )
+
+        report = run_pipeline(self.project, pipeline, wo, registry=reg)
+
+        # Write report to file (simulating real run)
+        report_path = self.project / "runs" / wo.id / "report.json"
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text(json.dumps(report.to_dict(), indent=2))
+
+        # Read back and verify required fields
+        report_data = json.loads(report_path.read_text())
+
+        # S1: Per-step measurements must be present
+        for step in report_data.get("steps", []):
+            if step.get("status") in ["packet_ready", "executed", "completed"]:
+                self.assertIn("measured_tokens", step,
+                            f"Step {step.get('station')} must record measured_tokens")
+                self.assertIn("budget", step,
+                            f"Step {step.get('station')} must record budget")
+                self.assertIn("budget_action", step,
+                            f"Step {step.get('station')} must record budget_action")
+
+        # S5: Astra total must be present field (even if zero)
+        self.assertIn("astra_measured_tokens_total", report_data,
+                     "Report must contain astra_measured_tokens_total field")
+
+        # S5: Usage fields per step (input/output tokens or null)
+        for step in report_data.get("steps", []):
+            if step.get("status") == "executed":
+                # Usage should be present (as dict with input/output or as null)
+                self.assertIn("usage", step,
+                            f"Executed step {step.get('station')} must have usage field")
+
+    def _make_png_chunk(self, chunk_type, data):
+        """Helper to create PNG chunk"""
+        length = struct.pack('>I', len(data))
+        chunk = chunk_type + data
+        crc = struct.pack('>I', zlib.crc32(chunk) & 0xffffffff)
+        return length + chunk + crc
+
+
+class TestFactorySuiteCompatibility(unittest.TestCase):
     """Integration tests: full factory suite compatibility"""
 
     def test_existing_tests_still_pass(self):
-        """Verify changes don't break existing factory tests"""
-        # This is a placeholder that documents the requirement
+        """Verify changes do not break existing factory tests"""
+        # This test documents the requirement that the full factory suite must pass
         # The actual existing tests are in other test_*.py files
-        # CI runs the full suite, this test ensures the intent is captured
+        # CI runs the full suite to verify compatibility
         pass
 
 

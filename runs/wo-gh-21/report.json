@@ -8,20 +8,23 @@
       "station": "intake",
       "status": "completed",
       "detail": "Work order normalized",
-      "duration_ms": 0.009,
+      "duration_ms": 0.011,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/report.json"
       ],
       "configured_model": "default",
       "executed_model": null,
-      "executor": null
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
     },
     {
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/spec-writer.output.md",
-      "duration_ms": 96690.765,
+      "duration_ms": 174267.914,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/spec-writer.output.md"
@@ -31,13 +34,16 @@
       "executor": {
         "kind": "command",
         "detail": "python3"
-      }
+      },
+      "measured_tokens": 2870,
+      "budget": 0,
+      "budget_action": "none"
     },
     {
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/test-writer.output.md",
-      "duration_ms": 199307.783,
+      "duration_ms": 234928.645,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/test-writer.output.md"
@@ -47,13 +53,16 @@
       "executor": {
         "kind": "command",
         "detail": "python3"
-      }
+      },
+      "measured_tokens": 2876,
+      "budget": 0,
+      "budget_action": "none"
     },
     {
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/builder.output.md",
-      "duration_ms": 368076.076,
+      "duration_ms": 365502.648,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/builder.output.md"
@@ -63,13 +72,16 @@
       "executor": {
         "kind": "command",
         "detail": "python3"
-      }
+      },
+      "measured_tokens": 3409,
+      "budget": 50000,
+      "budget_action": "sent"
     },
     {
       "station": "reviewer-spec",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-spec.output.md; review output did not parse as a review JSON",
-      "duration_ms": 102137.978,
+      "duration_ms": 169974.546,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/reviewer-spec.output.md"
@@ -79,13 +91,16 @@
       "executor": {
         "kind": "command",
         "detail": "python3"
-      }
+      },
+      "measured_tokens": 3074,
+      "budget": 0,
+      "budget_action": "none"
     },
     {
       "station": "reviewer-security",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-security.output.md; review output did not parse as a review JSON",
-      "duration_ms": 68379.39,
+      "duration_ms": 159732.248,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/reviewer-security.output.md"
@@ -95,13 +110,16 @@
       "executor": {
         "kind": "command",
         "detail": "python3"
-      }
+      },
+      "measured_tokens": 3085,
+      "budget": 0,
+      "budget_action": "none"
     },
     {
       "station": "reviewer-tests",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-tests.output.md; review output did not parse as a review JSON",
-      "duration_ms": 48731.963,
+      "duration_ms": 81685.113,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/reviewer-tests.output.md"
@@ -111,13 +129,16 @@
       "executor": {
         "kind": "command",
         "detail": "python3"
-      }
+      },
+      "measured_tokens": 3087,
+      "budget": 0,
+      "budget_action": "none"
     },
     {
       "station": "reviewer-architecture",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-architecture.output.md; review output did not parse as a review JSON",
-      "duration_ms": 137285.174,
+      "duration_ms": 96568.359,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/reviewer-architecture.output.md"
@@ -127,13 +148,16 @@
       "executor": {
         "kind": "command",
         "detail": "python3"
-      }
+      },
+      "measured_tokens": 3110,
+      "budget": 0,
+      "budget_action": "none"
     },
     {
       "station": "reviewer-design",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/reviewer-design.output.md; review output did not parse as a review JSON",
-      "duration_ms": 66775.086,
+      "duration_ms": 38144.627,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/reviewer-design.output.md"
@@ -143,50 +167,62 @@
       "executor": {
         "kind": "command",
         "detail": "python3"
-      }
+      },
+      "measured_tokens": 4208,
+      "budget": 50000,
+      "budget_action": "sent"
     },
     {
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.019,
+      "duration_ms": 0.025,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/report.json"
       ],
       "configured_model": "default",
       "executed_model": null,
-      "executor": null
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
     },
     {
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: required",
-      "duration_ms": 0.005,
+      "duration_ms": 0.007,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
       "executed_model": null,
-      "executor": null
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
     },
     {
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-21/deployer.packet.md",
-      "duration_ms": 0.05,
+      "duration_ms": 0.229,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/deployer.packet.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
-      "executor": null
+      "executor": null,
+      "measured_tokens": 2949,
+      "budget": 0,
+      "budget_action": "none"
     },
     {
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-21/observer.output.md",
-      "duration_ms": 41437.492,
+      "duration_ms": 52281.109,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-21/observer.output.md"
@@ -196,7 +232,10 @@
       "executor": {
         "kind": "command",
         "detail": "python3"
-      }
+      },
+      "measured_tokens": 2956,
+      "budget": 0,
+      "budget_action": "none"
     }
   ],
   "verdict": "no_reviews",

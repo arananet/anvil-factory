@@ -1,14 +1,19 @@
-Security review complete. The review has been written to `runs/wo-gh-21/reviewer-security.review.json`.
+Security review complete. I found five security issues, including one critical gap where the provenance-based allowlist check is implemented but never enforced.
 
-**Verdict**: changes_requested
+**Review verdict: changes_requested**
 
-**Summary**: Found 6 security issues requiring attention:
+**Key findings:**
+1. **Critical** - Provenance allowlist verification function exists but is never called in the run path
+2. **High** - Substring matching in allowlist check allows unintended path matches
+3. **High** - PNG decompression bomb vulnerability (no validation of decompressed size)
+4. **Medium** - Allowlist integration unclear (built but not enforced)
+5. **Low** - No cap on accumulated IDAT data before decompression
 
-1. **PNG decompression bomb vulnerability** - No size limits before decompressing PNG data could allow memory exhaustion attacks
-2. **Missing CRC validation** - PNG chunks are parsed without verifying integrity checksums
-3. **Path traversal risk** - File paths in WorkOrder fields lack validation to ensure they're within project boundaries
-4. **Weak allowlist enforcement** - Simple regex patterns could miss various file reference formats
-5. **PNG chunk bounds checking** - Malformed chunks with excessive lengths could cause out-of-bounds reads
-6. **Output path validation** - Contact sheet output path not validated to be within expected directory
+**Security controls that work correctly:**
+- File size caps (100MB before read)
+- Dimension caps (50000x50000 from headers)
+- PNG CRC verification for all chunks
+- Chunk length bounds checking
+- Path traversal protection for output paths and WorkOrder file paths
 
-All findings reference specific locations in anvil/runner.py and anvil/model.py with concrete remediation steps.
+The review has been written to `runs/wo-gh-21/reviewer-security.review.json` as the authoritative verdict, with detailed findings in `reviewer-security.output.md`.

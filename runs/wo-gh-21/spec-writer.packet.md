@@ -51,6 +51,22 @@ Guardrails: runtime code stays on the Python standard library only. No em dash o
 The reviewer writes its review to the authoritative review file named in its packet; prose outside that file is not a review.
 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/21
+
+LOOPBACK (gate round 2, operator brief): round 1 executed the full line (Actions run 41581311619) and the verdict of record is no_reviews: all five reviewer stations wrote prose into their authoritative .review.json files, so the parser counted 0 of 5, failed closed and named each one; prose is not a review and round 1's outcome stands as recorded. The five raw reviewer outputs are on record in runs/wo-gh-21/ and their substantive findings, quoted and summarized below, are this loopback's scope. The implementation built the infrastructure (estimator, budget enforcement, contact sheet assembler, scoped packet builder, 17 mapped tests passing per reviewer-tests) but the reviewers found it is not wired into the executed run path and is not hardened. Fix exactly this, nothing else:
+
+1. INTEGRATE S2 AND S3 INTO THE RUN PATH (reviewer-architecture findings 1 and 2, and reviewer-spec's integration shortfall). assemble_contact_sheet and build_reviewer_design_packet exist and pass unit tests but are never called by the run pipeline: when the runner prepares the reviewer-design step, it must assemble the round's contact sheet from the run's captures when captures exist and build the reviewer-design packet through the scoped builder, so a real run's reviewer-design packet is the fresh scoped packet of spec S3, not the standard packet. The WorkOrder evidence_images field is added but never read: builder packet assembly must consult it, including image references only when the order declares them and none otherwise.
+
+2. FIX THE LAYER VIOLATION (reviewer-architecture finding 3). build_reviewer_design_packet imports from .stations inside the runner module, inverting the layer separation. Place the scoped packet assembly where the architecture allows and state the chosen placement in the builder output.
+
+3. ALLOWLIST CHECK BY PROVENANCE (reviewer-architecture finding 4, reviewer-security finding 4). Pattern scanning of packet text cannot verify content provenance. The runner check must verify, deterministically, that each content block embedded in the reviewer-design packet carries a source inside the declared allowlist (tag content with its source path at assembly time and check the tags), so out of allowlist content fails the check even when its text mentions allowlisted names.
+
+4. PNG ASSEMBLER AND PATH HARDENING (reviewer-security findings 1, 2, 3, 5, 6, in anvil/runner.py and anvil/model.py). Enforce input byte size and pixel dimension caps read from headers before any inflation of image data; verify PNG chunk CRCs; bounds check chunk lengths before reads; validate the contact sheet output path to resolve inside the run evidence directory; validate WorkOrder file path fields this order touches (including evidence image paths) to resolve inside the project tree.
+
+5. MAKE S1 AND S5 VISIBLE IN THE REAL RUN REPORT. Round 1's runs/wo-gh-21/report.json contains no measured tokens, budget, action or usage anywhere, although the spec requires the run report to record them per measured step. After this loopback, the report must carry, per measured step: measured tokens, budget and action (sent, trimmed or failed); the executor reported usage or null; and the per work order total of measured packet tokens for the Astra bound stations as a present field (its value may be zero when no station in the run is Astra bound, but the field and the interface stations' measurements, reviewer-design included, must be there).
+
+6. REVIEW CHANNEL DISCIPLINE (restated for every reviewer station in this round): your review is exactly one JSON object written to runs/wo-gh-21/<your station>.review.json and nothing else in that file. Prose, summaries and narrative belong in your .output.md only. A .review.json that is not one parseable JSON object is not counted, and round 1 ended with 0 of 5 counted for exactly that reason.
+
+Guardrails unchanged: never modify tools/claude_station.py, the review parsing contract or the prompts' Output Format sections; standard library only; no em dash or en dash characters; S1, S4 and S5's already correct parts stay as they are except for item 5's report visibility.
 - risk_hints: 
 - status: new
 

@@ -1,30 +1,21 @@
-Tests have been written and saved to `/home/runner/work/anvil-factory/anvil-factory/tests/test_astra_consumption.py`.
+Tests written for loopback gate round 2. Updated `tests/test_astra_consumption.py` with 11 new tests covering:
 
-The test file contains comprehensive test coverage for all scenarios in the spec:
+**Integration (items 1-2):**
+- Contact sheet assembly in run path
+- Scoped packet builder in run path  
+- Architectural layer validation
 
-**S1 - Packet Budget (TestTokenEstimator, TestPacketBudget)**
-- Estimator determinism, zero for empty, monotonic growth
-- Over budget packet trimming in declared order
-- Fail policy preventing execution
-- Under budget byte identity
-- Report fields recording
+**Security hardening (items 3-4):**
+- Provenance-based allowlist checking (2 tests)
+- PNG size caps enforcement
+- PNG CRC verification
+- PNG chunk bounds checking
+- Output path validation
+- WorkOrder path validation
 
-**S2 - Evidence Image Policy (TestContactSheet)**
-- Contact sheet dimensions within max width
-- Scaling down proportionally, never up
-- Original captures unchanged
-- Non-PNG failure handling
+**Report visibility (item 5):**
+- Real run report.json field verification
 
-**S3 - Scoped Design Review (TestScopedReview)**
-- reviewer-design packet contents (design, spec, diff, contact sheet)
-- Allowlist check rejecting out-of-scope content
-- Allowlist check passing for scoped content
+All tests map to spec scenarios. Suite now contains 26 tests total. Python syntax validated and all tests loadable.
 
-**S4 - Stable Prefix Layout (TestPacketLayout)**
-- Stable prefix sharing across runs
-- Design and learnings before work order block
-
-**S5 - Per Station Cost Visibility**
-- Covered in budget tests (report fields)
-
-All tests use Python standard library only (no external dependencies), following the project's constraint. The tests are written for functionality that will be implemented, following TDD approach.
+Output: `runs/wo-gh-21/test-writer.output.md`

@@ -1,13 +1,11 @@
-I've reviewed the existing spec at `.openspec/specs/astra-consumption/spec.md` and verified it against the work order. The spec is complete and comprehensively covers all requirements:
+Spec revised. The Astra consumption spec has been updated to revision 2 with clarifications addressing all 6 loopback findings from gate round 2:
 
-**Verification:**
-- ✓ All five scenarios (S1-S5) from the work order are fully specified
-- ✓ All guardrails are present, including the sequencing gate for wo-gh-16
-- ✓ Tests map correctly to each scenario
-- ✓ Purpose section provides the baseline metrics (45,000 input tokens per request, 70.14 USD Astra cost)
-- ✓ Status is "proposed" (appropriate for a spec ready for implementation)
-- ✓ All implementation details match: packet budgets, contact sheets, fresh session design review, stable prefix layout, and cost visibility
+**Key changes:**
+- S2/S3 integration: Explicitly requires runner to call contact sheet assembler and scoped packet builder in the run path
+- Architectural placement: Scoped packet builder must be in anvil/runner.py or helper module, not importing from anvil/stations  
+- Provenance-based allowlist: Content blocks tagged with source paths; verification by tags, not pattern scanning
+- PNG security hardening: Size caps, CRC validation, bounds checks, path validation
+- Report visibility: Measurements must appear in actual report.json for real runs
+- Integration test: Verify S2/S3 wiring with a test design order execution
 
-The spec is production-ready and requires no revision. The output file is already at the specified location.
-
-**Output:** `.openspec/specs/astra-consumption/spec.md` (no changes needed)
+Output: `runs/wo-gh-21/spec-writer.output.md`
