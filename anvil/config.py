@@ -18,6 +18,21 @@ DEFAULT_MODELS = {
     "supervisor": "reasoning-strong",
 }
 
+# S1: Token estimator constant (visible in config per spec)
+CHARS_PER_TOKEN = 3.5
+
+# S1: Factory defaults for packet budgets
+DEFAULT_STATION_BUDGETS = {
+    "builder": 50000,
+    "writer": 50000,
+    "media-producer": 50000,
+    "brief-writer": 50000,
+    "reviewer-design": 50000,
+}
+
+# S2: Factory default for contact sheet max width
+DEFAULT_CONTACT_SHEET_MAX_WIDTH = 1600
+
 def default_model(station_id):
     if station_id in DEFAULT_MODELS:
         return DEFAULT_MODELS[station_id]
@@ -100,3 +115,21 @@ def build_default_config(station_ids):
 def render_anvil_yaml(station_ids):
     # JSON is valid YAML, so this file is both machine simple and YAML legal.
     return json.dumps(build_default_config(station_ids), indent=2) + "\n"
+
+def get_station_budget(config, station_id):
+    """S1: Get the budget for a station, using factory defaults as fallback."""
+    if not isinstance(config, dict):
+        return DEFAULT_STATION_BUDGETS.get(station_id, 50000)
+
+    budgets = config.get("station_budgets", {})
+    if not isinstance(budgets, dict):
+        return DEFAULT_STATION_BUDGETS.get(station_id, 50000)
+
+    return budgets.get(station_id, DEFAULT_STATION_BUDGETS.get(station_id, 50000))
+
+def get_contact_sheet_max_width(config):
+    """S2: Get contact sheet max width from config."""
+    if not isinstance(config, dict):
+        return DEFAULT_CONTACT_SHEET_MAX_WIDTH
+
+    return config.get("contact_sheet_max_width", DEFAULT_CONTACT_SHEET_MAX_WIDTH)

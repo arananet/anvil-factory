@@ -258,3 +258,99 @@ def packet_design_section(project, station_id):
         lines.append("")
 
     return "\n".join(lines)
+
+def packet_design_section_compact(project, station_id):
+    """S1 trim rule 1: Render design section with compact (non-pretty) JSON tokens."""
+    interface_stations = {
+        "builder",
+        "writer",
+        "media-producer",
+        "brief-writer",
+        "reviewer-design"
+    }
+
+    if station_id not in interface_stations:
+        return ""
+
+    design_system = load_design_system(project)
+    if design_system is None:
+        return ""
+
+    lines = ["## Project design", ""]
+
+    # Add tokens (compact, no indent)
+    if design_system["tokens"]:
+        lines.append("### Design tokens")
+        lines.append("")
+        lines.append("```json")
+        lines.append(json.dumps(design_system["tokens"]))  # No indent
+        lines.append("```")
+        lines.append("")
+
+    # Add quality bars
+    if design_system["quality_bars"]:
+        lines.append("### Quality bars")
+        lines.append("")
+        lines.append(design_system["quality_bars"])
+        lines.append("")
+
+    return "\n".join(lines)
+
+def packet_design_section_reduced(project, station_id):
+    """S1 trim rule 2: Render design section with reduced quality bars (headings + first line only)."""
+    interface_stations = {
+        "builder",
+        "writer",
+        "media-producer",
+        "brief-writer",
+        "reviewer-design"
+    }
+
+    if station_id not in interface_stations:
+        return ""
+
+    design_system = load_design_system(project)
+    if design_system is None:
+        return ""
+
+    lines = ["## Project design", ""]
+
+    # Add tokens (compact)
+    if design_system["tokens"]:
+        lines.append("### Design tokens")
+        lines.append("")
+        lines.append("```json")
+        lines.append(json.dumps(design_system["tokens"]))
+        lines.append("```")
+        lines.append("")
+
+    # Add quality bars (reduced: headings + first line only)
+    if design_system["quality_bars"]:
+        lines.append("### Quality bars")
+        lines.append("")
+        reduced_bars = _reduce_quality_bars(design_system["quality_bars"])
+        lines.append(reduced_bars)
+        lines.append("")
+
+    return "\n".join(lines)
+
+def _reduce_quality_bars(quality_bars_text):
+    """Extract only headings and first line of each bar from quality bars section."""
+    lines = quality_bars_text.split("\n")
+    reduced = []
+    in_bar = False
+    first_line_added = False
+
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("###"):
+            # Heading
+            reduced.append(line)
+            in_bar = True
+            first_line_added = False
+        elif in_bar and stripped and not first_line_added:
+            # First non-empty line after heading
+            reduced.append(line)
+            first_line_added = True
+
+    return "\n".join(reduced)

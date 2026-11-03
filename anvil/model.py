@@ -42,6 +42,8 @@ class WorkOrder:
     description: str = ""
     risk_hints: list = field(default_factory=list)
     status: str = "new"
+    spec_path: str = ""
+    evidence_images: list = field(default_factory=list)
     def __post_init__(self):
         if self.kind not in KINDS:
             raise ValueError(f"Invalid work order kind: {self.kind}")
@@ -51,10 +53,12 @@ class WorkOrder:
     def from_dict(cls, data):
         return cls(id=data["id"], kind=data["kind"], title=data["title"],
                    source=data.get("source", "manual"), description=data.get("description", ""),
-                   risk_hints=list(data.get("risk_hints", [])), status=data.get("status", "new"))
+                   risk_hints=list(data.get("risk_hints", [])), status=data.get("status", "new"),
+                   spec_path=data.get("spec_path", ""), evidence_images=list(data.get("evidence_images", [])))
     def to_dict(self):
         return {"id": self.id, "kind": self.kind, "title": self.title, "source": self.source,
-                "description": self.description, "risk_hints": list(self.risk_hints), "status": self.status}
+                "description": self.description, "risk_hints": list(self.risk_hints), "status": self.status,
+                "spec_path": self.spec_path, "evidence_images": list(self.evidence_images)}
 
 @dataclass
 class Review:
