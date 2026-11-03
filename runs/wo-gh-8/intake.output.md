@@ -1,23 +1,17 @@
-Looking at this work order to judge if it's buildable as stated.
+I'll assess this work order against the intake criteria.
 
-**Work order wo-gh-8**: Implement risk and surface routing for reviewer sets and station models based on a spec document.
+The work order asks for implementation of a risk-based routing system per the spec. The spec is clear and detailed, covering:
+- Routing logic that runs between intake and reviewers
+- Configuration-driven reviewer selection based on risk + surfaces
+- Six testable scenarios
+- Report and swimlane updates
+- Test coverage and documentation
 
-**Analysis**:
-- Clear scope: Implement 6 scenarios (S1-S6) for routing reviewers and models based on risk/surfaces
-- References a spec file: `.openspec/specs/risk-routing/spec.md`
-- Defined deliverables: routing logic, config, tests, docs, CHANGELOG
-- Single coherent feature: risk-based routing system
-- No harmful, deceptive, or unlawful intent
+This is **one buildable scope** - all scenarios are part of the same routing feature. It doesn't fall into the refusal class. The work touches the core routing pipeline logic and data models for work orders and run reports.
 
-**Risk rating**: **Medium**
-- Modifies CI/CD review routing logic
-- Controls security reviewer selection (S2) - errors could skip necessary security review
-- Blast radius contained to review process, not end-user systems
-- Testable and reversible
+**Risk assessment**: This affects which reviewers run and at what models. Incorrect routing could cause reviews to be skipped, but it's testable, reversible, and requires keeping the suite green. The blast radius is moderate. **Medium risk**.
 
-**Surfaces touched**:
-- `security`: Controls when security reviewers are included in review sets
-- `deploy`: Modifies CI/CD pipeline infrastructure and routing behavior
+**Surfaces**: This touches `data` - the work order data model (consuming risk/surfaces fields), routing records, and run report structure.
 
 ```json
 {
@@ -25,6 +19,6 @@ Looking at this work order to judge if it's buildable as stated.
     "outcome": "accepted"
   },
   "risk": "medium",
-  "surfaces": ["security", "deploy"]
+  "surfaces": ["data"]
 }
 ```

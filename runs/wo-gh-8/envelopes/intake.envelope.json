@@ -5,7 +5,7 @@
   "work_order_id": "wo-gh-8",
   "artifact_path": "runs/wo-gh-8/intake.output.md",
   "status": "executed",
-  "created_at": "2026-11-03T09:06:55.019825+00:00",
+  "created_at": "2026-11-03T23:41:50.785157+00:00",
   "configured_model": "default",
   "executor": {
     "kind": "command",

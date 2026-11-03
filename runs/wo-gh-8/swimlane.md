@@ -1,25 +1,28 @@
 # Swimlane
 
+Routing: 5 reviewers (full panel)
+
 Cost is reported as null here. Model runtimes report cost when they run a station; ANVIL never invents a number.
 
 | Station | Status | Duration ms | Artifacts | Cost |
 |---|---|---|---|---|
-| intake | executed | 28748.249 | runs/wo-gh-8/intake.output.md | null |
-| spec-writer | executed | 251223.487 | runs/wo-gh-8/spec-writer.output.md | null |
-| test-writer | executed | 225623.143 | runs/wo-gh-8/test-writer.output.md | null |
-| builder | failed | 297015.699 | runs/wo-gh-8/builder.packet.md | null |
-| checks-gate | passed | 12783.567 | runs/wo-gh-8/checks-gate.pre-review.output.md | null |
-| reviewer-spec | failed | 17876.023 | runs/wo-gh-8/reviewer-spec.packet.md | null |
-| reviewer-security | failed | 20558.076 | runs/wo-gh-8/reviewer-security.packet.md | null |
-| reviewer-tests | failed | 9744.013 | runs/wo-gh-8/reviewer-tests.packet.md | null |
-| reviewer-architecture | failed | 9490.319 | runs/wo-gh-8/reviewer-architecture.packet.md | null |
-| reviewer-design | failed | 19495.592 | runs/wo-gh-8/reviewer-design.packet.md | null |
-| approver | completed | 0.024 | runs/wo-gh-8/report.json | null |
-| triage-human | completed | 0.006 | - | null |
-| deployer | packet_ready | 0.091 | runs/wo-gh-8/deployer.packet.md | null |
-| observer | failed | 9582.207 | runs/wo-gh-8/observer.packet.md | null |
+| intake | executed | 35994.871 | runs/wo-gh-8/intake.output.md | null |
+| spec-writer | executed | 102760.021 | runs/wo-gh-8/spec-writer.output.md | null |
+| test-writer | executed | 96521.445 | runs/wo-gh-8/test-writer.output.md | null |
+| builder | executed | 185813.635 | runs/wo-gh-8/builder.output.md | null |
+| checks-gate | passed | 15099.719 | runs/wo-gh-8/checks-gate.pre-review.output.md | null |
+| reviewer-spec | executed | 131542.796 | runs/wo-gh-8/reviewer-spec.output.md | null |
+| reviewer-security | executed | 125006.209 | runs/wo-gh-8/reviewer-security.output.md | null |
+| reviewer-tests | executed | 86689.451 | runs/wo-gh-8/reviewer-tests.output.md | null |
+| reviewer-architecture | executed | 130303.573 | runs/wo-gh-8/reviewer-architecture.output.md | null |
+| reviewer-design | executed | 130574.671 | runs/wo-gh-8/reviewer-design.output.md | null |
+| approver | completed | 0.046 | runs/wo-gh-8/report.json | null |
+| approver | loopback | 0.0 | - | null |
+| triage-human | completed | 0.007 | - | null |
+| deployer | packet_ready | 0.22 | runs/wo-gh-8/deployer.packet.md | null |
+| observer | executed | 59753.195 | runs/wo-gh-8/observer.output.md | null |
 
 ## Decision
 
-- Approver: No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)
-- Human gate: Verdict is no_reviews, not approved, so a human is required.
+- Approver: Reviewers reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture requested changes.
+- Human gate: Verdict is changes_requested, not approved, so a human is required.

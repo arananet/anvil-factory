@@ -5,7 +5,7 @@
   "work_order_id": "wo-gh-8",
   "artifact_path": "runs/wo-gh-8/checks-gate.pre-review.output.md",
   "status": "passed",
-  "created_at": "2026-11-03T09:20:01.666435+00:00",
+  "created_at": "2026-11-03T23:48:30.980996+00:00",
   "phase": "pre-review",
   "commands": [
     "python -m unittest discover -s tests -p 'test_*.py'"
@@ -21,7 +21,22 @@
   "protected_path_verdict": "pass",
   "protected_path_findings": [],
   "observed_additions": [
-    "Protected path addition (observed): tests/test_risk_routing.py (matches tests/)"
+    "Protected path addition (observed): tests/__pycache__/test_gates.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_content.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_review_producer.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_greenfield.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_community.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_statuspage.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_design.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_onboard.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_review_parsing_integrity.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_checks_gate.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_decision.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_supervisor.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_execution.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_anvil.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_intake_outcomes.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/__pycache__/test_brain.cpython-312.pyc (matches tests/)"
   ],
   "basis": "builder_delta (attempt 1)",
   "gate_verdict": "pass",

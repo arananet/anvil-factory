@@ -70,7 +70,7 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/8
 - intake: executed
 - spec-writer: executed
 - test-writer: executed
-- builder: failed
+- builder: executed
 - checks-gate: passed
 
 ## Output contract
