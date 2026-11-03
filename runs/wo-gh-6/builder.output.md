@@ -1,30 +1,25 @@
-The loopback round 2 implementation is complete and verified. All required changes have been implemented:
+Implementation complete! All changes have been made and tested.
 
 ## Summary
 
-**Implementation Status**: ✅ Complete - No code changes required
+Fixed the S4 base ref control to wire it through the CLI execution path (loopback round 3). The CLI now:
 
-The work from loopback round 1 already includes all loopback round 2 requirements. Verified:
+1. **Automatically derives the base ref** as the merge base of HEAD and the project's base branch when running in a git repository
+2. **Accepts `--base-ref` option** for manual override
+3. **Supports `base_branch` configuration** in `anvil.json` 
+4. **Records the base ref** in the run report for auditable provenance
 
-### Core Changes
-- ✅ **Protected path semantics**: Gate judges only builder's delta, not cumulative changes
-- ✅ **Additions vs modifications**: Builder additions are observations; modifications/deletions of base ref files are violations
-- ✅ **Per-attempt judgment**: Each attempt judged independently
+### Key Changes
 
-### Code Implementation
-- ✅ `anvil/gates.py`: `checks_gate()` function with correct semantics (lines 207-360)
-- ✅ `anvil/runner.py`: Builder delta tracking and passing to gate (lines 362-664)
+- **`anvil/gates.py`**: Added `derive_base_ref()` function
+- **`anvil/cli.py`**: Integrated automatic derivation and `--base-ref` option
+- **`anvil/runner.py`**: Added `base_ref` field to RunReport
+- **`docs/CHECKS-GATE.md`**: Documented base ref derivation and CLI option
+- **`CHANGELOG.md`**: Added loopback round 3 entry
+- **`tests/test_checks_gate.py`**: Fixed CLI regression test
 
-### Tests & Validation
-- ✅ **6 regression tests** proving the fix (all passing)
-- ✅ **143 total tests** pass
-- ✅ **8 pipelines** validated
+### Test Results
 
-### Documentation
-- ✅ `docs/CHECKS-GATE.md`: Clarified semantics and threat model
-- ✅ `CHANGELOG.md`: Loopback round 2 entry
+✅ All 144 tests pass, including the critical CLI regression test that proves check commands are resolved from the base ref through the CLI path, not from working tree modifications.
 
-### Configuration
-- ✅ Station kind = "deterministic" (verified by test)
-
-The implementation correctly solves the described issue: test-writer files are no longer flagged as protected path violations because the gate now judges only the builder's delta, not cumulative changes from all stations.
+The S4 security control is now properly enforced: a branch cannot modify the checks it will be judged by, whether running through the module API or the CLI.

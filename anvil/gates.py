@@ -95,6 +95,89 @@ def _run_shell(command, cwd, work_order_id, timeout):
         return None, f"Timed out after {timeout}s"
 
 
+def derive_base_ref(project_dir, base_branch=None):
+    """Derive the base ref for a git repository.
+
+    Loopback round 3: When a run starts in a git repository and no explicit base
+    ref is supplied, derive it as the merge base of HEAD and the project's base
+    branch (defaulting to the repository's default branch).
+
+    Args:
+        project_dir: Path to project directory
+        base_branch: Name of the base branch (e.g., "main"). If None, uses repo default.
+
+    Returns:
+        Base ref SHA as a string, or None if not in a git repo or derivation fails.
+    """
+    try:
+        # Check if this is a git repo
+        result = subprocess.run(
+            ["git", "rev-parse", "--git-dir"],
+            cwd=str(project_dir),
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        if result.returncode != 0:
+            return None
+
+        # If no base_branch specified, get the repository's default branch
+        if not base_branch:
+            # Try to get the default branch from the remote
+            result = subprocess.run(
+                ["git", "symbolic-ref", "refs/remotes/origin/HEAD"],
+                cwd=str(project_dir),
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result.returncode == 0:
+                # Output is like "refs/remotes/origin/main", extract the branch name
+                base_branch = result.stdout.strip().split('/')[-1]
+            else:
+                # Fallback: try common default branch names
+                for candidate in ["main", "master"]:
+                    result = subprocess.run(
+                        ["git", "rev-parse", "--verify", f"refs/heads/{candidate}"],
+                        cwd=str(project_dir),
+                        capture_output=True,
+                        text=True,
+                        timeout=10
+                    )
+                    if result.returncode == 0:
+                        base_branch = candidate
+                        break
+
+            if not base_branch:
+                # Last resort: use HEAD itself
+                result = subprocess.run(
+                    ["git", "rev-parse", "HEAD"],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                if result.returncode == 0:
+                    return result.stdout.strip()
+                return None
+
+        # Find merge base of HEAD and base_branch
+        result = subprocess.run(
+            ["git", "merge-base", "HEAD", base_branch],
+            cwd=str(project_dir),
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        if result.returncode == 0:
+            return result.stdout.strip()
+
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        pass
+
+    return None
+
+
 def resolve_base_ref_config(project_dir, base_ref=None, config_filename="anvil.json"):
     """Resolve project configuration from base ref using git.
 

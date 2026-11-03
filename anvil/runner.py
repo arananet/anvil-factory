@@ -27,13 +27,15 @@ class RunReport:
     risk_hints: list = field(default_factory=list)
     decision: dict = field(default_factory=dict)
     warnings: list = field(default_factory=list)
+    base_ref: str = None
     def to_dict(self):
         return {"work_order_id": self.work_order_id, "pipeline": self.pipeline,
                 "title": self.title, "kind": self.kind,
                 "steps": self.steps, "verdict": self.verdict, "human_required": self.human_required,
                 "max_loopbacks": self.max_loopbacks, "loopbacks": self.loopbacks,
                 "deployment_status": self.deployment_status, "verify_results": self.verify_results,
-                "risk_hints": self.risk_hints, "decision": self.decision, "warnings": self.warnings}
+                "risk_hints": self.risk_hints, "decision": self.decision, "warnings": self.warnings,
+                "base_ref": self.base_ref}
 
 def parse_review(text, station_id):
     """Parse exactly one review JSON object from the authoritative channel.
@@ -760,7 +762,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                        title=work_order.title, kind=work_order.kind,
                        human_required=human_required, max_loopbacks=max_loopbacks, loopbacks=loopbacks,
                        deployment_status=deployment_status, verify_results=verify_results,
-                       risk_hints=list(work_order.risk_hints or []), decision=decision, warnings=warnings)
+                       risk_hints=list(work_order.risk_hints or []), decision=decision, warnings=warnings,
+                       base_ref=base_ref)
     (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
     # Swimlane
     lines = ["# Swimlane", "", "Cost is reported as null here. Model runtimes report cost when they run a station; ANVIL never invents a number.", "",

@@ -1,1 +1,1 @@
-Observer output created. The deployer station hasn't executed yet, so there's no release record to observe. The output file reports the missing input as required by the station rules.
+Observer output created at `runs/wo-gh-6/observer.output.md`. The deployer hasn't executed yet, so there's no release record to observe. The output documents this missing input per the station's rules.

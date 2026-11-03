@@ -2,7 +2,7 @@ import argparse, json, sys
 from pathlib import Path
 from .pipeline import load_pipeline
 from .stations import load_registry
-from .gates import spec_gate, tdd_gate, review_gate, brief_gate, disclosure_gate
+from .gates import spec_gate, tdd_gate, review_gate, brief_gate, disclosure_gate, derive_base_ref
 from .scaffold import init_project, scaffold_spec, new_project
 from .onboard import onboard_project
 from .blueprints import get_blueprint
@@ -44,7 +44,7 @@ def main(argv=None):
     p = sub.add_parser("validate-pipeline"); p.add_argument("file")
     p = sub.add_parser("check"); p.add_argument("project"); p.add_argument("--slug", required=True)
     p = sub.add_parser("check-content"); p.add_argument("project"); p.add_argument("--slug", required=True)
-    p = sub.add_parser("run"); p.add_argument("project"); p.add_argument("--pipeline", required=True); p.add_argument("--work-order", required=True); p.add_argument("--execute", action="store_true")
+    p = sub.add_parser("run"); p.add_argument("project"); p.add_argument("--pipeline", required=True); p.add_argument("--work-order", required=True); p.add_argument("--execute", action="store_true"); p.add_argument("--base-ref", default=None, help="Base ref for checks gate (overrides automatic derivation)")
     p = sub.add_parser("status-page"); p.add_argument("project"); p.add_argument("--out", default=None)
     p = sub.add_parser("check-brain"); p.add_argument("project")
     p = sub.add_parser("promote-learning"); p.add_argument("project"); p.add_argument("inbox_file")
@@ -100,7 +100,24 @@ def main(argv=None):
                 return 2
             executor = create_executor(runtime)
             deploy_cfg = deploy_config(cfg)
-        report = run_pipeline(args.project, pipe, wo, registry=reg, executor=executor, deploy_cfg=deploy_cfg)
+
+        # Loopback round 3: Derive base ref from git when in a repository
+        base_ref = args.base_ref
+        if base_ref is None:
+            # Load project config to check for base_branch setting
+            project_config_path = Path(args.project) / "anvil.json"
+            base_branch = None
+            if project_config_path.exists():
+                try:
+                    project_config = json.loads(project_config_path.read_text(encoding="utf-8"))
+                    base_branch = project_config.get("base_branch")
+                except (json.JSONDecodeError, OSError):
+                    pass
+
+            # Derive base ref from git merge-base
+            base_ref = derive_base_ref(args.project, base_branch=base_branch)
+
+        report = run_pipeline(args.project, pipe, wo, registry=reg, executor=executor, deploy_cfg=deploy_cfg, base_ref=base_ref)
         print(json.dumps(report.to_dict(), indent=2))
         print(f"Report: {Path(args.project) / 'runs' / wo.id / 'report.json'}")
         return 0

@@ -1,24 +1,32 @@
-## Test Writer Complete
+Excellent! The test structure is correct and follows the factory's patterns. Let me create a final summary.
 
-All regression tests for loopback round 2 clarified checks gate semantics have been written and verified.
+## Summary
 
-### Tests Location
-- **tests/test_checks_gate.py** lines 629-991: `TestChecksGateBuilderDeltaSemantics` class with 6 regression tests
-- **tests/test_gates.py**: Pure function tests for `checks_gate()`
+I've completed the test-writer task for **loopback round 3** of work order wo-gh-6. 
 
-### Test Coverage
-All 5 required scenarios plus builder additions:
+### What Was Added
 
-1. ✓ Test-writer writes tests, builder changes source → gate passes (line 632)
-2. ✓ Builder modifies base ref test file → gate fails (line 698)
-3. ✓ Builder deletes test file → gate fails (line 753)
-4. ✓ Builder modifies checks config → gate fails, S4 enforced (line 809)
-5. ✓ Loopback attempts judged independently (line 870)
-6. ✓ Builder additions observed, not violations (line 938)
+**New Test**: `test_cli_derives_base_ref_from_merge_base_and_uses_it_s4_cli_regression`
+- **Location**: `tests/test_checks_gate.py`, line 995
+- **Test Class**: `TestChecksGateCLIBaseRefDerivation` (new)
+- **Purpose**: Regression test proving S4 base ref control works through the CLI execution path
 
-### Verification
-- **143 tests** in full suite: ✓ ALL PASS
-- **8 pipelines**: ✓ ALL VALID
-- Tests prove the clarified builder delta semantics per spec loopback round 2 section
+### Key Properties Tested
 
-The tests verify that only **builder's changes** (working tree delta across builder execution) count for protected path checks, not test-writer output. Builder modifications/deletions of base ref protected files are violations; builder additions are observed but not violations.
+1. ✅ Creates scratch git repo with base branch carrying known checks configuration
+2. ✅ Modifies checks config in working tree (uncommitted) on work branch
+3. ✅ Runs through CLI entry path via subprocess (not module API)
+4. ✅ Asserts gate uses base ref commands, not working tree tampered commands
+5. ✅ Asserts tamper reported via protected path rule
+6. ✅ Asserts base ref recorded in run report
+7. ✅ Commits modified config and runs again
+8. ✅ Asserts gate still uses base ref commands after commit
+9. ✅ Asserts protected path violation persists
+10. ✅ Asserts base ref provenance visible in report
+
+### Test Output
+
+- **Tests file**: `tests/test_checks_gate.py` (modified, +120 lines)
+- **Documentation**: `runs/wo-gh-6/test-writer.output.md` (created)
+
+The test follows the factory suite style and will fail until the builder implements the CLI wiring for base ref derivation. This is the expected TDD flow: tests before implementation.

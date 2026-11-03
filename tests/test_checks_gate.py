@@ -989,5 +989,176 @@ class TestChecksGateBuilderDeltaSemantics(unittest.TestCase):
             additions = result["observed_additions"]
             self.assertTrue(any("test_new_from_builder.py" in str(a) for a in additions))
 
+class TestChecksGateCLIBaseRefDerivation(unittest.TestCase):
+    """Loopback round 3 regression test: S4 control wired through CLI execution path"""
+
+    def test_cli_derives_base_ref_from_merge_base_and_uses_it_s4_cli_regression(self):
+        """Loopback round 3 REGRESSION: CLI derives base ref from merge base, uses it to resolve checks config"""
+        import subprocess
+        from anvil.cli import main
+
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp) / "cli-test-proj"
+
+            # Create initial project structure first
+            init_project(proj, "CLI Test Project")
+            scaffold_spec(proj, "cli-test-feature", "CLI Test Feature")
+
+            # Initialize scratch git repo IN THE PROJECT DIRECTORY
+            subprocess.run(["git", "init"], cwd=proj, check=True, capture_output=True)
+            subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=proj, check=True, capture_output=True)
+            subprocess.run(["git", "config", "user.name", "Test"], cwd=proj, check=True, capture_output=True)
+
+            # Set up base branch with known checks configuration
+            config = json.loads((proj / "anvil.json").read_text())
+            config["checks"] = ["echo 'base ref check command from main'", "exit 0"]
+            config["protected_paths"] = ["anvil.json", "tests/"]
+            (proj / "anvil.json").write_text(json.dumps(config, indent=2))
+
+            # Create a simple pipeline and work order for testing
+            pipeline_path = proj / "test-pipeline.json"
+            pipeline = {
+                "name": "cli-test-pipeline",
+                "stages": [
+                    {"station": "intake"},
+                    {"station": "checks-gate"},
+                    {"station": "builder"}
+                ]
+            }
+            pipeline_path.write_text(json.dumps(pipeline, indent=2))
+
+            work_order_path = proj / "test-wo.json"
+            wo_data = {
+                "id": "wo-cli-test",
+                "kind": "feature",
+                "title": "CLI base ref test",
+                "description": "Test CLI base ref derivation"
+            }
+            work_order_path.write_text(json.dumps(wo_data, indent=2))
+
+            # Commit everything to establish base ref on main branch
+            subprocess.run(["git", "add", "."], cwd=proj, check=True, capture_output=True)
+            subprocess.run(["git", "commit", "-m", "Base ref state on main"], cwd=proj, check=True, capture_output=True)
+
+            # Get the base ref (current HEAD on main)
+            base_ref = subprocess.run(["git", "rev-parse", "HEAD"], cwd=proj,
+                                     capture_output=True, text=True, check=True).stdout.strip()
+
+            # Create work branch
+            subprocess.run(["git", "checkout", "-b", "work-branch"], cwd=proj, check=True, capture_output=True)
+
+            # FIRST: Modify checks config in working tree (uncommitted)
+            malicious_config = json.loads((proj / "anvil.json").read_text())
+            malicious_config["checks"] = ["echo 'MALICIOUS CHECK - should not run'", "exit 0"]
+            (proj / "anvil.json").write_text(json.dumps(malicious_config, indent=2))
+
+            # Run through CLI path (not module API) - this should derive base ref automatically
+            # and use base ref commands, not working tree commands
+            try:
+                # Capture output to check what commands were run
+                result = subprocess.run(
+                    [sys.executable, "-m", "anvil.cli", "run", str(proj),
+                     "--pipeline", str(pipeline_path),
+                     "--work-order", str(work_order_path)],
+                    cwd=ROOT,
+                    capture_output=True,
+                    text=True,
+                    check=False
+                )
+
+                # Parse the report from stdout
+                # The JSON output is from the first line until "Report:" line
+                report_json = None
+                lines = result.stdout.split('\n')
+                json_lines = []
+                for line in lines:
+                    if line.startswith('Report:'):
+                        break
+                    json_lines.append(line)
+
+                if json_lines:
+                    try:
+                        report_json = json.loads('\n'.join(json_lines))
+                    except json.JSONDecodeError:
+                        pass
+
+                self.assertIsNotNone(report_json, f"Should have JSON report output from CLI. Got stdout: {result.stdout[:500]}")
+
+                # Find the checks-gate step
+                gate_steps = [s for s in report_json.get("steps", []) if s.get("station") == "checks-gate"]
+                self.assertGreater(len(gate_steps), 0, "Gate should have run")
+                gate_step = gate_steps[0]
+
+                # ASSERT 1: Commands run should be from base ref, not working tree
+                commands = gate_step.get("commands", [])
+                self.assertTrue(any("base ref check command from main" in cmd for cmd in commands),
+                               f"Gate should run base ref commands, got: {commands}")
+                self.assertFalse(any("MALICIOUS" in cmd for cmd in commands),
+                                f"Gate should NOT run working tree commands, got: {commands}")
+
+                # ASSERT 2: Protected path violation should be detected (anvil.json modified)
+                self.assertEqual(gate_step["protected_path_verdict"], "fail",
+                               "Gate should detect anvil.json modification")
+
+                # ASSERT 3: Base ref should be recorded in report
+                self.assertIn("base_ref", report_json,
+                            "Report should record which base ref was used")
+
+            finally:
+                pass  # Cleanup handled by tempfile context
+
+            # SECOND: Commit the malicious config and run again
+            subprocess.run(["git", "add", "anvil.json"], cwd=proj, check=True, capture_output=True)
+            subprocess.run(["git", "commit", "-m", "Attempt to modify checks"], cwd=proj,
+                          check=True, capture_output=True)
+
+            # Run through CLI again - should STILL use base ref commands
+            result2 = subprocess.run(
+                [sys.executable, "-m", "anvil.cli", "run", str(proj),
+                 "--pipeline", str(pipeline_path),
+                 "--work-order", str(work_order_path)],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=False
+            )
+
+            # Parse the second report
+            report_json2 = None
+            lines2 = result2.stdout.split('\n')
+            json_lines2 = []
+            for line in lines2:
+                if line.startswith('Report:'):
+                    break
+                json_lines2.append(line)
+
+            if json_lines2:
+                try:
+                    report_json2 = json.loads('\n'.join(json_lines2))
+                except json.JSONDecodeError:
+                    pass
+
+            self.assertIsNotNone(report_json2, f"Should have JSON report output from second CLI run. Got stdout: {result2.stdout[:500]}")
+
+            # Find the checks-gate step in second run
+            gate_steps2 = [s for s in report_json2.get("steps", []) if s.get("station") == "checks-gate"]
+            self.assertGreater(len(gate_steps2), 0, "Gate should have run in second attempt")
+            gate_step2 = gate_steps2[0]
+
+            # ASSERT 4: Commands should STILL be from base ref (not committed modified config)
+            commands2 = gate_step2.get("commands", [])
+            self.assertTrue(any("base ref check command from main" in cmd for cmd in commands2),
+                           f"Gate should STILL run base ref commands after commit, got: {commands2}")
+            self.assertFalse(any("MALICIOUS" in cmd for cmd in commands2),
+                            f"Gate should NOT run committed modified commands, got: {commands2}")
+
+            # ASSERT 5: Protected path violation should still be detected
+            self.assertEqual(gate_step2["protected_path_verdict"], "fail",
+                           "Gate should still detect anvil.json modification after commit")
+
+            # ASSERT 6: Base ref recorded should match the original base
+            self.assertIn("base_ref", report_json2,
+                        "Second report should also record base ref")
+
 if __name__ == "__main__":
     unittest.main()

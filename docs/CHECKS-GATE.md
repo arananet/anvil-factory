@@ -73,6 +73,31 @@ This prevents a branch from modifying the checks it will be judged by. The runne
 2. Uses `git show <base-ref>:anvil.json` to read the configuration from that ref
 3. Falls back to reading the working tree file only when git is not present (non-git projects)
 
+### Base Ref Derivation (Loopback Round 3)
+
+When running in a git repository:
+
+**Automatic derivation**: If no `--base-ref` is specified, the runner automatically derives the base ref as the **merge base** of `HEAD` and the project's base branch:
+
+```bash
+git merge-base HEAD <base-branch>
+```
+
+The base branch is determined by:
+1. The `base_branch` field in `anvil.json` (if specified)
+2. The repository's default branch (from `git symbolic-ref refs/remotes/origin/HEAD`)
+3. Common default branch names (`main`, `master`)
+
+**Manual override**: The `anvil run` command accepts a `--base-ref` option to override automatic derivation:
+
+```bash
+anvil run /path/to/project --pipeline pipeline.json --work-order wo.json --base-ref abc123def
+```
+
+**Recorded provenance**: The base ref used is recorded in the run report's `base_ref` field, making the configuration provenance auditable.
+
+**Non-git fallback**: For projects without a git repository, the runner reads the working tree `anvil.json` file. This fallback is documented but only used when git is not present - when a git repository exists, the base ref resolution always uses git.
+
 A run that modifies `anvil.json` will trigger the protected path rule (since the config file is protected by default), and the gate will still run the commands from the base ref, not the modified ones.
 
 ## Gate Phases
