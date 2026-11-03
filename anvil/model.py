@@ -153,10 +153,9 @@ class WorkOrder:
                 "description": self.description, "risk_hints": list(self.risk_hints), "status": self.status}
         if self.intake_outcome:
             result["intake_outcome"] = dict(self.intake_outcome)
-        if self.risk:
-            result["risk"] = self.risk
-        if self.surfaces:
-            result["surfaces"] = list(self.surfaces)
+        # Always include risk and surfaces fields (even if None or empty)
+        result["risk"] = self.risk
+        result["surfaces"] = list(self.surfaces) if self.surfaces else []
         return result
 
 @dataclass

@@ -1,6 +1,6 @@
 # Risk and Surface Routing
 
-Status: approved
+Status: draft
 Slug: risk-routing
 
 ## Roles
@@ -30,13 +30,13 @@ Every run today pays for the full reviewer panel at the policy models, whether t
 ## Scenarios
 
 ### Scenario: Low risk work runs a reduced panel at cheaper models
-- S1: Given a work order rated low risk with no ui and no security surface, when routing runs, then the selected reviewer set is the reduced set from the routing table, the selected reviewer model is the cheaper configured model, and the routing record names the low risk rule as the reason.
+- S1: Given a work order rated low risk with no ui and no security surface, when routing runs, then the selected reviewer set is the reduced set from the routing table (reviewer-spec and reviewer-tests), the selected reviewer model is the cheaper configured model, and the routing record names the low risk rule as the reason.
 
 ### Scenario: A security surface always keeps the security reviewer at the strong model
 - S2: Given a work order with a security surface at any risk level, when routing runs, then reviewer-security is in the selected set at the strong configured reviewer model, and the routing record names the security rule.
 
-### Scenario: Unrated work defaults to the full panel at the policy models
-- S3: Given a work order with a null risk rating, when routing runs, then the selected set is the pipeline's full reviewer panel, the selected models are the policy models, and the routing record states that the default applied because the work was unrated.
+### Scenario: Full panel routing for default and unrated cases
+- S3: Given a work order with a null risk rating, when routing runs, then the selected set is the pipeline's full reviewer panel, the selected models are the policy models, and the routing record states that the default applied because the work was unrated. Given a work order with a ui surface, when routing runs, then reviewer-design is in the selected set whenever the pipeline has it. Given a work order rated medium risk, when routing runs, then the selected set is the full panel at the policy models. Given a work order rated high risk, when routing runs, then the selected set is the full panel at the policy models and the routing record explicitly states that no reduction applied.
 
 ### Scenario: Routing may never exceed the policy ceiling
 - S4: Given a project routing configuration that assigns a station kind a model above the recorded policy, when the configuration is loaded, then loading fails with an error naming the station kind, the configured model and the policy model it exceeds.
