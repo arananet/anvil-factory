@@ -34,7 +34,8 @@ class RenderCrashToleranceS4Tests(unittest.TestCase):
             # Create fake blender that succeeds for section 2 but always fails for section 1
             fake_blender = work / "fake_blender.sh"
             fake_blender.write_text("""#!/bin/bash
-s=$5; a=$7; b=$8; out=$6
+# Arguments: section, total_frames, outdir, res_percent, first_frame, last_frame
+s=$5; n=$6; out=$7; res=$8; a=$9; b=${10}
 mkdir -p "$out"
 
 # Section 2 works fine

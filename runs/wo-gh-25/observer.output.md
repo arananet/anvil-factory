@@ -1,1 +1,0 @@
-Observer report written to `runs/wo-gh-25/observer.output.md`. The deployer station hasn't executed yet, so there's no release record to observe. The report documents what input is missing and what's needed to complete the observation.

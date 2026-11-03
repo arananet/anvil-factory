@@ -33,7 +33,17 @@ ROOT = Path(__file__).resolve().parent.parent
 def find_piece_dir():
     # Check environment variable first
     if "VIDEO_CONTENT_DIR" in os.environ:
-        return Path(os.environ["VIDEO_CONTENT_DIR"])
+        env_path = Path(os.environ["VIDEO_CONTENT_DIR"]).resolve()
+        if not env_path.exists():
+            print(f"ERROR: VIDEO_CONTENT_DIR '{env_path}' does not exist", file=sys.stderr)
+            sys.exit(1)
+        if not env_path.is_dir():
+            print(f"ERROR: VIDEO_CONTENT_DIR '{env_path}' is not a directory", file=sys.stderr)
+            sys.exit(1)
+        if not (env_path / "durations.json").exists():
+            print(f"ERROR: VIDEO_CONTENT_DIR '{env_path}' does not contain durations.json", file=sys.stderr)
+            sys.exit(1)
+        return env_path
 
     # Check production location
     prod_path = ROOT / "content" / "youtube-anvil-v2"
@@ -103,7 +113,7 @@ def main():
                 exit_code = outcome["exit_code"]
                 success = outcome["success"]
                 requeued = outcome.get("requeued", False)
-                sweep = outcome.get("sweep", 0)
+                attempts_from_outcome = outcome.get("attempts", 1)
 
                 chunk_info = {
                     "section": section,
@@ -115,11 +125,11 @@ def main():
                 if not success:
                     # Failed chunk
                     chunk_info["exit_code"] = exit_code
-                    chunk_info["attempts"] = sweep + 1 if sweep > 0 else 1
+                    chunk_info["attempts"] = attempts_from_outcome
                     outcome_classes["failed"].append(chunk_info)
                 elif requeued:
                     # Re-queued and eventually succeeded
-                    chunk_info["attempts"] = sweep + 1
+                    chunk_info["attempts"] = attempts_from_outcome
                     chunk_info["final_exit_code"] = exit_code
                     outcome_classes["requeued"].append(chunk_info)
                 elif exit_code == 0:
@@ -146,6 +156,13 @@ def main():
     durations = PIECE / "durations.json"
     if durations.exists():
         data = json.loads(durations.read_text(encoding="utf-8"))
+        # Validate section IDs are integers
+        for k in data.get("sections", {}):
+            try:
+                int(k)
+            except ValueError:
+                print(f"ERROR: Invalid section ID '{k}' in durations.json, must be an integer", file=sys.stderr)
+                sys.exit(1)
         planned = {k: v.get("frames") for k, v in data.get("sections", {}).items()}
 
     version = blender_version()

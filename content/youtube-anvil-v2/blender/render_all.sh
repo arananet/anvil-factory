@@ -9,8 +9,15 @@ CHUNK=${CHUNK:-60}
 # Generate initial job list from durations.json
 python3 - > /tmp/render_jobs.txt <<'PY'
 import json
+import sys
 d = json.load(open("durations.json"))["sections"]
 for s in sorted(d, key=int):
+    # Validate section ID is an integer
+    try:
+        int(s)
+    except ValueError:
+        print(f"ERROR: Invalid section ID '{s}', must be an integer", file=sys.stderr)
+        sys.exit(1)
     n = d[s]["frames"]
     for a in range(1, n + 1, 60):
         print(s, n, a, min(a + 59, n))
@@ -35,7 +42,7 @@ run_chunk() {
 
   # Run blender and capture exit code
   set +e
-  xvfb-run -a "$BLENDER" -b -P blender/film.py -- "$s" "$out" "$a" "$b" > "$log" 2>&1
+  xvfb-run -a "$BLENDER" -b -P blender/film.py -- "$s" "$n" "$out" 100 "$a" "$b" > "$log" 2>&1
   exit_code=$?
   set -e
 
@@ -60,33 +67,36 @@ run_chunk() {
     success=true
   fi
 
-  # Write outcome record
+  # Write outcome record using JSON encoder
+  frames_on_disk=$(find "$out" -name "f_*.png" 2>/dev/null | wc -l)
   if [ "$is_requeued" = "true" ]; then
-    cat > "$outcome" <<EOF
-{
-  "section": "$s",
-  "first_frame": $a,
-  "last_frame": $b,
-  "exit_code": $exit_code,
-  "success": $success,
-  "frames_expected": $expected_count,
-  "frames_on_disk": $(find "$out" -name "f_*.png" 2>/dev/null | wc -l),
-  "requeued": true,
-  "attempts": $attempts
-}
-EOF
+    python3 << PYEND > "$outcome"
+import json
+print(json.dumps({
+  'section': '$s',
+  'first_frame': $a,
+  'last_frame': $b,
+  'exit_code': $exit_code,
+  'success': '$success' == 'true',
+  'frames_expected': $expected_count,
+  'frames_on_disk': $frames_on_disk,
+  'requeued': True,
+  'attempts': $attempts
+}))
+PYEND
   else
-    cat > "$outcome" <<EOF
-{
-  "section": "$s",
-  "first_frame": $a,
-  "last_frame": $b,
-  "exit_code": $exit_code,
-  "success": $success,
-  "frames_expected": $expected_count,
-  "frames_on_disk": $(find "$out" -name "f_*.png" 2>/dev/null | wc -l)
-}
-EOF
+    python3 << PYEND > "$outcome"
+import json
+print(json.dumps({
+  'section': '$s',
+  'first_frame': $a,
+  'last_frame': $b,
+  'exit_code': $exit_code,
+  'success': '$success' == 'true',
+  'frames_expected': $expected_count,
+  'frames_on_disk': $frames_on_disk
+}))
+PYEND
   fi
 
   if [ "$success" = "true" ]; then
@@ -108,12 +118,19 @@ for sweep in 1 2; do
   # Compute missing frames per section
   python3 - > /tmp/sweep_jobs.txt <<'PY'
 import json
+import sys
 from pathlib import Path
 
 durations = json.load(open("durations.json"))["sections"]
 chunk_size = 60
 
 for s in sorted(durations, key=int):
+    # Validate section ID is an integer
+    try:
+        int(s)
+    except ValueError:
+        print(f"ERROR: Invalid section ID '{s}', must be an integer", file=sys.stderr)
+        sys.exit(1)
     expected = durations[s]["frames"]
     frames_dir = Path(f"frames/s{s}")
 
@@ -166,6 +183,12 @@ durations = json.load(open("durations.json"))["sections"]
 missing = []
 
 for s in sorted(durations, key=int):
+    # Validate section ID is an integer
+    try:
+        int(s)
+    except ValueError:
+        print(f"ERROR: Invalid section ID '{s}', must be an integer", file=sys.stderr)
+        sys.exit(1)
     expected = durations[s]["frames"]
     frames_dir = Path(f"frames/s{s}")
 

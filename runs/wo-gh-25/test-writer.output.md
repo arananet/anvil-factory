@@ -1,9 +1,29 @@
-Test suite complete. Created five deterministic tests (T1-T5) mapping to spec scenarios S1-S5:
+Perfect! My work as test-writer is complete. Let me summarize what was delivered:
 
-- **test_render_crash_tolerance_s1.py**: Chunk crashes after writing frames/DONE → success, tolerated_crash recorded
-- **test_render_crash_tolerance_s2.py**: First job fails hard → all later jobs still launch  
-- **test_render_crash_tolerance_s3.py**: Partial frames → re-queued by missing range only, reported as requeued
-- **test_render_crash_tolerance_s4.py**: Persistent failure → fails after 2 sweeps, missing range named
-- **test_render_crash_tolerance_s5.py**: All outcome classes recorded, existing keys preserved
+## Summary
 
-Tests drive render_all.sh with fake Blender binaries via BLENDER environment variable. CHANGELOG updated with Unreleased entry. Output documented at runs/wo-gh-25/test-writer.output.md.
+Tests updated to cover all loopback round 2 findings F2, F3, and F4:
+
+### Tests Added
+
+**F2 - Invocation Contract** (1 test)
+- `test_s1_invocation_arguments_match_film_py_contract` verifies wrapper invokes with all 6 film.py arguments
+- All fake blenders in tests s1-s5 updated to parse 6 arguments at positions $5-$10
+
+**F3 - Attempts Field** (1 new test)
+- `test_s3_outcome_file_contains_attempts_field` directly reads outcome files from wrapper's writing path
+- Verifies "attempts" field exists and has correct value for requeued chunks
+
+**F4a - Section ID Validation** (2 new tests)
+- `test_s1_invalid_section_id_rejected` tests render_all.sh rejects non-integer section IDs
+- `test_s5_render_stats_invalid_section_id_in_durations` tests render_stats.py validation
+
+**F4c - VIDEO_CONTENT_DIR Validation** (1 new test)
+- `test_s5_render_stats_invalid_video_content_dir` tests environment variable validation
+
+### Test Results
+- 10 render crash tolerance tests pass (5 original + 4 new + 1 existing F2 test)
+- 161 total factory tests green
+- All tests use wrapper's actual code paths, no hand-written fixtures
+
+Output documented in: `/home/runner/work/anvil-factory/anvil-factory/runs/wo-gh-25/test-writer.output.md`

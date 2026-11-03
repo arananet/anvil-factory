@@ -39,7 +39,8 @@ class RenderCrashToleranceS5Tests(unittest.TestCase):
             # Create fake blender with different behaviors per section
             fake_blender = work / "fake_blender.sh"
             fake_blender.write_text(f"""#!/bin/bash
-s=$5; a=$7; b=$8; out=$6
+# Arguments: section, total_frames, outdir, res_percent, first_frame, last_frame
+s=$5; n=$6; out=$7; res=$8; a=$9; b=${{10}}
 mkdir -p "$out"
 
 # Section 1: clean exit (frames + DONE, exit 0)
@@ -148,6 +149,69 @@ exit 0
             failed = stats["failed"]
             self.assertGreaterEqual(len(failed), 1, "Should have at least one failed chunk (section 4)")
             self.assertTrue(any(c["section"] == "4" for c in failed), "Section 4 should be in failed")
+
+
+    def test_s5_render_stats_invalid_video_content_dir(self):
+        """render-crash-tolerance F4c: render_stats.py validates VIDEO_CONTENT_DIR"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Test 1: Non-existent directory
+            env = {"VIDEO_CONTENT_DIR": str(Path(tmpdir) / "nonexistent")}
+            result = subprocess.run(
+                ["python3", str(FACTORY / "tools" / "render_stats.py")],
+                cwd=FACTORY,
+                capture_output=True,
+                text=True,
+                env={**env}
+            )
+            self.assertNotEqual(result.returncode, 0, "Should fail with non-existent directory")
+            self.assertIn("does not exist", result.stderr, "Error should mention directory does not exist")
+
+            # Test 2: Path without durations.json
+            work_no_durations = Path(tmpdir) / "no_durations"
+            work_no_durations.mkdir()
+            env = {"VIDEO_CONTENT_DIR": str(work_no_durations)}
+            result = subprocess.run(
+                ["python3", str(FACTORY / "tools" / "render_stats.py")],
+                cwd=FACTORY,
+                capture_output=True,
+                text=True,
+                env={**env}
+            )
+            self.assertNotEqual(result.returncode, 0, "Should fail without durations.json")
+            self.assertIn("durations.json", result.stderr, "Error should mention missing durations.json")
+
+    def test_s5_render_stats_invalid_section_id_in_durations(self):
+        """render-crash-tolerance F4a: render_stats.py validates section IDs in durations.json"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            work = Path(tmpdir) / "work"
+            work.mkdir()
+
+            # Set up durations.json with invalid section ID
+            durations = {
+                "sections": {
+                    "1": {"frames": 60},
+                    "not-an-int": {"frames": 60}
+                }
+            }
+            (work / "durations.json").write_text(json.dumps(durations))
+
+            # Create minimal frames structure
+            (work / "frames" / "logs").mkdir(parents=True)
+
+            # Run render_stats.py
+            env = {"VIDEO_CONTENT_DIR": str(work)}
+            result = subprocess.run(
+                ["python3", str(FACTORY / "tools" / "render_stats.py")],
+                cwd=FACTORY,
+                capture_output=True,
+                text=True,
+                env={**env}
+            )
+
+            # Should fail with error about invalid section ID
+            self.assertNotEqual(result.returncode, 0, "Should fail with invalid section ID")
+            self.assertIn("Invalid section ID", result.stderr, "Error should mention invalid section ID")
+            self.assertIn("not-an-int", result.stderr, "Error should identify the invalid section ID")
 
 
 if __name__ == "__main__":

@@ -39,7 +39,8 @@ class RenderCrashToleranceS2Tests(unittest.TestCase):
             # Create fake blender that logs invocations, fails for section 1, succeeds for others
             fake_blender = work / "fake_blender.sh"
             fake_blender.write_text(f"""#!/bin/bash
-s=$5; a=$7; b=$8; out=$6
+# Arguments: section, total_frames, outdir, res_percent, first_frame, last_frame
+s=$5; n=$6; out=$7; res=$8; a=$9; b=${{10}}
 mkdir -p "$out"
 
 # Log this invocation

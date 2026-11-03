@@ -1,25 +1,19 @@
-I'll verify the spec against the work order requirements.
+Excellent! All tests pass. Let me create a summary of the completed work:
 
-The existing spec at `.openspec/specs/render-crash-tolerance/spec.md` is complete and correctly structured. Let me verify it covers all work order requirements:
+## Summary
 
-**Work Order Requirements Coverage:**
+Fixed all 5 counted findings from the round 1 review:
 
-✓ **S1 (Output judgment)**: Spec requirement "Output judgment" and scenario S1 - chunk succeeds based on frame files + SECTION_RENDER_DONE line, not exit code alone
+**F1 - Blender invocation arguments**: Restored the 6-argument interface (`section, total_frames, outdir, res_percent, first_frame, last_frame`) in render_all.sh to match film.py's documented contract.
 
-✓ **S2 (Queue never aborts)**: Spec requirement "The queue never aborts" and scenario S2 - no chunk failure stops other chunks from launching
+**F2 - Test fake Blenders**: Updated all 5 test files to use the correct 6-argument interface and added a new test (`test_s1_invocation_arguments_match_film_py_contract`) that verifies the wrapper passes all 6 arguments correctly.
 
-✓ **S3/S4 (Completion sweep)**: Spec requirement "Completion sweep" and scenarios S3-S4 - compute missing ranges, re-queue at chunk size, max 2 passes, report missing ranges
+**F3 - Attempts field alignment**: Fixed render_stats.py to read the "attempts" field that the wrapper actually writes, instead of reading a non-existent "sweep" field.
 
-✓ **S5 (Per chunk statistics)**: Spec requirement "Per chunk statistics" and scenario S5 - machine-readable records, outcome classes (clean_exit, tolerated_crash, requeued, failed), preserve existing keys
+**F4 - Security fixes**:
+- **F4a**: Added integer validation for section IDs in all locations where durations.json is parsed
+- **F4b**: Replaced shell heredoc JSON string interpolation with proper Python JSON encoding using `json.dumps()`
+- **F4c**: Added validation for VIDEO_CONTENT_DIR environment variable (must exist, be a directory, and contain durations.json)
+- **F4d**: Existing quoting preserved; F4a's validation closes the injection vector
 
-✓ **Compatibility**: Spec requirement "Compatibility frozen" - bash invocation, BLENDER/CHUNK env vars, frame/log naming unchanged
-
-✓ **Frozen surfaces**: All frozen surfaces listed in spec match work order
-
-✓ **Tests**: T1-T5 map to scenarios S1-S2 with fake chunk binary
-
-✓ **Python stdlib only, no em/en dash**: Both specified in spec
-
-The spec is complete, follows OpenSpec format (status, slug, roles, purpose, requirements, scenarios, tests), and accurately captures all work order requirements. No revisions needed.
-
-**Output:** The spec file already exists at the correct location with all required content. The spec is ready for implementation.
+All 6 tests pass (5 existing + 1 new invocation verification test). Round 1 implementation preserved exactly except for the 5 specified fixes.

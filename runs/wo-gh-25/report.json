@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "completed",
       "detail": "Work order normalized",
-      "duration_ms": 0.027,
+      "duration_ms": 0.014,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-25/report.json"
@@ -21,7 +21,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-25/spec-writer.output.md",
-      "duration_ms": 44982.383,
+      "duration_ms": 343143.259,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-25/spec-writer.output.md"
@@ -37,7 +37,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-25/test-writer.output.md",
-      "duration_ms": 211741.943,
+      "duration_ms": 501608.961,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-25/test-writer.output.md"
@@ -53,7 +53,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-25/builder.output.md",
-      "duration_ms": 530429.857,
+      "duration_ms": 378053.87,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-25/builder.output.md"
@@ -69,7 +69,7 @@
       "station": "reviewer-spec",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-25/reviewer-spec.output.md",
-      "duration_ms": 281684.422,
+      "duration_ms": 147070.308,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-25/reviewer-spec.output.md"
@@ -85,7 +85,7 @@
       "station": "reviewer-security",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-25/reviewer-security.output.md",
-      "duration_ms": 134211.668,
+      "duration_ms": 129792.756,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-25/reviewer-security.output.md"
@@ -101,7 +101,7 @@
       "station": "reviewer-tests",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-25/reviewer-tests.output.md",
-      "duration_ms": 255924.669,
+      "duration_ms": 159121.752,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-25/reviewer-tests.output.md"
@@ -117,7 +117,7 @@
       "station": "reviewer-architecture",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-25/reviewer-architecture.output.md",
-      "duration_ms": 153672.954,
+      "duration_ms": 100262.605,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-25/reviewer-architecture.output.md"
@@ -133,7 +133,7 @@
       "station": "reviewer-design",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-25/reviewer-design.output.md",
-      "duration_ms": 62186.1,
+      "duration_ms": 49060.298,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-25/reviewer-design.output.md"
@@ -148,8 +148,8 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: rejected",
-      "duration_ms": 0.035,
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.038,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-25/report.json"
@@ -159,23 +159,10 @@
       "executor": null
     },
     {
-      "station": "approver",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: Blender invocation compatibility break (render_all.sh:23): Implementation changes film.py invocation from 6 arguments to 4, removing total frames count ($n) and quality parameter (100). Original invocation was '-- $s $n frames/s$s 100 $a $b', new invocation is '-- \"$s\" \"$out\" \"$a\" \"$b\"'. This breaks compatibility with frozen surface blender/film.py which expects 6 arguments per the original contract. Spec requirement: 'Frozen surfaces: blender/film.py' and 'Compatibility frozen: SECTION_RENDER_DONE line format produced by blender/film.py unchanged'.; Test fake Blenders don't match real film.py interface: Test files use fake Blender scripts expecting 4 arguments (s=$5, out=$6, a=$7, b=$8) matching the buggy implementation, rather than 6 arguments matching real film.py's interface. Tests pass with incompatible implementation but would fail with real film.py. Spec requirement: Tests should 'drive the wrapper and the statistics aggregation with a fake chunk binary standing in for Blender' - the fake must match the real interface.; Statistics script reads non-existent field (render_stats.py:107,115,119): Code reads 'sweep = outcome.get(\"sweep\", 0)' but outcome JSON files write 'attempts' field, not 'sweep'. This causes attempts count to always be computed as 1 instead of reading the actual value. Affects requeued and failed outcome statistics. Spec requirement S5: 'attempts count and final attempt exit behavior are recorded as fields'.; Path traversal vulnerability in render_all.sh: Section IDs from durations.json are used to construct file paths (lines 24, 26) without validation. If a section ID contains '..' or '/', files could be written to arbitrary directories. Add validation to ensure section IDs contain only alphanumeric characters.; JSON injection in render_all.sh heredocs: Variables are interpolated into JSON strings (lines 67, 81) without escaping. If section IDs or other variables contain quotes or JSON metacharacters, the outcome JSON files will be malformed. Use proper JSON encoding or validate inputs to contain only safe characters.; Path traversal in render_stats.py: Section IDs from durations.json are used to construct paths (lines 123, 138) without validation. Add input validation to ensure section IDs match expected format before using in file paths.; Unsafe environment variable trust in render_stats.py: VIDEO_CONTENT_DIR environment variable (line 36) is used directly without validation or sanitization, allowing potential directory traversal if the environment is compromised. Validate that the path stays within expected boundaries.; Command injection potential in render_all.sh: Section ID variable $s is passed to blender command line (line 38). While currently quoted, add validation to ensure section IDs cannot contain shell metacharacters as defense in depth.; render_all.sh script complexity increased from ~10 to 201 lines to implement output-based chunk judgment, sweep passes, and outcome recording. This complexity is necessary for the crash tolerance features and is explicitly allowed by the spec requirement 'Bash for the wrapper shell'. The script is well-structured with a clear worker function and maintains single responsibility (chunk-based parallel rendering with crash tolerance).; render_stats.py adds environment-dependent path resolution (VIDEO_CONTENT_DIR and rglob search) to support both production and test contexts. This is necessary for the spec's deterministic test requirement (tests without real Blender) and maintains production path as the default. Complexity is justified by test infrastructure needs.; Changes align with Decision 0002 (Headless Blender for modeled 3D assets) by making the Blender render wrapper more robust and reliable. Output-based chunk judgment and crash tolerance directly address the intermittent Blender exit crashes while preserving deterministic build behavior.; Frozen surfaces respected: no changes to scene scripts (film.py, scene_*.py, common.py, etc.), stations, pipelines, or review contracts. Changes are isolated to production tooling (render_all.sh and render_stats.py).; Project style rules followed: no em or en dashes in produced files, Python code uses standard library only, compatibility contracts preserved (invocation, frame naming, log naming, SECTION_RENDER_DONE format).; Test infrastructure properly structured: deterministic tests in tests/ directory drive wrapper with fake Blender via BLENDER environment variable, following established factory test patterns.",
-      "reason": "Blender invocation compatibility break (render_all.sh:23): Implementation changes film.py invocation from 6 arguments to 4, removing total frames count ($n) and quality parameter (100). Original invocation was '-- $s $n frames/s$s 100 $a $b', new invocation is '-- \"$s\" \"$out\" \"$a\" \"$b\"'. This breaks compatibility with frozen surface blender/film.py which expects 6 arguments per the original contract. Spec requirement: 'Frozen surfaces: blender/film.py' and 'Compatibility frozen: SECTION_RENDER_DONE line format produced by blender/film.py unchanged'.; Test fake Blenders don't match real film.py interface: Test files use fake Blender scripts expecting 4 arguments (s=$5, out=$6, a=$7, b=$8) matching the buggy implementation, rather than 6 arguments matching real film.py's interface. Tests pass with incompatible implementation but would fail with real film.py. Spec requirement: Tests should 'drive the wrapper and the statistics aggregation with a fake chunk binary standing in for Blender' - the fake must match the real interface.; Statistics script reads non-existent field (render_stats.py:107,115,119): Code reads 'sweep = outcome.get(\"sweep\", 0)' but outcome JSON files write 'attempts' field, not 'sweep'. This causes attempts count to always be computed as 1 instead of reading the actual value. Affects requeued and failed outcome statistics. Spec requirement S5: 'attempts count and final attempt exit behavior are recorded as fields'.; Path traversal vulnerability in render_all.sh: Section IDs from durations.json are used to construct file paths (lines 24, 26) without validation. If a section ID contains '..' or '/', files could be written to arbitrary directories. Add validation to ensure section IDs contain only alphanumeric characters.; JSON injection in render_all.sh heredocs: Variables are interpolated into JSON strings (lines 67, 81) without escaping. If section IDs or other variables contain quotes or JSON metacharacters, the outcome JSON files will be malformed. Use proper JSON encoding or validate inputs to contain only safe characters.; Path traversal in render_stats.py: Section IDs from durations.json are used to construct paths (lines 123, 138) without validation. Add input validation to ensure section IDs match expected format before using in file paths.; Unsafe environment variable trust in render_stats.py: VIDEO_CONTENT_DIR environment variable (line 36) is used directly without validation or sanitization, allowing potential directory traversal if the environment is compromised. Validate that the path stays within expected boundaries.; Command injection potential in render_all.sh: Section ID variable $s is passed to blender command line (line 38). While currently quoted, add validation to ensure section IDs cannot contain shell metacharacters as defense in depth.; render_all.sh script complexity increased from ~10 to 201 lines to implement output-based chunk judgment, sweep passes, and outcome recording. This complexity is necessary for the crash tolerance features and is explicitly allowed by the spec requirement 'Bash for the wrapper shell'. The script is well-structured with a clear worker function and maintains single responsibility (chunk-based parallel rendering with crash tolerance).; render_stats.py adds environment-dependent path resolution (VIDEO_CONTENT_DIR and rglob search) to support both production and test contexts. This is necessary for the spec's deterministic test requirement (tests without real Blender) and maintains production path as the default. Complexity is justified by test infrastructure needs.; Changes align with Decision 0002 (Headless Blender for modeled 3D assets) by making the Blender render wrapper more robust and reliable. Output-based chunk judgment and crash tolerance directly address the intermittent Blender exit crashes while preserving deterministic build behavior.; Frozen surfaces respected: no changes to scene scripts (film.py, scene_*.py, common.py, etc.), stations, pipelines, or review contracts. Changes are isolated to production tooling (render_all.sh and render_stats.py).; Project style rules followed: no em or en dashes in produced files, Python code uses standard library only, compatibility contracts preserved (invocation, frame naming, log naming, SECTION_RENDER_DONE format).; Test infrastructure properly structured: deterministic tests in tests/ directory drive wrapper with fake Blender via BLENDER environment variable, following established factory test patterns.",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null
-    },
-    {
       "station": "triage-human",
       "status": "completed",
-      "detail": "Human review: required",
-      "duration_ms": 0.006,
+      "detail": "Human review: not_required",
+      "duration_ms": 0.011,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -186,7 +173,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-25/deployer.packet.md",
-      "duration_ms": 0.073,
+      "duration_ms": 0.243,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-25/deployer.packet.md"
@@ -197,12 +184,12 @@
     },
     {
       "station": "observer",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-25/observer.output.md",
-      "duration_ms": 47692.88,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station observer: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.36. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 25308.734,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-25/observer.output.md"
+        "runs/wo-gh-25/observer.packet.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
@@ -212,10 +199,10 @@
       }
     }
   ],
-  "verdict": "rejected",
-  "human_required": true,
+  "verdict": "approved",
+  "human_required": false,
   "max_loopbacks": 2,
-  "loopbacks": 1,
+  "loopbacks": 0,
   "deployment_status": null,
   "verify_results": [],
   "risk_hints": [],
@@ -224,11 +211,11 @@
       "reviews_counted": [
         {
           "station": "reviewer-spec",
-          "verdict": "fail"
+          "verdict": "pass"
         },
         {
           "station": "reviewer-security",
-          "verdict": "changes_requested"
+          "verdict": "pass"
         },
         {
           "station": "reviewer-tests",
@@ -250,11 +237,11 @@
         "reviewer-architecture",
         "reviewer-design"
       ],
-      "rule": "Reviewer reviewer-spec returned fail."
+      "rule": "All counted reviews passed."
     },
     "human_gate": {
-      "required": true,
-      "rule": "Verdict is rejected, not approved, so a human is required.",
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
       "hints_matched": []
     }
   },

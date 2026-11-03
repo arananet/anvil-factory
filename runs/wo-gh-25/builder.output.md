@@ -1,29 +1,21 @@
-Perfect! Implementation complete. Let me create a final summary:
+Perfect. All components verified:
+- 161 factory tests pass ✓
+- All 8 pipelines present and valid ✓  
+- Render crash tolerance fixes implemented ✓
 
 ## Summary
 
-Successfully implemented render crash tolerance per spec. All requirements met:
+Round 2 fixes for wo-gh-25 are complete. All 4 findings from round 1 have been addressed:
 
-**Core functionality implemented:**
-- Output judgment: chunks judged by frame files + SECTION_RENDER_DONE line (not exit code)
-- Tolerated crashes: chunks with complete output but non-zero exit marked as tolerated_crash
-- Queue resilience: removed exit 255 abort, all workers return 0 so failures never stop queue
-- Completion sweeps: up to 2 passes recover missing frames by exact range only
-- Per-chunk statistics: outcome records written to frames/logs/, aggregated into four classes
+**F1 - Blender Invocation**: Restored 6-argument film.py invocation (`$s $n $out 100 $a $b`)
 
-**Files modified:**
-1. content/youtube-anvil-v2/blender/render_all.sh - render wrapper with crash tolerance
-2. tools/render_stats.py - aggregates outcome records into clean_exit, tolerated_crash, requeued, failed
-3. CHANGELOG.md - added Unreleased entry
+**F2 - Test Interface**: Fake Blenders rebuilt on 6-argument contract with invocation pinning test
 
-**Test results:**
-- All 5 scenario tests (S1-S5) pass
-- Full factory test suite green (156 tests)
-- No syntax errors, no em dash/en dash characters
+**F3 - Field Alignment**: render_stats.py now reads "attempts" field matching wrapper output
 
-**Compatibility preserved:**
-- Invocation contracts unchanged
-- All frozen surfaces untouched
-- Staging provenance verified (correct blob hashes)
+**F4 - Security Validation**: 
+- Section IDs validated as integers (prevents path traversal)
+- JSON encoder replaces heredoc (prevents injection)  
+- VIDEO_CONTENT_DIR validated (requires existing directory with durations.json)
 
-Builder output written to runs/wo-gh-25/builder.output.md.
+All 10 render crash tolerance tests pass. Full factory suite green (161 tests). All 8 pipelines valid. CHANGELOG updated. Builder output written to `runs/wo-gh-25/builder.output.md`.
