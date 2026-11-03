@@ -1,16 +1,23 @@
-Review complete. All 35 tests pass and are properly mapped to spec scenarios:
+## Review Complete
 
-**Test Coverage Summary:**
-- **S1 Packet Budget**: 7 tests (estimator determinism/monotonicity, trim order, fail policy, under-budget byte identity, report fields)
-- **S2 Contact Sheet**: 10 tests (dimensions, scaling, originals unchanged, PNG security hardening including size caps, CRC verification, chunk bounds, IDAT decompression bounds, IDAT accumulation cap)
-- **S3 Scoped Review**: 9 tests (packet contents, layer violation resolution, provenance verification, path boundary matching)
-- **S4 Packet Layout**: 2 tests (stable prefix, section ordering)
-- **S5 Report Visibility**: covered in integration tests
-- **Integration**: 5 tests (contact sheet wiring, scoped builder wiring, provenance check execution, report visibility)
+I've reviewed the tests in `tests/test_astra_consumption.py` against the spec and the round 4 loopback requirements.
 
-**Gate Round 3 Requirements Coverage:**
-1. ✓ Provenance check integration (2 tests drive prepare_reviewer_design_step path)
-2. ✓ Layer violation resolution verified (architectural placement test)
-3. ✓ Security residuals: allowlist path boundaries (5 tests), IDAT decompression bounds (1 test), IDAT accumulation cap (1 test)
+**Verdict: PASS**
 
-All tests are real, mapped to scenarios as documented in their docstrings, and passing.
+All tests are real, mapped to spec scenarios, and passing (36/36 tests passed).
+
+### Round 4 Items Verified
+
+**Item 1** (Provenance check integration): The test `test_provenance_check_integration_fails_on_violation` now correctly uses `unittest.mock.patch` to make `build_reviewer_design_packet` return a packet with out-of-allowlist provenance tags, then calls `prepare_reviewer_design_step` (not the verifier directly) and verifies `AllowlistViolation` is raised. This satisfies spec S3 line 85-86 requirement that "prepare_reviewer_design_step itself is tested."
+
+**Item 2** (IDAT hard cap): The test `test_png_idat_decompression_hard_cap_during_inflation` creates a compression bomb (1 MB of zeros compressing to tiny size, expecting only 80 bytes) and verifies it's rejected. The implementation uses `decompressor.decompress(idat_data, expected_raw_size)` where the max_length parameter enforces a hard cap during decompression - the decompressor never materializes more than expected_raw_size bytes before detecting the violation.
+
+### Test Coverage
+
+- **S1** (packet budget): Estimator determinism, budget trim order, fail policy, under budget byte identity, report fields ✓
+- **S2** (evidence policy): Contact sheet assembly, PNG security hardening (size caps, CRC verification, bounds checks, IDAT caps, path validation) ✓
+- **S3** (scoped review): Packet contents, provenance verification by tags, integration through prepare_reviewer_design_step, path boundary matching ✓
+- **S4** (stable prefix): Stable prefix across runs, layout order ✓
+- **S5** (cost visibility): Report measurements ✓
+
+Review written to `runs/wo-gh-21/reviewer-tests.review.json`.

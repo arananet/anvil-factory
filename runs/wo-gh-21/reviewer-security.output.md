@@ -1,33 +1,13 @@
-## Security Review Complete
+Security review complete for wo-gh-21 round 4.
 
-I've reviewed the wo-gh-21 round 3 implementation for security risks. My review is written to `runs/wo-gh-21/reviewer-security.review.json`.
+## Summary
 
-**Verdict: changes_requested**
+Reviewed the two items in scope:
 
-### Critical Security Vulnerability Found
+**Item 1 (Integration test)**: The test `test_provenance_check_integration_fails_on_violation` correctly uses `unittest.mock.patch` to mock `build_reviewer_design_packet`, returning a packet with out-of-allowlist provenance tags, then calls `prepare_reviewer_design_step` and verifies it raises `AllowlistViolation`. This satisfies the spec requirement. Runtime implementation already correct from round 3.
 
-**IDAT Decompression Not Actually Bounded** (anvil/runner.py:212)
+**Item 2 (IDAT hard cap)**: The implementation correctly prevents compression bomb memory exhaustion. Uses `decompressobj().decompress(data, max_length=expected_raw_size)` which enforces a hard limit (not a hint). At most `expected_raw_size` bytes are materialized in memory before the unconsumed_tail check detects excess and fails immediately. Regression test validates a 1 MB compression bomb is rejected after materializing only 81 bytes.
 
-The implementation attempts to comply with loopback gate round 3, finding 3b, but uses the wrong approach. Line 212 calls:
+Security properties verified: hard cap enforcement, bounded memory, early detection during decompression, defense in depth with multiple checks, path boundary enforcement, and all existing hardening preserved.
 
-```python
-raw_pixels = zlib.decompress(idat_data, bufsize=expected_raw_size)
-```
-
-The `bufsize` parameter is **not a maximum length** - it's only an initial buffer allocation hint. Python's zlib documentation states this is "the initial size of the output buffer", not a decompression limit.
-
-A crafted PNG can decompress to gigabytes during this call, exhausting memory before the defensive size check at line 217 executes. The requirement explicitly states: "decompress with an explicit maximum length" and "fail loudly when the stream yields more than the expected size."
-
-**Attack scenario**: Attacker provides a small PNG file (passing the 100MB file size cap) containing highly compressed IDAT data. During decompression at line 212, the data expands to gigabytes, causing memory exhaustion before line 217's size validation runs.
-
-**Required fix**: Use actual bounded decompression - either the `max_length` parameter (Python 3.11+) or `zlib.decompressobj()` with incremental decompression and a hard cap.
-
-### Verified Correct Implementations
-
-- **Finding 1**: S3 provenance check properly wired into `prepare_reviewer_design_step` (line 482)
-- **Finding 2**: Layer violation resolved - no `.stations` import in `build_reviewer_design_packet`
-- **Finding 3a**: Allowlist path boundaries correctly enforced at path separator boundaries
-- **Finding 3c**: IDAT accumulated bytes properly capped before decompression (lines 198-202)
-- PNG file size caps, dimension caps, CRC verification, and path validation all correctly implemented
-
-The IDAT decompression vulnerability is the single blocking security defect requiring changes.
+**Verdict: PASS** - No security vulnerabilities identified. Both items correctly implemented with proper security properties.

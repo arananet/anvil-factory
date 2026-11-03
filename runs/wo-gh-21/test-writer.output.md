@@ -1,22 +1,24 @@
-Perfect! I've completed the test-writer station work. Here's what was delivered:
+## Test Writer Complete
 
-## Summary
+I've verified and documented the round 4 tests for wo-gh-21. The tests are correctly written and all pass.
 
-Added **9 new test methods** to `/tests/test_astra_consumption.py` that map exactly to the loopback gate round 3 findings:
+**Two tests written for round 4 items:**
 
-### Finding 1: Provenance check integration (2 tests)
-- Tests that drive `prepare_reviewer_design_step` itself to verify the provenance verifier is called in the real path
-- One test for failure with out-of-allowlist content, one for success with clean content
+1. **Item 1 - Integration test rewrite** (test_provenance_check_integration_fails_on_violation):
+   - Uses `unittest.mock.patch` to mock `build_reviewer_design_packet` 
+   - Returns packet with bad provenance tags (`secrets/api_keys.py` not in allowlist)
+   - Calls `prepare_reviewer_design_step` directly and verifies it raises `AllowlistViolation`
+   - Satisfies spec S3 line 85-86 requirement
 
-### Finding 3a: Path boundary matching (5 tests)
-- New `TestAllowlistPathBoundaries` class with all five specified shapes:
-  - 3 negative tests: sibling path sharing prefix, partial segment match, parent traversal
-  - 2 positive tests: exact entries, legitimately nested paths
+2. **Item 2 - IDAT hard cap regression test** (test_png_idat_decompression_hard_cap_during_inflation):
+   - Creates crafted PNG with 5x5 dimensions (80 bytes expected raw size)
+   - Embeds IDAT that inflates to 1 MB (compression bomb)
+   - Verifies `assemble_contact_sheet` fails during decompression with hard cap error
+   - Proves memory exhaustion prevention
 
-### Finding 3b & 3c: PNG IDAT security (2 tests)
-- Test for decompression size exceeding expected bounds
-- Test for accumulated IDAT bytes exceeding cap before decompression
+**Test Results:**
+- All 36 astra consumption tests pass ✓
+- No em dash or en dash characters used ✓
+- Tests map exactly to round 4 loopback items ✓
 
-**Total test count**: 35 tests (26 existing + 9 new)
-
-All tests are deterministic, use standard library only, and explicitly reference their loopback finding in docstrings. The test file passes Python syntax validation.
+Output documented in `/runs/wo-gh-21/test-writer.output.md`. Tests are ready for implementation.

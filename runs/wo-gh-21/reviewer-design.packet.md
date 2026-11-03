@@ -146,42 +146,38 @@ These bars apply to every product page or interface this project ships.
 
 ## Diff summary
 
-- .openspec/specs/astra-consumption/spec.md: +16, -9
-- anvil/runner.py: +96, -22
-- runs/wo-gh-21/builder.output.md: +22, -9
-- runs/wo-gh-21/builder.packet.md: +15, -0
+- anvil/runner.py: +37, -4
+- runs/wo-gh-21/builder.output.md: +13, -23
+- runs/wo-gh-21/builder.packet.md: +10, -0
 - runs/wo-gh-21/envelopes/builder.envelope.json: +1, -1
 - runs/wo-gh-21/envelopes/intake.envelope.json: +1, -1
-- runs/wo-gh-21/envelopes/reviewer-architecture.envelope.json: +6, -2
-- runs/wo-gh-21/envelopes/reviewer-security.envelope.json: +13, -2
-- runs/wo-gh-21/envelopes/reviewer-spec.envelope.json: +8, -2
-- runs/wo-gh-21/envelopes/reviewer-tests.envelope.json: +6, -2
+- runs/wo-gh-21/envelopes/reviewer-architecture.envelope.json: +1, -1
+- runs/wo-gh-21/envelopes/reviewer-security.envelope.json: +3, -10
+- runs/wo-gh-21/envelopes/reviewer-spec.envelope.json: +4, -5
+- runs/wo-gh-21/envelopes/reviewer-tests.envelope.json: +1, -1
 - runs/wo-gh-21/envelopes/spec-writer.envelope.json: +1, -1
 - runs/wo-gh-21/envelopes/test-writer.envelope.json: +1, -1
-- runs/wo-gh-21/reviewer-architecture.output.md: +18, -5
-- runs/wo-gh-21/reviewer-architecture.packet.md: +15, -0
-- runs/wo-gh-21/reviewer-architecture.review.json: +5, -9
-- runs/wo-gh-21/reviewer-security.output.md: +29, -15
-- runs/wo-gh-21/reviewer-security.packet.md: +15, -0
-- runs/wo-gh-21/reviewer-security.review.json: +12, -19
-- runs/wo-gh-21/reviewer-spec.output.md: +10, -1
-- runs/wo-gh-21/reviewer-spec.packet.md: +15, -0
-- runs/wo-gh-21/reviewer-spec.review.json: +7, -1
-- runs/wo-gh-21/reviewer-tests.output.md: +16, -1
-- runs/wo-gh-21/reviewer-tests.packet.md: +15, -0
-- runs/wo-gh-21/reviewer-tests.review.json: +5, -1
-- runs/wo-gh-21/spec-writer.output.md: +13, -9
-- runs/wo-gh-21/spec-writer.packet.md: +15, -0
-- runs/wo-gh-21/test-writer.output.md: +17, -16
-- runs/wo-gh-21/test-writer.packet.md: +15, -0
-- tests/test_astra_consumption.py: +302, -1
+- runs/wo-gh-21/reviewer-architecture.output.md: +8, -22
+- runs/wo-gh-21/reviewer-architecture.packet.md: +10, -0
+- runs/wo-gh-21/reviewer-security.output.md: +7, -27
+- runs/wo-gh-21/reviewer-security.packet.md: +10, -0
+- runs/wo-gh-21/reviewer-security.review.json: +2, -9
+- runs/wo-gh-21/reviewer-spec.output.md: +8, -7
+- runs/wo-gh-21/reviewer-spec.packet.md: +10, -0
+- runs/wo-gh-21/reviewer-spec.review.json: +2, -4
+- runs/wo-gh-21/reviewer-tests.output.md: +23, -16
+- runs/wo-gh-21/reviewer-tests.packet.md: +10, -0
+- runs/wo-gh-21/spec-writer.output.md: +23, -10
+- runs/wo-gh-21/spec-writer.packet.md: +10, -0
+- runs/wo-gh-21/test-writer.output.md: +18, -16
+- runs/wo-gh-21/test-writer.packet.md: +10, -0
+- tests/test_astra_consumption.py: +84, -41
 
 ## File access allowlist
 
 This packet may only embed content from:
 - design/DESIGN.md
 - design/tokens.json
-- .openspec/specs/astra-consumption/spec.md
 - anvil/runner.py
 - runs/wo-gh-21/builder.output.md
 - runs/wo-gh-21/builder.packet.md
@@ -195,7 +191,6 @@ This packet may only embed content from:
 - runs/wo-gh-21/envelopes/test-writer.envelope.json
 - runs/wo-gh-21/reviewer-architecture.output.md
 - runs/wo-gh-21/reviewer-architecture.packet.md
-- runs/wo-gh-21/reviewer-architecture.review.json
 - runs/wo-gh-21/reviewer-security.output.md
 - runs/wo-gh-21/reviewer-security.packet.md
 - runs/wo-gh-21/reviewer-security.review.json
@@ -204,7 +199,6 @@ This packet may only embed content from:
 - runs/wo-gh-21/reviewer-spec.review.json
 - runs/wo-gh-21/reviewer-tests.output.md
 - runs/wo-gh-21/reviewer-tests.packet.md
-- runs/wo-gh-21/reviewer-tests.review.json
 - runs/wo-gh-21/spec-writer.output.md
 - runs/wo-gh-21/spec-writer.packet.md
 - runs/wo-gh-21/test-writer.output.md

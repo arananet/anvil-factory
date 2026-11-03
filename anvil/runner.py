@@ -206,14 +206,47 @@ def _read_png(path):
 
         idx += 12 + chunk_length  # length + type + data + CRC
 
-    # Loopback gate round 3, finding 3b: Decompress with explicit maximum length
-    # Bound inflation to expected raw size
+    # Loopback gate round 4, item 2: Decompress with hard cap to prevent memory exhaustion
+    # CRITICAL: zlib.decompress bufsize parameter is NOT a hard limit - it is only a buffer hint
+    # A crafted PNG can decompress far beyond bufsize before any size check executes
+    # Use decompressobj with max_length = expected_raw_size to ensure we never materialize
+    # more than expected_raw_size bytes before detecting a violation
     try:
-        raw_pixels = zlib.decompress(idat_data, bufsize=expected_raw_size)
+        decompressor = zlib.decompressobj()
+
+        # Decompress with hard cap set to expected_raw_size
+        # This ensures we never materialize more than expected bytes before failing
+        raw_pixels = decompressor.decompress(idat_data, expected_raw_size)
+
+        # Check if there's more data in the stream beyond expected_raw_size
+        # If unconsumed_tail exists, the decompressor stopped at max_length
+        if decompressor.unconsumed_tail:
+            # Try to decompress one more byte to verify there's excess data
+            excess = decompressor.decompress(decompressor.unconsumed_tail, 1)
+            if excess:
+                # Stream contains more data than expected - fail immediately
+                raise ValueError(
+                    f"PNG IDAT decompression exceeds expected size during inflation: "
+                    f"stream yields more than expected {expected_raw_size} bytes. "
+                    f"Possible compression bomb (dimensions {width}x{height} imply {expected_raw_size} bytes)."
+                )
+
+        # Flush any remaining buffered data
+        final_chunk = decompressor.flush()
+        if final_chunk:
+            # Check if flush would exceed expected size
+            if len(raw_pixels) + len(final_chunk) > expected_raw_size:
+                raise ValueError(
+                    f"PNG IDAT decompression exceeds expected size during flush: "
+                    f"total {len(raw_pixels) + len(final_chunk)} bytes, expected {expected_raw_size} bytes "
+                    f"(dimensions {width}x{height} imply {expected_raw_size} bytes). "
+                    f"Possible compression bomb attack."
+                )
+            raw_pixels += final_chunk
     except zlib.error as e:
         raise ValueError(f"PNG IDAT decompression failed: {e}")
 
-    # Loopback gate round 3, finding 3b: Verify decompressed size matches expected
+    # Loopback gate round 3, finding 3b: Verify decompressed size matches expected (second line of defense)
     if len(raw_pixels) != expected_raw_size:
         raise ValueError(
             f"PNG decompressed IDAT size {len(raw_pixels)} does not match expected size {expected_raw_size} "

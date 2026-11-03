@@ -5,6 +5,7 @@ Tests map to scenarios S1-S5 as documented in the spec's Tests section.
 
 Loopback gate round 2: Tests for integration, PNG hardening, provenance checking, report visibility.
 Loopback gate round 3: Tests for provenance check integration, path boundary matching, IDAT security.
+Loopback gate round 4: Integration test rewrite for prepare_reviewer_design_step, IDAT hard cap regression test.
 """
 
 import json
@@ -533,6 +534,58 @@ class TestContactSheet(unittest.TestCase):
         self.assertTrue(
             "idat" in error_msg or "accumulate" in error_msg or "cap" in error_msg or "size" in error_msg,
             f"Error should indicate IDAT accumulation cap violation: {ctx.exception}"
+        )
+
+    def test_png_idat_decompression_hard_cap_during_inflation(self):
+        """Loopback gate round 4, item 2: IDAT decompression HARD CAP enforced during inflation.
+        
+        CRITICAL regression test: Proves that a crafted PNG with highly compressed IDAT that
+        inflates far beyond the expected raw size is rejected DURING decompression, not after.
+        The hard cap prevents memory exhaustion from compression bombs.
+        """
+        from anvil.runner import assemble_contact_sheet, ContactSheetError
+
+        # Create a crafted PNG with IDAT that inflates far beyond expected size
+        crafted_png = self.evidence_dir / "compression-bomb-hard-cap.png"
+
+        signature = b'\x89PNG\r\n\x1a\n'
+
+        # IHDR claiming tiny dimensions (5x5 pixels)
+        width, height = 5, 5
+        ihdr_data = struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0)
+        ihdr_chunk = self._make_png_chunk(b'IHDR', ihdr_data)
+
+        # Expected raw size: height * (1 filter byte + width * 3 bytes RGB)
+        # = 5 * (1 + 5 * 3) = 5 * 16 = 80 bytes
+
+        # Create IDAT that compresses VERY well and inflates to MASSIVE size
+        # Use highly repetitive data that compresses to small size but inflates huge
+        # Create 1 MB of repetitive data (much more than the 80 bytes expected)
+        massive_raw = b'\x00' * 1024 * 1024  # 1 MB of zeros - compresses extremely well
+        compressed = zlib.compress(massive_raw, level=9)  # Tiny compressed, huge inflated
+        
+        # The compressed size will be very small (maybe a few hundred bytes)
+        # But it inflates to 1 MB - far beyond the expected 80 bytes
+        idat_chunk = self._make_png_chunk(b'IDAT', compressed)
+
+        iend_chunk = self._make_png_chunk(b'IEND', b'')
+
+        crafted_png.write_bytes(signature + ihdr_chunk + idat_chunk + iend_chunk)
+
+        output_path = self.evidence_dir / "contact-sheet.png"
+
+        # CRITICAL: Must fail during decompression with hard cap, not after
+        # The decompressor must detect size violation and fail before fully materializing the data
+        with self.assertRaises(ContactSheetError) as ctx:
+            assemble_contact_sheet([crafted_png], output_path, max_width=1600)
+
+        error_msg = str(ctx.exception).lower()
+        # Error must indicate the decompression was bounded and failed
+        self.assertTrue(
+            ("decompress" in error_msg and ("exceed" in error_msg or "bound" in error_msg or "cap" in error_msg)) or
+            ("inflation" in error_msg and "size" in error_msg) or
+            ("compression" in error_msg and "bomb" in error_msg),
+            f"Error should indicate hard cap rejection during decompression: {ctx.exception}"
         )
 
 
@@ -1084,10 +1137,17 @@ class TestIntegration(unittest.TestCase):
                         "Scoped packet must not contain upstream steps")
 
     def test_provenance_check_integration_fails_on_violation(self):
-        """Loopback gate round 3, finding 1: prepare_reviewer_design_step fails with out-of-allowlist content"""
+        """Loopback gate round 4, item 1: prepare_reviewer_design_step integration test.
+        
+        Uses unittest.mock.patch to mock build_reviewer_design_packet to return a packet
+        with out-of-allowlist provenance tags, then calls prepare_reviewer_design_step and
+        verifies it raises AllowlistViolation. This satisfies the spec requirement that
+        prepare_reviewer_design_step itself is tested with a packet carrying bad provenance.
+        """
+        from unittest.mock import patch
+        import anvil.runner
         from anvil.runner import prepare_reviewer_design_step, AllowlistViolation
 
-        # Create a work order
         wo = WorkOrder(
             id="wo-provenance-fail-001",
             kind="feature",
@@ -1099,50 +1159,33 @@ class TestIntegration(unittest.TestCase):
 
         files_changed = [{"file": "src/app.py", "added": 10, "removed": 5}]
 
-        # Temporarily create a file outside the allowlist
-        secrets_file = self.project / "secrets" / "api_keys.py"
-        secrets_file.parent.mkdir(parents=True, exist_ok=True)
-        secrets_file.write_text("API_KEY = 'secret123'\n")
-
-        # Mock build_reviewer_design_packet to include out-of-allowlist content
-        # In real scenario, this would be caught by the provenance verifier
-        # For this test, we need to verify the integration path calls the verifier
-
-        # The test approach: we can't easily inject bad content into the real builder,
-        # but we can verify that the verifier is called by checking for the AllowlistViolation
-        # when out-of-allowlist content is somehow included
-
-        # For a more direct test, let's verify that prepare_reviewer_design_step
-        # would reject a packet if we could inject bad provenance
-        # This is inherently difficult without mocking, but the key is that
-        # the function MUST call verify_packet_allowlist_by_provenance
-
-        # Alternative: verify the function exists and is importable
-        from anvil.runner import verify_packet_allowlist_by_provenance
-
-        # The actual integration is proven by:
-        # 1. The verifier exists and works (tested in TestScopedReview)
-        # 2. prepare_reviewer_design_step calls it (verified by code inspection in loopback)
-        # 3. This test verifies the call signature and that violations propagate
-
-        # Test that a packet with bad provenance fails
+        # Mock build_reviewer_design_packet to return a packet with bad provenance tags
+        # and an allowlist that does NOT include those paths
         bad_packet = """
 # Task packet: reviewer-design
 
-## Content
+## Spec
+<!-- source: .openspec/specs/test-feature/spec.md -->
+Spec content
+
+## Secret content
 <!-- source: secrets/api_keys.py -->
-Secret content
+This content is from a file outside the allowlist
 """
-        allowlist = ["src/app.py", "design/DESIGN.md"]
+        # Allowlist that does NOT include secrets/api_keys.py
+        allowlist = ["src/app.py", "design/DESIGN.md", ".openspec/specs/test-feature/spec.md"]
 
-        # Verify that the verifier would reject this
-        with self.assertRaises(AllowlistViolation):
-            verify_packet_allowlist_by_provenance(bad_packet, allowlist)
+        # Patch build_reviewer_design_packet to return the bad packet and allowlist
+        with patch.object(anvil.runner, 'build_reviewer_design_packet', return_value=(bad_packet, allowlist)):
+            # Call prepare_reviewer_design_step - it should call the verifier and raise
+            with self.assertRaises(AllowlistViolation) as ctx:
+                prepare_reviewer_design_step(
+                    self.project, wo, files_changed, captures=[]
+                )
 
-        # Clean up
-        import shutil
-        if secrets_file.parent.exists():
-            shutil.rmtree(secrets_file.parent)
+            error_msg = str(ctx.exception)
+            self.assertIn("secrets/api_keys.py", error_msg,
+                         "AllowlistViolation must identify the out-of-allowlist source")
 
     def test_provenance_check_integration_passes_clean_packet(self):
         """Loopback gate round 3, finding 1: prepare_reviewer_design_step passes with clean packet"""

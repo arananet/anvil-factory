@@ -1,28 +1,18 @@
-## Implementation Complete
+## Summary
 
-I've successfully implemented all three findings from gate round 3:
+Gate round 4 implementation complete. Both items fixed:
 
-### 1. **CRITICAL: Wired S3 provenance check into preparation path**
-- `verify_packet_allowlist_by_provenance` now called in `prepare_reviewer_design_step` (anvil/runner.py:425)
-- `build_reviewer_design_packet` returns `(packet, allowlist)` tuple
-- Provenance check executes before any model call, failing with `AllowlistViolation` on violations
-- Allowlist is surfaced so both building and verification use the same list
+**Item 1 - Provenance Integration Test:** The test `test_provenance_check_integration_fails_on_violation` now uses `unittest.mock.patch` to mock `build_reviewer_design_packet` and calls `prepare_reviewer_design_step` to verify it raises `AllowlistViolation`, satisfying the spec S3 requirement.
 
-### 2. **Resolved .stations layer violation**
-- Removed function-scoped `from .stations import load_registry` from `build_reviewer_design_packet`
-- Caller (`prepare_reviewer_design_step`) resolves prompt through station registry and passes it in
-- No imports from .stations at any scope for this functionality
+**Item 2 - IDAT Hard Cap:** Fixed decompression in `anvil/runner.py` to use `expected_raw_size` as the max_length parameter (not the fixed 8192). The decompressor now:
+- Decompresses at most `expected_raw_size` bytes using `decompressor.decompress(idat_data, expected_raw_size)`
+- Checks for excess data by attempting to decompress one more byte
+- Fails during decompression if the stream yields more than expected
+- Never materializes more than `expected_raw_size` bytes before failing
 
-### 3. **Security residuals fixed**
-- **(a) Path boundary matching**: Uses `os.path.normpath` to resolve `..` traversals, enforces exact matches or nested paths at separator boundaries
-- **(b) IDAT decompression bounds**: Limited to expected raw size calculated from IHDR dimensions, verified after decompression
-- **(c) IDAT accumulation cap**: Caps accumulated compressed bytes before decompression based on expected raw size
+**Test results:**
+- Both round 4 specific tests pass
+- All 36 astra-consumption tests pass  
+- All 187 factory tests pass
 
-### Test Results
-- **All 186 factory tests pass** ✓
-- **35 astra consumption tests pass**, including:
-  - Path boundary tests (sibling prefix, partial segment, traversal, exact, nested)
-  - IDAT security tests (decompression bounds, accumulation cap)
-  - Integration tests (provenance check in preparation path)
-
-Implementation documented in `/runs/wo-gh-21/builder.output.md` and ready for review.
+**Scope compliance:** Only `anvil/runner.py` and `tests/test_astra_consumption.py` changed. No modifications to tools, prompts, or wo-gh-24 mechanisms. Standard library only. No em/en dash characters.

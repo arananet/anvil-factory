@@ -1,44 +1,41 @@
- .openspec/specs/astra-consumption/spec.md          |  25 +-
- anvil/runner.py                                    | 118 ++++++--
- runs/unknown/reviewer-design.review.json           |   5 +
- runs/wo-gh-21/builder.output.md                    |  31 ++-
- runs/wo-gh-21/builder.packet.md                    |  15 +
- runs/wo-gh-21/deployer.packet.md                   |  16 ++
+ anvil/runner.py                                    |  41 ++++++-
+ runs/wo-gh-21/builder.output.md                    |  36 +++---
+ runs/wo-gh-21/builder.packet.md                    |  10 ++
+ runs/wo-gh-21/deployer.packet.md                   |  11 +-
  runs/wo-gh-21/envelopes/approver.envelope.json     |   2 +-
  runs/wo-gh-21/envelopes/builder.envelope.json      |   2 +-
  runs/wo-gh-21/envelopes/deployer.envelope.json     |   2 +-
  runs/wo-gh-21/envelopes/intake.envelope.json       |   2 +-
  runs/wo-gh-21/envelopes/observer.envelope.json     |   2 +-
- .../envelopes/reviewer-architecture.envelope.json  |   8 +-
+ .../envelopes/reviewer-architecture.envelope.json  |   2 +-
  .../envelopes/reviewer-design.envelope.json        |   2 +-
- .../envelopes/reviewer-security.envelope.json      |  15 +-
- .../wo-gh-21/envelopes/reviewer-spec.envelope.json |  10 +-
- .../envelopes/reviewer-tests.envelope.json         |   8 +-
+ .../envelopes/reviewer-security.envelope.json      |  13 +--
+ .../wo-gh-21/envelopes/reviewer-spec.envelope.json |   9 +-
+ .../envelopes/reviewer-tests.envelope.json         |   2 +-
  runs/wo-gh-21/envelopes/spec-writer.envelope.json  |   2 +-
  runs/wo-gh-21/envelopes/test-writer.envelope.json  |   2 +-
  runs/wo-gh-21/envelopes/triage-human.envelope.json |   2 +-
- runs/wo-gh-21/observer.output.md                   |  15 +-
- runs/wo-gh-21/observer.packet.md                   |  16 ++
- runs/wo-gh-21/report.json                          |  97 ++++---
- runs/wo-gh-21/reviewer-architecture.output.md      |  23 +-
- runs/wo-gh-21/reviewer-architecture.packet.md      |  15 +
- runs/wo-gh-21/reviewer-architecture.review.json    |  14 +-
- runs/wo-gh-21/reviewer-design.output.md            |   2 +-
- runs/wo-gh-21/reviewer-design.packet.md            | 133 ++++-----
- runs/wo-gh-21/reviewer-design.review.json          |   2 +-
- runs/wo-gh-21/reviewer-security.output.md          |  44 ++-
- runs/wo-gh-21/reviewer-security.packet.md          |  15 +
- runs/wo-gh-21/reviewer-security.review.json        |  31 +--
- runs/wo-gh-21/reviewer-spec.output.md              |  11 +-
- runs/wo-gh-21/reviewer-spec.packet.md              |  15 +
- runs/wo-gh-21/reviewer-spec.review.json            |   8 +-
- runs/wo-gh-21/reviewer-tests.output.md             |  17 +-
- runs/wo-gh-21/reviewer-tests.packet.md             |  15 +
- runs/wo-gh-21/reviewer-tests.review.json           |   6 +-
- runs/wo-gh-21/spec-writer.output.md                |  22 +-
- runs/wo-gh-21/spec-writer.packet.md                |  15 +
- runs/wo-gh-21/swimlane.md                          |  29 +-
- runs/wo-gh-21/test-writer.output.md                |  33 +--
- runs/wo-gh-21/test-writer.packet.md                |  15 +
- tests/test_astra_consumption.py                    | 303 ++++++++++++++++++++-
- 43 files changed, 905 insertions(+), 260 deletions(-)
+ runs/wo-gh-21/observer.output.md                   |   7 +-
+ runs/wo-gh-21/observer.packet.md                   |  11 +-
+ runs/wo-gh-21/report.json                          |  81 ++++++-------
+ runs/wo-gh-21/reviewer-architecture.output.md      |  30 ++---
+ runs/wo-gh-21/reviewer-architecture.packet.md      |  10 ++
+ runs/wo-gh-21/reviewer-design.output.md            |   6 +-
+ runs/wo-gh-21/reviewer-design.packet.md            |  50 ++++-----
+ runs/wo-gh-21/reviewer-design.review.json          |   6 +-
+ runs/wo-gh-21/reviewer-security.output.md          |  34 ++----
+ runs/wo-gh-21/reviewer-security.packet.md          |  10 ++
+ runs/wo-gh-21/reviewer-security.review.json        |  11 +-
+ runs/wo-gh-21/reviewer-spec.correction.json        |   4 +
+ runs/wo-gh-21/reviewer-spec.output.md              |  15 +--
+ runs/wo-gh-21/reviewer-spec.packet.md              |  10 ++
+ runs/wo-gh-21/reviewer-spec.review.json            |   6 +-
+ runs/wo-gh-21/reviewer-tests.output.md             |  39 ++++---
+ runs/wo-gh-21/reviewer-tests.packet.md             |  10 ++
+ runs/wo-gh-21/spec-writer.output.md                |  33 ++++--
+ runs/wo-gh-21/spec-writer.packet.md                |  10 ++
+ runs/wo-gh-21/swimlane.md                          |  31 +++--
+ runs/wo-gh-21/test-writer.output.md                |  34 +++---
+ runs/wo-gh-21/test-writer.packet.md                |  10 ++
+ tests/test_astra_consumption.py                    | 125 ++++++++++++++-------
+ 40 files changed, 424 insertions(+), 301 deletions(-)
