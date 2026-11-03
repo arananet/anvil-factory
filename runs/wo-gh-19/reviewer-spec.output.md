@@ -1,3 +1,13 @@
+Based on my review of the loopback round implementation, I've verified:
+
+**Reconciliation achieved**: CONTRIBUTING.md now states "Work enters ANVIL through a work order... The work itself starts with a spec under `.openspec/specs/` before tests or implementation begin." This reconciles with README's "Every change starts with a spec under .openspec/specs/" by clarifying that work ENTERS via work order, but the work ITSELF starts with the spec.
+
+**Only CONTRIBUTING.md modified**: As required, only the CONTRIBUTING.md file was changed. Other deliverable files remain untouched.
+
+**Style compliance**: No em dash or en dash characters present.
+
+The S2 finding has been correctly resolved.
+
 ```json
-{"station": "reviewer-spec", "verdict": "changes_requested", "findings": ["S2 requirement violation: CONTRIBUTING.md contradicts the README Contributing section. README states 'Every change starts with a spec under .openspec/specs/' while CONTRIBUTING.md states 'Every change in ANVIL starts with a work order.' The spec requirement explicitly states CONTRIBUTING 'expands the README's existing Contributing section without contradicting it.' The flow must be reconciled.", "S1: All required files exist in correct locations (CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md at root; bug_report.md, work_order.md, config.yml under .github/ISSUE_TEMPLATE/; pull_request_template.md at .github/)", "S3: CODE_OF_CONDUCT.md is Contributor Covenant v2.1 with version attribution intact, enforcement contact is info@arananet.net, no covenant clauses modified", "S4: SECURITY.md correctly states supported versions (main branch and latest release), routes reports to info@arananet.net, states GitHub private vulnerability reporting is not enabled, names all three security surfaces (checks gate and base ref enforcement, review parsing contract, gateway credential routing), makes no timeline promises", "S5: bug_report.md asks for what happened, expected behavior, reproduction steps, environment, and run evidence; work_order.md asks for problem, proposed scope, out of scope, acceptance evidence, and risk hints (auth, payments, data deletion, production deploy, secrets, publishing); config.yml disables blank issues", "S6: pull_request_template.md asks for work order, spec link, change summary, and evidence checklist (tests, run report, rendered evidence, documentation, changelog), states author never approves their own work", "S7: All changes are additions only (no modified files), no em dash or en dash characters found in any produced file"]}
+{"station": "reviewer-spec", "verdict": "pass", "findings": []}
 ```

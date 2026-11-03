@@ -4,7 +4,7 @@ Thank you for your interest in contributing to ANVIL. This guide explains how wo
 
 ## How Work Enters the Project
 
-Every change in ANVIL starts with a work order. Work orders come from GitHub issues, the intake worker, or a file. No code is written without one.
+Work enters ANVIL through a work order. Work orders come from GitHub issues, the intake worker, or a file. They state what problem needs solving. The work itself starts with a spec under `.openspec/specs/` before tests or implementation begin.
 
 The flow is:
 

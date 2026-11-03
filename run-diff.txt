@@ -1,19 +1,12 @@
- .github/ISSUE_TEMPLATE/bug_report.md               |  42 +++++++
- .github/ISSUE_TEMPLATE/config.yml                  |   5 +
- .github/ISSUE_TEMPLATE/work_order.md               |  43 +++++++
- .github/pull_request_template.md                   |  29 +++++
- CODE_OF_CONDUCT.md                                 | 132 ++++++++++++++++++++
- CONTRIBUTING.md                                    |  54 +++++++++
- SECURITY.md                                        |  39 ++++++
- runs/wo-gh-19/builder.output.md                    |  16 +++
- runs/wo-gh-19/builder.packet.md                    | 134 +++++++++++++++++++++
- runs/wo-gh-19/envelopes/approver.envelope.json     |  10 ++
- runs/wo-gh-19/envelopes/builder.envelope.json      |  15 +++
- runs/wo-gh-19/envelopes/intake.envelope.json       |  10 ++
- .../wo-gh-19/envelopes/reviewer-spec.envelope.json |  28 +++++
- runs/wo-gh-19/report.json                          | 106 ++++++++++++++++
- runs/wo-gh-19/reviewer-spec.output.md              |   3 +
- runs/wo-gh-19/reviewer-spec.packet.md              |  56 +++++++++
- runs/wo-gh-19/reviews/reviewer-spec.review.json    |  13 ++
- runs/wo-gh-19/swimlane.md                          |  16 +++
- 18 files changed, 751 insertions(+)
+ CONTRIBUTING.md                                    |  2 +-
+ runs/wo-gh-19/builder.output.md                    | 17 +---------
+ runs/wo-gh-19/builder.packet.md                    |  6 ++++
+ runs/wo-gh-19/envelopes/approver.envelope.json     |  2 +-
+ runs/wo-gh-19/envelopes/builder.envelope.json      |  2 +-
+ runs/wo-gh-19/envelopes/intake.envelope.json       |  2 +-
+ .../wo-gh-19/envelopes/reviewer-spec.envelope.json | 14 ++------
+ runs/wo-gh-19/report.json                          | 37 +++++++---------------
+ runs/wo-gh-19/reviewer-spec.output.md              | 12 ++++++-
+ runs/wo-gh-19/reviewer-spec.packet.md              |  6 ++++
+ runs/wo-gh-19/swimlane.md                          | 13 ++++----
+ 11 files changed, 49 insertions(+), 64 deletions(-)

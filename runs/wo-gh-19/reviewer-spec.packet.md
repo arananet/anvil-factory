@@ -47,6 +47,12 @@ S6: .github/pull_request_template.md asks for the work order, the spec link, a c
 The reviewer writes its review to the authoritative review file named in its packet; prose outside that file is not a review.
 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/19
+
+LOOPBACK ROUND (gate loopback, recorded in the first executed run report: loopbacks 1 of max 2, return_to builder). The first executed run returned changes_requested with reviews counted 1 of 1 (reviewer-spec), no parse failure, and exactly one blocking finding, quoted verbatim:
+
+"S2 requirement violation: CONTRIBUTING.md contradicts the README Contributing section. README states 'Every change starts with a spec under .openspec/specs/' while CONTRIBUTING.md states 'Every change in ANVIL starts with a work order.' The spec requirement explicitly states CONTRIBUTING 'expands the README's existing Contributing section without contradicting it.' The flow must be reconciled."
+
+Scenarios S1, S3, S4, S5, S6 and S7 all passed in that review and are closed; do not revisit them. The ONLY work in this round is reconciling the CONTRIBUTING.md flow wording so it states the true ANVIL sequence and cannot be read as contradicting the README's Contributing section: work enters as a work order, and the work itself starts with a spec under .openspec/specs/ before any implementation. Rewrite the opening of the 'How Work Enters the Project' section of CONTRIBUTING.md to state that sequence (the work order is how work enters; the spec under .openspec/specs/ is where the work itself starts, before tests and implementation, as the numbered flow in that section already lists). Modify no other file: CODE_OF_CONDUCT.md, SECURITY.md, .github/ISSUE_TEMPLATE/bug_report.md, .github/ISSUE_TEMPLATE/work_order.md, .github/ISSUE_TEMPLATE/config.yml and .github/pull_request_template.md stay exactly as they are, and the README and the spec are not touched. No em dash or en dash character in any edited file.
 - risk_hints: 
 - status: new
 
