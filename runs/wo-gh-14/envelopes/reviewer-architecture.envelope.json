@@ -1,0 +1,27 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-architecture",
+  "to_station": "reviewer-design",
+  "work_order_id": "wo-gh-14",
+  "artifact_path": "runs/wo-gh-14/reviewer-architecture.output.md",
+  "status": "executed",
+  "created_at": "2026-11-04T15:53:31.947013+00:00",
+  "review": {
+    "station": "reviewer-architecture",
+    "verdict": "changes_requested",
+    "findings": [
+      "Critical: Health verification not integrated into runner execution flow. The anvil/health.py module implements verify_health() but is never called by anvil/runner.py. Per spec requirement 'Health verification runs after a run's deploy step completes', the runner must call verify_health() after successful deployment (around runner.py line 744, after deployment_status is set). The health result must feed deployment_status_text and populate a health section in the report. Currently the module exists only as library code exercised by tests.",
+      "Critical: RunReport lacks health section field and serialization. The RunReport dataclass (runner.py lines 39-75) must gain a health field (dict or None), and to_dict() must include it in the returned report. Spec requires 'The outcome lands in the run report as a health section'. Currently no health data reaches the report even if verify_health() were called.",
+      "Critical: No swimlane rendering for health step. Per spec 'the swimlane shows the health outcome as its own step after the deploy step', the swimlane renderer must emit a health step. The health outcome (healthy/unhealthy/unknown) and duration must appear as a step in runs/<id>/swimlane.md after the deployer step. No swimlane code references health.",
+      "Critical: Human gate not wired to health outcomes. Health result field requires_human_gate (set when outcome is unhealthy per spec S2) must integrate with needs_human() in anvil/gates.py or the triage-human station logic. Spec requires 'An unhealthy outcome feeds the human gate exactly as other risk outcomes do...even when the approver's verdict was approved'. Currently health outcomes cannot force the human gate.",
+      "Architectural integrity: The health module structure as a deterministic utility module (no model calls, pure functions returning dicts) correctly matches the project's deterministic station pattern and the spec statement 'Health verification is deterministic, never a model station'. This design choice is sound.",
+      "Metrics slot scaffold integration follows project pattern: Changes to anvil/scaffold.py (init_project, new_project) and anvil/onboard.py correctly use the _write_if_missing discipline and preserve existing configs byte-for-byte, matching the onboarding contract per docs/ARCHITECTURE.md lines 94-96. The metrics section structure (endpoint, provider_key, _comment) is provider-agnostic as required by spec S4."
+    ]
+  },
+  "configured_model": "review-balanced",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
+}

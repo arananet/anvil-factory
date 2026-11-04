@@ -1,0 +1,22 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-design",
+  "to_station": "reviewer-ux",
+  "work_order_id": "wo-gh-14",
+  "artifact_path": "runs/wo-gh-14/reviewer-design.output.md",
+  "status": "executed",
+  "created_at": "2026-11-04T15:56:19.458046+00:00",
+  "review": {
+    "station": "reviewer-design",
+    "verdict": "changes_requested",
+    "findings": [
+      "Quality bar violation: Responsive Behavior - The table on mobile (screenshot-390x844.png) requires horizontal scrolling to view all columns. The 'Artifacts' column and portions of other columns extend beyond the 390px viewport, violating the 'No horizontal scrolling on standard viewports' requirement stated in the quality bars. The page lacks responsive table handling (overflow containers, column prioritization, or media queries) to adapt the five-column table to narrow viewports."
+    ]
+  },
+  "configured_model": "openai/gpt-6-astra",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
+}

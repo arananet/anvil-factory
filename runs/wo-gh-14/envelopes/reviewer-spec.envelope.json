@@ -1,0 +1,29 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-spec",
+  "to_station": "reviewer-security",
+  "work_order_id": "wo-gh-14",
+  "artifact_path": "runs/wo-gh-14/reviewer-spec.output.md",
+  "status": "executed",
+  "created_at": "2026-11-04T15:49:03.605661+00:00",
+  "review": {
+    "station": "reviewer-spec",
+    "verdict": "fail",
+    "findings": [
+      "S1-S3 CRITICAL: Health verification module exists but is never integrated into the runner. The spec requires health verification to run after deploy step completes, add health section to run reports, modify deployment status, and show in swimlane. Current state: anvil/runner.py never imports anvil.health, never calls verify_health(), and run reports never gain a health section. The module is tested in isolation but operationally inert.",
+      "S5 CRITICAL: Demonstration cannot be satisfied without runner integration. The spec requires a demonstration run's report to carry the health section and evidence, but no run report will ever contain health data because the runner never calls the health verification code.",
+      "S1-S2: Human gate integration missing. Spec requires unhealthy outcome to force human gate with health reason in decision record even when approver verdict is approved. Current state: runner.py human_gate() and decision record construction have no awareness of health outcomes.",
+      "S1: Swimlane integration missing. Spec requires health step to appear in swimlane after deploy step with outcome visible. Current state: no swimlane rendering code for health step exists.",
+      "S4: Metrics slot scaffolding correctly implemented in anvil/scaffold.py init_project() and anvil/onboard.py onboard_project(). Structure matches spec: empty endpoint and provider_key fields, explanatory comment, no vendor names, onboard preserves existing configs byte-for-byte.",
+      "Configuration contract undefined: Spec says project declares health target in project configuration with base_url, routes, and optional platform config, but no code validates or loads health configuration from anvil.json or anvil.yaml. The health module accepts config dict but nothing reads project config to provide it.",
+      "Demonstration target selection exists as library function (select_demonstration_target, is_deployable in anvil/health.py) but is never called or recorded in any run.",
+      "Documentation partially correct: docs/EXECUTION.md documents health verification section and metrics slot, CHANGELOG.md has comprehensive entry, but documentation describes a feature that doesn't execute in practice because runner integration is missing."
+    ]
+  },
+  "configured_model": "review-balanced",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
+}

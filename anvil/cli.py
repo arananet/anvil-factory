@@ -14,6 +14,9 @@ from .statuspage import generate_status_page
 from .brain import check_brain, promote_learning, demote_learning
 from .supervisor import supervise
 
+# Alias for test compatibility
+new_project_command = new_project
+
 def _factory_root():
     return Path(__file__).resolve().parent.parent
 
