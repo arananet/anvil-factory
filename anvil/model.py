@@ -119,6 +119,7 @@ class WorkOrder:
     intake_outcome: dict = field(default_factory=dict)
     risk: str = None
     surfaces: list = field(default_factory=list)
+    knowledge_pack: str = None
     
     def __post_init__(self):
         if self.kind not in KINDS:
@@ -147,7 +148,8 @@ class WorkOrder:
                    risk_hints=list(data.get("risk_hints", [])), status=data.get("status", "new"),
                    intake_outcome=dict(data.get("intake_outcome", {})),
                    risk=data.get("risk"),
-                   surfaces=list(data.get("surfaces", [])))
+                   surfaces=list(data.get("surfaces", [])),
+                   knowledge_pack=data.get("knowledge_pack"))
     def to_dict(self):
         result = {"id": self.id, "kind": self.kind, "title": self.title, "source": self.source,
                 "description": self.description, "risk_hints": list(self.risk_hints), "status": self.status}
@@ -156,6 +158,8 @@ class WorkOrder:
         # Always include risk and surfaces fields (even if None or empty)
         result["risk"] = self.risk
         result["surfaces"] = list(self.surfaces) if self.surfaces else []
+        if self.knowledge_pack:
+            result["knowledge_pack"] = self.knowledge_pack
         return result
 
 @dataclass

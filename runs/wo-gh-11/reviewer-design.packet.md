@@ -22,9 +22,10 @@ Judge interface output against the project's own design system: its design token
   - Component and layout rules: Do components follow the documented patterns?
   - Motion rules: Does any animation or transition follow the motion guidelines?
   - Quality bars: Does the interface meet the stated quality bars for visual hierarchy, scale contrast, spacing rhythm, and responsive behavior?
+- **Authority**: The project's own design system (design/DESIGN.md, design/tokens.json) is the authority for this project. The Design knowledge section in your packet (when present) is reference material that the design system may draw from. On any conflict between the project's design system and the knowledge base, the project's design system wins. A deviation from the knowledge base alone is never a finding; a deviation from the project's design system is.
 - Focus on the design system the project has defined. Do not impose external design opinions or preferences that are not documented in the project's design system.
 - A design token marked as "TODO" or placeholder means the project hasn't defined that value yet. Flag missing values as findings only if the interface output actually uses undefined tokens.
-- Findings should be specific and actionable: cite which quality bar was violated, which token was used incorrectly, or which rule was not followed.
+- Findings should be specific and actionable: cite which quality bar was violated, which token was used incorrectly, or which rule was not followed. When referencing the Design knowledge base in a finding or suggestion, name the specific knowledge entry (e.g., "metrics-blue palette", "data-dense style", "accessibility guideline for contrast").
 - Your verdict must be one of: `pass`, `fail`, or `changes_requested`.
 - Produce the output as a JSON object, not as chat text.
 
@@ -93,6 +94,18 @@ Tests covering S1 to S10 in the factory suite style, docs updated (a docs page d
 GitHub issue: https://github.com/arananet/anvil-factory/issues/11
 
 Operator standing note for every round of this order: the builder must not create or modify anything under .github/workflows/ (the Actions token cannot push workflow changes; a run that touches them loses its commit-back). Tooling the run needs is staged by the operator in the workflow before the line step. Test changes are written by the test-writer station; the builder must not modify tests/, anvil.json or pipelines/. Tests must be real: every test calls the implementation it names and asserts behavior, never the mere existence of data structures.
+
+GATE LOOPBACK 1 (after run 41768971456, verdict changes_requested, reviews counted 5 of 5; reviewer-architecture is the only requesting reviewer). The knowledge data layer and rendering exist; the runtime wiring does not. Fix exactly these counted findings:
+
+1. Wire S3 into packet building: the runner's packet construction must include the Design knowledge section (slice plus authority statement) for reviewer-design, for the builder on a UI surface, and for the design authoring path, by calling the knowledge module (packet_knowledge_section or its successor) from the packet pipeline (anvil/runner.py packet_step and anvil/design.py as appropriate). Other stations' packets stay unchanged, and the slice is computed once per run (S2).
+
+2. Wire the runtime pack flow (S7, S8, S9): at run start the runner reads the work order's knowledge_pack field when present, loads and validates the pack, prefers pack entries for the product types the pack covers, falls back to the built in dataset otherwise, and records the pack in the run report as an operator supplied input (name and manifest product types at minimum).
+
+3. S10 guide designation: the station catalogs must stop hardcoding a design model string. The guide designation reads the design model from the recorded routing policy (anvil/routing.py) at the point of use, whatever model the policy currently records; no model name is duplicated across station.json files.
+
+4. Defense in depth on pack loading (approver note): the pack loader rejects paths that resolve into sensitive system locations (for example /etc, /sys, /proc) with a named error at load, covered by a test. The existing whitelist based filename validation stays.
+
+Real tests for the wiring, written by the test-writer station: a run level test proving a design station packet contains the knowledge section and a non design packet does not; a pack loading test proving preference, fallback and report recording; a sensitive path rejection test. The builder must not modify tests/, anvil.json, pipelines/ or .github/workflows/. Keep the whole suite green and every pipeline valid. Update CHANGELOG Unreleased.
 - risk_hints: 
 - status: new
 

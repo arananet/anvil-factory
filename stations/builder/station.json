@@ -18,6 +18,5 @@
   "prompt": "stations/builder/PROMPT.md",
   "tools": [],
   "guided": true,
-  "designation": "guided design station",
-  "design_model": "openai/gpt-6-astra"
+  "designation": "guided design station"
 }

@@ -1,22 +1,47 @@
 ## Security Review Complete
 
-I've reviewed the design knowledge base implementation for security risks and unsafe defaults. The review has been written to `runs/wo-gh-11/reviewer-security.review.json`.
+I have completed the security review of the knowledge pack loading implementation. 
 
-**Verdict: PASS**
+### Verdict: **PASS**
 
-The implementation introduces a design knowledge base system with operator-supplied knowledge pack support. I identified three defense-in-depth recommendations but no critical vulnerabilities:
+The implementation includes appropriate security controls and no critical security risks were found.
 
-1. **Pack path validation** - Currently accepts any filesystem path for operator-supplied packs. Recommend adding validation to reject sensitive system directories (/etc/, /sys/, /proc/) as defense-in-depth, though the strict filename whitelist provides strong protection.
+### Security Controls Verified
 
-2. **Resolved path verification** - Recommend adding an explicit check that resolved paths stay within the pack directory after path combination, preventing potential symlink attacks. Current whitelist prevents direct traversal.
+1. **Sensitive System Path Rejection** (anvil/knowledge.py:119-137)
+   - Correctly rejects paths resolving to `/etc`, `/sys`, `/proc`, `/dev`, `/boot`
+   - Path resolution occurs before validation, preventing symlink bypass attacks
+   - Clear error messages identify rejected paths without information leakage
 
-3. **Resource limits** - JSON parsing lacks explicit file size limits. Recommend adding max file size validation (e.g., 10MB) for production hardening, though risk is low given operator-controlled context.
+2. **Whitelist-Based Filename Validation** (anvil/knowledge.py:169-179)
+   - Strict whitelist allows only: `styles.json`, `palettes.json`, `fonts.json`, `guidelines.json`, `product-types.json`
+   - Prevents path traversal via malicious filenames in manifest
 
-**Positive security measures identified:**
-- Strict filename whitelist prevents arbitrary file reads
-- Fail-fast validation with descriptive errors
-- Pack isolation (never written to repo)
-- Required field validation on all data
-- Proper UTF-8 encoding and exception handling
+3. **Input Validation**
+   - Manifest structure validation (required fields: name, format_version, product_types, data_files)
+   - JSON parsing with proper exception handling
+   - Entry-level validation for all loaded data
 
-The security posture is appropriate for an internal operator tool with documented trust boundaries. The findings are recommendations for future hardening, not blocking issues.
+4. **Pack Isolation**
+   - Pack files never written to project or factory tree
+   - Only read from external operator-supplied location
+   - Tests verify no pack content leaks into repository
+
+5. **Test Coverage** (tests/test_design_knowledge.py:777-856)
+   - Real tests that execute actual code
+   - Cover sensitive path rejection for `/etc`, `/sys`, `/proc`
+   - Verify normal paths still accepted
+
+### Threat Model
+
+The security controls are appropriate for the threat model:
+- Knowledge packs are **operator-supplied** (trusted input)
+- Operator already has filesystem access
+- Defense in depth measures protect against misconfiguration
+
+### Minor Observations (Not Critical)
+
+- No file size limits on JSON files (could theoretically allow memory exhaustion, but acceptable for operator-supplied input)
+- Relies on Python's default JSON nesting depth limits (appropriate for this use case)
+
+The review output has been written to `runs/wo-gh-11/reviewer-security.review.json`.

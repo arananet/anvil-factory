@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 45388.164,
+      "duration_ms": 72195.052,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-11/intake.output.md"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-11/spec-writer.output.md",
-      "duration_ms": 48086.59,
+      "duration_ms": 158383.651,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-11/spec-writer.output.md"
@@ -40,7 +40,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-11/test-writer.output.md",
-      "duration_ms": 265217.241,
+      "duration_ms": 168323.085,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-11/test-writer.output.md"
@@ -56,7 +56,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-11/builder.output.md",
-      "duration_ms": 441594.087,
+      "duration_ms": 427110.766,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-11/builder.output.md"
@@ -72,7 +72,7 @@
       "station": "checks-gate",
       "status": "passed",
       "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 29542.95,
+      "duration_ms": 27024.065,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-11/checks-gate.pre-review.output.md"
@@ -100,7 +100,7 @@
       "station": "reviewer-spec",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-11/reviewer-spec.output.md",
-      "duration_ms": 233059.277,
+      "duration_ms": 280973.739,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-11/reviewer-spec.output.md"
@@ -116,7 +116,7 @@
       "station": "reviewer-security",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-11/reviewer-security.output.md",
-      "duration_ms": 154349.27,
+      "duration_ms": 148860.86,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-11/reviewer-security.output.md"
@@ -132,7 +132,7 @@
       "station": "reviewer-tests",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-11/reviewer-tests.output.md",
-      "duration_ms": 134375.176,
+      "duration_ms": 170831.552,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-11/reviewer-tests.output.md"
@@ -148,7 +148,7 @@
       "station": "reviewer-architecture",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-11/reviewer-architecture.output.md",
-      "duration_ms": 160124.128,
+      "duration_ms": 141489.932,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-11/reviewer-architecture.output.md"
@@ -164,7 +164,7 @@
       "station": "reviewer-design",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-11/reviewer-design.output.md",
-      "duration_ms": 67796.092,
+      "duration_ms": 30711.884,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-11/reviewer-design.output.md"
@@ -180,7 +180,7 @@
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: changes_requested",
-      "duration_ms": 0.079,
+      "duration_ms": 0.044,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-11/report.json"
@@ -192,9 +192,9 @@
     {
       "station": "approver",
       "status": "loopback",
-      "return_to": "spec-writer",
-      "detail": "Loopback to spec-writer: Knowledge pack loading accepts arbitrary filesystem paths without validating they're not sensitive system locations. While documented as operator-supplied (trusted context), recommend adding validation to reject paths like /etc/, /sys/, /proc/ as defense-in-depth to prevent accidental misconfiguration. Current whitelist-based filename validation provides strong protection against direct exploitation.; Recommend adding resolved path validation after pack_path / filename combination (line 161 in knowledge.py) to verify the resolved path stays within the pack directory, preventing potential symlink-based attacks. Current exact filename whitelist prevents direct traversal attacks but explicit boundary check would strengthen defense-in-depth.; JSON files loaded without explicit size limits could theoretically cause resource exhaustion with extremely large files. Low risk given operator-controlled context, but recommend adding file size validation (e.g., max 10MB per file) before JSON parsing for production hardening.; S1-S10: All spec scenarios are covered by tests that call real implementation and assert behavior; 18 of 20 tests pass. 2 tests skip due to incomplete import statements (test_s1_malformed_entry_fails_validation tries to import 'load_knowledge' which doesn't exist; should import only 'validate_knowledge_entry'. test_s10_guide_designation_names_design_model skips checking for 'load_routing_policy' but the function exists at anvil/knowledge.py:474); Tests are real: they import anvil.knowledge functions, call compute_knowledge_slice(), load_knowledge_pack(), packet_knowledge_section(), validate_knowledge_entry(), load_registry(), and assert actual behavior (exceptions raised, content returned, data structures populated) rather than checking mere existence; Tests are mapped: each test class explicitly maps to a spec scenario (S1: BuiltInDatasetTests, S2: DeterministicSliceTests, S3: PacketInjectionTests, S4: AuthorityStatementTests, S5: UndeclaredProductTypeTests, S6: CitationDisciplineTests, S7-S8: OperatorSuppliedPackTests, S9: PackValidationTests, S10: GuideDesignationTests); Implementation verified: design-knowledge/ contains all 5 required data files, anvil/knowledge.py provides all functions being tested, station contracts (reviewer-design/PROMPT.md:21, builder/PROMPT.md:19) include authority and citation rules, station.json files have guide designation ('guided': true, 'designation': 'guided design station', 'design_model': 'openai/gpt-6-astra'); Minor: The 2 skipped tests could be fixed by correcting import statements, but the functionality they test is already validated by other passing tests in the same scenario groups; Critical integration gap: The knowledge module (anvil/knowledge.py) provides packet_knowledge_section() to inject Design knowledge sections into packets (spec S3), but this function is never called by the runner or design module. The station prompts reference 'The Design knowledge section in your packet (when present)' (reviewer-design PROMPT.md line 21), confirming dynamic packet injection is required, yet anvil/design.py:packet_design_section() does not import or call the knowledge module, and anvil/runner.py:packet_step() line 439 only calls packet_design_section() without knowledge integration. The knowledge data layer and rendering logic exist but are not wired into the packet building pipeline.; Incomplete runtime integration: Spec scenarios S3, S7 and S8 require knowledge pack loading and slice computation at run start with pack recording in run reports, but anvil/runner.py shows no imports from anvil.knowledge (line 1-15), no calls to load_knowledge_pack() or compute_knowledge_slice(), and no integration of knowledge_pack field from work orders. The runner must load packs at intake (S9), compute slices once per run (S2), and inject them into design station packets (S3), but none of this runtime wiring exists.; Missing routing policy integration: Spec S10 requires the guide designation to reference the design model from 'the recorded routing policy' (spec line 36), and docs/UX-MODULE.md states the model is 'from the factory's routing policy (currently openai/gpt-6-astra)' (line 111), yet the station.json files hardcode design_model: 'openai/gpt-6-astra' instead of reading it from anvil/routing.py's policy. The implementation should call load_routing_policy() or read from a central config, not duplicate the model string across three station catalogs.; Architectural fit with Decision 0001 composable stations: The knowledge module correctly extends the factory as a reusable component (knowledge.py in anvil/ package, data in design-knowledge/ at factory root), and station catalog updates are minimal additions to existing stations. Station IDs remain unique and the module does not redefine stations. This aligns with the composable stations decision.",
-      "reason": "Knowledge pack loading accepts arbitrary filesystem paths without validating they're not sensitive system locations. While documented as operator-supplied (trusted context), recommend adding validation to reject paths like /etc/, /sys/, /proc/ as defense-in-depth to prevent accidental misconfiguration. Current whitelist-based filename validation provides strong protection against direct exploitation.; Recommend adding resolved path validation after pack_path / filename combination (line 161 in knowledge.py) to verify the resolved path stays within the pack directory, preventing potential symlink-based attacks. Current exact filename whitelist prevents direct traversal attacks but explicit boundary check would strengthen defense-in-depth.; JSON files loaded without explicit size limits could theoretically cause resource exhaustion with extremely large files. Low risk given operator-controlled context, but recommend adding file size validation (e.g., max 10MB per file) before JSON parsing for production hardening.; S1-S10: All spec scenarios are covered by tests that call real implementation and assert behavior; 18 of 20 tests pass. 2 tests skip due to incomplete import statements (test_s1_malformed_entry_fails_validation tries to import 'load_knowledge' which doesn't exist; should import only 'validate_knowledge_entry'. test_s10_guide_designation_names_design_model skips checking for 'load_routing_policy' but the function exists at anvil/knowledge.py:474); Tests are real: they import anvil.knowledge functions, call compute_knowledge_slice(), load_knowledge_pack(), packet_knowledge_section(), validate_knowledge_entry(), load_registry(), and assert actual behavior (exceptions raised, content returned, data structures populated) rather than checking mere existence; Tests are mapped: each test class explicitly maps to a spec scenario (S1: BuiltInDatasetTests, S2: DeterministicSliceTests, S3: PacketInjectionTests, S4: AuthorityStatementTests, S5: UndeclaredProductTypeTests, S6: CitationDisciplineTests, S7-S8: OperatorSuppliedPackTests, S9: PackValidationTests, S10: GuideDesignationTests); Implementation verified: design-knowledge/ contains all 5 required data files, anvil/knowledge.py provides all functions being tested, station contracts (reviewer-design/PROMPT.md:21, builder/PROMPT.md:19) include authority and citation rules, station.json files have guide designation ('guided': true, 'designation': 'guided design station', 'design_model': 'openai/gpt-6-astra'); Minor: The 2 skipped tests could be fixed by correcting import statements, but the functionality they test is already validated by other passing tests in the same scenario groups; Critical integration gap: The knowledge module (anvil/knowledge.py) provides packet_knowledge_section() to inject Design knowledge sections into packets (spec S3), but this function is never called by the runner or design module. The station prompts reference 'The Design knowledge section in your packet (when present)' (reviewer-design PROMPT.md line 21), confirming dynamic packet injection is required, yet anvil/design.py:packet_design_section() does not import or call the knowledge module, and anvil/runner.py:packet_step() line 439 only calls packet_design_section() without knowledge integration. The knowledge data layer and rendering logic exist but are not wired into the packet building pipeline.; Incomplete runtime integration: Spec scenarios S3, S7 and S8 require knowledge pack loading and slice computation at run start with pack recording in run reports, but anvil/runner.py shows no imports from anvil.knowledge (line 1-15), no calls to load_knowledge_pack() or compute_knowledge_slice(), and no integration of knowledge_pack field from work orders. The runner must load packs at intake (S9), compute slices once per run (S2), and inject them into design station packets (S3), but none of this runtime wiring exists.; Missing routing policy integration: Spec S10 requires the guide designation to reference the design model from 'the recorded routing policy' (spec line 36), and docs/UX-MODULE.md states the model is 'from the factory's routing policy (currently openai/gpt-6-astra)' (line 111), yet the station.json files hardcode design_model: 'openai/gpt-6-astra' instead of reading it from anvil/routing.py's policy. The implementation should call load_routing_policy() or read from a central config, not duplicate the model string across three station catalogs.; Architectural fit with Decision 0001 composable stations: The knowledge module correctly extends the factory as a reusable component (knowledge.py in anvil/ package, data in design-knowledge/ at factory root), and station catalog updates are minimal additions to existing stations. Station IDs remain unique and the module does not redefine stations. This aligns with the composable stations decision.",
+      "return_to": "builder",
+      "detail": "Loopback to builder: test_s1_malformed_entry_fails_validation (line 58): Test is skipped due to incorrect import. Tries to import 'load_knowledge' which doesn't exist - should import 'load_builtin_knowledge' instead. The implementation exists (anvil/knowledge.py:52), so this test should run and validate that malformed entries fail with file and entry named.; test_s10_guide_designation_names_design_model (line 548): Test is skipped due to incorrect import. Tries to import 'load_routing_policy()' which doesn't exist - should either import and call 'get_design_model_from_routing()' or access MODEL_POLICY directly from anvil.routing. The routing policy exists (anvil/routing.py:18-25), so this test should run and validate that stations reference the design model.; test_s1_builtin_dataset_exists_and_validates (line 33): Test checks that data files exist and contain valid JSON, but never calls load_builtin_knowledge() to validate that the loader actually works. Per the standing note 'Tests must be real: every test calls the implementation it names and asserts behavior', this test should call load_builtin_knowledge() and assert it succeeds without validation errors.; S10 guide designation not wired into runtime: The station.json files declare 'guided': true and 'designation': 'guided design station' for builder, reviewer-design, and writer, but the Station dataclass in anvil/stations.py (line 9-21) does not include a 'guided' field. When load_registry loads station.json files, this field is dropped. The runner (anvil/runner.py lines 483-486) has no way to detect guided stations and apply the design model from routing policy. The function get_design_model_from_routing exists in knowledge.py (lines 499-506) but is never called. Fix: add 'guided' field to Station dataclass, preserve it in load_registry, and in runner.py apply the design model from routing policy when station.guided is True.; S10 test references non-existent function: tests/test_design_knowledge.py test_s10_guide_designation_names_design_model (line 548) tries to import load_routing_policy from anvil.routing, but this function does not exist in routing.py. The test will skip rather than validating the requirement. The routing.py module has MODEL_POLICY dict and load_routing_config function, but no load_routing_policy. Either the test should use the correct function name or a load_routing_policy wrapper should be added.; S10 hardcoded models contradict requirement: The loopback finding states 'the station catalogs must stop hardcoding a design model string' and 'no model name is duplicated across station.json files', yet builder/station.json has 'model': 'fast-builder', reviewer-design/station.json has 'model': 'review-balanced', and writer/station.json has 'model': 'writing-strong'. These are not duplicates but they are hardcoded values. The requirement says the guide designation should read the model 'at the point of use' from routing policy. The current architecture applies station.model from the catalog (runner.py line 483) with no check for guided stations. The routing policy defines 'designer': 'openai/gpt-6-astra' (routing.py line 24) as the design model, but guided stations never use it.",
+      "reason": "test_s1_malformed_entry_fails_validation (line 58): Test is skipped due to incorrect import. Tries to import 'load_knowledge' which doesn't exist - should import 'load_builtin_knowledge' instead. The implementation exists (anvil/knowledge.py:52), so this test should run and validate that malformed entries fail with file and entry named.; test_s10_guide_designation_names_design_model (line 548): Test is skipped due to incorrect import. Tries to import 'load_routing_policy()' which doesn't exist - should either import and call 'get_design_model_from_routing()' or access MODEL_POLICY directly from anvil.routing. The routing policy exists (anvil/routing.py:18-25), so this test should run and validate that stations reference the design model.; test_s1_builtin_dataset_exists_and_validates (line 33): Test checks that data files exist and contain valid JSON, but never calls load_builtin_knowledge() to validate that the loader actually works. Per the standing note 'Tests must be real: every test calls the implementation it names and asserts behavior', this test should call load_builtin_knowledge() and assert it succeeds without validation errors.; S10 guide designation not wired into runtime: The station.json files declare 'guided': true and 'designation': 'guided design station' for builder, reviewer-design, and writer, but the Station dataclass in anvil/stations.py (line 9-21) does not include a 'guided' field. When load_registry loads station.json files, this field is dropped. The runner (anvil/runner.py lines 483-486) has no way to detect guided stations and apply the design model from routing policy. The function get_design_model_from_routing exists in knowledge.py (lines 499-506) but is never called. Fix: add 'guided' field to Station dataclass, preserve it in load_registry, and in runner.py apply the design model from routing policy when station.guided is True.; S10 test references non-existent function: tests/test_design_knowledge.py test_s10_guide_designation_names_design_model (line 548) tries to import load_routing_policy from anvil.routing, but this function does not exist in routing.py. The test will skip rather than validating the requirement. The routing.py module has MODEL_POLICY dict and load_routing_config function, but no load_routing_policy. Either the test should use the correct function name or a load_routing_policy wrapper should be added.; S10 hardcoded models contradict requirement: The loopback finding states 'the station catalogs must stop hardcoding a design model string' and 'no model name is duplicated across station.json files', yet builder/station.json has 'model': 'fast-builder', reviewer-design/station.json has 'model': 'review-balanced', and writer/station.json has 'model': 'writing-strong'. These are not duplicates but they are hardcoded values. The requirement says the guide designation should read the model 'at the point of use' from routing policy. The current architecture applies station.model from the catalog (runner.py line 483) with no check for guided stations. The routing policy defines 'designer': 'openai/gpt-6-astra' (routing.py line 24) as the design model, but guided stations never use it.",
       "duration_ms": 0.0,
       "cost": null,
       "artifacts": [],
@@ -217,7 +217,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-11/deployer.packet.md",
-      "duration_ms": 0.097,
+      "duration_ms": 0.226,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-11/deployer.packet.md"
@@ -230,7 +230,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-11/observer.output.md",
-      "duration_ms": 65748.422,
+      "duration_ms": 14432.934,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-11/observer.output.md"
@@ -263,7 +263,7 @@
         },
         {
           "station": "reviewer-tests",
-          "verdict": "pass"
+          "verdict": "changes_requested"
         },
         {
           "station": "reviewer-architecture",
@@ -281,7 +281,7 @@
         "reviewer-architecture",
         "reviewer-design"
       ],
-      "rule": "Reviewer reviewer-architecture requested changes."
+      "rule": "Reviewers reviewer-tests, reviewer-architecture requested changes."
     },
     "human_gate": {
       "required": true,
@@ -290,7 +290,7 @@
     }
   },
   "warnings": [],
-  "base_ref": "3c48eab10f05f9b13bdd1595c410616d1d5ffc21",
+  "base_ref": "b751d058947e0cd69834d428e76757e1a07a3b0c",
   "evidence": [],
   "cost": {
     "total": 0,

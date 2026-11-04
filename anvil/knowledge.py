@@ -116,6 +116,26 @@ def load_knowledge_pack(pack_path: Path) -> Dict[str, Any]:
     """
     pack_path = Path(pack_path)
 
+    # Defense in depth: reject paths that resolve into sensitive system locations
+    try:
+        resolved_path = pack_path.resolve()
+    except (OSError, RuntimeError) as e:
+        raise KnowledgeValidationError(f"Cannot resolve pack path: {e}")
+
+    sensitive_prefixes = ["/etc", "/sys", "/proc", "/dev", "/boot"]
+    for prefix in sensitive_prefixes:
+        prefix_path = Path(prefix).resolve()
+        try:
+            resolved_path.relative_to(prefix_path)
+            # If relative_to succeeds, the path is under the sensitive prefix
+            raise KnowledgeValidationError(
+                f"Knowledge pack path rejected: {resolved_path} resolves into sensitive "
+                f"system location {prefix}. Pack paths must be outside system directories."
+            )
+        except ValueError:
+            # relative_to raises ValueError if not a subpath - this is what we want
+            pass
+
     if not pack_path.exists():
         raise FileNotFoundError(f"Knowledge pack path does not exist: {pack_path}")
 
@@ -402,7 +422,11 @@ def render_knowledge_slice(slice_data: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def packet_knowledge_section(project_dir: Path, station_id: str) -> str:
+def packet_knowledge_section(
+    project_dir: Path,
+    station_id: str,
+    knowledge_pack: Optional[Dict[str, Any]] = None
+) -> str:
     """Generate Design knowledge section for a station packet.
 
     Only design stations receive this section: reviewer-design, builder (for UI work),
@@ -411,6 +435,7 @@ def packet_knowledge_section(project_dir: Path, station_id: str) -> str:
     Args:
         project_dir: Path to project directory
         station_id: Station ID
+        knowledge_pack: Optional loaded pack from load_knowledge_pack()
 
     Returns:
         Markdown section text, or empty string if station should not receive it
@@ -424,8 +449,8 @@ def packet_knowledge_section(project_dir: Path, station_id: str) -> str:
     # Get product type
     product_type = get_project_product_type(project_dir)
 
-    # Compute slice (without pack for now - pack is loaded by runner)
-    slice_data = compute_knowledge_slice(product_type)
+    # Compute slice with pack if provided
+    slice_data = compute_knowledge_slice(product_type, knowledge_pack)
 
     # Build section
     lines = ["## Design knowledge"]
@@ -471,15 +496,11 @@ def record_pack_in_run_report(run_dir: Path, pack: Dict[str, Any]):
     report_file.write_text(content, encoding="utf-8")
 
 
-def load_routing_policy() -> Dict[str, str]:
-    """Load the factory's model routing policy.
+def get_design_model_from_routing() -> str:
+    """Get the design model from the factory's routing policy.
 
     Returns:
-        Dict with model assignments, including design_model
+        Design model name from routing policy
     """
-    # Design model from the UX module guide designation
-    return {
-        "design_model": "openai/gpt-6-astra",  # As specified in the spec
-        "review_model": "review-balanced",
-        "builder_model": "fast-builder",
-    }
+    from .routing import MODEL_POLICY
+    return MODEL_POLICY.get("designer", "openai/gpt-6-astra")

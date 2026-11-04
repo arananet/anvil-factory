@@ -5,17 +5,14 @@
   "work_order_id": "wo-gh-11",
   "artifact_path": "runs/wo-gh-11/reviewer-tests.output.md",
   "status": "executed",
-  "created_at": "2026-11-04T04:07:20.448550+00:00",
+  "created_at": "2026-11-04T04:38:15.829839+00:00",
   "review": {
     "station": "reviewer-tests",
-    "verdict": "pass",
+    "verdict": "changes_requested",
     "findings": [
-      "S1-S10: All spec scenarios are covered by tests that call real implementation and assert behavior",
-      "18 of 20 tests pass. 2 tests skip due to incomplete import statements (test_s1_malformed_entry_fails_validation tries to import 'load_knowledge' which doesn't exist; should import only 'validate_knowledge_entry'. test_s10_guide_designation_names_design_model skips checking for 'load_routing_policy' but the function exists at anvil/knowledge.py:474)",
-      "Tests are real: they import anvil.knowledge functions, call compute_knowledge_slice(), load_knowledge_pack(), packet_knowledge_section(), validate_knowledge_entry(), load_registry(), and assert actual behavior (exceptions raised, content returned, data structures populated) rather than checking mere existence",
-      "Tests are mapped: each test class explicitly maps to a spec scenario (S1: BuiltInDatasetTests, S2: DeterministicSliceTests, S3: PacketInjectionTests, S4: AuthorityStatementTests, S5: UndeclaredProductTypeTests, S6: CitationDisciplineTests, S7-S8: OperatorSuppliedPackTests, S9: PackValidationTests, S10: GuideDesignationTests)",
-      "Implementation verified: design-knowledge/ contains all 5 required data files, anvil/knowledge.py provides all functions being tested, station contracts (reviewer-design/PROMPT.md:21, builder/PROMPT.md:19) include authority and citation rules, station.json files have guide designation ('guided': true, 'designation': 'guided design station', 'design_model': 'openai/gpt-6-astra')",
-      "Minor: The 2 skipped tests could be fixed by correcting import statements, but the functionality they test is already validated by other passing tests in the same scenario groups"
+      "test_s1_malformed_entry_fails_validation (line 58): Test is skipped due to incorrect import. Tries to import 'load_knowledge' which doesn't exist - should import 'load_builtin_knowledge' instead. The implementation exists (anvil/knowledge.py:52), so this test should run and validate that malformed entries fail with file and entry named.",
+      "test_s10_guide_designation_names_design_model (line 548): Test is skipped due to incorrect import. Tries to import 'load_routing_policy()' which doesn't exist - should either import and call 'get_design_model_from_routing()' or access MODEL_POLICY directly from anvil.routing. The routing policy exists (anvil/routing.py:18-25), so this test should run and validate that stations reference the design model.",
+      "test_s1_builtin_dataset_exists_and_validates (line 33): Test checks that data files exist and contain valid JSON, but never calls load_builtin_knowledge() to validate that the loader actually works. Per the standing note 'Tests must be real: every test calls the implementation it names and asserts behavior', this test should call load_builtin_knowledge() and assert it succeeds without validation errors."
     ]
   },
   "configured_model": "review-balanced",

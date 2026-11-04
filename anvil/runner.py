@@ -13,6 +13,12 @@ from .approver import aggregate, needs_human, aggregate_explained, needs_human_e
 from .executor import ExecutorError
 from .routing import route_reviewers, write_routing_record, render_routing_section, routing_swimlane_summary
 from .cost import load_price_table, calculate_cost, build_cost_section
+from .knowledge import (
+    load_knowledge_pack,
+    packet_knowledge_section,
+    get_project_product_type,
+    KnowledgeValidationError,
+)
 
 def _escape_markdown(text):
     """Escape markdown special characters to prevent content injection.
@@ -314,7 +320,7 @@ def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None, b
     return set()
 
 
-def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section="", rendered_evidence_section=""):
+def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section="", rendered_evidence_section="", knowledge_section=""):
     upstream = "\n".join(f"- {s['station']}: {s['status']}" for s in steps) or "- (none)"
     # Use rescoped description if intake rescoped the work
     description = work_order.description
@@ -329,6 +335,8 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
         text += f"\n{learnings_section}\n"
     if design_section:
         text += f"\n{design_section}\n"
+    if knowledge_section:
+        text += f"\n{knowledge_section}\n"
     if rendered_evidence_section:
         text += f"\n{rendered_evidence_section}\n"
     # Reviewer stations have a specific output contract
@@ -379,6 +387,16 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     # Verified learnings are computed once per run: only non demoted entries
     # from brain/learnings.md, never inbox proposals (see anvil/brain.py).
     learnings_section = packet_learnings_section(project)
+
+    # Load knowledge pack if provided in work order (S7, S8, S9)
+    knowledge_pack = None
+    pack_load_error = None
+    if hasattr(work_order, 'knowledge_pack') and work_order.knowledge_pack:
+        try:
+            knowledge_pack = load_knowledge_pack(Path(work_order.knowledge_pack))
+        except (FileNotFoundError, KnowledgeValidationError) as e:
+            pack_load_error = str(e)
+            # Pack loading failure stops the run at intake (S9)
 
     # Routing record: will be populated after intake
     routing_record = None
@@ -438,12 +456,23 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         prompt = station.prompt if station and station.prompt else f"Station {station_id}: carry out your role for this work order."
         design_section = packet_design_section(project, station_id)
         rendered_evidence_section = packet_rendered_evidence_section(project, work_order.id, station_id)
+        # S3: Design knowledge section for design stations (computed once per run)
+        knowledge_section = packet_knowledge_section(project, station_id, knowledge_pack)
         packet = run_dir / f"{station_id}.packet.md"
-        packet.write_text(_packet_text(station_id, prompt, work_order, steps, learnings_section, design_section, rendered_evidence_section), encoding="utf-8")
+        packet.write_text(_packet_text(station_id, prompt, work_order, steps, learnings_section, design_section, rendered_evidence_section, knowledge_section), encoding="utf-8")
         return packet
 
     for idx, station_id in enumerate(order):
         started = time.perf_counter()
+
+        # S9: Pack loading failure stops the run at intake
+        if station_id == "intake" and pack_load_error:
+            steps.append({"station": station_id, "status": "failed", "elapsed": 0,
+                        "model": "", "usage": {}, "cost": None,
+                        "error": f"Knowledge pack loading failed: {pack_load_error}"})
+            verdict = "failed"
+            break
+
         station = None
         if registry is not None and station_id in registry:
             station = registry.get(station_id)
@@ -1077,6 +1106,16 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     # Include routing section if present
     if routing_record:
         report_lines.append(render_routing_section(routing_record))
+
+    # S7: Record operator-supplied knowledge pack
+    if knowledge_pack:
+        report_lines.append("## Operator Supplied Inputs")
+        report_lines.append("")
+        report_lines.append("**Knowledge Pack**:")
+        report_lines.append(f"- Name: {knowledge_pack['name']}")
+        report_lines.append(f"- Product types covered: {', '.join(knowledge_pack['product_types'])}")
+        report_lines.append(f"- Data files: {', '.join(knowledge_pack['files'])}")
+        report_lines.append("")
 
     # Include verdict
     report_lines.append(f"## Verdict")

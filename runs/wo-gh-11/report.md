@@ -28,7 +28,7 @@ Surfaces: content
 
 Verdict: changes_requested
 
-Reviewer reviewer-architecture requested changes.
+Reviewers reviewer-tests, reviewer-architecture requested changes.
 
 ## Steps
 
