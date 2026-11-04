@@ -5,8 +5,8 @@
   "work_order_id": "wo-gh-14",
   "artifact_path": "runs/wo-gh-14/builder.output.md",
   "status": "executed",
-  "created_at": "2026-11-04T15:45:58.256796+00:00",
-  "configured_model": "claude-sonnet-4-5",
+  "created_at": "2026-11-04T16:28:48.240070+00:00",
+  "configured_model": "openai/gpt-6-astra",
   "executor": {
     "kind": "command",
     "detail": "python3"

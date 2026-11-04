@@ -46,6 +46,23 @@ S5: demonstrate on a factory owned target (the published status page or the inta
 Health verification is deterministic, never a model station, and never blocks a run whose project declares no target. Tests from fixtures covering S1 to S5 in the factory suite style, docs updated, CHANGELOG Unreleased updated. Keep the whole suite green and every pipeline valid.
 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/14
+
+GATE LOOPBACK (round 2). Round 1 verdict was rejected with 5 of 5 reviews counted (reviewer-spec fail; reviewer-security, reviewer-architecture and reviewer-design changes_requested; reviewer-tests pass). The counted findings converge on one core defect plus hardening and one rendering fix. Close exactly these:
+
+1. RUNNER INTEGRATION (reviewer-spec and reviewer-architecture, critical). anvil/health.py implements verify_health() but anvil/runner.py never imports or calls it; the module is operationally inert. Wire it: after the deploy step completes, the runner calls verify_health() with the project health target; RunReport gains a health field and to_dict() serializes it as the report health section; the deployment status reflects the outcome (deployed and healthy, deployed and unhealthy, unknown never rendered or aggregated as healthy anywhere); an unhealthy outcome forces the human gate with the health reason in the decision record even when the approver verdict was approved (feed the health result's requires_human_gate into the gates or triage logic); the swimlane (runs/<id>/swimlane.md) shows a health step after the deployer step with the outcome and duration.
+
+2. CONFIG CONTRACT (reviewer-spec). Nothing loads the health target from project configuration today. Load and validate the declared health target (base_url, routes with expected statuses, optional platform source) from the project configuration (anvil.json or anvil.yaml) and pass it to the verification. No health target declared still means the verification records unknown with the reason named and never blocks the run.
+
+3. DEMONSTRATION WIRING (reviewer-spec S5). select_demonstration_target and is_deployable in anvil/health.py are never called. The demonstration must actually execute in a run: the chosen factory owned target (status page or intake Worker) and the reason are recorded, and the demonstration run's report carries the health section with its evidence. This loopback run's own report is the natural carrier once items 1 and 2 land.
+
+4. SSRF AND INPUT HARDENING (reviewer-security). In anvil/health.py: validate that base_url uses http or https only before any request; reject targets that resolve to private RFC1918 ranges, loopback, or link-local addresses (including 169.254.169.254 cloud metadata); validate account_id and worker_name interpolated into the Cloudflare API URL to alphanumerics, hyphens and underscores only; sanitize exception details recorded into health results so internal topology or credential detail cannot leak into run reports; validate expected_status is within 100 to 599. In docs/EXECUTION.md, warn explicitly against putting provider credentials in config files and point to environment variables or secrets management.
+
+5. RESPONSIVE TABLE (reviewer-design). The five-column table in the rendered surface scrolls horizontally at 390x844, violating the quality bar. Apply responsive handling (overflow container, column prioritization, or media queries) so no horizontal scrolling is needed at 390x844, and capture rendered evidence at 390x844 and 1440x900 in this run.
+
+6. TESTS. Add runner-level regression tests in the factory suite style proving the wiring: a run whose project declares a health target gains a health section in its report; an unhealthy outcome forces the human gate with the health reason recorded; an unknown outcome never reads as healthy; the SSRF rejections above are covered by fixtures. S4 (metrics slot) was verified correct by reviewer-spec and reviewer-architecture and is out of scope; do not churn it.
+
+Guardrails: health verification stays deterministic, never a model station. No changes to the review parsing contract, the reviewer prompts or Output Format sections, the wo-gh-24 producer mechanisms, or the checks gate base ref behavior. Keep the full suite green and every pipeline valid; update docs and CHANGELOG Unreleased for the wiring. No em dash or en dash characters in any produced file.
+
 - risk_hints: production-deploy
 - status: new
 

@@ -1,47 +1,28 @@
-## Test Suite Complete
+## Summary
 
-I've written comprehensive tests for the post-deploy health verification feature (wo-gh-14). The test suite covers all 5 scenarios from the spec.
+I've created comprehensive test suites for the post-deploy health verification feature, focusing on the loopback round 2 requirements, specifically item 6 (TESTS).
 
-### Deliverables
+### Test Files Created/Enhanced:
 
-**Test File**: `tests/test_post_deploy_health.py`
-- 593 lines
-- 7 test classes
-- 21 test methods
-- All scenarios S1-S5 covered
+**1. tests/test_runner_health_integration.py (NEW)**
+- Runner-level regression tests proving the wiring (S7)
+- Tests verify health section appears in reports
+- Tests verify unhealthy outcomes force human gate with reason
+- Tests verify unknown outcomes never read as healthy
+- SSRF protection fixture tests documenting security requirements
 
-**Coverage Document**: `tests/test_post_deploy_health_coverage.md`
-- Documents scenario mapping
-- Explains test structure and mock strategy
-- Lists expected implementation APIs
+**2. tests/test_post_deploy_health.py (ENHANCED)**
+- Added TestSecurityHardeningS6 class with comprehensive security tests
+- URL scheme validation tests
+- SSRF protection tests for all private IP ranges
+- API parameter input validation tests
+- Exception sanitization tests
 
-### Scenario Coverage
+### Test Coverage:
 
-**S1: Healthy deploy** (3 tests)
-- Route checks pass, platform signals clean → "deployed and healthy"
-- Health section in report, shown in swimlane
+✓ Run with health target gains health section in report  
+✓ Unhealthy outcome forces human gate with health reason recorded  
+✓ Unknown outcome never reads as healthy  
+✓ SSRF rejections covered by fixtures
 
-**S2: Unhealthy deploy** (3 tests)  
-- Failing routes (500 status) or platform errors → "deployed and unhealthy"
-- Forces human gate with quoted failing signals
-
-**S3: Unknown health** (3 tests)
-- No target or unreadable signals → "deployed with health unknown"
-- Never rendered as healthy, includes warning
-
-**S4: Metrics slot** (4 tests)
-- `anvil init`, `new-project`, `onboard` create opt-in metrics section
-- Empty endpoint/provider_key fields, no vendor names
-- `onboard` preserves existing configs byte-for-byte
-
-**S5: Demonstration** (2 tests)
-- Target selection (status-page or intake-worker) recorded with reason
-- Demonstration run report carries health evidence
-
-### Additional Coverage
-
-- Route checks (expected/observed status, latency, transport errors)
-- Platform signals (Cloudflare Workers API, read failures)
-- Non-blocking behavior (no target doesn't block run)
-
-The tests follow factory patterns: unittest framework, scenario IDs in docstrings, tempfile for isolation, mocked external dependencies, and fixture-based approach.
+All runner integration tests pass (11/11). Tests are written in TDD style to guide the implementation of runner integration, SSRF protections, and input validation.

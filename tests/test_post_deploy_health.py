@@ -1,4 +1,4 @@
-import json, tempfile, unittest, sys
+import json, os, tempfile, unittest, sys
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -533,6 +533,235 @@ class TestDemonstration(unittest.TestCase):
             self.assertIn("demonstration_target", loaded["health"])
             self.assertIn("demonstration_reason", loaded["health"])
             self.assertIn("route_results", loaded["health"])
+
+
+class TestSecurityHardeningS6(unittest.TestCase):
+    """Tests for security hardening requirements (S6)."""
+
+    def test_url_scheme_validation_rejects_non_http_https(self):
+        """URL scheme validation rejects schemes other than http or https"""
+        from anvil.health import verify_health
+
+        invalid_schemes = [
+            "file:///etc/passwd",
+            "ftp://example.com/data",
+            "gopher://archive.example",
+            "javascript:alert(1)",
+            "data:text/html,<script>alert(1)</script>"
+        ]
+
+        for base_url in invalid_schemes:
+            with self.subTest(base_url=base_url):
+                health_config = make_health_config(
+                    base_url=base_url,
+                    routes=[{"path": "/", "expected_status": 200}]
+                )
+
+                result = verify_health(health_config, deploy_time="2026-11-04T10:00:00Z")
+
+                # Should return unknown with configuration error
+                self.assertEqual(result["outcome"], "unknown")
+                self.assertIn("reason", result)
+                # Reason should indicate invalid scheme or configuration error
+                self.assertTrue(
+                    "scheme" in result["reason"].lower() or
+                    "configuration" in result["reason"].lower() or
+                    "invalid" in result["reason"].lower()
+                )
+
+    def test_ssrf_protection_rejects_private_rfc1918_ranges(self):
+        """SSRF protection rejects RFC1918 private IP ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)"""
+        from anvil.health import verify_health
+
+        private_ips = [
+            "http://10.0.0.1",
+            "http://10.255.255.255",
+            "http://172.16.0.1",
+            "http://172.31.255.255",
+            "http://192.168.0.1",
+            "http://192.168.255.255"
+        ]
+
+        for base_url in private_ips:
+            with self.subTest(base_url=base_url):
+                health_config = make_health_config(
+                    base_url=base_url,
+                    routes=[{"path": "/", "expected_status": 200}]
+                )
+
+                result = verify_health(health_config, deploy_time="2026-11-04T10:00:00Z")
+
+                # Should be rejected with SSRF reason
+                self.assertEqual(result["outcome"], "unknown")
+                self.assertIn("reason", result)
+                # Reason should indicate SSRF rejection or private IP
+                reason_lower = result["reason"].lower()
+                self.assertTrue(
+                    "ssrf" in reason_lower or
+                    "private" in reason_lower or
+                    "rejected" in reason_lower
+                )
+
+    def test_ssrf_protection_rejects_loopback_addresses(self):
+        """SSRF protection rejects loopback addresses (127.0.0.0/8)"""
+        from anvil.health import verify_health
+
+        loopback_addresses = [
+            "http://127.0.0.1",
+            "http://127.0.0.2",
+            "http://127.255.255.255"
+        ]
+
+        for base_url in loopback_addresses:
+            with self.subTest(base_url=base_url):
+                health_config = make_health_config(
+                    base_url=base_url,
+                    routes=[{"path": "/", "expected_status": 200}]
+                )
+
+                result = verify_health(health_config, deploy_time="2026-11-04T10:00:00Z")
+
+                # Should be rejected
+                self.assertEqual(result["outcome"], "unknown")
+                self.assertIn("reason", result)
+                reason_lower = result["reason"].lower()
+                self.assertTrue(
+                    "loopback" in reason_lower or
+                    "rejected" in reason_lower or
+                    "private" in reason_lower
+                )
+
+    def test_ssrf_protection_rejects_link_local_including_cloud_metadata(self):
+        """SSRF protection rejects link-local addresses (169.254.0.0/16) including 169.254.169.254"""
+        from anvil.health import verify_health
+
+        link_local_addresses = [
+            "http://169.254.169.254",  # AWS/GCP/Azure metadata endpoint
+            "http://169.254.1.1",
+            "http://169.254.255.255"
+        ]
+
+        for base_url in link_local_addresses:
+            with self.subTest(base_url=base_url):
+                health_config = make_health_config(
+                    base_url=base_url,
+                    routes=[{"path": "/latest/meta-data", "expected_status": 200}]
+                )
+
+                result = verify_health(health_config, deploy_time="2026-11-04T10:00:00Z")
+
+                # Should be rejected
+                self.assertEqual(result["outcome"], "unknown")
+                self.assertIn("reason", result)
+                reason_lower = result["reason"].lower()
+                self.assertTrue(
+                    "link-local" in reason_lower or
+                    "rejected" in reason_lower or
+                    "metadata" in reason_lower
+                )
+
+    def test_api_parameter_input_validation_alphanumeric_only(self):
+        """Input validation for API parameters allows only alphanumerics, hyphens, and underscores"""
+        from anvil.health import read_platform_signals
+
+        invalid_inputs = [
+            ("test-account", "worker/../../../etc/passwd", "path traversal"),
+            ("account@malicious.com", "worker", "@ character"),
+            ("account;rm -rf /", "worker", "shell injection"),
+            ("test-account", "worker<script>alert(1)</script>", "HTML injection"),
+            ("account$var", "worker", "variable expansion"),
+            ("test-account", "worker name", "space character")
+        ]
+
+        for account_id, worker_name, description in invalid_inputs:
+            with self.subTest(description=description):
+                platform_config = {
+                    "source": "cloudflare_workers",
+                    "account_id": account_id,
+                    "worker_name": worker_name
+                }
+
+                result = read_platform_signals(
+                    platform_config,
+                    window_start="2026-11-04T10:00:00Z",
+                    window_end="2026-11-04T10:05:00Z"
+                )
+
+                # Should fail to read with validation error
+                self.assertFalse(result["read_success"])
+                self.assertIn("error", result)
+                # Error should indicate invalid input or configuration
+                error_lower = result["error"].lower()
+                self.assertTrue(
+                    "invalid" in error_lower or
+                    "configuration" in error_lower or
+                    "validation" in error_lower
+                )
+
+    def test_expected_status_validation_range_100_to_599(self):
+        """HTTP status validation ensures expected_status is within 100-599"""
+        from anvil.health import verify_health
+
+        invalid_statuses = [
+            (99, "below range"),
+            (600, "above range"),
+            (1000, "far above range"),
+            (-1, "negative"),
+            (0, "zero")
+        ]
+
+        for status, description in invalid_statuses:
+            with self.subTest(status=status, description=description):
+                health_config = make_health_config(
+                    base_url="https://example.com",
+                    routes=[{"path": "/", "expected_status": status}]
+                )
+
+                result = verify_health(health_config, deploy_time="2026-11-04T10:00:00Z")
+
+                # Should return unknown with configuration error
+                self.assertEqual(result["outcome"], "unknown")
+                self.assertIn("reason", result)
+                # Reason should indicate invalid status or configuration error
+                reason_lower = result["reason"].lower()
+                self.assertTrue(
+                    "status" in reason_lower or
+                    "invalid" in reason_lower or
+                    "configuration" in reason_lower
+                )
+
+    def test_exception_sanitization_prevents_credential_leakage(self):
+        """Exception sanitization prevents internal topology or credential details from leaking"""
+        from anvil.health import cloudflare_api_request
+
+        # Mock environment to have a fake token
+        with patch.dict(os.environ, {"CLOUDFLARE_API_TOKEN": "secret-token-12345"}):
+            with patch('requests.get') as mock_get:
+                # Simulate an API error that might expose credentials
+                mock_get.side_effect = Exception("Failed to connect to https://api.cloudflare.com with token secret-token-12345")
+
+                try:
+                    result = cloudflare_api_request(
+                        "test-account",
+                        "test-worker",
+                        "2026-11-04T10:00:00Z",
+                        "2026-11-04T10:05:00Z"
+                    )
+                    # If no exception, check the error message
+                    if "error" in result:
+                        error_msg = result["error"]
+                        # Should not contain the actual token
+                        self.assertNotIn("secret-token-12345", error_msg)
+                        self.assertNotIn("secret", error_msg.lower())
+                except Exception as e:
+                    error_msg = str(e)
+                    # Exception message should not contain credentials
+                    self.assertNotIn("secret-token-12345", error_msg)
+                    # Should be sanitized to generic error
+                    self.assertTrue(
+                        "API" in error_msg or
+                        "Failed to read" in error_msg
+                    )
 
 
 class TestHealthVerificationNonBlocking(unittest.TestCase):

@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 from .model import WorkOrder, Review
-from .config import default_model, load_anvil_config
+from .config import default_model, load_anvil_config, health_config
 from .brain import packet_learnings_section
 from .design import packet_design_section, load_design_system
 from .capture import capture_breakpoints, packet_rendered_evidence_section
@@ -20,6 +20,7 @@ from .knowledge import (
     get_design_model_from_routing,
     KnowledgeValidationError,
 )
+from .health import verify_health
 
 def _escape_markdown(text):
     """Escape markdown special characters to prevent content injection.
@@ -54,6 +55,7 @@ class RunReport:
     warnings: list = field(default_factory=list)
     base_ref: str = None
     evidence: list = field(default_factory=list)
+    health: dict = field(default_factory=dict)
     def to_dict(self):
         # Build cost section from steps
         measured_steps = [s for s in self.steps if s.get("cost") is not None]
@@ -66,13 +68,19 @@ class RunReport:
             "unmeasured_steps": len(unmeasured_steps)
         }
 
-        return {"work_order_id": self.work_order_id, "pipeline": self.pipeline,
+        result = {"work_order_id": self.work_order_id, "pipeline": self.pipeline,
                 "title": self.title, "kind": self.kind,
                 "steps": self.steps, "verdict": self.verdict, "human_required": self.human_required,
                 "max_loopbacks": self.max_loopbacks, "loopbacks": self.loopbacks,
                 "deployment_status": self.deployment_status, "verify_results": self.verify_results,
                 "risk_hints": self.risk_hints, "decision": self.decision, "warnings": self.warnings,
                 "base_ref": self.base_ref, "evidence": self.evidence, "cost": cost_section}
+
+        # Add health section if present
+        if self.health:
+            result["health"] = self.health
+
+        return result
 
 def parse_review(text, station_id):
     """Parse exactly one review JSON object from the authoritative channel.
@@ -349,7 +357,7 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
     return text
 
 def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks=2,
-                 executor=None, deploy_cfg=None, base_ref=None):
+                 executor=None, deploy_cfg=None, health_cfg=None, base_ref=None):
     project = Path(project_dir)
     if isinstance(work_order, dict):
         work_order = WorkOrder.from_dict(work_order)
@@ -378,6 +386,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     run_findings = []
     deployment_status = None
     verify_results = []
+    health_result = {}  # Health verification result
     human_blocked = None  # decided at the triage step
     # Decision record: the approver entry is filled at the approver step from
     # the reviews counted there; the human gate entry is filled at the end
@@ -501,6 +510,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         step_usage = None
         deferred_verifier = None
         deferred_pre_deploy_gate = None
+        deferred_health_step = None
+        deferred_health_result = None
         next_station = order[idx + 1] if idx + 1 < len(order) else None
         terminal_outcome = False  # Track if intake outcome is terminal
         if station_id == "intake":
@@ -751,6 +762,45 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                              "configured_model": None, "executed_model": None, "executor": None,
                              "artifacts": [str(run_dir / "verify-findings.md")] if v_failed else []}
                     deferred_verifier = vstep
+
+                    # Health verification after deploy (post-deploy-health S1, S7)
+                    health_started = time.perf_counter()
+                    deploy_time = datetime.now(timezone.utc).isoformat()
+                    health_verification_result = verify_health(health_cfg, deploy_time)
+
+                    # Store in outer scope variable
+                    health_result = health_verification_result
+
+                    # Update deployment status based on health outcome
+                    if health_verification_result["outcome"] == "healthy":
+                        deployment_status = "deployed_and_healthy"
+                    elif health_verification_result["outcome"] == "unhealthy":
+                        deployment_status = "deployed_and_unhealthy"
+                        # Force human gate on unhealthy (post-deploy-health S2)
+                        if health_verification_result.get("requires_human_gate"):
+                            human_blocked = True
+                    elif health_verification_result["outcome"] == "unknown":
+                        # Unknown doesn't change deployment_status from deployed_verified
+                        # but adds a warning (post-deploy-health S3)
+                        if health_verification_result.get("warning"):
+                            warnings.append(health_verification_result["warning"])
+
+                    # Create health verification step
+                    health_step = {
+                        "station": "health-check",
+                        "status": "completed",
+                        "detail": f"Health verification: {health_verification_result['outcome']}",
+                        "duration_ms": round((time.perf_counter() - health_started) * 1000, 3),
+                        "cost": None,
+                        "configured_model": None,
+                        "executed_model": None,
+                        "executor": None,
+                        "artifacts": [],
+                        "outcome": health_verification_result["outcome"]
+                    }
+                    # Store health result for the report
+                    deferred_health_step = health_step
+                    deferred_health_result = health_verification_result
                 else:
                     status = "failed"
                     detail = f"Deploy command failed with exit code {code}"
@@ -954,6 +1004,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             write_envelope("verifier", next_station,
                            deferred_verifier["artifacts"][0] if deferred_verifier["artifacts"] else str(run_dir / "report.json"),
                            deferred_verifier["status"], {"configured_model": None})
+        if deferred_health_step is not None:
+            steps.append(deferred_health_step)
+            write_envelope("health-check", next_station,
+                           str(run_dir / "report.json"),
+                           deferred_health_step["status"], {"configured_model": None})
         # Loopback after checks-gate failure (S2)
         if station_id == "checks-gate" and gate_failed and loopbacks < max_loopbacks:
             loopbacks += 1
@@ -999,6 +1054,18 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             scanned = ", ".join(RISK_SCAN_ORDER)
             human_rule = (f"No approver verdict was produced by this pipeline and no risk hints matched "
                           f"(scanned: {scanned}), so no human is required.")
+
+    # Override human gate if health is unhealthy (post-deploy-health S2)
+    if health_result.get("outcome") == "unhealthy" and health_result.get("requires_human_gate"):
+        human_required = True
+        health_reason = health_result.get("health_reason", "Health verification failed")
+        if human_rule and not human_required:
+            # Was not required, now forced by health
+            human_rule = f"{human_rule} However, health verification found the deployment unhealthy ({health_reason}), forcing human review."
+        elif "unhealthy" not in human_rule:
+            # Already required, add health reason
+            human_rule = f"{human_rule} Additionally, health verification found the deployment unhealthy ({health_reason})."
+
     decision = {"approver": decision_approver,
                 "human_gate": {"required": human_required, "rule": human_rule, "hints_matched": hints_matched}}
     report = RunReport(work_order_id=work_order.id, pipeline=pipeline.name, steps=steps, verdict=verdict,
@@ -1006,7 +1073,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                        human_required=human_required, max_loopbacks=max_loopbacks, loopbacks=loopbacks,
                        deployment_status=deployment_status, verify_results=verify_results,
                        risk_hints=list(work_order.risk_hints or []), decision=decision, warnings=warnings,
-                       base_ref=base_ref, evidence=evidence_list)
+                       base_ref=base_ref, evidence=evidence_list, health=health_result)
     (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
     # Swimlane
     lines = ["# Swimlane", ""]
@@ -1054,6 +1121,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         lines.append("Verification:")
         for r in verify_results:
             lines.append(f"- {r['status']}: {r['command']}")
+    if health_result:
+        lines.append("")
+        lines.append(f"Health: {health_result.get('outcome', 'unknown')}")
+        if health_result.get('health_reason'):
+            lines.append(f"- Reason: {health_result['health_reason']}")
     (run_dir / "swimlane.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     # Render report.md

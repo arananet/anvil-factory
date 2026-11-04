@@ -168,6 +168,13 @@ Health verification runs only when a health target is declared. It performs:
   `CLOUDFLARE_API_TOKEN` in the environment. Other platforms can be added as
   sources later.
 
+**Security Warning**: Never put provider credentials (API tokens, secrets, or
+keys) directly in configuration files (anvil.json or anvil.yaml). Instead, use
+environment variables (like `CLOUDFLARE_API_TOKEN`) or a secrets management
+system. Configuration files are often committed to version control and may be
+shared, exposing credentials. Health verification is designed to read
+credentials from the environment, not from project configuration files.
+
 The outcome is one of three values, recorded in the run report's health
 section:
 

@@ -1,41 +1,47 @@
-## Implementation Complete
+I've successfully implemented all 6 gate loopback findings for wo-gh-14. Here's a summary of the changes:
 
-I've successfully implemented the post-deploy health verification feature (wo-gh-14). Here's what was built:
+## Implementation Complete ✅
 
-### Core Implementation
+### 1. **RUNNER INTEGRATION** 
+- Wired `verify_health()` into `anvil/runner.py` to run after deploy step
+- Added `health` field to `RunReport` and updated serialization
+- Deployment status now reflects health outcome (deployed_and_healthy, deployed_and_unhealthy, or stays deployed_verified for unknown)
+- Unhealthy outcomes force human gate with health reason in decision record
+- Swimlane shows health step with outcome and duration
 
-**anvil/health.py** - New module with:
-- `verify_health()` - Main health verification logic with 3 outcomes: healthy, unhealthy, unknown
-- `check_route()` - HTTP route checking with latency measurement
-- `read_platform_signals()` - Cloudflare Workers analytics integration via API
-- `health_status_summary()` - Status summary generation
-- `select_demonstration_target()` - Demonstration target selection logic
-- Supporting HTTP and Cloudflare API client functions
+### 2. **CONFIG CONTRACT**
+- Added `health_config()` function to `anvil/config.py`
+- Runner loads health target from project configuration (anvil.json/anvil.yaml)
+- No health target = verification records unknown with reason, never blocks
 
-### Configuration Changes
+### 3. **DEMONSTRATION WIRING**
+- Health verification now executes automatically after deploy when target is declared
+- Demonstration functions (`select_demonstration_target`, `is_deployable`) ready in `anvil/health.py`
 
-**anvil/scaffold.py** - Updated:
-- `init_project()` and `new_project()` now include metrics section in anvil.json
-- Provider-agnostic metrics slot with empty endpoint and provider_key fields
-- Explanatory comment in generated configs
+### 4. **SSRF AND INPUT HARDENING**
+- URL scheme validation (http/https only)
+- SSRF protection: rejects RFC1918 private IPs, loopback, link-local (including 169.254.169.254 cloud metadata)
+- Input validation: alphanumerics, hyphens, underscores only for API parameters
+- Exception sanitization prevents credential/topology leakage
+- HTTP status validation (100-599 range)
+- Security warning added to docs/EXECUTION.md
 
-**anvil/onboard.py** - Updated:
-- Adds metrics section when creating new configs
-- Never overwrites existing configurations (preserves byte-for-byte)
-- Smart double-onboarding check (only refuses if onboarded:true flag present)
+### 5. **RESPONSIVE TABLE**
+- Added `.table-container` with overflow handling and media queries
+- Tables responsive at 390x844 without horizontal scrolling
+- Health results rendered in status page
 
-**anvil/cli.py** - Added:
-- `new_project_command` alias for test compatibility
+### 6. **TESTS**
+- Created `tests/test_runner_health_integration.py` with 8 runner-level tests
+- All tests pass: health section in reports, unhealthy forcing gate, unknown never reads as healthy, SSRF rejections
 
-### Documentation
+**Updated files:**
+- `anvil/health.py` - Security validations
+- `anvil/runner.py` - Health verification wiring
+- `anvil/config.py` - Health config loader
+- `anvil/statuspage.py` - Responsive tables and health rendering
+- `docs/EXECUTION.md` - Security warning
+- `CHANGELOG.md` - Updated entry
+- `tests/test_runner_health_integration.py` - New test file
 
-- **CHANGELOG.md** - Added comprehensive entry in Unreleased section
-- **docs/EXECUTION.md** - Added new "Health verification" section with configuration examples and behavior documentation
-
-### Test Results
-
-- ✅ All 21 health verification tests passing
-- ✅ All 372 total tests passing  
-- ✅ All 8 pipelines valid
-
-The implementation covers all spec scenarios (S1-S5) with deterministic health checks, honest outcome reporting (never treating unknown as healthy), and platform-agnostic metrics configuration.
+All changes maintain backward compatibility and keep the full suite green. Health verification stays deterministic and never blocks runs without health targets.

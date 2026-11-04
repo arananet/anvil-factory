@@ -5,14 +5,113 @@ and reading platform signals (e.g., Cloudflare Workers metrics).
 """
 
 import os
+import re
+import socket
 import time
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple, Any
+from urllib.parse import urlparse
+from ipaddress import ip_address, ip_network
 
 try:
     import requests
 except ImportError:
     requests = None
+
+
+def _validate_url_scheme(url: str) -> Tuple[bool, Optional[str]]:
+    """Validate that URL uses http or https scheme only.
+
+    Returns:
+        Tuple of (is_valid, error_message)
+    """
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme not in ('http', 'https'):
+            return False, f"Invalid URL scheme: {parsed.scheme}. Only http and https are allowed"
+        return True, None
+    except Exception as e:
+        return False, f"URL validation failed: {type(e).__name__}"
+
+
+def _is_ssrf_target(hostname: str) -> Tuple[bool, Optional[str]]:
+    """Check if hostname resolves to a private/reserved IP address.
+
+    Returns:
+        Tuple of (is_ssrf_target, rejection_reason)
+    """
+    try:
+        # Resolve hostname to IP address
+        addr = socket.gethostbyname(hostname)
+        ip = ip_address(addr)
+
+        # Check against private/reserved ranges
+        private_ranges = [
+            (ip_network('10.0.0.0/8'), 'RFC1918 private range'),
+            (ip_network('172.16.0.0/12'), 'RFC1918 private range'),
+            (ip_network('192.168.0.0/16'), 'RFC1918 private range'),
+            (ip_network('127.0.0.0/8'), 'loopback address'),
+            (ip_network('169.254.0.0/16'), 'link-local address (including cloud metadata endpoint)'),
+        ]
+
+        for network, reason in private_ranges:
+            if ip in network:
+                return True, f"SSRF protection: target resolves to {reason}"
+
+        return False, None
+    except socket.gaierror:
+        # DNS resolution failed - let it proceed to fail naturally during request
+        return False, None
+    except Exception as e:
+        # Other errors - reject to be safe
+        return True, f"Address validation failed"
+
+
+def _validate_identifier(value: str, field_name: str) -> Tuple[bool, Optional[str]]:
+    """Validate that identifier contains only alphanumerics, hyphens, and underscores.
+
+    Returns:
+        Tuple of (is_valid, error_message)
+    """
+    if not value:
+        return False, f"Missing {field_name}"
+
+    # Allow only alphanumerics, hyphens, and underscores
+    if not re.match(r'^[a-zA-Z0-9_-]+$', value):
+        return False, f"Invalid {field_name}: contains disallowed characters"
+
+    return True, None
+
+
+def _sanitize_exception(exc: Exception) -> str:
+    """Sanitize exception message to prevent credential/topology leakage.
+
+    Returns:
+        Sanitized error message
+    """
+    msg = str(exc)
+
+    # Remove common credential patterns
+    # Match: Bearer <token>, api_key=<value>, password=<value>, etc.
+    msg = re.sub(r'Bearer\s+[^\s]+', 'Bearer [REDACTED]', msg, flags=re.IGNORECASE)
+    msg = re.sub(r'(api[-_]?key|token|password|secret)\s*[=:]\s*[^\s&]+', r'\1=[REDACTED]', msg, flags=re.IGNORECASE)
+
+    # Remove IP addresses and hostnames that might expose internal topology
+    msg = re.sub(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', '[IP]', msg)
+    msg = re.sub(r'https?://[^\s/]+', 'https://[HOST]', msg, flags=re.IGNORECASE)
+
+    return msg
+
+
+def _validate_http_status(status: int) -> Tuple[bool, Optional[str]]:
+    """Validate HTTP status code is in valid range (100-599).
+
+    Returns:
+        Tuple of (is_valid, error_message)
+    """
+    if not isinstance(status, int) or status < 100 or status > 599:
+        return False, f"Invalid HTTP status: {status}. Must be between 100 and 599"
+    return True, None
 
 
 def http_request(url: str, timeout: int = 10) -> Dict[str, Any]:
@@ -78,7 +177,8 @@ def check_route(base_url: str, path: str, expected_status: int = 200) -> Dict[st
         result["observed_status"] = response["status"]
         result["latency_ms"] = response["latency_ms"]
     except Exception as e:
-        result["error"] = str(e)
+        # Sanitize exception to prevent credential/topology leakage
+        result["error"] = _sanitize_exception(e)
 
     return result
 
@@ -99,6 +199,15 @@ def cloudflare_api_request(account_id: str, worker_name: str,
     Raises:
         Exception: On API errors
     """
+    # Validate identifiers to prevent injection
+    valid, error = _validate_identifier(account_id, "account_id")
+    if not valid:
+        raise Exception(error)
+
+    valid, error = _validate_identifier(worker_name, "worker_name")
+    if not valid:
+        raise Exception(error)
+
     # Look for Cloudflare API token in environment
     api_token = os.environ.get('CLOUDFLARE_API_TOKEN')
     if not api_token:
@@ -126,7 +235,7 @@ def cloudflare_api_request(account_id: str, worker_name: str,
         if response.status_code == 401:
             raise Exception("API authentication failed")
         if response.status_code == 403:
-            raise Exception("API access forbidden - check permissions")
+            raise Exception("API access forbidden")
         if response.status_code >= 400:
             raise Exception(f"API returned status {response.status_code}")
 
@@ -139,12 +248,13 @@ def cloudflare_api_request(account_id: str, worker_name: str,
         }
     except requests.exceptions.Timeout:
         raise Exception("API request timeout")
-    except requests.exceptions.ConnectionError as e:
-        raise Exception(f"API connection failed: {str(e)}")
+    except requests.exceptions.ConnectionError:
+        raise Exception("API connection failed")
     except Exception as e:
-        if "API" in str(e) or "authentication" in str(e).lower():
+        if "API" in str(e) or "authentication" in str(e).lower() or "access forbidden" in str(e).lower():
             raise
-        raise Exception(f"Failed to read Cloudflare metrics: {str(e)}")
+        # Sanitize any other exceptions
+        raise Exception(_sanitize_exception(e))
 
 
 def read_platform_signals(platform_config: Dict[str, Any],
@@ -184,7 +294,8 @@ def read_platform_signals(platform_config: Dict[str, Any],
             raise Exception(f"Unsupported platform source: {source}")
 
     except Exception as e:
-        result["error"] = str(e)
+        # Sanitize exception to prevent credential/topology leakage
+        result["error"] = _sanitize_exception(e)
         result["read_success"] = False
 
     return result
@@ -223,6 +334,44 @@ def verify_health(health_config: Optional[Dict[str, Any]],
             "deployment_status_text": "deployed with health unknown"
         }
 
+    # Validate URL scheme
+    valid, error = _validate_url_scheme(base_url)
+    if not valid:
+        return {
+            "outcome": "unknown",
+            "reason": f"Configuration error: {error}",
+            "warning": "Health could not be verified - invalid configuration",
+            "deployment_status_text": "deployed with health unknown"
+        }
+
+    # Check for SSRF targets
+    try:
+        parsed = urlparse(base_url)
+        if parsed.hostname:
+            is_ssrf, rejection_reason = _is_ssrf_target(parsed.hostname)
+            if is_ssrf:
+                return {
+                    "outcome": "unknown",
+                    "reason": rejection_reason,
+                    "warning": "Health could not be verified - target rejected by SSRF protection",
+                    "deployment_status_text": "deployed with health unknown"
+                }
+    except Exception:
+        # If we can't parse the URL properly, let it fail during the request
+        pass
+
+    # Validate expected_status for all routes
+    for route_spec in routes:
+        expected_status = route_spec.get("expected_status", 200)
+        valid, error = _validate_http_status(expected_status)
+        if not valid:
+            return {
+                "outcome": "unknown",
+                "reason": f"Configuration error: {error}",
+                "warning": "Health could not be verified - invalid configuration",
+                "deployment_status_text": "deployed with health unknown"
+            }
+
     # Check all routes
     route_results = []
     route_failures = []
@@ -251,14 +400,15 @@ def verify_health(health_config: Optional[Dict[str, Any]],
                     "error": result.get("error")
                 })
         except Exception as e:
+            sanitized_error = _sanitize_exception(e)
             route_results.append({
                 "route": path,
                 "expected_status": expected_status,
-                "error": str(e)
+                "error": sanitized_error
             })
             route_failures.append({
                 "route": path,
-                "error": str(e)
+                "error": sanitized_error
             })
 
     # Read platform signals if configured
