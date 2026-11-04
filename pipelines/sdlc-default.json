@@ -22,7 +22,8 @@
         "reviewer-security",
         "reviewer-tests",
         "reviewer-architecture",
-        "reviewer-design"
+        "reviewer-design",
+        "reviewer-ux"
       ]
     },
     {

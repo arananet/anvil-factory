@@ -90,11 +90,11 @@ if station == "intake":
             "surfaces": ["security", "api"]
         }
     elif risk_mode == "null_risk":
-        # S3: null risk (unrated)
+        # S3: null risk (unrated) - non-UI work
         output = {
             "intake_outcome": {"outcome": "accepted"},
             "risk": None,
-            "surfaces": ["ui"]
+            "surfaces": ["api"]
         }
     elif risk_mode == "medium_ui_surface":
         # S3: medium risk with ui surface
@@ -347,7 +347,7 @@ class TestFullPanelRouting(unittest.TestCase):
             wo = WorkOrder(id="wo-routing-007", kind="feature",
                           title="Refactor payment processing")
             report = run_pipeline(proj, sdlc_pipe(reg), wo, registry=reg,
-                                  executor=routing_executor(tmp, "medium_ui_surface"))
+                                  executor=routing_executor(tmp, "medium_security_surface"))
 
             # Verify work order has medium risk
             wo_file = proj / "work_orders" / "wo-routing-007.json"

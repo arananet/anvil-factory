@@ -4,7 +4,7 @@
     { "station": "intake" },
     { "station": "brief-writer" },
     { "station": "writer" },
-    { "parallel": ["reviewer-facts", "reviewer-voice", "reviewer-design"] },
+    { "parallel": ["reviewer-facts", "reviewer-voice", "reviewer-design", "reviewer-ux"] },
     { "station": "approver" },
     { "station": "triage-human" },
     { "station": "publisher" }

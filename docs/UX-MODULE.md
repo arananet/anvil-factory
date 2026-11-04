@@ -71,6 +71,7 @@ Matching is **deterministic**: the same product type with the same inputs always
 
 When a station packet is built for:
 - **reviewer-design** (on every run)
+- **reviewer-ux** (on every run)
 - **builder** (when work is a UI surface)
 - **writer** (when authoring or revising design/DESIGN.md)
 
@@ -96,6 +97,12 @@ Other stations' packets are unchanged.
 - **Authority rule**: The project's design system wins. A deviation from the knowledge base alone is not a finding; a deviation from the project's design system is.
 - When referencing the knowledge base in a finding or suggestion, names the specific entry (e.g., "metrics-blue palette", "data-dense style", "accessibility guideline for contrast")
 
+**reviewer-ux**:
+- Judges user experience: flows and task completion, usability heuristics, accessibility basics, and interface copy clarity
+- Uses the UX guidelines slice from the knowledge base and (when available) rendered screenshots
+- Explicitly excludes visual system compliance (tokens, type scale, palette) as reviewer-design's lens
+- When there are no rendered screenshots, states in the review that it judged from source and knowledge slice without rendered evidence
+
 ## The Guide Layer: Guided Design Stations
 
 The stations that apply the knowledge base are **guided design stations**, marked in the catalog with:
@@ -114,6 +121,7 @@ The designated model is the **design model from the factory's routing policy** (
 - **Design authoring stations**: stations whose work order targets design/DESIGN.md
 - **builder**: when its work is a UI surface
 - **reviewer-design**: always
+- **reviewer-ux**: always
 
 Wiring a project's runtime to use that model is the project's configuration act, as the policy states. The designation in the catalog makes the module's shape explicit: which stations are guided, and to which model.
 
