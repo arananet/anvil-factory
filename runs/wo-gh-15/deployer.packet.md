@@ -65,6 +65,13 @@ GATE LOOPBACK (round 2). Round 1 verdict was changes_requested with 5 of 5 revie
 
 Guardrails: the charter document and quality.py's criteria content were not faulted; do not rewrite them beyond the wiring. No changes to the review parsing contract beyond the reviewer-design dual-section contract item 2 names (the parser and producer mechanisms themselves are frozen), the checks gate base ref behavior, or other items' modules. Keep the full suite green and every pipeline valid; docs and CHANGELOG Unreleased updated for the wiring. No em dash or en dash characters in any produced file.
 
+
+PURE VERIFICATION ROUND (round 3). Full history, disclosed: round 1 built anvil/quality.py and the charter but left the module orphaned (runner never called it, station contracts not updated, no path validation); verdict changes_requested, 5 of 5 counted after routing (spec and tests pass; security, architecture, design changes_requested). Round 2 implemented the loopback scope: runner wiring for the charter and anchor sections and the S2 report warning, the reviewer-design and reviewer-ux dual-section contracts, the generating stations' S4 self-comparison duty, WorkOrder path validation, the rendered surface contrast and responsive fixes, plus 14 real pipeline integration tests in tests/test_quality_wiring.py. Its checks gate shows the suite green on that tree (388 tests, OK) but failed the run on protected path violations, because round 2 modified three files that existed in its recorded base ref: tests/test_quality_standard.py (two call sites updated for the new packet_anchor_section signature, assertions unchanged), tests/test_quality_standard_coverage.md (additive documentation), and tests/test_review_parsing_integrity.py. All reviewers were skipped (no_reviews).
+
+One round 2 change is named here for explicit reviewer judgment: tests/test_review_parsing_integrity.py previously required every reviewer prompt's Output Format section to be identical modulo station id (the wo-gh-16 contract). Round 2 scoped that identity assertion to the non-visual reviewers and carved out reviewer-design and reviewer-ux, whose formats this item's spec S1 deliberately extends with the dual-section quality structure; the carve-out is documented in the test with its reason. Reviewer-tests and reviewer-spec: judge whether that scoping is the honest reconciliation of the two contracts or an impermissible weakening, and record the judgment.
+
+The standing tree at this round's start contains the complete item with the suite green. THIS ROUND MAKES NO CHANGES. The builder is barred from modifying, adding or deleting any file; its task is verification and reporting only. Reviewers: judge the standing tree against the spec scenarios S1 to S7 and the round 1 findings list (runner wiring, station contracts, path and input validation, rendered surface contrast and 390x844 responsive behavior with this run's rendered evidence). The verdict of this round is the item's verdict of record. If a reviewer finds the standing tree genuinely incomplete against the spec, name the specific gap for the record rather than requesting changes this round is barred from making.
+
 - risk_hints: 
 - status: new
 
@@ -74,13 +81,13 @@ Guardrails: the charter document and quality.py's criteria content were not faul
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
-- reviewer-spec: skipped
-- reviewer-security: skipped
-- reviewer-tests: skipped
-- reviewer-architecture: skipped
-- reviewer-design: skipped
-- reviewer-ux: skipped
+- checks-gate: passed
+- reviewer-spec: executed
+- reviewer-security: executed
+- reviewer-tests: executed
+- reviewer-architecture: executed
+- reviewer-design: executed
+- reviewer-ux: routed_out
 - approver: completed
+- approver: loopback
 - triage-human: completed

@@ -22,6 +22,39 @@ Implement the spec so the scenario tests pass.
 - Keep the change small and mapped to a spec scenario where one applies.
 - **Design citation**: When authoring or revising design/DESIGN.md, include a "Design knowledge sources" note citing the knowledge entries you drew from by data kind and entry name (e.g., "Style: modern-minimal", "Palette: metrics-blue", "Guideline: accessibility - contrast ratio"). If the knowledge came from an operator-supplied pack, cite it as "operator-supplied pack entry" without naming the pack's origin.
 
+### Visual Output Quality Verification
+
+When your packet includes a Quality Charter section (visual runs only), you must verify each produced output against the run's reference anchors and charter criteria before the review step:
+
+1. **Read the output**: Examine each visual deliverable you produce (images, UI components, rendered interfaces).
+
+2. **Compare against anchors**: If reference anchors are provided, compare your output against them. Check how your output measures up to the anchor's quality bar across the charter criteria.
+
+3. **Check charter criteria**: Evaluate your output against the observable criteria from the Quality Charter:
+   - For physical products: materials, light, contact, scale
+   - For games/illustrations: the stated standard from the project design system
+
+4. **Record the comparison**: Document your findings in the run evidence directory (runs/{work_order_id}/evidence/) as a JSON file named `{output_filename}.comparison.json` with this structure:
+
+```json
+{
+  "output": "path/to/generated/output.png",
+  "anchor_cited": "path/to/reference/anchor.png or null if none",
+  "criteria_checked": ["materials", "light", "contact", "scale"],
+  "gaps": [
+    {
+      "criterion": "materials",
+      "description": "Surfaces read as plastic rather than the metal shown in anchor"
+    }
+  ],
+  "statement": "Explicit statement: 'No gaps found at charter bar' or description of gaps identified"
+}
+```
+
+5. **Evidence, not verdict**: Your comparison is evidence for reviewers, not a final verdict. Record what you observe; reviewers are not bound by your self-assessment.
+
+This verification step only applies when the Quality Charter section is present in your packet. For non-visual work, this step does not apply.
+
 
 ## Work order
 
@@ -66,6 +99,13 @@ GATE LOOPBACK (round 2). Round 1 verdict was changes_requested with 5 of 5 revie
 5. TESTS. Add regression tests in the factory suite style proving the wiring: a visual run's generating and reviewing packets contain the charter section and the anchor section; a visual run with no anchors produces the report warning; a non-visual run contains no charter text anywhere (S3); the reviewer-design dual-section output validates against the contract; traversal paths in the new WorkOrder fields are rejected.
 
 Guardrails: the charter document and quality.py's criteria content were not faulted; do not rewrite them beyond the wiring. No changes to the review parsing contract beyond the reviewer-design dual-section contract item 2 names (the parser and producer mechanisms themselves are frozen), the checks gate base ref behavior, or other items' modules. Keep the full suite green and every pipeline valid; docs and CHANGELOG Unreleased updated for the wiring. No em dash or en dash characters in any produced file.
+
+
+PURE VERIFICATION ROUND (round 3). Full history, disclosed: round 1 built anvil/quality.py and the charter but left the module orphaned (runner never called it, station contracts not updated, no path validation); verdict changes_requested, 5 of 5 counted after routing (spec and tests pass; security, architecture, design changes_requested). Round 2 implemented the loopback scope: runner wiring for the charter and anchor sections and the S2 report warning, the reviewer-design and reviewer-ux dual-section contracts, the generating stations' S4 self-comparison duty, WorkOrder path validation, the rendered surface contrast and responsive fixes, plus 14 real pipeline integration tests in tests/test_quality_wiring.py. Its checks gate shows the suite green on that tree (388 tests, OK) but failed the run on protected path violations, because round 2 modified three files that existed in its recorded base ref: tests/test_quality_standard.py (two call sites updated for the new packet_anchor_section signature, assertions unchanged), tests/test_quality_standard_coverage.md (additive documentation), and tests/test_review_parsing_integrity.py. All reviewers were skipped (no_reviews).
+
+One round 2 change is named here for explicit reviewer judgment: tests/test_review_parsing_integrity.py previously required every reviewer prompt's Output Format section to be identical modulo station id (the wo-gh-16 contract). Round 2 scoped that identity assertion to the non-visual reviewers and carved out reviewer-design and reviewer-ux, whose formats this item's spec S1 deliberately extends with the dual-section quality structure; the carve-out is documented in the test with its reason. Reviewer-tests and reviewer-spec: judge whether that scoping is the honest reconciliation of the two contracts or an impermissible weakening, and record the judgment.
+
+The standing tree at this round's start contains the complete item with the suite green. THIS ROUND MAKES NO CHANGES. The builder is barred from modifying, adding or deleting any file; its task is verification and reporting only. Reviewers: judge the standing tree against the spec scenarios S1 to S7 and the round 1 findings list (runner wiring, station contracts, path and input validation, rendered surface contrast and 390x844 responsive behavior with this run's rendered evidence). The verdict of this round is the item's verdict of record. If a reviewer finds the standing tree genuinely incomplete against the spec, name the specific gap for the record rather than requesting changes this round is barred from making.
 
 - risk_hints: 
 - status: new

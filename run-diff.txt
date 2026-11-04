@@ -1,55 +1,47 @@
- CHANGELOG.md                                       |   2 +-
- anvil/model.py                                     |  56 ++-
- anvil/quality.py                                   |  41 +-
- anvil/runner.py                                    |  51 ++-
- runs/wo-gh-15/builder.output.md                    |  88 +++--
- runs/wo-gh-15/builder.packet.md                    |  15 +
- runs/wo-gh-15/checks-gate.pre-review.output.md     |  43 ++-
- runs/wo-gh-15/deployer.packet.md                   |  31 +-
+ runs/wo-gh-15/builder.output.md                    |  70 ++++-----
+ runs/wo-gh-15/builder.packet.md                    |  40 +++++
+ runs/wo-gh-15/checks-gate.pre-review.output.md     |  39 +----
+ runs/wo-gh-15/deployer.packet.md                   |  23 ++-
  runs/wo-gh-15/envelopes/approver.envelope.json     |   2 +-
  runs/wo-gh-15/envelopes/builder.envelope.json      |   4 +-
- runs/wo-gh-15/envelopes/checks-gate.envelope.json  |  42 +-
+ runs/wo-gh-15/envelopes/checks-gate.envelope.json  |  43 +-----
  runs/wo-gh-15/envelopes/deployer.envelope.json     |   2 +-
  runs/wo-gh-15/envelopes/intake.envelope.json       |   2 +-
  runs/wo-gh-15/envelopes/observer.envelope.json     |   2 +-
- .../envelopes/reviewer-architecture.envelope.json  |  26 +-
- .../envelopes/reviewer-design.envelope.json        |  21 +-
- .../envelopes/reviewer-security.envelope.json      |  22 +-
- .../wo-gh-15/envelopes/reviewer-spec.envelope.json |  18 +-
- .../envelopes/reviewer-tests.envelope.json         |  18 +-
+ .../envelopes/reviewer-architecture.envelope.json  |  18 ++-
+ .../envelopes/reviewer-design.envelope.json        |  18 ++-
+ .../envelopes/reviewer-security.envelope.json      |  18 ++-
+ .../wo-gh-15/envelopes/reviewer-spec.envelope.json |  18 ++-
+ .../envelopes/reviewer-tests.envelope.json         |  18 ++-
  runs/wo-gh-15/envelopes/reviewer-ux.envelope.json  |   4 +-
  runs/wo-gh-15/envelopes/spec-writer.envelope.json  |   2 +-
  runs/wo-gh-15/envelopes/test-writer.envelope.json  |   2 +-
  runs/wo-gh-15/envelopes/triage-human.envelope.json |   2 +-
- runs/wo-gh-15/evidence/screenshot-1440x900.png     | Bin 161637 -> 161279 bytes
- runs/wo-gh-15/evidence/screenshot-390x844.png      | Bin 80754 -> 76741 bytes
- runs/wo-gh-15/intake.output.md                     |   4 +-
- runs/wo-gh-15/intake.packet.md                     |  15 +
- runs/wo-gh-15/observer.output.md                   |   4 +-
- runs/wo-gh-15/observer.packet.md                   |  31 +-
- runs/wo-gh-15/report.json                          | 171 ++++-----
- runs/wo-gh-15/report.md                            |  30 +-
- runs/wo-gh-15/reviewer-architecture.packet.md      |  24 +-
- runs/wo-gh-15/reviewer-design.packet.md            |  26 +-
- runs/wo-gh-15/reviewer-security.packet.md          |  20 +-
- runs/wo-gh-15/reviewer-spec.packet.md              |  18 +-
- runs/wo-gh-15/reviewer-tests.packet.md             |  22 +-
- runs/wo-gh-15/reviewer-ux.packet.md                |  28 +-
+ runs/wo-gh-15/intake.output.md                     |  12 +-
+ runs/wo-gh-15/intake.packet.md                     |   7 +
+ runs/wo-gh-15/observer.output.md                   |   2 +-
+ runs/wo-gh-15/observer.packet.md                   |  23 ++-
+ runs/wo-gh-15/report.json                          | 171 ++++++++++++---------
+ runs/wo-gh-15/report.md                            |  36 ++---
+ runs/wo-gh-15/reviewer-architecture.output.md      |  44 +++++-
+ runs/wo-gh-15/reviewer-architecture.packet.md      |  16 +-
+ runs/wo-gh-15/reviewer-architecture.review.json    |  12 +-
+ runs/wo-gh-15/reviewer-design.output.md            |  26 +++-
+ runs/wo-gh-15/reviewer-design.packet.md            |  65 ++++++--
+ runs/wo-gh-15/reviewer-design.review.json          |  16 +-
+ runs/wo-gh-15/reviewer-security.output.md          |  39 +++--
+ runs/wo-gh-15/reviewer-security.packet.md          |  12 +-
+ runs/wo-gh-15/reviewer-security.review.json        |   8 +-
+ runs/wo-gh-15/reviewer-spec.output.md              |  60 ++++++--
+ runs/wo-gh-15/reviewer-spec.packet.md              |  10 +-
+ runs/wo-gh-15/reviewer-tests.output.md             |  35 +++--
+ runs/wo-gh-15/reviewer-tests.packet.md             |  14 +-
+ runs/wo-gh-15/reviewer-ux.packet.md                |  60 ++++++--
  runs/wo-gh-15/routing.json                         |  17 +-
- runs/wo-gh-15/spec-writer.output.md                |  16 +-
- runs/wo-gh-15/spec-writer.packet.md                |  15 +
- runs/wo-gh-15/swimlane.md                          |  40 +-
- runs/wo-gh-15/test-writer.output.md                |  80 ++--
- runs/wo-gh-15/test-writer.packet.md                |  15 +
- stations/brief-writer/PROMPT.md                    |  33 ++
- stations/builder/PROMPT.md                         |  33 ++
- stations/media-producer/PROMPT.md                  |  33 ++
- stations/reviewer-design/PROMPT.md                 |  47 ++-
- stations/reviewer-ux/PROMPT.md                     |  40 +-
- status/index.html                                  |  17 +-
- tests/test_quality_standard.py                     |   8 +-
- tests/test_quality_standard_coverage.md            |  44 ++-
- tests/test_quality_wiring.py                       | 427 +++++++++++++++++++++
- tests/test_review_parsing_integrity.py             |  46 ++-
- work_orders/wo-gh-15.json                          |   5 +-
- 54 files changed, 1351 insertions(+), 454 deletions(-)
+ runs/wo-gh-15/spec-writer.output.md                |  47 +++++-
+ runs/wo-gh-15/spec-writer.packet.md                |   7 +
+ runs/wo-gh-15/swimlane.md                          |  38 ++---
+ runs/wo-gh-15/test-writer.output.md                |  41 ++---
+ runs/wo-gh-15/test-writer.packet.md                |   7 +
+ work_orders/wo-gh-15.json                          |  13 +-
+ 46 files changed, 731 insertions(+), 434 deletions(-)

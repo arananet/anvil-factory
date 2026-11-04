@@ -1,8 +1,16 @@
 {
   "station": "reviewer-design",
   "verdict": "changes_requested",
-  "findings": [
-    "Scale Contrast quality bar violation: Secondary text (e.g., 'configured: default', 'configured: claude-sonnet-4-5') uses gray that appears to fall below the minimum 4.5:1 contrast ratio required for normal text against the dark background. Visible in both screenshot-1440x900.png and screenshot-390x844.png.",
-    "Responsive Behavior quality bar concern: The station data table in screenshot-390x844.png (mobile view) displays all columns (Station, Status, Duration ms, Cost, Artifacts) on a 390px viewport. This creates potential violations: (1) table cells may contain touch targets smaller than the required 44x44px minimum, and (2) the table may require horizontal scrolling, violating the 'No horizontal scrolling on standard viewports' requirement. The quality bars require 'Layout works on mobile, tablet, and desktop' — data tables typically need responsive treatment (card layouts, scrollable regions with clear affordance, or progressive disclosure) on mobile viewports."
-  ]
+  "compliance": {
+    "verdict": "pass",
+    "findings": []
+  },
+  "quality": {
+    "verdict": "changes_requested",
+    "findings": [
+      "S7 incomplete implementation: The WorkOrder model has identity_reference, identity_traits, and deliverable_set fields with path validation (COMPLETE). The docs/QUALITY_CHARTER.md documents the same-subject test requirement at lines 93-103 (COMPLETE). However, the reviewer-design PROMPT.md does not document the same-subject test duty that S7 requires reviewer-design to perform. The packet_quality_charter_section function injects only the observable criteria, not the full charter text with station duties. A reviewer receiving a work order with identity_reference and deliverable_set would not know from the packet or prompt that a same-subject test is required. The fixture tests in test_quality_standard.py verify the expected review structure but no integration test proves reviewer-design actually produces same_subject_test reviews.",
+      "Parsing integrity test carve-out judgment (explicitly requested): HONEST RECONCILIATION. The test_review_parsing_integrity.py test at lines 663-702 carves out reviewer-design and reviewer-ux from the identity requirement for Output Format sections. This reconciles two legitimately conflicting contracts: wo-gh-16 requires identical Output Format sections across all reviewers; wo-gh-15 S1 requires reviewer-design and reviewer-ux to have dual-section structure for quality judgments. The carve-out maintains wo-gh-16 for the 7 standard reviewers (enforcing identical formats) while allowing the 2 visual reviewers their required extension. The carve-out is documented with its reason in the test code. This is the correct resolution when two specs genuinely conflict on scope."
+    ],
+    "anchor": "charter floor only"
+  }
 }

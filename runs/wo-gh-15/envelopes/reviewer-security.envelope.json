@@ -3,8 +3,18 @@
   "from_station": "reviewer-security",
   "to_station": "reviewer-tests",
   "work_order_id": "wo-gh-15",
-  "artifact_path": "runs/wo-gh-15/reviewer-security.packet.md",
-  "status": "skipped",
-  "created_at": "2026-11-04T18:07:15.382823+00:00",
-  "configured_model": "review-strong"
+  "artifact_path": "runs/wo-gh-15/reviewer-security.output.md",
+  "status": "executed",
+  "created_at": "2026-11-04T18:28:54.739299+00:00",
+  "review": {
+    "station": "reviewer-security",
+    "verdict": "pass",
+    "findings": []
+  },
+  "configured_model": "review-strong",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
 }

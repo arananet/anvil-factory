@@ -7,8 +7,8 @@
     {
       "station": "intake",
       "status": "executed",
-      "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 41873.225,
+      "detail": "Executed by command; outcome: unknown",
+      "duration_ms": 29523.079,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/intake.output.md"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/spec-writer.output.md",
-      "duration_ms": 80435.658,
+      "duration_ms": 71226.298,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/spec-writer.output.md"
@@ -40,7 +40,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/test-writer.output.md",
-      "duration_ms": 212939.12,
+      "duration_ms": 99514.992,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/test-writer.output.md"
@@ -56,12 +56,12 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/builder.output.md",
-      "duration_ms": 584884.329,
+      "duration_ms": 268591.531,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/builder.output.md"
       ],
-      "configured_model": "openai/gpt-6-astra",
+      "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
       "executor": {
         "kind": "command",
@@ -70,9 +70,9 @@
     },
     {
       "station": "checks-gate",
-      "status": "failed",
-      "detail": "Gate failed: 1 checks, protected paths: fail",
-      "duration_ms": 26861.883,
+      "status": "passed",
+      "detail": "Gate passed: 1 checks, protected paths: pass",
+      "duration_ms": 28680.477,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/checks-gate.pre-review.output.md"
@@ -92,99 +92,95 @@
         "anvil.json",
         "pipelines/"
       ],
-      "protected_path_verdict": "fail",
-      "protected_path_findings": [
-        "Protected path violation: tests/test_quality_standard_coverage.md (base ref file modified/deleted, matches tests/)",
-        "Protected path violation: tests/test_review_parsing_integrity.py (base ref file modified/deleted, matches tests/)",
-        "Protected path violation: tests/test_quality_standard.py (base ref file modified/deleted, matches tests/)"
-      ],
-      "gate_verdict": "fail"
-    },
-    {
-      "station": "loopback",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: Gate failure: Protected path violation: tests/test_quality_standard_coverage.md (base ref file modified/deleted, matches tests/); Protected path violation: tests/test_review_parsing_integrity.py (base ref file modified/deleted, matches tests/); Protected path violation: tests/test_quality_standard.py (base ref file modified/deleted, matches tests/)",
-      "reason": "Gate failure: Protected path violation: tests/test_quality_standard_coverage.md (base ref file modified/deleted, matches tests/); Protected path violation: tests/test_review_parsing_integrity.py (base ref file modified/deleted, matches tests/); Protected path violation: tests/test_quality_standard.py (base ref file modified/deleted, matches tests/)",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null,
-      "feedback": "",
-      "from_station": "checks-gate"
+      "protected_path_verdict": "pass",
+      "protected_path_findings": [],
+      "gate_verdict": "pass"
     },
     {
       "station": "reviewer-spec",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 1.494,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-spec.output.md",
+      "duration_ms": 197897.211,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-15/reviewer-spec.packet.md"
+        "runs/wo-gh-15/reviewer-spec.output.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": null
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
     },
     {
       "station": "reviewer-security",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.311,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-security.output.md",
+      "duration_ms": 214865.83,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-15/reviewer-security.packet.md"
+        "runs/wo-gh-15/reviewer-security.output.md"
       ],
       "configured_model": "review-strong",
       "executed_model": null,
-      "executor": null
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
     },
     {
       "station": "reviewer-tests",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.316,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-tests.output.md",
+      "duration_ms": 141667.25,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-15/reviewer-tests.packet.md"
+        "runs/wo-gh-15/reviewer-tests.output.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": null
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
     },
     {
       "station": "reviewer-architecture",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.286,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-architecture.output.md",
+      "duration_ms": 199790.772,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-15/reviewer-architecture.packet.md"
+        "runs/wo-gh-15/reviewer-architecture.output.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": null
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
     },
     {
       "station": "reviewer-design",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 1.16,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-design.output.md",
+      "duration_ms": 289715.91,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-15/reviewer-design.packet.md"
+        "runs/wo-gh-15/reviewer-design.output.md"
       ],
       "configured_model": "openai/gpt-6-astra",
       "executed_model": null,
-      "executor": null
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
     },
     {
       "station": "reviewer-ux",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 1.066,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out: no UI surface",
+      "duration_ms": 2.548,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/reviewer-ux.packet.md"
@@ -196,13 +192,26 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.039,
+      "detail": "Approver verdict: changes_requested",
+      "duration_ms": 0.041,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/report.json"
       ],
       "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "approver",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Approver verdict: changes_requested",
+      "reason": "Approver verdict: changes_requested",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
       "executed_model": null,
       "executor": null
     },
@@ -221,7 +230,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-15/deployer.packet.md",
-      "duration_ms": 0.275,
+      "duration_ms": 0.218,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/deployer.packet.md"
@@ -234,7 +243,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/observer.output.md",
-      "duration_ms": 55509.635,
+      "duration_ms": 70218.645,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/observer.output.md"
@@ -247,7 +256,7 @@
       }
     }
   ],
-  "verdict": "no_reviews",
+  "verdict": "changes_requested",
   "human_required": true,
   "max_loopbacks": 2,
   "loopbacks": 1,
@@ -256,25 +265,45 @@
   "risk_hints": [],
   "decision": {
     "approver": {
-      "reviews_counted": [],
+      "reviews_counted": [
+        {
+          "station": "reviewer-spec",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-security",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-architecture",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "changes_requested"
+        }
+      ],
       "reviews_expected": [
         "reviewer-spec",
         "reviewer-security",
         "reviewer-tests",
         "reviewer-architecture",
-        "reviewer-design",
-        "reviewer-ux"
+        "reviewer-design"
       ],
-      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 6.)"
+      "rule": "Reviewer reviewer-design requested changes. (Expected 5 reviews after routing.)"
     },
     "human_gate": {
       "required": true,
-      "rule": "Verdict is no_reviews, not approved, so a human is required.",
+      "rule": "Verdict is changes_requested, not approved, so a human is required.",
       "hints_matched": []
     }
   },
   "warnings": [],
-  "base_ref": "cf2501cf25620bab53a3a271f6d0b8185e9fe091",
+  "base_ref": "acc5c1d1f5c22c1f01d65ffb384258c8f4592b97",
   "evidence": [
     {
       "type": "screenshot",
@@ -294,6 +323,6 @@
   "cost": {
     "total": 0,
     "measured_steps": 0,
-    "unmeasured_steps": 5
+    "unmeasured_steps": 10
   }
 }
