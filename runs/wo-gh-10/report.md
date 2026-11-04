@@ -9,26 +9,26 @@ Status: new
 
 Outcome: accepted
 
-Risk: medium
-
-Surfaces: data, api, content
+Risk: low
 
 ## Routing
 
-**Decision**: Medium risk: full panel at policy models
+**Decision**: Low risk with no UI and no security surface: reduced panel at cheaper model
 
-**Selected reviewers** (5):
-- reviewer-spec (model: review-balanced)
-- reviewer-security (model: review-strong)
-- reviewer-tests (model: review-balanced)
-- reviewer-architecture (model: review-balanced)
-- reviewer-design (model: review-balanced)
+**Selected reviewers** (2):
+- reviewer-spec (model: review-cheap)
+- reviewer-tests (model: review-cheap)
+
+**Routed out** (3):
+- reviewer-security: Routed out by low risk rule (not in reduced panel)
+- reviewer-design: Routed out by low risk rule (not in reduced panel)
+- reviewer-architecture: Routed out by low risk rule (not in reduced panel)
 
 ## Verdict
 
 Verdict: no_reviews
 
-No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)
+No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 2.)
 
 ## Steps
 

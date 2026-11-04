@@ -6,7 +6,6 @@ from pathlib import Path
 # accepts a tiny flat subset fallback for hand edits described in the docs.
 
 DEFAULT_MODELS = {
-    "intake": "reasoning-strong",
     "blueprint": "reasoning-strong",
     "spec-writer": "reasoning-strong",
     "test-writer": "reasoning-strong",

@@ -56,6 +56,16 @@ GATE LOOPBACK 1 (after run 41761646614, verdict changes_requested, reviews count
 3. Legacy cost override: anvil/runner.py (around lines 864-866) lets usage.cost override the calculated cost, and the spec does not document that behavior. Either remove the legacy path, or document it in the cost measurement spec and docs as intentional backwards compatibility. State which option was taken in the builder output. The suite stays green either way.
 
 Everything else from round 1 stands (reviewer-spec, reviewer-security, reviewer-tests and reviewer-design passed; the architecture review confirms anvil/cost.py separates concerns correctly and cost does not affect verdicts). Standing discipline unchanged: the builder must not modify tests/, anvil.json, pipelines/ or .github/workflows/. Keep the whole suite green and every pipeline valid. Update CHANGELOG Unreleased if the change set changes.
+
+CLOSING VERIFICATION RUN (after run 41764193801, verdict no_reviews: the checks gate failed on protected paths because the loopback builder deleted the round 1 test files, and deleting base ref files under tests/ is itself a protected path violation; the suite itself passed). Operator audit of the standing tree: the legacy cost override is removed, the builder test files are gone, BUT the intake changes are still present (anvil/config.py DEFAULT_MODELS gained an intake entry and stations/intake/station.json model was changed), so finding 2 is not closed. This run closes the order with a minimal builder delta:
+
+1. The builder reverts exactly the two intake changes and nothing else: remove the "intake": "reasoning-strong" entry it added to DEFAULT_MODELS in anvil/config.py, and restore the stations/intake/station.json model field to "default". The builder must not add, modify or delete anything under tests/, anvil.json, pipelines/ or .github/workflows/ in this run; the absence of the round 1 builder test files is the correction and stays.
+
+2. The test-writer station authors the cost measurement tests in its own step: real tests mapped to the cost measurement spec scenarios, calling the implementation (anvil/cost.py and the runner's cost recording) and asserting measured cost, unmeasured null handling and report contents. The builder-authored copies were removed in the loopback; coverage must come from the test-writer.
+
+3. Everything else stands as audited: anvil/cost.py, the price table configuration, the cost section in run reports, and the removed legacy override (anvil/runner.py no longer lets usage.cost override the calculated cost).
+
+On an approved verdict this order closes. Keep the whole suite green and every pipeline valid.
 - risk_hints: 
 - status: new
 

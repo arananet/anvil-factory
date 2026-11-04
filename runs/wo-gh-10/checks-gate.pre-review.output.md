@@ -2,72 +2,39 @@
 Basis: builder_delta
 Attempt: 1
 
-# Protected Path Violations
-Protected path violation: tests/test_cost_measurement.py (base ref file modified/deleted, matches tests/)
-Protected path violation: tests/test_cost_measurement_README.md (base ref file modified/deleted, matches tests/)
-
-# Protected Path Additions (Observed, Not Violations)
-Protected path addition (observed): tests/__pycache__/test_risk_routing.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_gates.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_community.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_greenfield.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_decision.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_rendered_design_review.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_supervisor.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_design.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_brain.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_intake_outcomes.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_onboard.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_review_producer.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_statuspage.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_review_parsing_integrity.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_execution.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_anvil.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_checks_gate.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_content.cpython-312.pyc (matches tests/)
-
 # Check Commands
 ## Command 1: python -m unittest discover -s tests -p 'test_*.py'
-Exit code: 0
+Exit code: 1
 Output:
 ```
-name
-hint: to use in all of your new repositories, which will suppress this warning,
-hint: call:
-hint:
-hint: 	git config --global init.defaultBranch <name>
-hint:
-hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
-hint: 'development'. The just-created branch can be renamed via this command:
-hint:
-hint: 	git branch -m <name>
-hint:
-hint: Disable this message with "git config set advice.defaultBranchName false"
-Switched to a new branch 'work-branch'
-.hint: Using 'master' as the name for the initial branch. This default branch name
-hint: will change to "main" in Git 3.0. To configure the initial branch name
-hint: to use in all of your new repositories, which will suppress this warning,
-hint: call:
-hint:
-hint: 	git config --global init.defaultBranch <name>
-hint:
-hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
-hint: 'development'. The just-created branch can be renamed via this command:
-hint:
-hint: 	git branch -m <name>
-hint:
-hint: Disable this message with "git config set advice.defaultBranchName false"
-Switched to a new branch 'work-branch'
-...................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 43181)>
+6/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 44215)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-.../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 34881)>
+.../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 36117)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ......................................................................................................................................s.....................................
+======================================================================
+FAIL: test_run_report_includes_cost_section (test_cost_measurement.TestCostInRunReport.test_run_report_includes_cost_section)
+cost-measurement S4: run report includes cost section with coverage counts
 ----------------------------------------------------------------------
-Ran 267 tests in 27.698s
+Traceback (most recent call last):
+  File "/home/runner/work/anvil-factory/anvil-factory/tests/test_cost_measurement.py", line 261, in test_run_report_includes_cost_section
+    self.assertEqual(cost["measured_steps"], 2)
+AssertionError: 1 != 2
 
-OK (skipped=1)
+======================================================================
+FAIL: test_gateway_response_with_usage (test_cost_measurement.TestGatewayUsageHandling.test_gateway_response_with_usage)
+cost-measurement S2: HTTP gateway response with usage is priced
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/anvil-factory/anvil-factory/tests/test_cost_measurement.py", line 310, in test_gateway_response_with_usage
+    self.assertIsNotNone(intake_step.get("cost"))
+AssertionError: unexpectedly None
+
+----------------------------------------------------------------------
+Ran 282 tests in 29.556s
+
+FAILED (failures=2, skipped=1)
 
 ```

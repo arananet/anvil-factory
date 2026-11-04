@@ -1,22 +1,18 @@
-Looking at this work order for the intake station.
+Looking at this work order for the closing verification run.
 
-This is a gate loopback requesting three specific fixes from a previous review:
-1. Remove test files the builder shouldn't have created (process violation)
-2. Revert unrelated intake station config changes (out of scope)
-3. Handle legacy cost override path - either remove or document it
+The scope is clear and specific:
+1. Revert exactly two intake configuration changes that were out-of-scope
+2. The test-writer station will author the cost measurement tests
+3. Everything else (the core cost measurement implementation) stands as audited
 
-The scope is clear and buildable. The constraints are explicit (no modifications to .github/workflows/, tests/, anvil.json, or pipelines/). Success criteria are concrete.
-
-**Risk assessment**: Medium - this touches cost measurement and runner execution, though it explicitly doesn't affect verdicts. Not high risk (no payments, credentials, or irreversible changes), but not low risk either (touches core runner functionality and pricing data).
-
-**Surfaces**: Cost records, token usage, price tables (data), HTTP gateway integrations (api), and documentation updates (content).
+This is buildable as stated - it's a minimal, focused fix to close out finding #2 from the loopback review.
 
 ```json
 {
   "intake_outcome": {
     "outcome": "accepted"
   },
-  "risk": "medium",
-  "surfaces": ["data", "api", "content"]
+  "risk": "low",
+  "surfaces": []
 }
 ```

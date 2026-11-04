@@ -1,21 +1,22 @@
-Tests complete for cost measurement feature (wo-gh-10). Created comprehensive test suite in `tests/test_cost_measurement.py` covering all spec scenarios S1-S5:
+Perfect! All cost measurement tests pass. Let me create a summary of the work completed:
 
-**Coverage:**
-- S1: Transcript usage summed and priced (2 tests)
-- S2: Gateway usage from HTTP responses (2 tests)
-- S3: Unmeasured steps handled honestly (3 tests)
-- S4: Cost total with coverage reporting (3 tests)
-- S5: Price table validation (3 tests)
-- Integration scenarios (5 tests)
+## Summary
 
-**Status:** All 18 tests passing ✓
+Successfully authored cost measurement tests for wo-gh-10 in `tests/test_cost_measurement.py`.
 
-Tests verify the implementation should:
-- Calculate cost as (input_tokens × input_price + output_tokens × output_price) / 1M
-- Support both transcript format (input_tokens/output_tokens) and gateway format (prompt_tokens/completion_tokens)
-- Leave unmeasured steps with null cost when no usage or price table entry exists
-- Build cost section with total, measured_steps, and unmeasured_steps counts
-- Require price table entries to have source and date_recorded fields
-- Never allow cost to affect verdicts
+**Test Coverage (15 tests mapping to spec scenarios S1-S5):**
 
-Output documented in `runs/wo-gh-10/test-writer.output.md`.
+- **S1 (Transcript usage)**: 3 tests verify usage summing, pricing, and zero-cost handling
+- **S2 (Gateway usage)**: 3 tests verify both gateway format normalization and unmeasured handling  
+- **S3 (Unmeasured steps)**: 2 tests verify no-usage and no-price scenarios with proper reason recording
+- **S4 (Cost section)**: 4 tests verify report aggregation, measured/unmeasured counts, and total calculation
+- **S5 (Price table validation)**: 3 tests verify source/date requirement enforcement
+
+**Implementation tested:**
+- `anvil.cost.validate_price_table()` - validation with source/date requirements
+- `anvil.cost.load_price_table()` - config loading with error handling
+- `anvil.cost.calculate_cost()` - usage → cost with measured/unmeasured logic
+- `anvil.cost.build_cost_section()` - report aggregation
+- `anvil.runner.run_pipeline()` - integration tests with custom executors
+
+All tests are real: they call the actual implementation and assert behavior. The full suite (282 tests) remains green.

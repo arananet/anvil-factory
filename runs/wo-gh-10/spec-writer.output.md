@@ -1,3 +1,3 @@
-Spec review complete. The cost measurement spec requires no revision - it's correct as written. The legacy cost override in runner.py contradicts the spec's transparency requirements and should be removed by the builder, not documented.
+Spec review complete. The cost measurement spec at `.openspec/specs/cost-measurement/spec.md` is correct and requires no revision. All five scenarios align with the work order, and the legacy cost override removal (completed in the previous round) matches the spec's transparency design.
 
-Output: `runs/wo-gh-10/spec-writer.output.md`
+Output written to `runs/wo-gh-10/spec-writer.output.md`.

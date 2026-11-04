@@ -1,39 +1,40 @@
- anvil/runner.py                                    |   3 -
- runs/wo-gh-10/builder.output.md                    |  51 +-
+ anvil/config.py                                    |   1 -
+ runs/wo-gh-10/builder.output.md                    |  25 +-
  runs/wo-gh-10/builder.packet.md                    |  10 +
- runs/wo-gh-10/checks-gate.pre-review.output.md     |  29 +-
- runs/wo-gh-10/deployer.packet.md                   |  24 +-
+ runs/wo-gh-10/checks-gate.pre-review.output.md     |  79 ++---
+ runs/wo-gh-10/deployer.packet.md                   |  10 +
  runs/wo-gh-10/envelopes/approver.envelope.json     |   2 +-
  runs/wo-gh-10/envelopes/builder.envelope.json      |   2 +-
- runs/wo-gh-10/envelopes/checks-gate.envelope.json  |  31 +-
+ runs/wo-gh-10/envelopes/checks-gate.envelope.json  |  32 +-
  runs/wo-gh-10/envelopes/deployer.envelope.json     |   2 +-
  runs/wo-gh-10/envelopes/intake.envelope.json       |   2 +-
  runs/wo-gh-10/envelopes/observer.envelope.json     |   2 +-
- .../envelopes/reviewer-architecture.envelope.json  |  24 +-
- .../envelopes/reviewer-design.envelope.json        |  18 +-
- .../envelopes/reviewer-security.envelope.json      |  18 +-
- .../wo-gh-10/envelopes/reviewer-spec.envelope.json |  18 +-
- .../envelopes/reviewer-tests.envelope.json         |  18 +-
+ .../envelopes/reviewer-architecture.envelope.json  |   4 +-
+ .../envelopes/reviewer-design.envelope.json        |   2 +-
+ .../envelopes/reviewer-security.envelope.json      |   4 +-
+ .../wo-gh-10/envelopes/reviewer-spec.envelope.json |   4 +-
+ .../envelopes/reviewer-tests.envelope.json         |   4 +-
  runs/wo-gh-10/envelopes/spec-writer.envelope.json  |   2 +-
  runs/wo-gh-10/envelopes/test-writer.envelope.json  |   2 +-
  runs/wo-gh-10/envelopes/triage-human.envelope.json |   2 +-
- runs/wo-gh-10/intake.output.md                     |  27 +-
+ runs/wo-gh-10/intake.output.md                     |  20 +-
  runs/wo-gh-10/intake.packet.md                     |  10 +
- runs/wo-gh-10/observer.packet.md                   |  24 +-
- runs/wo-gh-10/report.json                          | 164 ++---
- runs/wo-gh-10/report.md                            |  20 +-
- runs/wo-gh-10/reviewer-architecture.packet.md      |  19 +-
- runs/wo-gh-10/reviewer-design.packet.md            |  21 +-
- runs/wo-gh-10/reviewer-security.packet.md          |  15 +-
- runs/wo-gh-10/reviewer-spec.packet.md              |  13 +-
- runs/wo-gh-10/reviewer-tests.packet.md             |  17 +-
- runs/wo-gh-10/routing.json                         |   2 +-
- runs/wo-gh-10/spec-writer.output.md                |  19 +-
+ runs/wo-gh-10/observer.output.md                   |   4 +-
+ runs/wo-gh-10/observer.packet.md                   |  10 +
+ runs/wo-gh-10/report.json                          |  60 ++--
+ runs/wo-gh-10/report.md                            |  22 +-
+ runs/wo-gh-10/reviewer-architecture.packet.md      |  10 +
+ runs/wo-gh-10/reviewer-design.packet.md            |  10 +
+ runs/wo-gh-10/reviewer-security.packet.md          |  10 +
+ runs/wo-gh-10/reviewer-spec.packet.md              |  10 +
+ runs/wo-gh-10/reviewer-tests.packet.md             |  10 +
+ runs/wo-gh-10/routing.json                         |  29 +-
+ runs/wo-gh-10/spec-writer.output.md                |   4 +-
  runs/wo-gh-10/spec-writer.packet.md                |  10 +
- runs/wo-gh-10/swimlane.md                          |  36 +-
- runs/wo-gh-10/test-writer.output.md                |  71 +-
- runs/wo-gh-10/test-writer.packet.md                |  67 +-
- tests/test_cost_measurement.py                     | 729 ---------------------
- tests/test_cost_measurement_README.md              | 123 ----
- work_orders/wo-gh-10.json                          |   6 +-
- 38 files changed, 355 insertions(+), 1298 deletions(-)
+ runs/wo-gh-10/swimlane.md                          |  32 +-
+ runs/wo-gh-10/test-writer.output.md                |  35 +-
+ runs/wo-gh-10/test-writer.packet.md                |  87 +++--
+ stations/intake/station.json                       |   2 +-
+ tests/test_cost_measurement.py                     | 363 +++++++++++++++++++++
+ work_orders/wo-gh-10.json                          |  10 +-
+ 39 files changed, 700 insertions(+), 239 deletions(-)

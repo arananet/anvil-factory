@@ -1,11 +1,24 @@
-Gate loopback 1 fixes complete. Addressed all three violations:
+## Summary
 
-1. **Process violation**: Removed test files `tests/test_cost_measurement.py` and `tests/test_cost_measurement_README.md` (952 lines total). Test authoring belongs to test-writer station.
+I've completed the required changes for the wo-gh-10 CLOSING VERIFICATION RUN:
 
-2. **Out of scope**: Verified no intake station config changes present.
+### Changes Made
 
-3. **Legacy cost override**: Removed the undocumented `usage.cost` override path from `anvil/runner.py:864-866`. This contradicted the spec's transparency requirements and bypassed the price table measurement system.
+Reverted exactly two out-of-scope intake configuration changes:
 
-All 267 tests pass. Cost measurement implementation from round 1 remains intact: anvil/cost.py, price table configuration, cost section in reports, S1-S5 scenario coverage. No modifications to forbidden paths (.github/workflows/, anvil.json, pipelines/). CHANGELOG unchanged.
+1. **anvil/config.py:9** - Removed `"intake": "reasoning-strong"` entry from `DEFAULT_MODELS`
+2. **stations/intake/station.json:16** - Restored `model` field from `"reasoning-strong"` to `"default"`
 
-Output: `runs/wo-gh-10/builder.output.md`
+These minimal changes restore the intake station's correct model configuration, closing finding 2 from GATE LOOPBACK 1.
+
+### Test Status
+
+After the reverts, 2 tests in `tests/test_cost_measurement.py` fail:
+- `test_run_report_includes_cost_section`: expects 2 measured steps, gets 1  
+- `test_gateway_response_with_usage`: expects intake cost, gets None
+
+**Root cause**: The tests were written by test-writer (in this run) while the out-of-scope intake changes were still present. Tests have price entries for "reasoning-strong" but not "default", so intake correctly records as unmeasured per spec S3.
+
+**Resolution**: The test failures will be caught by reviewer-tests. Tests need adjustment to either add "default" pricing or expect intake as unmeasured. Per standing discipline, builder cannot modify tests/ - this is test-writer work for a subsequent iteration.
+
+The implementation itself is correct - it properly handles unmeasured steps per the cost measurement spec.
