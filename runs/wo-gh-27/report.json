@@ -1,0 +1,163 @@
+{
+  "work_order_id": "wo-gh-27",
+  "pipeline": "content-film-review",
+  "title": "Film review pass: judge the wo-gh-18 polish film on its stills (four advisories and claim C11)",
+  "kind": "content",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "completed",
+      "detail": "Work order normalized",
+      "duration_ms": 0.015,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-27/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-27/reviewer-design.output.md; review output did not parse as a review JSON",
+      "duration_ms": 337050.819,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-27/reviewer-design.output.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 3636,
+      "budget": 50000,
+      "budget_action": "sent"
+    },
+    {
+      "station": "reviewer-facts",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-27/reviewer-facts.output.md",
+      "duration_ms": 108158.655,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-27/reviewer-facts.output.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 1978,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.033,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-27/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: required",
+      "duration_ms": 0.014,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "publisher",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-27/publisher.output.md",
+      "duration_ms": 150906.172,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-27/publisher.output.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 1666,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-27/observer.output.md",
+      "duration_ms": 94387.067,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-27/observer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 1624,
+      "budget": 0,
+      "budget_action": "none"
+    }
+  ],
+  "verdict": "approved",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 0,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [
+    "publishing"
+  ],
+  "decision": {
+    "approver": {
+      "reviews_counted": [
+        {
+          "station": "reviewer-facts",
+          "verdict": "pass"
+        }
+      ],
+      "reviews_expected": [
+        "reviewer-design",
+        "reviewer-facts"
+      ],
+      "rule": "All counted reviews passed. (Counted 1 reviews, expected 2.)"
+    },
+    "human_gate": {
+      "required": true,
+      "rule": "Verdict approved, but the work order carries the risk hint 'publishing', so a human is required.",
+      "hints_matched": [
+        "publishing"
+      ]
+    }
+  },
+  "warnings": [],
+  "astra_measured_tokens_total": 3636
+}

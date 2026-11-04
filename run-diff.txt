@@ -1,3 +1,22 @@
- runs/wo-gh-27/contact-sheet.png              | Bin 0 -> 12152264 bytes
- runs/wo-gh-27/envelopes/intake.envelope.json |  10 ++++++++++
- 2 files changed, 10 insertions(+)
+ runs/wo-gh-27/envelopes/approver.envelope.json     |  10 +
+ runs/wo-gh-27/envelopes/intake.envelope.json       |   6 +-
+ runs/wo-gh-27/envelopes/observer.envelope.json     |  15 ++
+ runs/wo-gh-27/envelopes/publisher.envelope.json    |  15 ++
+ .../envelopes/reviewer-design.envelope.json        |  16 ++
+ .../envelopes/reviewer-facts.envelope.json         |  20 ++
+ runs/wo-gh-27/envelopes/triage-human.envelope.json |  10 +
+ runs/wo-gh-27/observation-report.md                |  84 ++++++++
+ runs/wo-gh-27/observer.output.md                   |  10 +
+ runs/wo-gh-27/observer.packet.md                   |  64 ++++++
+ runs/wo-gh-27/publish-record.md                    |  65 ++++++
+ runs/wo-gh-27/publisher.output.md                  |  19 ++
+ runs/wo-gh-27/publisher.packet.md                  |  64 ++++++
+ runs/wo-gh-27/report.json                          | 163 ++++++++++++++
+ runs/wo-gh-27/reviewer-design.output.md            |   7 +
+ runs/wo-gh-27/reviewer-design.packet.md            | 238 +++++++++++++++++++++
+ runs/wo-gh-27/reviewer-design.review.json          |   7 +
+ runs/wo-gh-27/reviewer-facts.output.md             |   3 +
+ runs/wo-gh-27/reviewer-facts.packet.md             |  95 ++++++++
+ runs/wo-gh-27/reviewer-facts.review.json           |   5 +
+ runs/wo-gh-27/swimlane.md                          |  18 ++
+ 21 files changed, 931 insertions(+), 3 deletions(-)
