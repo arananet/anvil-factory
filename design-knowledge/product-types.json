@@ -1,0 +1,30 @@
+[
+  {
+    "product_type": "dashboard",
+    "styles": ["data-dense", "modern-minimal"],
+    "palettes": ["metrics-blue", "data-neutral"],
+    "fonts": ["modern-geometric", "technical-mono"],
+    "why": "Dashboards prioritize information density and scanning efficiency. Data-dense layouts with restrained color palettes help users spot patterns and anomalies quickly. Monospace elements reinforce precision, while modern sans-serifs maintain readability at small sizes."
+  },
+  {
+    "product_type": "mobile-app",
+    "styles": ["friendly-conversational", "modern-minimal"],
+    "palettes": ["vibrant-primary"],
+    "fonts": ["modern-geometric"],
+    "why": "Mobile apps benefit from generous touch targets and simplified navigation. Friendly, conversational design reduces friction and builds trust. Vibrant colors create visual interest on small screens while maintaining sufficient contrast for outdoor readability."
+  },
+  {
+    "product_type": "marketing-site",
+    "styles": ["editorial-spacious", "friendly-conversational"],
+    "palettes": ["brand-bold"],
+    "fonts": ["classic-readable", "editorial-contrast"],
+    "why": "Marketing sites need to make strong first impressions and guide visitors toward conversion. Editorial spacing gives content room to breathe, while bold brand colors establish identity. Readable serif fonts add warmth and credibility."
+  },
+  {
+    "product_type": "documentation",
+    "styles": ["editorial-spacious", "technical-precise"],
+    "palettes": ["data-neutral"],
+    "fonts": ["editorial-contrast", "technical-mono"],
+    "why": "Documentation serves readers seeking specific information. Spacious layouts reduce fatigue during extended reading. Technical precision in code examples and UI elements builds confidence, while serif body text optimizes for sustained comprehension."
+  }
+]

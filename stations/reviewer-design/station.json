@@ -16,5 +16,8 @@
   ],
   "model": "review-balanced",
   "prompt": "stations/reviewer-design/PROMPT.md",
-  "tools": []
+  "tools": [],
+  "guided": true,
+  "designation": "guided design station",
+  "design_model": "openai/gpt-6-astra"
 }

@@ -18,9 +18,10 @@ Judge interface output against the project's own design system: its design token
   - Component and layout rules: Do components follow the documented patterns?
   - Motion rules: Does any animation or transition follow the motion guidelines?
   - Quality bars: Does the interface meet the stated quality bars for visual hierarchy, scale contrast, spacing rhythm, and responsive behavior?
+- **Authority**: The project's own design system (design/DESIGN.md, design/tokens.json) is the authority for this project. The Design knowledge section in your packet (when present) is reference material that the design system may draw from. On any conflict between the project's design system and the knowledge base, the project's design system wins. A deviation from the knowledge base alone is never a finding; a deviation from the project's design system is.
 - Focus on the design system the project has defined. Do not impose external design opinions or preferences that are not documented in the project's design system.
 - A design token marked as "TODO" or placeholder means the project hasn't defined that value yet. Flag missing values as findings only if the interface output actually uses undefined tokens.
-- Findings should be specific and actionable: cite which quality bar was violated, which token was used incorrectly, or which rule was not followed.
+- Findings should be specific and actionable: cite which quality bar was violated, which token was used incorrectly, or which rule was not followed. When referencing the Design knowledge base in a finding or suggestion, name the specific knowledge entry (e.g., "metrics-blue palette", "data-dense style", "accessibility guideline for contrast").
 - Your verdict must be one of: `pass`, `fail`, or `changes_requested`.
 - Produce the output as a JSON object, not as chat text.
 

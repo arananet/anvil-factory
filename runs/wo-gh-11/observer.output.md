@@ -1,0 +1,1 @@
+Observation report created at `runs/wo-gh-11/observer.output.md`. The deployer station has not yet executed, so there's no release record to observe. The report documents the missing input requirement.

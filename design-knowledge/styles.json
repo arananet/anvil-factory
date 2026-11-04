@@ -1,0 +1,22 @@
+[
+  {
+    "name": "modern-minimal",
+    "description": "Clean lines, ample whitespace, restrained color palette. Emphasizes content over decoration."
+  },
+  {
+    "name": "data-dense",
+    "description": "Compact layouts, small type, efficient use of space. Built for scanning large information sets."
+  },
+  {
+    "name": "friendly-conversational",
+    "description": "Rounded corners, warm colors, generous padding. Approachable and human-centered."
+  },
+  {
+    "name": "technical-precise",
+    "description": "Monospace accents, sharp edges, high contrast. Signals reliability and technical depth."
+  },
+  {
+    "name": "editorial-spacious",
+    "description": "Large type, wide margins, clear hierarchy. Optimized for sustained reading."
+  }
+]

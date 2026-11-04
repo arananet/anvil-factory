@@ -1,0 +1,26 @@
+[
+  {
+    "name": "classic-readable",
+    "display": "Georgia",
+    "text": "system-ui",
+    "character": "Timeless and approachable. The serif heading adds authority without formality."
+  },
+  {
+    "name": "modern-geometric",
+    "display": "Inter",
+    "text": "Inter",
+    "character": "Clean and neutral. Single typeface at multiple weights keeps interfaces unified."
+  },
+  {
+    "name": "technical-mono",
+    "display": "JetBrains Mono",
+    "text": "system-ui",
+    "character": "Code-forward. Monospace headings signal technical precision."
+  },
+  {
+    "name": "editorial-contrast",
+    "display": "Merriweather",
+    "text": "system-ui",
+    "character": "High readability. Strong serif for long-form content with sans-serif UI."
+  }
+]
