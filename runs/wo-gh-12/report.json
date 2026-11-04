@@ -1,0 +1,285 @@
+{
+  "work_order_id": "wo-gh-12",
+  "pipeline": "sdlc-default",
+  "title": "A dedicated UX reviewer station (reviewer-ux), separate from reviewer-design",
+  "kind": "feature",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "executed",
+      "detail": "Executed by command; outcome: accepted",
+      "duration_ms": 91219.454,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/intake.output.md"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-12/spec-writer.output.md",
+      "duration_ms": 124671.471,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/spec-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "test-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-12/test-writer.output.md",
+      "duration_ms": 215339.052,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/test-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-12/builder.output.md",
+      "duration_ms": 734449.664,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/builder.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "checks-gate",
+      "status": "failed",
+      "detail": "Gate failed: 1 checks, protected paths: fail",
+      "duration_ms": 28898.849,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/checks-gate.pre-review.output.md"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null,
+      "phase": "pre-review",
+      "commands": [
+        "python -m unittest discover -s tests -p 'test_*.py'"
+      ],
+      "exit_codes": [
+        1
+      ],
+      "protected_paths": [
+        "tests/",
+        "anvil.json",
+        "pipelines/"
+      ],
+      "protected_path_verdict": "fail",
+      "protected_path_findings": [
+        "Protected path violation: pipelines/sdlc-default.json (base ref file modified/deleted, matches pipelines/)",
+        "Protected path violation: pipelines/content-default.json (base ref file modified/deleted, matches pipelines/)",
+        "Protected path violation: pipelines/content-short.json (base ref file modified/deleted, matches pipelines/)"
+      ],
+      "gate_verdict": "fail"
+    },
+    {
+      "station": "loopback",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Gate failure: Protected path violation: pipelines/sdlc-default.json (base ref file modified/deleted, matches pipelines/); Protected path violation: pipelines/content-default.json (base ref file modified/deleted, matches pipelines/); Protected path violation: pipelines/content-short.json (base ref file modified/deleted, matches pipelines/)",
+      "reason": "Gate failure: Protected path violation: pipelines/sdlc-default.json (base ref file modified/deleted, matches pipelines/); Protected path violation: pipelines/content-default.json (base ref file modified/deleted, matches pipelines/); Protected path violation: pipelines/content-short.json (base ref file modified/deleted, matches pipelines/)",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null,
+      "feedback": "",
+      "from_station": "checks-gate"
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.089,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/reviewer-spec.packet.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "reviewer-security",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.055,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/reviewer-security.packet.md"
+      ],
+      "configured_model": "review-strong",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.052,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/reviewer-tests.packet.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.058,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/reviewer-architecture.packet.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "reviewer-design",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 1.025,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/reviewer-design.packet.md"
+      ],
+      "configured_model": "openai/gpt-6-astra",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: no_reviews",
+      "duration_ms": 0.017,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: required",
+      "duration_ms": 0.006,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "detail": "Packet written to runs/wo-gh-12/deployer.packet.md",
+      "duration_ms": 0.055,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/deployer.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-12/observer.output.md",
+      "duration_ms": 106980.481,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/observer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    }
+  ],
+  "verdict": "no_reviews",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 1,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [],
+      "reviews_expected": [
+        "reviewer-spec",
+        "reviewer-security",
+        "reviewer-tests",
+        "reviewer-architecture",
+        "reviewer-design"
+      ],
+      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)"
+    },
+    "human_gate": {
+      "required": true,
+      "rule": "Verdict is no_reviews, not approved, so a human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": [],
+  "base_ref": "bb61da34d7c2d1b6a49f44bca26b087120ee4468",
+  "evidence": [
+    {
+      "type": "screenshot",
+      "breakpoint": "390x844",
+      "path": "runs/wo-gh-12/evidence/screenshot-390x844.png",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "type": "screenshot",
+      "breakpoint": "1440x900",
+      "path": "runs/wo-gh-12/evidence/screenshot-1440x900.png",
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "cost": {
+    "total": 0,
+    "measured_steps": 0,
+    "unmeasured_steps": 5
+  }
+}

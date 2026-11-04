@@ -429,7 +429,7 @@ def packet_knowledge_section(
 ) -> str:
     """Generate Design knowledge section for a station packet.
 
-    Only design stations receive this section: reviewer-design, builder (for UI work),
+    Only design stations receive this section: reviewer-design, reviewer-ux, builder (for UI work),
     writer (for design authoring).
 
     Args:
@@ -441,7 +441,7 @@ def packet_knowledge_section(
         Markdown section text, or empty string if station should not receive it
     """
     # Design stations that receive knowledge
-    design_stations = {"reviewer-design", "builder", "writer"}
+    design_stations = {"reviewer-design", "reviewer-ux", "builder", "writer"}
 
     if station_id not in design_stations:
         return ""

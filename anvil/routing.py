@@ -112,7 +112,8 @@ def load_routing_config(project_dir: Path) -> Dict:
             "reviewer-security",
             "reviewer-tests",
             "reviewer-architecture",
-            "reviewer-design"
+            "reviewer-design",
+            "reviewer-ux"
         ],
         "models": {
             "reduced": "review-cheap",  # Cheaper model for reduced panel
@@ -278,24 +279,35 @@ def route_reviewers(
             selected.add("reviewer-security")
             models["reviewer-security"] = config["models"]["strong"]
 
-        # S3: UI surface -> keep reviewer-design when present
+        # S3: UI surface -> keep reviewer-design and reviewer-ux when present
         if "ui" in surfaces and "reviewer-design" in available_reviewers:
             selected.add("reviewer-design")
             models["reviewer-design"] = config["models"]["standard"]
+
+        if "ui" in surfaces and "reviewer-ux" in available_reviewers:
+            selected.add("reviewer-ux")
+            models["reviewer-ux"] = config["models"]["standard"]
 
         rule_parts = ["Low risk"]
         if "security" in surfaces:
             rule_parts.append("security surface keeps reviewer-security")
         if "ui" in surfaces:
-            rule_parts.append("UI surface keeps reviewer-design")
+            rule_parts.append("UI surface keeps reviewer-design and reviewer-ux")
         reasons.append("; ".join(rule_parts))
 
         # Record routed out reviewers
         for reviewer in available_reviewers - selected:
-            routed_out.append({
-                "reviewer": reviewer,
-                "reason": "Routed out by low risk rule with surface exceptions"
-            })
+            # Special reason for reviewer-ux when no UI surface
+            if reviewer == "reviewer-ux" and "ui" not in surfaces:
+                routed_out.append({
+                    "reviewer": reviewer,
+                    "reason": "Routed out: no UI surface"
+                })
+            else:
+                routed_out.append({
+                    "reviewer": reviewer,
+                    "reason": "Routed out by low risk rule with surface exceptions"
+                })
 
     elif risk == "medium":
         # S3: Medium risk -> full panel at policy models
@@ -332,6 +344,44 @@ def route_reviewers(
         models["reviewer-security"] = config["models"]["strong"]
         if not any("security" in r for r in reasons):
             reasons.append("Security surface: reviewer-security at strong model")
+
+    # UI surface handling for design reviewers (reviewer-design and reviewer-ux)
+    # When UI surface is present, ensure both design reviewers are selected
+    # When UI surface is absent, route out UI-focused reviewers
+    if "ui" in surfaces:
+        # Keep reviewer-design if available
+        if "reviewer-design" in available_reviewers and "reviewer-design" not in selected:
+            selected.add("reviewer-design")
+            models["reviewer-design"] = config["models"]["standard"]
+        # Keep reviewer-ux if available
+        if "reviewer-ux" in available_reviewers and "reviewer-ux" not in selected:
+            selected.add("reviewer-ux")
+            models["reviewer-ux"] = config["models"]["standard"]
+    else:
+        # No UI surface - route out UI-focused reviewers
+        # Remove reviewer-ux from selected if present and add to routed_out
+        if "reviewer-ux" in available_reviewers:
+            if "reviewer-ux" in selected:
+                selected.discard("reviewer-ux")
+                if "reviewer-ux" in models:
+                    del models["reviewer-ux"]
+            # Add to routed_out if not already there
+            if not any(r["reviewer"] == "reviewer-ux" for r in routed_out):
+                routed_out.append({
+                    "reviewer": "reviewer-ux",
+                    "reason": "Routed out: no UI surface"
+                })
+        # Also handle reviewer-design if no UI surface
+        if "reviewer-design" in available_reviewers:
+            if "reviewer-design" in selected:
+                selected.discard("reviewer-design")
+                if "reviewer-design" in models:
+                    del models["reviewer-design"]
+            if not any(r["reviewer"] == "reviewer-design" for r in routed_out):
+                routed_out.append({
+                    "reviewer": "reviewer-design",
+                    "reason": "Routed out: no UI surface"
+                })
 
     # Create routing record - preserve pipeline order
     selected_in_order = [r for r in pipeline_reviewers if r in selected]

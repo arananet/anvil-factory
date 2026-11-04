@@ -1,0 +1,23 @@
+{
+  "id": "reviewer-ux",
+  "name": "Reviewer UX",
+  "kind": "agent",
+  "inputs": [
+    "UX guidelines (usability heuristics, accessibility basics, copy clarity)",
+    "interface output",
+    "rendered evidence (screenshots when available)"
+  ],
+  "outputs": [
+    "review"
+  ],
+  "description": "Judge user experience: flows and task completion, usability heuristics, accessibility basics, and interface copy clarity.",
+  "context": [
+    "brain/project.md",
+    "design/"
+  ],
+  "model": "review-balanced",
+  "prompt": "stations/reviewer-ux/PROMPT.md",
+  "tools": [],
+  "guided": true,
+  "designation": "guided design station"
+}

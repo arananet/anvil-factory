@@ -407,12 +407,13 @@ def packet_rendered_evidence_section(
     work_order_id: str,
     station_id: str
 ) -> str:
-    """Generate rendered evidence section for reviewer-design packet.
+    """Generate rendered evidence section for design reviewer packets.
 
     Returns markdown section if captures exist for this run, empty string otherwise.
     If capture was attempted but failed, returns a section documenting the failure.
     """
-    if station_id != "reviewer-design":
+    # Only design reviewers receive rendered evidence
+    if station_id not in ("reviewer-design", "reviewer-ux"):
         return ""
 
     project_dir = Path(project_dir)
@@ -460,12 +461,23 @@ def packet_rendered_evidence_section(
         lines.append(f"- `{screenshot.name}` at `{rel_path}`")
 
     lines.append("")
-    lines.append(
-        "**Design review instruction:** When judging layout, scale, spacing, "
-        "or visual hierarchy findings, cite the rendered evidence screenshots "
-        "where applicable. The screenshots show what the page actually looks like "
-        "at each breakpoint, not just what the source implies."
-    )
+
+    # Station-specific review instructions
+    if station_id == "reviewer-design":
+        lines.append(
+            "**Design review instruction:** When judging layout, scale, spacing, "
+            "or visual hierarchy findings, cite the rendered evidence screenshots "
+            "where applicable. The screenshots show what the page actually looks like "
+            "at each breakpoint, not just what the source implies."
+        )
+    elif station_id == "reviewer-ux":
+        lines.append(
+            "**UX review instruction:** The screenshots show how users will experience "
+            "the interface at each breakpoint. Use them to judge flow visibility, "
+            "interactive element accessibility, focus states, and copy clarity as rendered. "
+            "When citing findings, reference the rendered evidence where applicable."
+        )
+
     lines.append("")
 
     return "\n".join(lines)
