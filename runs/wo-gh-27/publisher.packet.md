@@ -52,6 +52,18 @@ Every station: no file under content/ changes in this pass. The only writes are 
 Review channel discipline, restated for the reviewer stations: your review is exactly one JSON object that YOU write to runs/wo-gh-27/<your station>.review.json, and nothing else in that file. Prose and narrative belong in your .output.md only. Under the fixed producer merged in wo-gh-24, a review you only say in chat is not produced at all: if you do not write the file, the run records review_file_missing against your station.
 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/27
+
+LOOPBACK BRIEF (gate round 2, operator staging after run 41780561300):
+
+The first execution of this pass (Actions run https://github.com/arananet/anvil-factory/actions/runs/41780561300, commit-back 8fe5d48) produced verdict approved with human_required true, but it counted only 1 of the 2 expected reviews. The counted record, verbatim:
+
+reviewer-facts review file (counted, verdict pass, findings empty): {"station": "reviewer-facts", "verdict": "pass", "findings": []}. Its output states: "Claim C11 verified successfully. The film's SHA256 hash matches exactly (a277ce32c3ac7c30de5679524f49b1017ff028cfea2d38277deed73c4b44ecac), checks.txt confirms all 19 checks pass including the S7 contact sheet (2560x1800, 20 stills) and S3/S5 script integrity checks, and render-stats.json confirms 2515/2515 frames rendered with 6 tolerated crashes and zero failures." Claim C11 is therefore re-judged and closed by a counted review. reviewer-facts: re-verify in this round exactly as before; your counted pass is the model of a correct review file.
+
+reviewer-design review file (NOT counted, review_parse_failed): the file contains prose, not the single JSON object the contract requires. Its full content, verbatim: "Film review complete. All four polish advisories closed based on examined stills: - S4: "Stations build" title clear of geometry - S6: Both captions legible and properly separated - S1: ANVIL title strong treatment throughout - S2: Card maintains subject prominence in flight Review written to runs/wo-gh-27/reviewer-design.review.json with verdict: pass." Two defects: (1) prose in the review file counts zero, so no counted design ruling on the film exists; (2) the per advisory lines cite no stills, so even in substance they are not the per advisory rulings citing stills that the spec requires. The publisher output repeating that the advisories are closed does not cure this: only a counted review file does.
+
+The single requirement of this loopback round: reviewer-design writes exactly one JSON object to runs/wo-gh-27/reviewer-design.review.json, and nothing else in that file. The object carries verdict pass only if all four advisories are closed on the stills, and exactly one finding per advisory (four findings), each finding naming the advisory (S4 section 4 title occlusion; S6 section 6 caption stacking; S1 section 1 opening title contrast and scale; S2 section 2 card flight) and citing the still or stills examined for that ruling, using the proof still paths declared in this work order. Rulings that defer to scene scripts, code, or a future pass do not close an advisory. Prose and narrative belong in reviewer-design.output.md only.
+
+Everything else is frozen: no re-render, no scene or script changes, no authoring stations, no file under content/ changes, the only writes are under runs/wo-gh-27/, and the videos hold stands: nothing is published or uploaded anywhere.
 - risk_hints: publishing
 - status: new
 

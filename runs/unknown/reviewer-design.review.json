@@ -2,6 +2,9 @@
   "station": "reviewer-design",
   "verdict": "pass",
   "findings": [
-    "No interface output present in this change. The modifications are limited to Python test files (test_render_crash_tolerance_s*.py) and internal workflow artifacts (reviewer packets, envelopes, output files). No user-facing interface components, HTML, React, CSS, or visual artifacts were found that would require design system validation."
+    "S4 Section 4 title occlusion advisory CLOSED: Examined frame-mid-4.png, frame-cut-4-first.png, and frame-cut-4-last.png. The 'Stations build' title band sits clear of the full moving envelope of posts, caps, swing arms, and tips in every frame. No line geometry crosses the title glyphs. The title maintains consistent separation from all scene elements throughout the section.",
+    "S6 Section 6 caption stacking advisory CLOSED: Examined frame-mid-6.png, frame-cut-6-last.png, and frame-cut-7-first.png. The captions 'Verified memory.' and 'A human approves.' are both fully legible in the midpoint and final wide frames. They are positioned separately (left and right respectively), overlap neither each other nor the archive or gate geometry, and clearly do not read as one stacked block in a single column.",
+    "S1 Section 1 opening title advisory CLOSED: Examined frame-proof-s1-title.png, frame-mid-1.png, and frame-cut-1-last.png. The opening ANVIL title carries the strong treatment from early in the section: full ink color (dark teal/green) and full scale, matching how the same title reads at the end of the section. Visual hierarchy quality bar satisfied with clear prominence.",
+    "S2 Section 2 card flight advisory CLOSED: Examined frame-mid-2.png, frame-cut-2-first.png, and frame-cut-2-last.png. The card reads as the subject through its flight, particularly at the midpoint frame where it is prominently displayed in the left-center with clear visibility of its content and cyan border. No dead air failure observed. The card maintains visual prominence throughout its movement onto the conveyor."
   ]
 }

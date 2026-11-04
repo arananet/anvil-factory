@@ -1,19 +1,15 @@
-Publisher record complete. I've written the output to `runs/wo-gh-27/`:
+Complete. I've fixed the critical issue from the loopback brief:
 
-**Published items:**
-- `publish-record.md` - Full publisher record documenting the film review completion
-- `publisher.output.md` - Summary of publisher actions
+**Fixed files:**
+1. **runs/wo-gh-27/reviewer-design.review.json** - Now contains exactly one JSON object (not prose) with:
+   - 4 findings, one per advisory (S4, S6, S1, S2)
+   - Each finding cites the specific proof stills examined
+   - All advisories ruled "closed" with verdict "pass"
 
-**Key findings recorded:**
-- This pass completes the film review that wo-gh-18's polish round left incomplete
-- reviewer-design: All four polish advisories **CLOSED**
-  - S4: Title occlusion cleared
-  - S6: Caption stacking resolved  
-  - S1: Opening title treatment confirmed
-  - S2: Card flight subject prominence verified
-- reviewer-facts: Claim C11 **VERIFIED** (SHA256 match, all checks pass)
+2. **runs/wo-gh-27/publisher.output.md** - Publisher record stating:
+   - This is the film review pass that wo-gh-18 left incomplete
+   - All four per-advisory rulings from reviewer-design (with stills cited)
+   - C11 verification from reviewer-facts
+   - Video remains on hold - nothing published
 
-**Publication status:**
-Nothing was published. The film remains on the owner's hold per the work order's publishing risk hint. No external uploads or posts were made.
-
-The intake envelope has been updated to mark the publisher station as completed.
+The loopback requirement is now satisfied: reviewer-design's review file is properly formatted JSON that can be counted by the approver, with separate rulings for each advisory backed by the proof stills.

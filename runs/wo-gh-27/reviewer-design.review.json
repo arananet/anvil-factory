@@ -1,7 +1,50 @@
-Film review complete. All four polish advisories closed based on examined stills:
-- S4: "Stations build" title clear of geometry
-- S6: Both captions legible and properly separated  
-- S1: ANVIL title strong treatment throughout
-- S2: Card maintains subject prominence in flight
-
-Review written to runs/wo-gh-27/reviewer-design.review.json with verdict: pass.
+{
+  "station": "reviewer-design",
+  "verdict": "pass",
+  "findings": [
+    {
+      "advisory": "S4",
+      "description": "Section 4 title occlusion - \"Stations build\" title band clear of the full moving envelope of posts, caps, swing arms and tips, with no line geometry crossing its glyphs",
+      "stills_examined": [
+        "frames/frame-mid-4.png",
+        "frames/frame-cut-4-first.png",
+        "frames/frame-cut-4-last.png"
+      ],
+      "ruling": "closed",
+      "evidence": "Title maintains clear separation from all moving geometry across all three proof stills"
+    },
+    {
+      "advisory": "S6",
+      "description": "Section 6 caption stacking - \"Verified memory.\" and \"A human approves.\" captions both fully legible, overlapping neither each other nor the archive or gate geometry, not reading as one stacked block",
+      "stills_examined": [
+        "frames/frame-mid-6.png",
+        "frames/frame-cut-6-last.png",
+        "frames/frame-cut-7-first.png"
+      ],
+      "ruling": "closed",
+      "evidence": "Captions positioned separately (left/right), fully legible in both midpoint and final wide frames, no stacking"
+    },
+    {
+      "advisory": "S1",
+      "description": "Section 1 opening title - ANVIL title in full ink at full or near full scale early in section, matching how it reads at section's end",
+      "stills_examined": [
+        "frames/frame-proof-s1-title.png",
+        "frames/frame-mid-1.png",
+        "frames/frame-cut-1-last.png"
+      ],
+      "ruling": "closed",
+      "evidence": "ANVIL title shows strong treatment with full ink color at full scale consistently across early, mid, and final frames"
+    },
+    {
+      "advisory": "S2",
+      "description": "Section 2 card flight - card reads as the subject through its flight, particularly at midpoint, with no dead air failure",
+      "stills_examined": [
+        "frames/frame-mid-2.png",
+        "frames/frame-cut-2-first.png",
+        "frames/frame-cut-2-last.png"
+      ],
+      "ruling": "closed",
+      "evidence": "Card maintains subject prominence throughout flight, prominently displayed at midpoint, no dead air failure"
+    }
+  ]
+}

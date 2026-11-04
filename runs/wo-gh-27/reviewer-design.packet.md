@@ -208,7 +208,7 @@ No code changes are made by this order, so there are no new unit tests. The scen
 
 ## Diff summary
 
-- runs/wo-gh-27/envelopes/intake.envelope.json: +1, -1
+- runs/wo-gh-27/envelopes/intake.envelope.json: +3, -3
 
 ## Evidence
 
