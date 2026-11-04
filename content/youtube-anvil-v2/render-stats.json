@@ -1,5 +1,5 @@
 {
-  "blender_version": "4.5.15",
+  "blender_version": "unknown",
   "renderer": "Eevee",
   "resolution": "1920x1080",
   "fps": 30,
@@ -8,43 +8,43 @@
       "frames_rendered": 302,
       "render_seconds": 4138.5,
       "chunks": 6,
-      "frames_on_disk": 302
+      "frames_on_disk": 0
     },
     "2": {
       "frames_rendered": 207,
       "render_seconds": 3519.0,
       "chunks": 4,
-      "frames_on_disk": 207
+      "frames_on_disk": 0
     },
     "3": {
       "frames_rendered": 194,
       "render_seconds": 7451.0,
       "chunks": 4,
-      "frames_on_disk": 194
+      "frames_on_disk": 0
     },
     "4": {
       "frames_rendered": 205,
       "render_seconds": 3229.4,
       "chunks": 4,
-      "frames_on_disk": 205
+      "frames_on_disk": 0
     },
     "5": {
       "frames_rendered": 173,
       "render_seconds": 2838.0,
       "chunks": 3,
-      "frames_on_disk": 173
+      "frames_on_disk": 0
     },
     "6": {
       "frames_rendered": 498,
       "render_seconds": 7942.8,
       "chunks": 9,
-      "frames_on_disk": 498
+      "frames_on_disk": 0
     },
     "7": {
       "frames_rendered": 936,
       "render_seconds": 23359.6,
       "chunks": 16,
-      "frames_on_disk": 936
+      "frames_on_disk": 0
     }
   },
   "planned_frames": {
@@ -56,7 +56,7 @@
     "6": 498,
     "7": 936
   },
-  "total_frames_on_disk": 2515,
+  "total_frames_on_disk": 0,
   "total_render_seconds_logged": 52478.3,
   "rendered_by": "deterministic workflow step (parallel chunked headless Blender, at most 4 processes)",
   "clean_exit": [

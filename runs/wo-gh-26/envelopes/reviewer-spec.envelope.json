@@ -1,0 +1,22 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-spec",
+  "to_station": "reviewer-security",
+  "work_order_id": "wo-gh-26",
+  "artifact_path": "runs/wo-gh-26/reviewer-spec.output.md",
+  "status": "executed",
+  "created_at": "2026-11-04T04:00:13.291982+00:00",
+  "review": {
+    "station": "reviewer-spec",
+    "verdict": "changes_requested",
+    "findings": [
+      "R5 violation: content/ directory was modified despite frozen surface requirement. Spec states 'no station in THIS order modifies anything under content/' and work order explicitly says 'Do not modify anything under content/'. Files content/youtube-anvil-v2/production-notes.md and content/youtube-anvil-v2/render-stats.json show frame count changes (2515 frames to 0 frames, Blender version 4.5.15 to unknown). These modifications must be reverted."
+    ]
+  },
+  "configured_model": "claude-sonnet-4-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
+}

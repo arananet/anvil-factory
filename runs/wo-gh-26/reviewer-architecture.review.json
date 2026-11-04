@@ -1,0 +1,16 @@
+{
+  "station": "reviewer-architecture",
+  "verdict": "pass",
+  "findings": [
+    "The implementation correctly follows Decision 0001 (Composable stations): the new content-film-review pipeline reuses existing stations (reviewer-design, reviewer-facts, approver, triage-human, publisher, observer) and is defined as a small JSON file ordering stations, not redefining them.",
+    "The declared evidence feature aligns with Decision 0003 (Production shape evidence): it enables work orders to reference evidence exercising the production shape (like finished films) rather than only source captures, addressing the gap demonstrated by wo-gh-21 and wo-gh-18.",
+    "The prepare_reviewer_design_step function correctly places packet assembly logic in anvil/runner.py (the runner module) where orchestration happens, not in station definitions, maintaining the separation of concerns between runner orchestration and station execution.",
+    "The implementation reuses the PNG security hardening from wo-gh-21 (size caps, CRC verification, decompression bounds checking, path validation) without weakening it, maintaining the security posture established in prior work.",
+    "The R4 implementation uses station_id.startswith('reviewer') as a convention-based check for adding the Declared evidence inputs section. This pattern is consistent with existing code at line 813 for output contracts, fitting the established architectural style.",
+    "The DeclaredEvidenceMissing exception is properly defined at the module level (line 30-32) alongside other domain exceptions (PacketBudgetError, ContactSheetError, AllowlistViolation, PathValidationError), following the project's error handling pattern.",
+    "The WorkOrder model's evidence_images field (already present at line 46 in model.py) is correctly extended without modifying the model structure, maintaining backward compatibility.",
+    "Tests follow the established pattern from test_astra_consumption.py with small PNG fixtures, deterministic execution, no model calls, and no network, consistent with the project's test architecture.",
+    "The CHANGELOG entry correctly documents the feature in the Unreleased section following the project's changelog format and style.",
+    "Nine pipelines now exist (verified in pipelines/ directory), correctly increasing from the previous eight, with content-film-review.json following the same structure as other pipeline definitions."
+  ]
+}

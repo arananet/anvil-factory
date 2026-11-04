@@ -1,0 +1,11 @@
+{
+  "name": "content-film-review",
+  "stages": [
+    {"station": "intake"},
+    {"parallel": ["reviewer-design", "reviewer-facts"]},
+    {"station": "approver"},
+    {"station": "triage-human"},
+    {"station": "publisher"},
+    {"station": "observer"}
+  ]
+}

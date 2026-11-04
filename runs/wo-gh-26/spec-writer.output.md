@@ -1,0 +1,1 @@
+Spec verified and output written. The spec at `.openspec/specs/declared-evidence-review/spec.md` is complete and aligned with work order wo-gh-26. All five requirements (R1-R5), scenarios (S1-S5), and tests (T1-T5) are properly defined. Output file written to `runs/wo-gh-26/spec-writer.output.md`.

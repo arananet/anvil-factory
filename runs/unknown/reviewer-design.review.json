@@ -1,5 +1,7 @@
 {
   "station": "reviewer-design",
-  "verdict": "pass",
-  "findings": []
+  "verdict": "changes_requested",
+  "findings": [
+    "No interface output to review. This work order implements backend functionality for declared evidence review (Python code in anvil/runner.py, tests, pipeline configuration) but contains no user-facing interface artifacts (HTML, React components, CSS, or product pages) that can be judged against the design system's tokens and quality bars. reviewer-design cannot assess backend implementation code."
+  ]
 }

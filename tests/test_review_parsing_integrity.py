@@ -921,9 +921,9 @@ class TestRegressionSuite(unittest.TestCase):
         pipelines_dir = ROOT / "pipelines"
         pipeline_files = list(pipelines_dir.glob("*.json"))
 
-        # Factory should have exactly 8 pipelines
-        self.assertEqual(len(pipeline_files), 8,
-                        "Factory should have exactly 8 pipelines")
+        # Factory should have exactly 9 pipelines (8 original + content-film-review)
+        self.assertEqual(len(pipeline_files), 9,
+                        "Factory should have exactly 9 pipelines")
 
         reg = load_registry(ROOT / "stations")
         for pipeline_file in pipeline_files:

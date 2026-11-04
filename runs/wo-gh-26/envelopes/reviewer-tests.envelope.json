@@ -1,0 +1,25 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-tests",
+  "to_station": "reviewer-architecture",
+  "work_order_id": "wo-gh-26",
+  "artifact_path": "runs/wo-gh-26/reviewer-tests.output.md",
+  "status": "executed",
+  "created_at": "2026-11-04T04:05:21.473940+00:00",
+  "review": {
+    "station": "reviewer-tests",
+    "verdict": "changes_requested",
+    "findings": [
+      "Test implementation quality is high: all 6 tests in test_declared_evidence_review.py are real, deterministic, and correctly mapped to spec scenarios T1-T5. Tests use small PNG fixtures created with standard library (struct, zlib) as specified, with no model calls or network access.",
+      "Tests are passing: all 6 new tests pass, and all 21 tests in the modified test_review_parsing_integrity.py pass. The 27 tests directly related to this work order are green.",
+      "Full suite requirement not met: work order requires 'Full factory suite green' but test_render_crash_tolerance_s5.py has 1 failure and 3 errors. These failures are environmental (Blender not available in test environment, not a code defect) and unrelated to the declared evidence feature. The render test file was not modified in this work order.",
+      "Files under content/ were modified: content/youtube-anvil-v2/production-notes.md and content/youtube-anvil-v2/render-stats.json show changes (frames_on_disk values changed from actual counts to 0, blender_version changed from 4.5.15 to unknown). Work order frozen surfaces explicitly state 'No file under content/ changes.' These modifications must be reverted before approval."
+    ]
+  },
+  "configured_model": "claude-sonnet-4-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
+}

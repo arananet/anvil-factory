@@ -27,6 +27,10 @@ class PathValidationError(Exception):
     """Raised when a path fails validation"""
     pass
 
+class DeclaredEvidenceMissing(Exception):
+    """Raised when a declared evidence image is missing or escapes the project tree"""
+    pass
+
 def estimate_tokens(text):
     """S1: Deterministic token estimator for packet budgeting.
 
@@ -394,7 +398,7 @@ def verify_packet_allowlist_by_provenance(packet, allowlist):
             )
 
 def build_reviewer_design_packet(project, work_order, files_changed, contact_sheet_path,
-                                 prompt=None):
+                                 prompt=None, declared_evidence_paths=None):
     """S3: Build a fresh, scoped packet for reviewer-design.
 
     Loopback item 2: Located in anvil/runner.py (runner module), not anvil/stations.
@@ -409,10 +413,13 @@ def build_reviewer_design_packet(project, work_order, files_changed, contact_she
 
     Loopback item 3: Tags content with provenance for allowlist verification.
 
+    R3: Evidence section lists contact sheet path and each declared evidence image path.
+
     Returns: (packet_text, allowlist) tuple where allowlist is the list of allowed
     source paths for verification.
     """
     project = Path(project)
+    declared_evidence_paths = declared_evidence_paths or []
 
     # Loopback gate round 3, finding 2: Default prompt if none provided (no import)
     if prompt is None:
@@ -439,10 +446,16 @@ def build_reviewer_design_packet(project, work_order, files_changed, contact_she
         diff_lines.append(f"- {file_name}: +{added}, -{removed}")
     diff_summary = "\n".join(diff_lines)
 
-    # Contact sheet reference
+    # R3: Evidence section lists contact sheet and each declared evidence image path
     contact_sheet_ref = ""
-    if contact_sheet_path:
-        contact_sheet_ref = f"\n## Evidence\n\nContact sheet: {contact_sheet_path}\n"
+    if contact_sheet_path or declared_evidence_paths:
+        contact_sheet_ref = "\n## Evidence\n\n"
+        if contact_sheet_path:
+            contact_sheet_ref += f"Contact sheet: {contact_sheet_path}\n"
+        if declared_evidence_paths:
+            contact_sheet_ref += "\nDeclared evidence images:\n"
+            for img_path in declared_evidence_paths:
+                contact_sheet_ref += f"- {img_path}\n"
 
     # Build allowlist from files changed, design files, and spec
     allowlist = []
@@ -483,19 +496,55 @@ def prepare_reviewer_design_step(project, work_order, files_changed, captures, r
     Loopback gate round 3, finding 2: Resolves the reviewer-design prompt through the station
     registry and passes it to the builder.
 
+    R2: Before execution, validates every declared evidence image exists and resolves inside
+    project tree. Missing or escaping images fail with DeclaredEvidenceMissing.
+
+    R1: Assembles contact sheet from declared PNG images plus run directory captures.
+
     Returns (packet_text, contact_sheet_path) tuple.
     """
     from .config import load_anvil_config, get_contact_sheet_max_width
 
     project = Path(project)
     run_dir = project / "runs" / work_order.id
+    project_resolved = project.resolve()
 
-    # S2: Assemble contact sheet if captures exist
+    # R2: Validate declared evidence images before execution
+    declared_evidence_paths = []
+    if work_order.evidence_images:
+        for img_path in work_order.evidence_images:
+            full_path = (project / img_path).resolve()
+            # Check path resolves inside project tree
+            try:
+                full_path.relative_to(project_resolved)
+            except ValueError:
+                raise DeclaredEvidenceMissing(
+                    f"Declared evidence image escapes project tree: {img_path} "
+                    f"resolves to {full_path}, outside {project_resolved}"
+                )
+            # Check file exists
+            if not full_path.exists():
+                raise DeclaredEvidenceMissing(
+                    f"Declared evidence image does not exist: {img_path}"
+                )
+            declared_evidence_paths.append(full_path)
+
+    # R1: Assemble contact sheet from declared PNG images plus run directory captures
+    # Declared images join in declaration order, only .png files
+    capture_set = []
+    for declared_path in declared_evidence_paths:
+        if declared_path.suffix.lower() == '.png':
+            capture_set.append(declared_path)
+
+    # Add run directory captures
+    capture_set.extend(captures)
+
+    # S2: Assemble contact sheet if capture set exists
     contact_sheet_path = None
-    if captures:
+    if capture_set:
         max_width = get_contact_sheet_max_width(load_anvil_config(project / "anvil.yaml"))
         contact_sheet_path = run_dir / "contact-sheet.png"
-        assemble_contact_sheet(captures, contact_sheet_path, max_width, evidence_dir=run_dir)
+        assemble_contact_sheet(capture_set, contact_sheet_path, max_width, evidence_dir=run_dir)
 
     # Loopback gate round 3, finding 2: Resolve prompt through station registry
     prompt = None
@@ -505,8 +554,10 @@ def prepare_reviewer_design_step(project, work_order, files_changed, captures, r
             prompt = station.prompt
 
     # S3: Build scoped packet through scoped packet builder
+    # R3: Pass declared evidence paths for packet listing
     packet, allowlist = build_reviewer_design_packet(
-        project, work_order, files_changed, contact_sheet_path, prompt=prompt
+        project, work_order, files_changed, contact_sheet_path, prompt=prompt,
+        declared_evidence_paths=[str(p.relative_to(project)) for p in declared_evidence_paths]
     )
 
     # Loopback gate round 3, finding 1: Verify packet allowlist by provenance
@@ -721,6 +772,8 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
     (work order, upstream steps). This enables provider prefix caching.
 
     Loopback item 1: Builder packets reference evidence images only when the work order declares them.
+
+    R4: Reviewer packets carry Declared evidence inputs section when work order declares evidence_images.
     """
     # Stable prefix: station prompt
     text = f"# Task packet: {station_id}\n\n## Station prompt\n\n{prompt}\n"
@@ -743,6 +796,13 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
     # Loopback item 1: Include evidence images for builder when work order declares them
     if station_id == "builder" and work_order.evidence_images:
         text += f"## Evidence images\n\n"
+        for img_path in work_order.evidence_images:
+            text += f"- {img_path}\n"
+        text += "\n"
+
+    # R4: Declared evidence inputs section for reviewer stations when work order declares evidence_images
+    if station_id.startswith("reviewer") and work_order.evidence_images:
+        text += f"## Declared evidence inputs\n\n"
         for img_path in work_order.evidence_images:
             text += f"- {img_path}\n"
         text += "\n"
