@@ -733,12 +733,18 @@ class TestSecurityHardeningS6(unittest.TestCase):
     def test_exception_sanitization_prevents_credential_leakage(self):
         """Exception sanitization prevents internal topology or credential details from leaking"""
         from anvil.health import cloudflare_api_request
+        import urllib.error
 
         # Mock environment to have a fake token
         with patch.dict(os.environ, {"CLOUDFLARE_API_TOKEN": "secret-token-12345"}):
-            with patch('requests.get') as mock_get:
-                # Simulate an API error that might expose credentials
-                mock_get.side_effect = Exception("Failed to connect to https://api.cloudflare.com with token secret-token-12345")
+            # Create an exception with sensitive data that should be sanitized
+            sensitive_error = urllib.error.URLError(
+                Exception("Failed to connect to https://internal.cloudflare.api.example.com:8443/analytics with Authorization: Bearer secret-token-12345")
+            )
+
+            # Patch urllib.request.urlopen to raise the exception
+            with patch('urllib.request.urlopen') as mock_urlopen:
+                mock_urlopen.side_effect = sensitive_error
 
                 try:
                     result = cloudflare_api_request(
@@ -747,21 +753,17 @@ class TestSecurityHardeningS6(unittest.TestCase):
                         "2026-11-04T10:00:00Z",
                         "2026-11-04T10:05:00Z"
                     )
-                    # If no exception, check the error message
-                    if "error" in result:
-                        error_msg = result["error"]
-                        # Should not contain the actual token
-                        self.assertNotIn("secret-token-12345", error_msg)
-                        self.assertNotIn("secret", error_msg.lower())
+                    # Should not reach here
+                    self.fail("Expected exception to be raised")
                 except Exception as e:
                     error_msg = str(e)
-                    # Exception message should not contain credentials
+                    # Exception message should not contain credentials or internal topology
                     self.assertNotIn("secret-token-12345", error_msg)
-                    # Should be sanitized to generic error
-                    self.assertTrue(
-                        "API" in error_msg or
-                        "Failed to read" in error_msg
-                    )
+                    self.assertNotIn("internal.cloudflare.api.example.com", error_msg)
+                    self.assertNotIn(":8443", error_msg)
+                    # Should be sanitized with redactions
+                    self.assertIn("[REDACTED]", error_msg)
+                    self.assertIn("[HOST]", error_msg)
 
 
 class TestHealthVerificationNonBlocking(unittest.TestCase):

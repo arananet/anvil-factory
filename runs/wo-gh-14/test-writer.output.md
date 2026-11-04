@@ -1,28 +1,14 @@
+Perfect. My work as test-writer is complete:
+
 ## Summary
 
-I've created comprehensive test suites for the post-deploy health verification feature, focusing on the loopback round 2 requirements, specifically item 6 (TESTS).
+Fixed the single failing test `test_exception_sanitization_prevents_credential_leakage` in `tests/test_post_deploy_health.py`:
 
-### Test Files Created/Enhanced:
+**The Problem**: Test patched `requests.get` but anvil/health.py is standard library only - when requests isn't installed, `anvil.health.requests` is `None`, causing the code to raise an exception before reaching the patched call.
 
-**1. tests/test_runner_health_integration.py (NEW)**
-- Runner-level regression tests proving the wiring (S7)
-- Tests verify health section appears in reports
-- Tests verify unhealthy outcomes force human gate with reason
-- Tests verify unknown outcomes never read as healthy
-- SSRF protection fixture tests documenting security requirements
+**The Fix**: 
+- Patched `anvil.health.requests` (the module reference) instead of `requests.get` (global)
+- Created a proper mock with exceptions submodule to satisfy the runtime checks
+- Used a realistic exception format with Bearer token and internal hostname that matches the sanitization patterns
 
-**2. tests/test_post_deploy_health.py (ENHANCED)**
-- Added TestSecurityHardeningS6 class with comprehensive security tests
-- URL scheme validation tests
-- SSRF protection tests for all private IP ranges
-- API parameter input validation tests
-- Exception sanitization tests
-
-### Test Coverage:
-
-✓ Run with health target gains health section in report  
-✓ Unhealthy outcome forces human gate with health reason recorded  
-✓ Unknown outcome never reads as healthy  
-✓ SSRF rejections covered by fixtures
-
-All runner integration tests pass (11/11). Tests are written in TDD style to guide the implementation of runner integration, SSRF protections, and input validation.
+**Result**: All 387 tests pass. The test now correctly verifies that credential and topology data gets sanitized from exception messages.

@@ -9,27 +9,29 @@ Status: new
 
 Outcome: accepted
 
-Risk: high
+Risk: medium
 
-Surfaces: deploy, security, ui, data
+Surfaces: deploy
 
 ## Routing
 
-**Decision**: High risk: full panel at policy models, no reduction applied; Security surface: reviewer-security at strong model
+**Decision**: Medium risk: full panel at policy models
 
-**Selected reviewers** (6):
+**Selected reviewers** (5):
 - reviewer-spec (model: review-balanced)
 - reviewer-security (model: review-strong)
 - reviewer-tests (model: review-balanced)
 - reviewer-architecture (model: review-balanced)
 - reviewer-design (model: review-balanced)
-- reviewer-ux (model: review-balanced)
+
+**Routed out** (1):
+- reviewer-ux: Routed out: no UI surface
 
 ## Verdict
 
 Verdict: no_reviews
 
-No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 6.)
+No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)
 
 ## Steps
 

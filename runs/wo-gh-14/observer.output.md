@@ -1,1 +1,1 @@
-Observer report created. The deployer hasn't executed yet, so there's no release record to observe. The output file documents that the required input is missing and explains the observer needs the deployer's release record before it can report what actually happened.
+Observer output created. The report notes that no deployment has occurred yet - the deployer status is `packet_ready` but hasn't executed, so the required release record input is missing. The observation is blocked until the deployer completes the release step.

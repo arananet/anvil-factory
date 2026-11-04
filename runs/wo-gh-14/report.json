@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 25539.596,
+      "duration_ms": 40882.713,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/intake.output.md"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-14/spec-writer.output.md",
-      "duration_ms": 217835.678,
+      "duration_ms": 39325.521,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/spec-writer.output.md"
@@ -40,7 +40,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-14/test-writer.output.md",
-      "duration_ms": 342144.842,
+      "duration_ms": 197335.288,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/test-writer.output.md"
@@ -56,12 +56,12 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-14/builder.output.md",
-      "duration_ms": 633204.87,
+      "duration_ms": 528968.34,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/builder.output.md"
       ],
-      "configured_model": "openai/gpt-6-astra",
+      "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
       "executor": {
         "kind": "command",
@@ -71,8 +71,8 @@
     {
       "station": "checks-gate",
       "status": "failed",
-      "detail": "Gate failed: 1 checks, protected paths: pass",
-      "duration_ms": 31477.994,
+      "detail": "Gate failed: 1 checks, protected paths: fail",
+      "duration_ms": 34210.305,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/checks-gate.pre-review.output.md"
@@ -85,23 +85,25 @@
         "python -m unittest discover -s tests -p 'test_*.py'"
       ],
       "exit_codes": [
-        1
+        0
       ],
       "protected_paths": [
         "tests/",
         "anvil.json",
         "pipelines/"
       ],
-      "protected_path_verdict": "pass",
-      "protected_path_findings": [],
+      "protected_path_verdict": "fail",
+      "protected_path_findings": [
+        "Protected path violation: tests/test_post_deploy_health.py (base ref file modified/deleted, matches tests/)"
+      ],
       "gate_verdict": "fail"
     },
     {
       "station": "loopback",
       "status": "loopback",
       "return_to": "builder",
-      "detail": "Loopback to builder: Gate checks failed",
-      "reason": "Gate checks failed",
+      "detail": "Loopback to builder: Gate failure: Protected path violation: tests/test_post_deploy_health.py (base ref file modified/deleted, matches tests/)",
+      "reason": "Gate failure: Protected path violation: tests/test_post_deploy_health.py (base ref file modified/deleted, matches tests/)",
       "duration_ms": 0.0,
       "cost": null,
       "artifacts": [],
@@ -115,7 +117,7 @@
       "station": "reviewer-spec",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 0.252,
+      "duration_ms": 0.243,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/reviewer-spec.packet.md"
@@ -128,7 +130,7 @@
       "station": "reviewer-security",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 0.211,
+      "duration_ms": 0.204,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/reviewer-security.packet.md"
@@ -141,7 +143,7 @@
       "station": "reviewer-tests",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 0.237,
+      "duration_ms": 0.186,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/reviewer-tests.packet.md"
@@ -154,7 +156,7 @@
       "station": "reviewer-architecture",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 0.234,
+      "duration_ms": 0.205,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/reviewer-architecture.packet.md"
@@ -167,7 +169,7 @@
       "station": "reviewer-design",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 1.231,
+      "duration_ms": 1.63,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/reviewer-design.packet.md"
@@ -180,7 +182,7 @@
       "station": "reviewer-ux",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 1.063,
+      "duration_ms": 1.392,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/reviewer-ux.packet.md"
@@ -193,7 +195,7 @@
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.026,
+      "duration_ms": 0.034,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/report.json"
@@ -206,7 +208,7 @@
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: required",
-      "duration_ms": 0.006,
+      "duration_ms": 0.01,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -217,7 +219,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-14/deployer.packet.md",
-      "duration_ms": 0.213,
+      "duration_ms": 0.18,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/deployer.packet.md"
@@ -230,7 +232,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-14/observer.output.md",
-      "duration_ms": 53558.784,
+      "duration_ms": 61787.7,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/observer.output.md"
@@ -260,10 +262,9 @@
         "reviewer-security",
         "reviewer-tests",
         "reviewer-architecture",
-        "reviewer-design",
-        "reviewer-ux"
+        "reviewer-design"
       ],
-      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 6.)"
+      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)"
     },
     "human_gate": {
       "required": true,
@@ -272,7 +273,7 @@
     }
   },
   "warnings": [],
-  "base_ref": "d030decc7d43e1ab4826b8b237417dc3c4ccaf54",
+  "base_ref": "7af31be1968bfc6e84fc950cfb0cb3ee643f89db",
   "evidence": [
     {
       "type": "screenshot",

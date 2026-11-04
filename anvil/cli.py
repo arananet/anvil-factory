@@ -8,7 +8,7 @@ from .onboard import onboard_project
 from .blueprints import get_blueprint
 from .model import WorkOrder
 from .runner import run_pipeline
-from .config import load_anvil_config, apply_overrides, runtime_config, deploy_config
+from .config import load_anvil_config, apply_overrides, runtime_config, deploy_config, health_config
 from .executor import create_executor
 from .statuspage import generate_status_page
 from .brain import check_brain, promote_learning, demote_learning
@@ -95,6 +95,7 @@ def main(argv=None):
         wo = WorkOrder.from_dict(data)
         executor = None
         deploy_cfg = None
+        health_cfg = None
         if args.execute:
             cfg = load_anvil_config(Path(args.project) / "anvil.yaml")
             runtime = runtime_config(cfg)
@@ -103,6 +104,7 @@ def main(argv=None):
                 return 2
             executor = create_executor(runtime)
             deploy_cfg = deploy_config(cfg)
+            health_cfg = health_config(cfg)
 
         # Loopback round 3: Derive base ref from git when in a repository
         base_ref = args.base_ref
@@ -120,7 +122,7 @@ def main(argv=None):
             # Derive base ref from git merge-base
             base_ref = derive_base_ref(args.project, base_branch=base_branch)
 
-        report = run_pipeline(args.project, pipe, wo, registry=reg, executor=executor, deploy_cfg=deploy_cfg, base_ref=base_ref)
+        report = run_pipeline(args.project, pipe, wo, registry=reg, executor=executor, deploy_cfg=deploy_cfg, health_cfg=health_cfg, base_ref=base_ref)
         print(json.dumps(report.to_dict(), indent=2))
         print(f"Report: {Path(args.project) / 'runs' / wo.id / 'report.json'}")
         return 0

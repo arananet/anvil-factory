@@ -63,6 +63,14 @@ GATE LOOPBACK (round 2). Round 1 verdict was rejected with 5 of 5 reviews counte
 
 Guardrails: health verification stays deterministic, never a model station. No changes to the review parsing contract, the reviewer prompts or Output Format sections, the wo-gh-24 producer mechanisms, or the checks gate base ref behavior. Keep the full suite green and every pipeline valid; update docs and CHANGELOG Unreleased for the wiring. No em dash or en dash characters in any produced file.
 
+
+CLOSING VERIFICATION ROUND (round 3). Round 2 implemented the loopback scope but its run produced no verdict: the checks gate failed the suite on exactly one error and every reviewer was skipped (verdict no_reviews, 0 counted). The gate output is unambiguous: 387 tests ran, one error, in the run's own new test tests/test_post_deploy_health.py test_exception_sanitization_prevents_credential_leakage, which patches 'requests.get'; the factory is standard library only, the requests package is not installed, and anvil/health.py performs HTTP through the standard library. Every other test passed, including the new runner health integration tests.
+
+This round's entire scope:
+1. Rewrite that one test so it patches the standard library HTTP entry point anvil/health.py actually uses, keeping the sanitization assertion at full strength (a raised transport error carrying internal topology or credential detail must not surface those details in the recorded health result). Do not weaken, skip or delete any other test, and do not touch tests that round 2 did not author except this one file and only this one test.
+2. Verify the round 2 wiring stands as briefed and complete only what is actually missing from it: the runner calls verify_health after the deploy step with the target loaded and validated from project configuration; the report carries the health section; the deployment status reflects the outcome; an unhealthy outcome forces the human gate with the health reason in the decision record; the swimlane shows the health step; the SSRF and input validations are in anvil/health.py; the 390x844 responsive fix with rendered evidence at both breakpoints; the demonstration target choice and reason recorded with the health evidence in a run report (this run's report is the carrier). If the demonstration record is still missing, produce it in this run through the wired path, choosing the factory owned target that is checkable from this environment and recording the choice and reason.
+3. Nothing else changes. The review parsing contract, reviewer prompts, producer mechanisms, checks gate base ref behavior and the verified S4 metrics slot are frozen. Full suite green and every pipeline valid at the gate; docs and CHANGELOG already updated in round 2 stand unless the wiring completion requires a correction.
+
 - risk_hints: production-deploy
 - status: new
 

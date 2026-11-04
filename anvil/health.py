@@ -199,6 +199,10 @@ def cloudflare_api_request(account_id: str, worker_name: str,
     Raises:
         Exception: On API errors
     """
+    import urllib.request
+    import urllib.error
+    import json
+
     # Validate identifiers to prevent injection
     valid, error = _validate_identifier(account_id, "account_id")
     if not valid:
@@ -215,41 +219,47 @@ def cloudflare_api_request(account_id: str, worker_name: str,
 
     # Use GraphQL analytics API
     # This is a simplified implementation - real API would query analytics
-    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/workers/scripts/{worker_name}/analytics"
+    base_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/workers/scripts/{worker_name}/analytics"
 
-    headers = {
-        "Authorization": f"Bearer {api_token}",
-        "Content-Type": "application/json"
-    }
-
+    # Build URL with query parameters
+    from urllib.parse import urlencode
     params = {
         "since": window_start,
         "until": window_end
     }
+    url = f"{base_url}?{urlencode(params)}"
 
-    if requests is None:
-        raise Exception("requests library not available for Cloudflare API")
+    # Create request with headers
+    request = urllib.request.Request(url)
+    request.add_header("Authorization", f"Bearer {api_token}")
+    request.add_header("Content-Type", "application/json")
 
     try:
-        response = requests.get(url, headers=headers, params=params, timeout=30)
-        if response.status_code == 401:
-            raise Exception("API authentication failed")
-        if response.status_code == 403:
-            raise Exception("API access forbidden")
-        if response.status_code >= 400:
-            raise Exception(f"API returned status {response.status_code}")
+        response = urllib.request.urlopen(request, timeout=30)
+        response_data = response.read().decode('utf-8')
+        data = json.loads(response_data)
 
-        data = response.json()
         # Extract metrics from response
         # Real API format may vary - this is a simplified structure
         return {
             "requests": data.get("result", {}).get("requests", 0),
             "errors": data.get("result", {}).get("errors", 0)
         }
-    except requests.exceptions.Timeout:
-        raise Exception("API request timeout")
-    except requests.exceptions.ConnectionError:
-        raise Exception("API connection failed")
+    except urllib.error.HTTPError as e:
+        if e.code == 401:
+            raise Exception("API authentication failed")
+        if e.code == 403:
+            raise Exception("API access forbidden")
+        if e.code >= 400:
+            raise Exception(f"API returned status {e.code}")
+        raise Exception(_sanitize_exception(e))
+    except urllib.error.URLError as e:
+        reason_str = str(e.reason)
+        if "timed out" in reason_str.lower() or "timeout" in reason_str.lower():
+            raise Exception("API request timeout")
+        # Sanitize the error reason to prevent credential/topology leakage
+        sanitized_reason = _sanitize_exception(Exception(reason_str))
+        raise Exception(f"API connection failed: {sanitized_reason}")
     except Exception as e:
         if "API" in str(e) or "authentication" in str(e).lower() or "access forbidden" in str(e).lower():
             raise
