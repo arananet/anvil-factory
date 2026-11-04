@@ -1,20 +1,12 @@
-Gate round 2 builder work complete.
-
 ## Summary
 
-**Root cause fixed**: Four render crash tolerance tests (s1, s3, s4, s5) now set `VIDEO_CONTENT_DIR` to their tmp work directories when calling `render_stats.py`, preventing production file modifications.
+Fixed the relative project path crash in reviewer-design preparation (loopback round 3 for wo-gh-26).
 
-**Verification results**:
-- Video file staging: hash and size match ✓
-- Test suite: 203 tests passed, 0 failed ✓
-- Content directory: no modifications, byte-identical to staging ✓
-- Pipeline validation: all 9 pipelines valid ✓
+**The fix:** Changed line 560 in `anvil/runner.py` to use `project_resolved` instead of `project` when computing declared evidence display paths. This prevents ValueError when the CLI runs with a relative project argument like `python3 -m anvil.cli run . --pipeline ...`
 
-**Changed files**:
-- tests/test_render_crash_tolerance_s1.py
-- tests/test_render_crash_tolerance_s3.py
-- tests/test_render_crash_tolerance_s4.py
-- tests/test_render_crash_tolerance_s5.py
-- runs/wo-gh-26/builder.output.md
+**Verification complete:**
+- Content staging verified: video file hash and size correct, durations.json absent, no modifications to content/
+- Full factory suite: 204 tests passed (including T6 regression test for relative paths)
+- All 9 pipelines valid
 
-Round 1 implementation remains intact: declared evidence wiring, DeclaredEvidenceMissing error, packet evidence naming, reviewer packet sections, content-film-review pipeline, and all six scenario tests.
+The implementation from rounds 1 and 2 stands unchanged. This was a surgical fix for the path resolution bug discovered when wo-gh-27 executed the new code path.

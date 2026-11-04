@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "completed",
       "detail": "Work order normalized",
-      "duration_ms": 0.011,
+      "duration_ms": 0.01,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/report.json"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/spec-writer.output.md",
-      "duration_ms": 72595.795,
+      "duration_ms": 93298.199,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/spec-writer.output.md"
@@ -35,7 +35,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2698,
+      "measured_tokens": 3667,
       "budget": 0,
       "budget_action": "none"
     },
@@ -43,7 +43,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/test-writer.output.md",
-      "duration_ms": 126974.997,
+      "duration_ms": 126572.416,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/test-writer.output.md"
@@ -54,7 +54,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2704,
+      "measured_tokens": 3673,
       "budget": 0,
       "budget_action": "none"
     },
@@ -62,7 +62,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/builder.output.md",
-      "duration_ms": 208128.925,
+      "duration_ms": 156605.461,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/builder.output.md"
@@ -73,7 +73,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 3236,
+      "measured_tokens": 4206,
       "budget": 50000,
       "budget_action": "sent"
     },
@@ -81,7 +81,7 @@
       "station": "reviewer-spec",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/reviewer-spec.output.md",
-      "duration_ms": 115293.347,
+      "duration_ms": 119527.549,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/reviewer-spec.output.md"
@@ -92,7 +92,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2901,
+      "measured_tokens": 3871,
       "budget": 0,
       "budget_action": "none"
     },
@@ -100,7 +100,7 @@
       "station": "reviewer-security",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/reviewer-security.output.md",
-      "duration_ms": 213919.763,
+      "duration_ms": 120802.013,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/reviewer-security.output.md"
@@ -111,7 +111,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2912,
+      "measured_tokens": 3882,
       "budget": 0,
       "budget_action": "none"
     },
@@ -119,7 +119,7 @@
       "station": "reviewer-tests",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/reviewer-tests.output.md",
-      "duration_ms": 206093.862,
+      "duration_ms": 84841.366,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/reviewer-tests.output.md"
@@ -130,7 +130,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2914,
+      "measured_tokens": 3884,
       "budget": 0,
       "budget_action": "none"
     },
@@ -138,7 +138,7 @@
       "station": "reviewer-architecture",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/reviewer-architecture.output.md",
-      "duration_ms": 179038.811,
+      "duration_ms": 136183.745,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/reviewer-architecture.output.md"
@@ -149,7 +149,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2938,
+      "measured_tokens": 3908,
       "budget": 0,
       "budget_action": "none"
     },
@@ -157,7 +157,7 @@
       "station": "reviewer-design",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/reviewer-design.output.md; review output did not parse as a review JSON",
-      "duration_ms": 42381.598,
+      "duration_ms": 46167.69,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/reviewer-design.output.md"
@@ -168,7 +168,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 4494,
+      "measured_tokens": 4544,
       "budget": 50000,
       "budget_action": "sent"
     },
@@ -176,7 +176,7 @@
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: approved",
-      "duration_ms": 0.038,
+      "duration_ms": 0.037,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/report.json"
@@ -192,7 +192,7 @@
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: not_required",
-      "duration_ms": 0.011,
+      "duration_ms": 0.014,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -206,7 +206,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-26/deployer.packet.md",
-      "duration_ms": 0.234,
+      "duration_ms": 61.347,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/deployer.packet.md"
@@ -214,7 +214,7 @@
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
       "executor": null,
-      "measured_tokens": 2776,
+      "measured_tokens": 3746,
       "budget": 0,
       "budget_action": "none"
     },
@@ -222,7 +222,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/observer.output.md",
-      "duration_ms": 138445.224,
+      "duration_ms": 152629.034,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/observer.output.md"
@@ -233,7 +233,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2783,
+      "measured_tokens": 3753,
       "budget": 0,
       "budget_action": "none"
     }
@@ -281,5 +281,5 @@
     }
   },
   "warnings": [],
-  "astra_measured_tokens_total": 7730
+  "astra_measured_tokens_total": 8750
 }

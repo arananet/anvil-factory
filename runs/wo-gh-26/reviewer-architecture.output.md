@@ -1,34 +1,29 @@
-## Architecture Review: Pass
+## Architectural Review Complete
 
-The implementation fits well with the project structure and architectural decisions.
+**Verdict: PASS**
 
-**Verified alignment with Decision 0001 (Composable stations)**:
-- content-film-review.json correctly references existing stations without redefining them
-- Pipeline count increased from 8 to 9 as expected
-- Pipeline structure matches spec R5 exactly: intake → parallel [reviewer-design, reviewer-facts] → approver → triage-human → publisher → observer
+The implementation properly fits the project architecture across all dimensions:
 
-**Verified alignment with project principles** (brain/project.md):
-- Spec before code: ✓ spec exists at .openspec/specs/declared-evidence-review/spec.md
-- Tests before implementation: ✓ 6 scenario tests implemented and passing
-- Builder/reviewer separation: ✓ maintained (reviewers consume packets, don't build)
-- Artifacts in repo: ✓ pipeline file, tests, CHANGELOG entry all present
+**1. Composable Stations (Decision 0001)**: The new `content-film-review.json` pipeline correctly composes existing stations without redefining them. The pipeline structure (intake → parallel [reviewer-design, reviewer-facts] → approver → triage-human → publisher → observer) follows the reusable station pattern.
 
-**Frozen surfaces respected**:
-- parse_review semantics and review channel discipline: unchanged
-- PNG hardening from wo-gh-21: reused in assemble_contact_sheet(), not weakened
-- Python stdlib only: verified in tests (no external dependencies)
-- No em/en dash characters: verified in new files
+**2. Production Shape Evidence (Decision 0003)**: The declared evidence feature directly supports the project's architectural decision that evidence must exercise the production shape. By enabling pre-existing production evidence to reach review stations, this implementation aligns with the principle established after the Sentia bundling incident.
 
-**Implementation quality**:
-- R1-R5 requirements all implemented correctly in runner.py
-- DeclaredEvidenceMissing exception provides loud, named failures
-- Declared evidence paths properly integrated into reviewer packets
-- All 6 scenario tests pass; full suite green (203 tests)
+**3. Path Resolution Architecture**: The round 3 fix properly resolves the defect discovered in wo-gh-27. The implementation now:
+- Resolves the project path once at preparation time (line 510: `project_resolved = project.resolve()`)
+- Uses absolute paths internally for validation and operations
+- Computes display paths consistently using `project_resolved` (line 560)
+- Works identically for relative CLI arguments (`python -m anvil.cli run .`) and absolute paths
 
-**Round 2 verification**:
-- Video staging: hash a277ce32... and size 21,401,761 bytes verified ✓
-- content/ directory: no modifications, byte-identical to staging ✓
-- durations.json: absent as required ✓
-- Full test suite: 203 passed, 0 failed ✓
+**4. Separation of Concerns**: Each responsibility is properly isolated:
+- Evidence validation in `prepare_reviewer_design_step` (before execution, fail-fast)
+- Contact sheet assembly via existing `assemble_contact_sheet` (reused PNG hardening from wo-gh-21)
+- Packet building in `build_reviewer_design_packet` (scoped, with allowlist verification)
+- General reviewer packet handling in `_packet_text` (R4 implementation)
 
-The implementation extends the existing architecture cleanly without violating any frozen surfaces or architectural decisions.
+**5. Review-Only Pipeline**: The new pipeline contains zero authoring stations, maintaining the architectural separation between content production and review.
+
+**6. Test Coverage**: All six spec scenarios (S1-S6) verified with deterministic tests, including regression test T6 for the relative path defect. All tests pass.
+
+**7. Frozen Surfaces**: All specified surfaces remain untouched, including the review channel contract, parse_review semantics, and PNG security hardening.
+
+No architectural concerns found.

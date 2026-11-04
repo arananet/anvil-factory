@@ -47,6 +47,9 @@ Staged inputs, not product: the film evidence under content/youtube-anvil-v2/ is
 ### Scenario: The review only pipeline contains exactly the review stations
 - S5: Given pipelines/content-film-review.json, when the pipeline is loaded and its topological order computed, then the order is intake, then reviewer-design and reviewer-facts as the parallel review stage, then approver, triage-human, publisher, observer, and no authoring station appears.
 
+### Scenario: Relative project paths work identically to absolute paths
+- S6: Given a work order declaring evidence images and a relative project path argument (the CLI form: project argument '.', invoked from inside the project directory), when the reviewer-design step is prepared, then the preparation succeeds and the packet lists each declared path, computed against the resolved project root rather than raising ValueError from mixing absolute and relative paths.
+
 ## Tests
 
 Deterministic tests in the factory suite (tests/), named for their scenarios, using small PNG fixtures generated through the codebase's own PNG writing helpers or fixtures in the style of tests/test_astra_consumption.py. No model calls, no network.
@@ -56,4 +59,5 @@ Deterministic tests in the factory suite (tests/), named for their scenarios, us
 - T3 (S3): the built reviewer-design packet lists the contact sheet and each declared path individually.
 - T4 (S4): a packet prepared for another reviewer station contains the Declared evidence inputs section with each declared path.
 - T5 (S5): the new pipeline file loads, validates, and its topological order matches S5 exactly.
+- T6 (S6): a reviewer-design step prepared with a relative project path (project argument '.', from inside a tmp project) and declared PNG fixtures returns a packet listing the declared paths without raising.
 - The full factory suite stays green and all pipelines stay valid (the count grows by the one new pipeline).

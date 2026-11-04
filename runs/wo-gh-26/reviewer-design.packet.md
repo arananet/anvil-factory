@@ -192,6 +192,9 @@ Staged inputs, not product: the film evidence under content/youtube-anvil-v2/ is
 ### Scenario: The review only pipeline contains exactly the review stations
 - S5: Given pipelines/content-film-review.json, when the pipeline is loaded and its topological order computed, then the order is intake, then reviewer-design and reviewer-facts as the parallel review stage, then approver, triage-human, publisher, observer, and no authoring station appears.
 
+### Scenario: Relative project paths work identically to absolute paths
+- S6: Given a work order declaring evidence images and a relative project path argument (the CLI form: project argument '.', invoked from inside the project directory), when the reviewer-design step is prepared, then the preparation succeeds and the packet lists each declared path, computed against the resolved project root rather than raising ValueError from mixing absolute and relative paths.
+
 ## Tests
 
 Deterministic tests in the factory suite (tests/), named for their scenarios, using small PNG fixtures generated through the codebase's own PNG writing helpers or fixtures in the style of tests/test_astra_consumption.py. No model calls, no network.
@@ -201,41 +204,37 @@ Deterministic tests in the factory suite (tests/), named for their scenarios, us
 - T3 (S3): the built reviewer-design packet lists the contact sheet and each declared path individually.
 - T4 (S4): a packet prepared for another reviewer station contains the Declared evidence inputs section with each declared path.
 - T5 (S5): the new pipeline file loads, validates, and its topological order matches S5 exactly.
+- T6 (S6): a reviewer-design step prepared with a relative project path (project argument '.', from inside a tmp project) and declared PNG fixtures returns a packet listing the declared paths without raising.
 - The full factory suite stays green and all pipelines stay valid (the count grows by the one new pipeline).
 
 
 ## Diff summary
 
-- runs/wo-gh-26/builder.output.md: +15, -19
-- runs/wo-gh-26/builder.packet.md: +14, -0
+- .openspec/specs/declared-evidence-review/spec.md: +4, -0
+- anvil/runner.py: +1, -1
+- runs/wo-gh-26/builder.output.md: +7, -15
+- runs/wo-gh-26/builder.packet.md: +12, -0
 - runs/wo-gh-26/envelopes/builder.envelope.json: +1, -1
 - runs/wo-gh-26/envelopes/intake.envelope.json: +1, -1
-- runs/wo-gh-26/envelopes/reviewer-architecture.envelope.json: +2, -13
+- runs/wo-gh-26/envelopes/reviewer-architecture.envelope.json: +1, -1
 - runs/wo-gh-26/envelopes/reviewer-security.envelope.json: +1, -1
-- runs/wo-gh-26/envelopes/reviewer-spec.envelope.json: +3, -5
-- runs/wo-gh-26/envelopes/reviewer-tests.envelope.json: +3, -8
+- runs/wo-gh-26/envelopes/reviewer-spec.envelope.json: +1, -1
+- runs/wo-gh-26/envelopes/reviewer-tests.envelope.json: +1, -1
 - runs/wo-gh-26/envelopes/spec-writer.envelope.json: +1, -1
 - runs/wo-gh-26/envelopes/test-writer.envelope.json: +1, -1
-- runs/wo-gh-26/reviewer-architecture.output.md: +34, -1
-- runs/wo-gh-26/reviewer-architecture.packet.md: +14, -0
-- runs/wo-gh-26/reviewer-architecture.review.json: +1, -12
-- runs/wo-gh-26/reviewer-security.output.md: +13, -25
-- runs/wo-gh-26/reviewer-security.packet.md: +14, -0
-- runs/wo-gh-26/reviewer-spec.output.md: +6, -13
-- runs/wo-gh-26/reviewer-spec.packet.md: +14, -0
-- runs/wo-gh-26/reviewer-spec.review.json: +2, -4
-- runs/wo-gh-26/reviewer-tests.output.md: +15, -6
-- runs/wo-gh-26/reviewer-tests.packet.md: +14, -0
-- runs/wo-gh-26/reviewer-tests.review.json: +2, -7
-- runs/wo-gh-26/spec-writer.output.md: +11, -1
-- runs/wo-gh-26/spec-writer.packet.md: +14, -0
-- runs/wo-gh-26/test-writer.output.md: +1, -23
-- runs/wo-gh-26/test-writer.packet.md: +14, -0
-- runs/wo-gh-26/test-writer.review.json: +1, -2
-- tests/test_render_crash_tolerance_s1.py: +1, -1
-- tests/test_render_crash_tolerance_s3.py: +1, -0
-- tests/test_render_crash_tolerance_s4.py: +1, -0
-- tests/test_render_crash_tolerance_s5.py: +1, -0
+- runs/wo-gh-26/reviewer-architecture.output.md: +29, -34
+- runs/wo-gh-26/reviewer-architecture.packet.md: +12, -0
+- runs/wo-gh-26/reviewer-security.output.md: +7, -14
+- runs/wo-gh-26/reviewer-security.packet.md: +12, -0
+- runs/wo-gh-26/reviewer-spec.output.md: +23, -6
+- runs/wo-gh-26/reviewer-spec.packet.md: +12, -0
+- runs/wo-gh-26/reviewer-tests.output.md: +1, -20
+- runs/wo-gh-26/reviewer-tests.packet.md: +12, -0
+- runs/wo-gh-26/spec-writer.output.md: +1, -11
+- runs/wo-gh-26/spec-writer.packet.md: +12, -0
+- runs/wo-gh-26/test-writer.output.md: +22, -1
+- runs/wo-gh-26/test-writer.packet.md: +12, -0
+- tests/test_declared_evidence_review.py: +91, -0
 
 ## File access allowlist
 
@@ -243,6 +242,8 @@ This packet may only embed content from:
 - design/DESIGN.md
 - design/tokens.json
 - .openspec/specs/declared-evidence-review/spec.md
+- .openspec/specs/declared-evidence-review/spec.md
+- anvil/runner.py
 - runs/wo-gh-26/builder.output.md
 - runs/wo-gh-26/builder.packet.md
 - runs/wo-gh-26/envelopes/builder.envelope.json
@@ -255,21 +256,14 @@ This packet may only embed content from:
 - runs/wo-gh-26/envelopes/test-writer.envelope.json
 - runs/wo-gh-26/reviewer-architecture.output.md
 - runs/wo-gh-26/reviewer-architecture.packet.md
-- runs/wo-gh-26/reviewer-architecture.review.json
 - runs/wo-gh-26/reviewer-security.output.md
 - runs/wo-gh-26/reviewer-security.packet.md
 - runs/wo-gh-26/reviewer-spec.output.md
 - runs/wo-gh-26/reviewer-spec.packet.md
-- runs/wo-gh-26/reviewer-spec.review.json
 - runs/wo-gh-26/reviewer-tests.output.md
 - runs/wo-gh-26/reviewer-tests.packet.md
-- runs/wo-gh-26/reviewer-tests.review.json
 - runs/wo-gh-26/spec-writer.output.md
 - runs/wo-gh-26/spec-writer.packet.md
 - runs/wo-gh-26/test-writer.output.md
 - runs/wo-gh-26/test-writer.packet.md
-- runs/wo-gh-26/test-writer.review.json
-- tests/test_render_crash_tolerance_s1.py
-- tests/test_render_crash_tolerance_s3.py
-- tests/test_render_crash_tolerance_s4.py
-- tests/test_render_crash_tolerance_s5.py
+- tests/test_declared_evidence_review.py
