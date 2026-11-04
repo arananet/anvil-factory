@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 91219.454,
+      "duration_ms": 59822.586,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-12/intake.output.md"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-12/spec-writer.output.md",
-      "duration_ms": 124671.471,
+      "duration_ms": 98398.929,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-12/spec-writer.output.md"
@@ -40,7 +40,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-12/test-writer.output.md",
-      "duration_ms": 215339.052,
+      "duration_ms": 369970.547,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-12/test-writer.output.md"
@@ -56,7 +56,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-12/builder.output.md",
-      "duration_ms": 734449.664,
+      "duration_ms": 423072.62,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-12/builder.output.md"
@@ -72,7 +72,7 @@
       "station": "checks-gate",
       "status": "failed",
       "detail": "Gate failed: 1 checks, protected paths: fail",
-      "duration_ms": 28898.849,
+      "duration_ms": 30782.998,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-12/checks-gate.pre-review.output.md"
@@ -85,7 +85,7 @@
         "python -m unittest discover -s tests -p 'test_*.py'"
       ],
       "exit_codes": [
-        1
+        0
       ],
       "protected_paths": [
         "tests/",
@@ -94,9 +94,8 @@
       ],
       "protected_path_verdict": "fail",
       "protected_path_findings": [
-        "Protected path violation: pipelines/sdlc-default.json (base ref file modified/deleted, matches pipelines/)",
-        "Protected path violation: pipelines/content-default.json (base ref file modified/deleted, matches pipelines/)",
-        "Protected path violation: pipelines/content-short.json (base ref file modified/deleted, matches pipelines/)"
+        "Protected path violation: tests/test_supervisor.py (base ref file modified/deleted, matches tests/)",
+        "Protected path violation: tests/test_risk_routing.py (base ref file modified/deleted, matches tests/)"
       ],
       "gate_verdict": "fail"
     },
@@ -104,8 +103,8 @@
       "station": "loopback",
       "status": "loopback",
       "return_to": "builder",
-      "detail": "Loopback to builder: Gate failure: Protected path violation: pipelines/sdlc-default.json (base ref file modified/deleted, matches pipelines/); Protected path violation: pipelines/content-default.json (base ref file modified/deleted, matches pipelines/); Protected path violation: pipelines/content-short.json (base ref file modified/deleted, matches pipelines/)",
-      "reason": "Gate failure: Protected path violation: pipelines/sdlc-default.json (base ref file modified/deleted, matches pipelines/); Protected path violation: pipelines/content-default.json (base ref file modified/deleted, matches pipelines/); Protected path violation: pipelines/content-short.json (base ref file modified/deleted, matches pipelines/)",
+      "detail": "Loopback to builder: Gate failure: Protected path violation: tests/test_supervisor.py (base ref file modified/deleted, matches tests/); Protected path violation: tests/test_risk_routing.py (base ref file modified/deleted, matches tests/)",
+      "reason": "Gate failure: Protected path violation: tests/test_supervisor.py (base ref file modified/deleted, matches tests/); Protected path violation: tests/test_risk_routing.py (base ref file modified/deleted, matches tests/)",
       "duration_ms": 0.0,
       "cost": null,
       "artifacts": [],
@@ -119,7 +118,7 @@
       "station": "reviewer-spec",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 0.089,
+      "duration_ms": 0.176,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-12/reviewer-spec.packet.md"
@@ -132,7 +131,7 @@
       "station": "reviewer-security",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 0.055,
+      "duration_ms": 0.171,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-12/reviewer-security.packet.md"
@@ -145,7 +144,7 @@
       "station": "reviewer-tests",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 0.052,
+      "duration_ms": 0.132,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-12/reviewer-tests.packet.md"
@@ -158,7 +157,7 @@
       "station": "reviewer-architecture",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 0.058,
+      "duration_ms": 0.131,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-12/reviewer-architecture.packet.md"
@@ -171,7 +170,7 @@
       "station": "reviewer-design",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 1.025,
+      "duration_ms": 1.234,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-12/reviewer-design.packet.md"
@@ -181,10 +180,23 @@
       "executor": null
     },
     {
+      "station": "reviewer-ux",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 1.197,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-12/reviewer-ux.packet.md"
+      ],
+      "configured_model": "openai/gpt-6-astra",
+      "executed_model": null,
+      "executor": null
+    },
+    {
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.017,
+      "duration_ms": 0.021,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-12/report.json"
@@ -197,7 +209,7 @@
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: required",
-      "duration_ms": 0.006,
+      "duration_ms": 0.007,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -208,7 +220,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-12/deployer.packet.md",
-      "duration_ms": 0.055,
+      "duration_ms": 0.133,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-12/deployer.packet.md"
@@ -221,7 +233,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-12/observer.output.md",
-      "duration_ms": 106980.481,
+      "duration_ms": 97114.141,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-12/observer.output.md"
@@ -248,10 +260,9 @@
         "reviewer-spec",
         "reviewer-security",
         "reviewer-tests",
-        "reviewer-architecture",
-        "reviewer-design"
+        "reviewer-architecture"
       ],
-      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)"
+      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 4.)"
     },
     "human_gate": {
       "required": true,
@@ -260,7 +271,7 @@
     }
   },
   "warnings": [],
-  "base_ref": "bb61da34d7c2d1b6a49f44bca26b087120ee4468",
+  "base_ref": "fab323c52ecffc1eff59b85c98f4177e193aa7ab",
   "evidence": [
     {
       "type": "screenshot",

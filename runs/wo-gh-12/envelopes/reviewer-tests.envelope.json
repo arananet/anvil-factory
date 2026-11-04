@@ -5,6 +5,6 @@
   "work_order_id": "wo-gh-12",
   "artifact_path": "runs/wo-gh-12/reviewer-tests.packet.md",
   "status": "skipped",
-  "created_at": "2026-11-04T05:27:13.198516+00:00",
+  "created_at": "2026-11-04T05:48:19.382312+00:00",
   "configured_model": "review-balanced"
 }

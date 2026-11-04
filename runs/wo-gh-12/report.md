@@ -17,18 +17,21 @@ Surfaces: content
 
 **Decision**: Medium risk: full panel at policy models
 
-**Selected reviewers** (5):
+**Selected reviewers** (4):
 - reviewer-spec (model: review-balanced)
 - reviewer-security (model: review-strong)
 - reviewer-tests (model: review-balanced)
 - reviewer-architecture (model: review-balanced)
-- reviewer-design (model: review-balanced)
+
+**Routed out** (2):
+- reviewer-ux: Routed out: no UI surface
+- reviewer-design: Routed out: no UI surface
 
 ## Verdict
 
 Verdict: no_reviews
 
-No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)
+No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 4.)
 
 ## Steps
 
@@ -43,6 +46,7 @@ No reviews were produced in this run, so the verdict is no_reviews; standing pro
 - reviewer-tests: skipped
 - reviewer-architecture: skipped
 - reviewer-design: skipped
+- reviewer-ux: skipped
 - approver: completed
 - triage-human: completed
 - deployer: packet_ready

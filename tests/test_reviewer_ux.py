@@ -102,11 +102,14 @@ elif station.startswith("reviewer"):
     if station == "reviewer-design":
         findings = ["Design token spacing violation at header"]
     elif station == "reviewer-ux":
-        # Check if packet mentions "judged from source" or has rendered evidence
+        # Check if packet has actual rendered evidence (screenshots)
         packet_text = open(packet_path, encoding="utf-8").read()
-        if "## Rendered evidence" not in packet_text:
-            # No screenshots - review should state this
-            findings = ["Note: Judged from source and knowledge slice without rendered evidence"]
+        # Look for actual screenshot references, not just the header
+        has_screenshots = ("## Rendered evidence" in packet_text and
+                          "screenshot-" in packet_text)
+        if not has_screenshots:
+            # No screenshots - review should state this (S5)
+            findings = ["Judged from source and knowledge slice without rendered evidence"]
         else:
             findings = ["Primary action button not keyboard accessible"]
 

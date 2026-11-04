@@ -79,7 +79,6 @@ Your verdict must be one of: `pass`, `fail`, or `changes_requested`.
 
 Return a JSON object with this structure:
 
-```json
 {
   "station": "reviewer-ux",
   "verdict": "pass | fail | changes_requested",
@@ -88,33 +87,5 @@ Return a JSON object with this structure:
     "Another finding if applicable"
   ]
 }
-```
 
 The station field must equal "reviewer-ux", the verdict must be one of pass, fail, or changes_requested, and findings must be a list of strings.
-
-## Examples
-
-### Example 1: Interface judged without rendered evidence
-
-- verdict: pass
-- findings: ["Note: Judged from source and knowledge slice without rendered evidence. Source review shows labeled form controls and keyboard-accessible navigation."]
-
-### Example 2: Flow breakdown
-
-- verdict: changes_requested
-- findings:
-  * "Flow breakdown: User cannot complete the primary task (search) because the search button is only visible after scrolling, but there is no visual cue that content exists below the fold."
-  * "Usability (visibility of state): Form submission provides no loading indicator or confirmation, leaving users uncertain whether their action succeeded."
-
-### Example 3: Accessibility issues
-
-- verdict: changes_requested
-- findings:
-  * "Accessibility: Primary action button lacks visible focus indicator, preventing keyboard users from knowing where focus is."
-  * "Accessibility (contrast): Error message text at #FF0000 on #FFCCCC background has insufficient contrast (2.1:1, requires minimum 4.5:1 per design system quality bars)."
-  * "Copy clarity: Error message 'Invalid input' does not explain what went wrong or how to fix it."
-
-### Example 4: Usable interface
-
-- verdict: pass
-- findings: []

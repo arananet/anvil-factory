@@ -46,6 +46,18 @@ Tests covering S1 to S5 in the factory suite style, including the ui-surface sel
 GitHub issue: https://github.com/arananet/anvil-factory/issues/12
 
 Operator standing note for every round of this order: the builder must not create or modify anything under .github/workflows/ (the Actions token cannot push workflow changes; a run that touches them loses its commit-back). Tooling the run needs is staged by the operator in the workflow before the line step. Test changes are written by the test-writer station; the builder must not modify tests/, anvil.json or pipelines/. Tests must be real: every test calls the implementation it names and asserts behavior, never the mere existence of data structures.
+
+CLOSING AND REPAIR RUN (after run 41777213190, verdict no_reviews). Two facts frame this run, stated plainly. First, round 1's builder added reviewer-ux to pipelines/sdlc-default.json, pipelines/content-default.json and pipelines/content-short.json; pipelines/ is a protected path, so the checks gate blocked round 1 before any review. That pipeline composition change is this item's core deliverable; it stands in the tree and is part of what the reviewers judge in this run. The builder must not modify pipelines/, anvil.json or .github/workflows/ in this run. Second, the gate suite on the standing tree fails 10 tests (319 run), reproduced by the operator locally. They are the work of this run:
+
+Implementation defects, owned by the builder:
+A. test_review_parsing_integrity.test_reviewer_prompts_have_no_json_examples_s5 fails: the new stations/reviewer-ux/PROMPT.md violates the reviewer prompt contract (no parseable JSON examples; the canonical Output Format contract shape only). Fix the prompt.
+B. The routing surface rule: four test_risk_routing full panel tests and three test_supervisor flow tests fail. Per this item's spec S3, reviewer-ux is routed out when the work has no UI surface, with the reason recorded; the risk routing and supervisor fixtures describe non UI work, so their counted panel stays the classic five. If the routing integration selects reviewer-ux for non UI work anywhere in the default path, that is an implementation defect: fix the routing so the surface rule applies in every path that builds the selected set. Do not fix these by editing the tests to expect six reviewers for non UI work.
+
+Test defects, owned by the test-writer station:
+C. test_reviewer_ux.test_s5_no_screenshots_declared_in_review fails on its executor simulation (the builder's round 1 output admits the spec behavior is in the prompt but the simulation does not drive it). Fix the simulation so the S5 declaration is genuinely exercised.
+D. test_anvil.TestRegistry.test_registry_s6 pins the station registry from before this item existed. This item adds a station by design; update the expectation to the registry as it now stands, including reviewer-ux, and nothing else about that test.
+
+Success is a green gate: the full suite passes (319 tests at round 1 count, plus any legitimately added), protected paths pass, and the reviewers judge the whole standing change, pipeline composition included. Keep every pipeline valid.
 - risk_hints: 
 - status: new
 
@@ -62,6 +74,7 @@ Operator standing note for every round of this order: the builder must not creat
 - reviewer-tests: skipped
 - reviewer-architecture: skipped
 - reviewer-design: skipped
+- reviewer-ux: skipped
 - approver: completed
 - triage-human: completed
 - deployer: packet_ready

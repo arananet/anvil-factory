@@ -1,27 +1,20 @@
-Looking at this work order and the referenced spec, I can make an intake judgment.
+Looking at the work order and spec to make an intake judgment.
 
-**Analysis:**
-- The work order requests implementation of a single, well-defined feature: a new UX reviewer station separate from the existing design reviewer
-- The spec at `.openspec/specs/reviewer-ux/spec.md` is complete with clear requirements and test scenarios
-- The scope is coherent: station implementation + routing integration + reporting
-- No harmful, deceptive, or unlawful purpose
-- All necessary information is provided
+This is a closing and repair run with a well-defined scope: fix 10 specific test failures across 4 categories (prompt contract violation, routing surface rule defects, test simulation fix, and registry expectation update). The work is buildable as stated with clear success criteria (green gate suite) and explicit constraints about protected paths.
 
-**Risk Assessment:**
-This is **medium** risk because:
-- It modifies the factory's pipeline routing system and reviewer workflow
-- Changes have moderate blast radius across multiple pipelines
-- More complex than a simple isolated change, but doesn't touch high-risk areas like payments, credentials, or irreversible data operations
-- Changes are reversible
+The work order asks to:
+- Fix implementation defects (prompt contract, routing logic)  
+- Fix test defects (simulation, registry expectation)
 
-**Surfaces:**
-The work primarily touches factory internals (station catalog, routing logic), with the only clearly applicable surface from the vocabulary being **content** for documentation and CHANGELOG updates.
+All focused on completing the reviewer-ux feature integration. This is a coherent unit of repair work, not multiple separate changes.
+
+**Risk assessment**: Medium - this touches internal review tooling and test infrastructure with moderate complexity, but has limited blast radius and doesn't involve production deployment, credentials, or data deletion.
+
+**Surfaces touched**: The work modifies a prompt file (documentation/content), routing logic, and test code. From the surfaces vocabulary, `content` is the clearest match for the PROMPT.md changes.
 
 ```json
 {
-  "intake_outcome": {
-    "outcome": "accepted"
-  },
+  "intake_outcome": {"outcome": "accepted"},
   "risk": "medium",
   "surfaces": ["content"]
 }

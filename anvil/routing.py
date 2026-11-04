@@ -345,20 +345,16 @@ def route_reviewers(
         if not any("security" in r for r in reasons):
             reasons.append("Security surface: reviewer-security at strong model")
 
-    # UI surface handling for design reviewers (reviewer-design and reviewer-ux)
-    # When UI surface is present, ensure both design reviewers are selected
-    # When UI surface is absent, route out UI-focused reviewers
+    # UI surface handling for reviewer-ux
+    # reviewer-ux is only activated when UI surface is present
+    # reviewer-design is part of the classic full panel and stays regardless
     if "ui" in surfaces:
-        # Keep reviewer-design if available
-        if "reviewer-design" in available_reviewers and "reviewer-design" not in selected:
-            selected.add("reviewer-design")
-            models["reviewer-design"] = config["models"]["standard"]
         # Keep reviewer-ux if available
         if "reviewer-ux" in available_reviewers and "reviewer-ux" not in selected:
             selected.add("reviewer-ux")
             models["reviewer-ux"] = config["models"]["standard"]
     else:
-        # No UI surface - route out UI-focused reviewers
+        # No UI surface - route out reviewer-ux
         # Remove reviewer-ux from selected if present and add to routed_out
         if "reviewer-ux" in available_reviewers:
             if "reviewer-ux" in selected:
@@ -369,17 +365,6 @@ def route_reviewers(
             if not any(r["reviewer"] == "reviewer-ux" for r in routed_out):
                 routed_out.append({
                     "reviewer": "reviewer-ux",
-                    "reason": "Routed out: no UI surface"
-                })
-        # Also handle reviewer-design if no UI surface
-        if "reviewer-design" in available_reviewers:
-            if "reviewer-design" in selected:
-                selected.discard("reviewer-design")
-                if "reviewer-design" in models:
-                    del models["reviewer-design"]
-            if not any(r["reviewer"] == "reviewer-design" for r in routed_out):
-                routed_out.append({
-                    "reviewer": "reviewer-design",
                     "reason": "Routed out: no UI surface"
                 })
 

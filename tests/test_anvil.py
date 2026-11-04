@@ -63,9 +63,9 @@ class TestPipeline(unittest.TestCase):
 
 class TestRegistry(unittest.TestCase):
     def test_registry_s6(self):
-        """factory-pipeline-engine S6: 26 stations including scout, blueprint, content, supervisor, reviewer-design and checks-gate"""
+        """factory-pipeline-engine S6: 27 stations including scout, blueprint, content, supervisor, reviewer-design, reviewer-ux and checks-gate"""
         reg = load_registry(ROOT / "stations")
-        self.assertEqual(len(reg), 26)
+        self.assertEqual(len(reg), 27)
         self.assertIn("scout", reg)
         self.assertIn("blueprint", reg)
         self.assertIn("writer", reg)

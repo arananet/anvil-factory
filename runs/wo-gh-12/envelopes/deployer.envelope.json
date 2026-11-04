@@ -5,6 +5,6 @@
   "work_order_id": "wo-gh-12",
   "artifact_path": "runs/wo-gh-12/deployer.packet.md",
   "status": "packet_ready",
-  "created_at": "2026-11-04T05:27:13.200260+00:00",
+  "created_at": "2026-11-04T05:48:19.385937+00:00",
   "configured_model": "claude-sonnet-4-5"
 }
