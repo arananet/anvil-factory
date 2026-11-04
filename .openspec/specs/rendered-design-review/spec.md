@@ -18,8 +18,21 @@ reviewer-design judges interface work by reading source, and source does not sho
 - reviewer-design's packet gains a Rendered evidence section when captures exist: the screenshot file names and their evidence paths, and the instruction that findings about layout, scale and spacing must cite the rendered evidence where it applies. In runtimes whose packets can carry images, the images themselves are attached; where the packet is text only, the paths are the citation targets and the executing runtime is expected to open them.
 - The capability is scoped to projects that declare a servable page. A project with no serve declaration gets no capture step and reviewer-design proceeds as today; the report records that no rendered evidence was configured.
 - When serving or capture is attempted and fails (the server does not answer, the capture tool errors, a breakpoint fails), reviewer-design's recorded review carries an explicit note that rendered evidence could not be captured and the review judged source only, with the failure reason. The run does not fail for a capture failure, and no screenshot evidence is claimed in the report for captures that did not happen.
-- Executed runs in GitHub Actions follow the same contract through the project workflow wiring pattern: the workflow gains a serve plus headless capture step (installing the headless browser in the workflow, as it installs other runtimes) so the evidence exists in the run's committed evidence exactly as a local capture would produce it.
-- Demonstration: the capability is demonstrated on the factory's own status page (a servable static page this repo already ships) or on the example project, and the demonstration run's evidence directory contains the captured screenshots, referenced from that run's report.
+- Executed runs in GitHub Actions follow the same contract through the project workflow wiring pattern: Playwright and Chromium are preinstalled in the workflow by the operator (the builder must not modify files under .github/workflows/). The serve and capture step runs in factory code or the capture module, and the evidence exists in the run's committed evidence exactly as a local capture would produce it.
+- Demonstration: the capability is demonstrated on the factory's own status page (the servable static page this repo ships at status/index.html). The demonstration run's evidence directory must contain the captured screenshots of the served status page, referenced from that run's report. This demonstration is completed in the current run, not deferred.
+
+### Security
+The implementation must enforce these security constraints:
+- **Command injection prevention**: serve_command configuration values must be executed without shell expansion. Use subprocess with shell=False and split the command with shlex.split, or maintain an allowlist of permitted serve commands. Never pass serve_command to shell=True.
+- **Path traversal prevention**: static_root configuration values must be validated to remain within the project directory. Resolve the path and verify it does not escape project_dir boundaries. Reject values like ../../../etc that attempt directory traversal.
+- **URL path injection prevention**: page_path configuration values must be validated before concatenation to base URLs. Require page_path to start with '/' and contain no '..' sequences.
+- **Port collision prevention**: do not hardcode server ports. Use dynamic port allocation or a configurable port with automatic fallback to prevent collisions when multiple captures run concurrently.
+- **Dimension validation**: breakpoint width and height values must be bounded. Validate that width is between 1 and 7680 pixels, and height is between 1 and 4320 pixels, to prevent memory exhaustion from extreme values.
+- **Subprocess cleanup**: when terminating a server process, clean up the entire process group with os.killpg to ensure spawned child processes do not remain behind.
+- **Evidence directory permissions**: create evidence directories with owner-only permissions (0o700) to protect captured screenshots.
+
+### Testing discipline
+The capture module must have a testable seam: unit tests cover packet section construction, evidence listing and failure recording with the capture tool behind an injectable interface, following the factory suite style. Tests do not run the actual capture in the critical path. The test-writer station writes test changes; the builder does not modify tests/, anvil.json, pipelines/ or .github/workflows/.
 
 ## Scenarios
 
@@ -33,4 +46,4 @@ reviewer-design judges interface work by reading source, and source does not sho
 - S3: Given a project whose server never answers, when capture is attempted, then the run completes, reviewer-design's recorded review states that rendered evidence could not be captured with the reason and that it judged source only, and the report claims no screenshot evidence.
 
 ### Scenario: The demonstration run holds real screenshots
-- S4: Given the demonstration target (the factory status page or the example project) declared servable, when its demonstration run completes, then its evidence directory contains the breakpoint screenshots and its run report references them.
+- S4: Given the factory status page (status/index.html) declared servable in anvil.yaml, when the current demonstration run completes, then the run's evidence directory at runs/wo-gh-9/evidence/ contains the breakpoint screenshots of the served factory status page, and the run report references them as evidence.
