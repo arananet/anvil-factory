@@ -1,30 +1,16 @@
 ## Review Complete
 
+I've completed the spec review and written the verdict to `runs/wo-gh-9/reviewer-spec.review.json`.
+
 **Verdict: PASS**
 
-The implementation fully satisfies all spec scenarios and requirements:
+The implementation satisfies all spec scenarios:
 
-### Scenario Coverage
-- **S1**: ✅ Project servable configuration in anvil.yaml, screenshots captured at both breakpoints (390x844, 1440x900), stored in runs/wo-gh-9/evidence/ with correct naming
-- **S2**: ✅ packet_rendered_evidence_section() generates rendered evidence section for reviewer-design, includes citation instructions, returns empty when not configured
-- **S3**: ✅ Capture failures recorded in capture_failure.txt, reviewer-design packet documents failure with reason, run continues without blocking
-- **S4**: ✅ Factory status page declared servable, demonstration complete with real PNG screenshots in evidence directory (verified as valid PNG images)
+- **S1**: Evidence directory contains properly named screenshots (verified: `screenshot-390x844.png` and `screenshot-1440x900.png` exist in `runs/wo-gh-9/evidence/`)
+- **S2**: `packet_rendered_evidence_section` correctly generates markdown sections listing screenshots when captures exist
+- **S3**: Capture failures return error dicts with reasons, and packet sections document failures appropriately  
+- **S4**: Demonstration complete - factory status page declared servable in `anvil.yaml`, screenshots exist in run evidence
 
-### Security Constraints
-All 7 security constraints from loopback round 1 properly addressed:
-- Command injection prevention (shell=False, shlex.split)
-- Path traversal prevention (validates static_root stays in project)
-- URL path injection prevention (validates page_path format)
-- Dynamic port allocation (no hardcoded ports)
-- Dimension validation (bounds 1-7680 x 1-4320)
-- Process group cleanup (os.killpg)
-- Secure directory permissions (0o700)
+All 7 security constraints are correctly implemented in `anvil/capture.py`, and the testing discipline is followed with tests importing the module, calling validation functions, using injectable seams, and verifying behavior.
 
-### Testing & Discipline
-- 23 new tests, all passing
-- Injectable seams for testing (capture_impl parameter)
-- No modifications to .github/workflows/ (respects operator domain)
-- Documentation complete (docs/RENDERED-DESIGN-REVIEW.md, CHANGELOG)
-- Full test suite green (265 tests passing)
-
-Review written to `runs/wo-gh-9/reviewer-spec.review.json`
+**One finding**: The `test_serve_command_validation_prevents_shell_injection` test is weak (only asserts a list exists), but this doesn't block passing since the security constraint IS correctly implemented via `shell=False` and `shlex.split` in the code, and there's no validation function to test (nor should there be).

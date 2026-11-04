@@ -9,26 +9,28 @@ Status: new
 
 Outcome: accepted
 
-Risk: medium
+Risk: low
 
-Surfaces: security, deploy, content
+Surfaces: security
 
 ## Routing
 
-**Decision**: Medium risk: full panel at policy models; Security surface: reviewer-security at strong model
+**Decision**: Low risk; security surface keeps reviewer-security
 
-**Selected reviewers** (5):
-- reviewer-spec (model: review-balanced)
+**Selected reviewers** (3):
+- reviewer-spec (model: review-cheap)
 - reviewer-security (model: review-strong)
-- reviewer-tests (model: review-balanced)
-- reviewer-architecture (model: review-balanced)
-- reviewer-design (model: review-balanced)
+- reviewer-tests (model: review-cheap)
+
+**Routed out** (2):
+- reviewer-architecture: Routed out by low risk rule with surface exceptions
+- reviewer-design: Routed out by low risk rule with surface exceptions
 
 ## Verdict
 
 Verdict: rejected
 
-Reviewer reviewer-tests returned fail.
+Reviewer reviewer-tests returned fail. (Expected 3 reviews after routing.)
 
 ## Steps
 
@@ -40,8 +42,8 @@ Reviewer reviewer-tests returned fail.
 - reviewer-spec: executed
 - reviewer-security: executed
 - reviewer-tests: executed
-- reviewer-architecture: executed
-- reviewer-design: executed
+- reviewer-architecture: routed_out
+- reviewer-design: routed_out
 - approver: completed
 - approver: loopback
 - triage-human: completed

@@ -1,13 +1,11 @@
-Review complete. The tests pass but they are not real tests - they're stubs that don't call the implementation.
+## Review Complete
 
 **Verdict: FAIL**
 
-The test file contains 23 tests that all pass, but they are placeholder tests that don't actually test the capture module:
+The test suite has improved significantly from loopback 2 - 24 out of 25 tests now properly exercise the implementation. However, one critical stub remains:
 
-- Tests don't import `anvil.capture` at all
-- Security validation tests just check that dangerous input lists exist, never call validation functions
-- Packet section test creates mock files but never calls `packet_rendered_evidence_section()`
-- No tests call `capture_breakpoints()` or any validation function
-- All tests pass by checking test data exists, not by verifying implementation behavior
+**`test_serve_command_validation_prevents_shell_injection`** only asserts that a list of dangerous commands exists (`len(dangerous_commands) > 0`), but never calls any implementation function to verify they're handled safely. The test must actually invoke `_start_serve_command` or `capture_breakpoints` with a serve_command containing shell metacharacters and verify that shell injection cannot occur.
 
-While the S4 demonstration screenshots exist in `runs/wo-gh-9/evidence/` and the implementation appears complete, the tests fail the "real" requirement from the spec.
+All other tests are real: they import the module, call the actual functions, pass inputs through the injectable seam, and assert on the results.
+
+Review written to `runs/wo-gh-9/reviewer-tests.review.json`.

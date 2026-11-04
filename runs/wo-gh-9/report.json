@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 37712.6,
+      "duration_ms": 34608.819,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-9/intake.output.md"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-9/spec-writer.output.md",
-      "duration_ms": 98999.873,
+      "duration_ms": 183755.153,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-9/spec-writer.output.md"
@@ -40,7 +40,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-9/test-writer.output.md",
-      "duration_ms": 182649.418,
+      "duration_ms": 211934.263,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-9/test-writer.output.md"
@@ -56,7 +56,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-9/builder.output.md",
-      "duration_ms": 408912.672,
+      "duration_ms": 336863.058,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-9/builder.output.md"
@@ -72,7 +72,7 @@
       "station": "checks-gate",
       "status": "passed",
       "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 15912.886,
+      "duration_ms": 27120.936,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-9/checks-gate.pre-review.output.md"
@@ -100,12 +100,12 @@
       "station": "reviewer-spec",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-9/reviewer-spec.output.md",
-      "duration_ms": 99743.941,
+      "duration_ms": 167237.01,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-9/reviewer-spec.output.md"
       ],
-      "configured_model": "review-balanced",
+      "configured_model": "review-cheap",
       "executed_model": null,
       "executor": {
         "kind": "command",
@@ -116,7 +116,7 @@
       "station": "reviewer-security",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-9/reviewer-security.output.md",
-      "duration_ms": 100544.817,
+      "duration_ms": 55854.727,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-9/reviewer-security.output.md"
@@ -132,12 +132,12 @@
       "station": "reviewer-tests",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-9/reviewer-tests.output.md",
-      "duration_ms": 95398.898,
+      "duration_ms": 121098.334,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-9/reviewer-tests.output.md"
       ],
-      "configured_model": "review-balanced",
+      "configured_model": "review-cheap",
       "executed_model": null,
       "executor": {
         "kind": "command",
@@ -146,41 +146,35 @@
     },
     {
       "station": "reviewer-architecture",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-9/reviewer-architecture.output.md",
-      "duration_ms": 94799.728,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out by low risk rule with surface exceptions",
+      "duration_ms": 0.258,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-9/reviewer-architecture.output.md"
+        "runs/wo-gh-9/reviewer-architecture.packet.md"
       ],
-      "configured_model": "review-balanced",
+      "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-design",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-9/reviewer-design.output.md",
-      "duration_ms": 99335.615,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out by low risk rule with surface exceptions",
+      "duration_ms": 0.836,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-9/reviewer-design.output.md"
+        "runs/wo-gh-9/reviewer-design.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: rejected",
-      "duration_ms": 0.04,
+      "duration_ms": 0.034,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-9/report.json"
@@ -193,8 +187,8 @@
       "station": "approver",
       "status": "loopback",
       "return_to": "builder",
-      "detail": "Loopback to builder: Tests do not import anvil.capture module - the test file imports only anvil.scaffold.init_project and anvil.model.WorkOrder but nothing from the capture module being tested; Security validation tests are stubs that never call validation functions - test_serve_command_validation_prevents_shell_injection, test_static_root_prevents_path_traversal, test_page_path_prevents_url_injection, and test_breakpoint_dimensions_are_bounded only assert that test data lists exist (len > 0) without calling _validate_static_root, _validate_page_path, _validate_dimensions or capture_breakpoints; Packet section test does not test the function - test_s2_packet_section_with_captures creates mock screenshot files but never calls packet_rendered_evidence_section to verify the output markdown contains the required elements; Failure handling tests are placeholders - test_s3_server_never_answers_records_failure and test_s3_capture_tool_error_records_failure define expected messages but never call capture_breakpoints with configurations that would trigger these failures; Injectable seam tests don't verify injection works - test_capture_function_accepts_mock_implementation and test_server_startup_accepts_mock_implementation define mock functions but never pass them to capture_breakpoints or verify they're actually called; No integration testing - tests never call capture_breakpoints, packet_rendered_evidence_section, or any validation function with real or mock inputs to verify behavior; Tests pass without testing - all 23 tests pass because they only check that test data structures exist, not that the implementation works correctly, violating the spec requirement that tests must be real and mapped to scenarios",
-      "reason": "Tests do not import anvil.capture module - the test file imports only anvil.scaffold.init_project and anvil.model.WorkOrder but nothing from the capture module being tested; Security validation tests are stubs that never call validation functions - test_serve_command_validation_prevents_shell_injection, test_static_root_prevents_path_traversal, test_page_path_prevents_url_injection, and test_breakpoint_dimensions_are_bounded only assert that test data lists exist (len > 0) without calling _validate_static_root, _validate_page_path, _validate_dimensions or capture_breakpoints; Packet section test does not test the function - test_s2_packet_section_with_captures creates mock screenshot files but never calls packet_rendered_evidence_section to verify the output markdown contains the required elements; Failure handling tests are placeholders - test_s3_server_never_answers_records_failure and test_s3_capture_tool_error_records_failure define expected messages but never call capture_breakpoints with configurations that would trigger these failures; Injectable seam tests don't verify injection works - test_capture_function_accepts_mock_implementation and test_server_startup_accepts_mock_implementation define mock functions but never pass them to capture_breakpoints or verify they're actually called; No integration testing - tests never call capture_breakpoints, packet_rendered_evidence_section, or any validation function with real or mock inputs to verify behavior; Tests pass without testing - all 23 tests pass because they only check that test data structures exist, not that the implementation works correctly, violating the spec requirement that tests must be real and mapped to scenarios",
+      "detail": "Loopback to builder: test_serve_command_validation_prevents_shell_injection (lines 32-45) is a weak test that only asserts a list exists rather than verifying the implementation uses shell=False. While the security constraint IS correctly implemented in anvil/capture.py:135-156 using shlex.split and shell=False, the test could be improved to verify this behavior through mocking subprocess.Popen or calling capture_breakpoints with a dangerous serve_command and a mock capture_impl to confirm shell expansion doesn't occur.; test_serve_command_validation_prevents_shell_injection (line 32) is a stub that only asserts len(dangerous_commands) > 0 without calling any implementation function. It must call _start_serve_command or capture_breakpoints with a serve_command containing shell metacharacters (e.g., 'python -m http.server; rm -rf /') and verify safe handling - either by inspecting the subprocess arguments to confirm shell=False is used, or by verifying the command parts are split correctly by shlex.split so injection cannot occur. All other 24 tests are real and properly exercise the implementation.",
+      "reason": "test_serve_command_validation_prevents_shell_injection (lines 32-45) is a weak test that only asserts a list exists rather than verifying the implementation uses shell=False. While the security constraint IS correctly implemented in anvil/capture.py:135-156 using shlex.split and shell=False, the test could be improved to verify this behavior through mocking subprocess.Popen or calling capture_breakpoints with a dangerous serve_command and a mock capture_impl to confirm shell expansion doesn't occur.; test_serve_command_validation_prevents_shell_injection (line 32) is a stub that only asserts len(dangerous_commands) > 0 without calling any implementation function. It must call _start_serve_command or capture_breakpoints with a serve_command containing shell metacharacters (e.g., 'python -m http.server; rm -rf /') and verify safe handling - either by inspecting the subprocess arguments to confirm shell=False is used, or by verifying the command parts are split correctly by shlex.split so injection cannot occur. All other 24 tests are real and properly exercise the implementation.",
       "duration_ms": 0.0,
       "cost": null,
       "artifacts": [],
@@ -217,7 +211,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-9/deployer.packet.md",
-      "duration_ms": 0.093,
+      "duration_ms": 0.216,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-9/deployer.packet.md"
@@ -230,7 +224,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-9/observer.output.md",
-      "duration_ms": 123537.874,
+      "duration_ms": 87087.439,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-9/observer.output.md"
@@ -264,24 +258,14 @@
         {
           "station": "reviewer-tests",
           "verdict": "fail"
-        },
-        {
-          "station": "reviewer-architecture",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-design",
-          "verdict": "pass"
         }
       ],
       "reviews_expected": [
         "reviewer-spec",
         "reviewer-security",
-        "reviewer-tests",
-        "reviewer-architecture",
-        "reviewer-design"
+        "reviewer-tests"
       ],
-      "rule": "Reviewer reviewer-tests returned fail."
+      "rule": "Reviewer reviewer-tests returned fail. (Expected 3 reviews after routing.)"
     },
     "human_gate": {
       "required": true,
@@ -290,5 +274,21 @@
     }
   },
   "warnings": [],
-  "base_ref": "d5fe89841d790b76d73116278f41f5b6e48a30a4"
+  "base_ref": "cb6e8b557d520be1af8449564841af623c9e318e",
+  "evidence": [
+    {
+      "type": "screenshot",
+      "breakpoint": "390x844",
+      "path": "runs/wo-gh-9/evidence/screenshot-390x844.png",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "type": "screenshot",
+      "breakpoint": "1440x900",
+      "path": "runs/wo-gh-9/evidence/screenshot-1440x900.png",
+      "width": 1440,
+      "height": 900
+    }
+  ]
 }

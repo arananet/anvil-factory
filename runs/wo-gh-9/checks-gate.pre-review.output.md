@@ -7,7 +7,7 @@ Attempt: 1
 Exit code: 0
 Output:
 ```
-h name
+name
 hint: to use in all of your new repositories, which will suppress this warning,
 hint: call:
 hint:
@@ -34,15 +34,15 @@ hint: 	git branch -m <name>
 hint:
 hint: Disable this message with "git config set advice.defaultBranchName false"
 Switched to a new branch 'work-branch'
-...................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 44715)>
+...................................................../opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 44957)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-.../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 45335)>
+.../opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 46317)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-....................................................................................................................................s.....................................
+......................................................................................................................................s.....................................
 ----------------------------------------------------------------------
-Ran 265 tests in 15.772s
+Ran 267 tests in 27.005s
 
 OK (skipped=1)
 

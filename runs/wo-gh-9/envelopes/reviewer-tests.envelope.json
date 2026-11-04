@@ -5,21 +5,15 @@
   "work_order_id": "wo-gh-9",
   "artifact_path": "runs/wo-gh-9/reviewer-tests.output.md",
   "status": "executed",
-  "created_at": "2026-11-04T01:47:34.978880+00:00",
+  "created_at": "2026-11-04T02:14:02.176891+00:00",
   "review": {
     "station": "reviewer-tests",
     "verdict": "fail",
     "findings": [
-      "Tests do not import anvil.capture module - the test file imports only anvil.scaffold.init_project and anvil.model.WorkOrder but nothing from the capture module being tested",
-      "Security validation tests are stubs that never call validation functions - test_serve_command_validation_prevents_shell_injection, test_static_root_prevents_path_traversal, test_page_path_prevents_url_injection, and test_breakpoint_dimensions_are_bounded only assert that test data lists exist (len > 0) without calling _validate_static_root, _validate_page_path, _validate_dimensions or capture_breakpoints",
-      "Packet section test does not test the function - test_s2_packet_section_with_captures creates mock screenshot files but never calls packet_rendered_evidence_section to verify the output markdown contains the required elements",
-      "Failure handling tests are placeholders - test_s3_server_never_answers_records_failure and test_s3_capture_tool_error_records_failure define expected messages but never call capture_breakpoints with configurations that would trigger these failures",
-      "Injectable seam tests don't verify injection works - test_capture_function_accepts_mock_implementation and test_server_startup_accepts_mock_implementation define mock functions but never pass them to capture_breakpoints or verify they're actually called",
-      "No integration testing - tests never call capture_breakpoints, packet_rendered_evidence_section, or any validation function with real or mock inputs to verify behavior",
-      "Tests pass without testing - all 23 tests pass because they only check that test data structures exist, not that the implementation works correctly, violating the spec requirement that tests must be real and mapped to scenarios"
+      "test_serve_command_validation_prevents_shell_injection (line 32) is a stub that only asserts len(dangerous_commands) > 0 without calling any implementation function. It must call _start_serve_command or capture_breakpoints with a serve_command containing shell metacharacters (e.g., 'python -m http.server; rm -rf /') and verify safe handling - either by inspecting the subprocess arguments to confirm shell=False is used, or by verifying the command parts are split correctly by shlex.split so injection cannot occur. All other 24 tests are real and properly exercise the implementation."
     ]
   },
-  "configured_model": "review-balanced",
+  "configured_model": "review-cheap",
   "executor": {
     "kind": "command",
     "detail": "python3"

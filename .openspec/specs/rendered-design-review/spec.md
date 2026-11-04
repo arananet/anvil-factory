@@ -32,7 +32,7 @@ The implementation must enforce these security constraints:
 - **Evidence directory permissions**: create evidence directories with owner-only permissions (0o700) to protect captured screenshots.
 
 ### Testing discipline
-The capture module must have a testable seam: unit tests cover packet section construction, evidence listing and failure recording with the capture tool behind an injectable interface, following the factory suite style. Tests do not run the actual capture in the critical path. The test-writer station writes test changes; the builder does not modify tests/, anvil.json, pipelines/ or .github/workflows/.
+The capture module must have a testable seam: tests must import the capture module and packet functions, call validation functions with inputs that must raise and inputs that must pass, call packet_rendered_evidence_section with real capture result objects and assert the markdown lists the screenshots with their citations, and drive capture_breakpoints through the injectable seam with mock serve and capture functions, asserting the mocks were called and that server-never-answers and capture-error configurations record the failure notes this spec requires. Tests stay deterministic and browser-free through the seam, following the factory suite style. Tests do not run the actual capture in the critical path. The test-writer station writes test changes; the builder does not modify tests/, anvil.json, pipelines/ or .github/workflows/.
 
 ## Scenarios
 

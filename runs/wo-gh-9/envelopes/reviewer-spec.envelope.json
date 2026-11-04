@@ -5,13 +5,15 @@
   "work_order_id": "wo-gh-9",
   "artifact_path": "runs/wo-gh-9/reviewer-spec.output.md",
   "status": "executed",
-  "created_at": "2026-11-04T01:44:19.034862+00:00",
+  "created_at": "2026-11-04T02:11:05.223230+00:00",
   "review": {
     "station": "reviewer-spec",
     "verdict": "pass",
-    "findings": []
+    "findings": [
+      "test_serve_command_validation_prevents_shell_injection (lines 32-45) is a weak test that only asserts a list exists rather than verifying the implementation uses shell=False. While the security constraint IS correctly implemented in anvil/capture.py:135-156 using shlex.split and shell=False, the test could be improved to verify this behavior through mocking subprocess.Popen or calling capture_breakpoints with a dangerous serve_command and a mock capture_impl to confirm shell expansion doesn't occur."
+    ]
   },
-  "configured_model": "review-balanced",
+  "configured_model": "review-cheap",
   "executor": {
     "kind": "command",
     "detail": "python3"

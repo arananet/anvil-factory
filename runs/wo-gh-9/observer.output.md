@@ -1,13 +1,9 @@
-Observation complete. I've created the observation report at `runs/wo-gh-9/observer.report.md`.
+Observer report completed. The deployer hasn't executed because the run was rejected at reviewer-tests (one test stub remains), so there's no release to observe yet.
 
-**Key finding:** The deployer station hasn't executed yet, so there's no release record to observe. The implementation is complete and approved (all reviews passed, 265 tests passing, demonstration screenshots captured), but not yet deployed.
+**Key findings:**
+- No release record exists - deployer blocked by "rejected" verdict
+- Reviewer-tests failed: `test_serve_command_validation_prevents_shell_injection` at line 32 is a stub
+- 24/25 tests properly exercise implementation, but the shell injection validation test just checks `len(dangerous_commands) > 0` without calling any implementation functions
+- The run needs to loop back to test-writer to fix the stub before release can proceed
 
-The observation report documents:
-- Missing release record input
-- Current pre-release implementation status
-- All completed upstream stages
-- Files created/modified
-- Evidence captured (both breakpoint screenshots exist as valid PNGs)
-- What the deployer needs to provide next
-
-Per the observer station contract, I cannot proceed without the release record input from the deployer.
+Report written to `runs/wo-gh-9/observer.output.md`.

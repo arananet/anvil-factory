@@ -2,17 +2,22 @@
   "selected_reviewers": [
     "reviewer-spec",
     "reviewer-security",
-    "reviewer-tests",
-    "reviewer-architecture",
-    "reviewer-design"
+    "reviewer-tests"
   ],
-  "routed_out": [],
+  "routed_out": [
+    {
+      "reviewer": "reviewer-architecture",
+      "reason": "Routed out by low risk rule with surface exceptions"
+    },
+    {
+      "reviewer": "reviewer-design",
+      "reason": "Routed out by low risk rule with surface exceptions"
+    }
+  ],
   "selected_models": {
-    "reviewer-architecture": "review-balanced",
-    "reviewer-tests": "review-balanced",
-    "reviewer-design": "review-balanced",
-    "reviewer-spec": "review-balanced",
+    "reviewer-tests": "review-cheap",
+    "reviewer-spec": "review-cheap",
     "reviewer-security": "review-strong"
   },
-  "reason": "Medium risk: full panel at policy models; Security surface: reviewer-security at strong model"
+  "reason": "Low risk; security surface keeps reviewer-security"
 }

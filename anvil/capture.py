@@ -116,10 +116,11 @@ def _start_static_server(static_root: Path, port: int) -> subprocess.Popen:
     ]
 
     # Start new process group for proper cleanup
+    # Use DEVNULL for stdout/stderr since we don't need the output
     process = subprocess.Popen(
         cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
         preexec_fn=os.setsid  # Create new process group
     )
 
@@ -145,10 +146,11 @@ def _start_serve_command(serve_command: str, project_dir: Path, port: Optional[i
         cmd_parts = [part.replace('{port}', str(port)) for part in cmd_parts]
 
     # Start new process group for proper cleanup
+    # Use DEVNULL for stdout/stderr since we don't need the output
     process = subprocess.Popen(
         cmd_parts,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
         cwd=project_dir,
         preexec_fn=os.setsid  # Create new process group
     )
