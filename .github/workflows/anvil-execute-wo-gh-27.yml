@@ -1,0 +1,211 @@
+name: anvil-execute-wo-gh-27
+
+# Execute mode run of the ANVIL content line for one known work order
+# (issue 27, the film review pass for the wo-gh-18 polish film). It mirrors
+# anvil-execute-wo-gh-26.yml with the differences this run needs:
+#
+# - The pipeline is pipelines/content-film-review.json (the review only
+#   pipeline added by issue 26): intake, reviewer-design and reviewer-facts
+#   in parallel, approver, triage-human, publisher, observer. No authoring
+#   stations, no production steps, nothing renders.
+# - The film and its evidence are already committed on this branch under
+#   content/youtube-anvil-v2/ (byte identical from anvil/run-youtube-video-v2
+#   at 312e606). The work order declares the contact sheet and the twelve
+#   proof stills as evidence_images; a deterministic step below verifies
+#   the film hash and the declared files before the line runs.
+# - This run is counted by the fixed review producer merged in wo-gh-24:
+#   reviewers write their own review files and the wrapper validates them
+#   at station exit.
+# - The work order carries the publishing risk hint on purpose: the video
+#   stays on the owner's hold, the publisher writes its record into the run
+#   directory only, and nothing in this workflow posts anything anywhere.
+# - This repo's .gitignore ignores runs/, so the commit back step force
+#   adds the run evidence for this work order.
+#
+# Trigger: the vault PAT cannot dispatch workflows or apply labels, so the
+# trigger is a push to the anvil/run-film-review branch. The commit this
+# workflow pushes back uses GITHUB_TOKEN, which does not retrigger
+# workflows, so the run cannot loop on its own push.
+
+on:
+  push:
+    branches: [anvil/run-film-review]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: anvil-execute-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  anvil-execute:
+    name: Run the ANVIL film review pass with Claude Code executing the stations
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      ANTHROPIC_BASE_URL: https://gateway.ai.cloudflare.com/v1/693ae9c587f1f2c34328bb47447366b0/arananet-ai-gateway/anthropic
+      ANTHROPIC_API_KEY: ${{ secrets.CF_AIG_TOKEN }}
+      ANTHROPIC_CUSTOM_HEADERS: "cf-aig-authorization: Bearer ${{ secrets.CF_AIG_TOKEN }}"
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+    steps:
+      - name: Check out this repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Claude Code
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude --version
+
+      - name: Gateway smoke test
+        id: smoke
+        run: |
+          REPLY=$(claude -p "Reply with exactly: GATEWAY_OK" --model claude-sonnet-4-5 --output-format text)
+          echo "Gateway reply: ${REPLY}"
+          CLEAN=$(printf '%s' "${REPLY}" | tr -d '[:space:]')
+          if [ "${CLEAN}" != "GATEWAY_OK" ]; then
+            echo "Gateway smoke failed: expected GATEWAY_OK and got the reply above. Stopping before the line runs."
+            exit 1
+          fi
+          echo "Gateway smoke passed: the gateway answered through the Anthropic endpoint."
+
+      - name: Verify the film and the declared evidence
+        id: evidence
+        if: steps.smoke.outcome == 'success'
+        run: |
+          EXPECTED="a277ce32c3ac7c30de5679524f49b1017ff028cfea2d38277deed73c4b44ecac"
+          ACTUAL=$(sha256sum content/youtube-anvil-v2/anvil-youtube-v2.mp4 | cut -d' ' -f1)
+          echo "Film sha256: ${ACTUAL}"
+          if [ "${ACTUAL}" != "${EXPECTED}" ]; then
+            echo "FILM HASH MISMATCH: the film on this branch is not the wo-gh-18 polish film. Stopping."
+            exit 1
+          fi
+          python3 - <<'PYEOF'
+          import json
+          from pathlib import Path
+          wo = json.loads(Path("work-orders/issue-27.json").read_text())
+          missing = [p for p in wo.get("evidence_images", []) if not Path(p).is_file()]
+          if missing:
+              print("Declared evidence missing:", *missing, sep="\n")
+              raise SystemExit(1)
+          print(f"All {len(wo['evidence_images'])} declared evidence images present.")
+          PYEOF
+
+      - name: Run the ANVIL film review pass in execute mode
+        id: line
+        if: steps.evidence.outcome == 'success'
+        run: |
+          PYTHONPATH=. python3 -m anvil.cli run . \
+            --pipeline pipelines/content-film-review.json \
+            --work-order work-orders/issue-27.json \
+            --execute
+
+      - name: Commit the run evidence back to the branch
+        if: always() && steps.smoke.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git add -f runs/ 2>/dev/null || true
+          git diff --cached --stat > run-diff.txt || true
+          git add run-diff.txt
+          if git diff --cached --quiet; then
+            echo "The run produced no file changes to commit."
+            exit 0
+          fi
+          VERDICT=$(python3 -c "import json; print(json.load(open('runs/wo-gh-27/report.json'))['verdict'])" 2>/dev/null || echo "no-report")
+          git commit -m "ANVIL execute run wo-gh-27 (issue 27): verdict ${VERDICT}" -m "Film review pass over the wo-gh-18 polish film: reviewer-design ruled on the four advisories from the declared stills and reviewer-facts re-judged claim C11 against the film. Publishing hold: nothing posted anywhere; see runs/wo-gh-27/."
+          git fetch origin "${GITHUB_REF_NAME}"
+          git rebase "origin/${GITHUB_REF_NAME}" || { git rebase --abort; echo "Rebase onto the branch tip failed; pushing as is not attempted."; exit 1; }
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Comment the run report on issue 27
+        if: always() && steps.smoke.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          python3 - <<'PYEOF'
+          import json, os
+          from pathlib import Path
+          run_url = os.environ["RUN_URL"]
+          branch = os.environ["BRANCH"]
+          report_path = Path("runs/wo-gh-27/report.json")
+          if not report_path.exists():
+              lines = [
+                  "## ANVIL execute run report",
+                  "",
+                  "The executed run did not produce a report.json, so there is no verdict to report. "
+                  f"See the workflow run for the failure: {run_url}",
+              ]
+              Path("comment.md").write_text("\n".join(lines) + "\n")
+              raise SystemExit(0)
+          report = json.loads(report_path.read_text())
+          decision = report.get("decision", {})
+          lines = [
+              "## ANVIL execute run report",
+              "",
+              f"Work order: {report['work_order_id']}",
+              f"Pipeline: {report['pipeline']}",
+              f"Approver verdict: {report['verdict']}",
+              f"Human review required: {report['human_required']}",
+              f"Deployment status: {report.get('deployment_status')}",
+              "",
+              "Decision record:",
+              f"- Approver: {decision.get('approver', {}).get('rule', '')}",
+              f"- Human gate: {decision.get('human_gate', {}).get('rule', '')}",
+              "",
+              "| Station | Status | Configured model | Executed model |",
+              "|---|---|---|---|",
+          ]
+          for step in report.get("steps", []):
+              lines.append(
+                  f"| {step['station']} | {step['status']} | "
+                  f"{step.get('configured_model')} | {step.get('executed_model')} |"
+              )
+          warnings = report.get("warnings") or []
+          if warnings:
+              lines += ["", "Warnings recorded by the run:"] + [f"- {w}" for w in warnings]
+          diff_path = Path("run-diff.txt")
+          if diff_path.exists() and diff_path.read_text().strip():
+              lines += ["", "Files changed by the run (committed to "
+                        f"`{branch}`):", "", "```", diff_path.read_text().strip(), "```"]
+          lines += [
+              "",
+              "Honest note: this run EXECUTED the film review pass only. The "
+              "review only pipeline (issue 26) ran reviewer-design and "
+              "reviewer-facts against the finished wo-gh-18 polish film, whose "
+              "sha256 the workflow verified before the line ran; the contact "
+              "sheet and the twelve proof stills reached reviewer-design as "
+              "declared evidence_images on the work order. No authoring "
+              "station ran, nothing was rendered, and no file under content/ "
+              "was changed by design. The work order carries the publishing "
+              "risk hint, so the film stops at the human gate: nothing was "
+              "published or posted anywhere.",
+              f"Workflow run: {run_url}",
+          ]
+          Path("comment.md").write_text("\n".join(lines) + "\n")
+          print(f"Verdict: {report['verdict']}")
+          PYEOF
+          gh issue comment 27 --body-file comment.md
+
+      - name: Upload the run directory
+        if: always() && steps.smoke.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: anvil-execute-run-wo-gh-27
+          path: runs/
+          if-no-files-found: ignore
