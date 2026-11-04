@@ -1,6 +1,10 @@
-This work order is buildable as stated. It requests wiring of an existing design knowledge module into the runner's packet building and runtime loading flow, with 4 specific findings to address from a prior review.
+Looking at this work order for intake evaluation.
 
-The scope is focused and coherent - all changes relate to integrating the knowledge module. The loopback note confirms the data layer exists and only the runtime wiring is needed. Constraints clearly prevent touching high-risk areas like workflows.
+This is a GATE LOOPBACK 2 refinement with two clear, specific fixes:
+1. Wire S10 guided designation into the runtime (add guided field to Station dataclass, wire it through load_registry, apply design model from routing policy)
+2. Fix three skipped tests to actually test their implementations
+
+The work is clearly scoped, buildable as stated, and has all necessary information. It's touching core factory runtime logic (station loading, routing policy integration) and test implementations - moderate complexity with reversible changes and moderate blast radius.
 
 ```json
 {
@@ -8,6 +12,6 @@ The scope is focused and coherent - all changes relate to integrating the knowle
     "outcome": "accepted"
   },
   "risk": "medium",
-  "surfaces": ["content"]
+  "surfaces": ["data"]
 }
 ```

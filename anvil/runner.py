@@ -17,6 +17,7 @@ from .knowledge import (
     load_knowledge_pack,
     packet_knowledge_section,
     get_project_product_type,
+    get_design_model_from_routing,
     KnowledgeValidationError,
 )
 
@@ -484,6 +485,13 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         # Apply routing model overrides if routing selected a specific model for this station
         if routing_record and station_id in routing_record.selected_models:
             configured_model = routing_record.selected_models[station_id]
+        # Apply guided designation: guided design stations use the design model from routing policy
+        # For the builder, only apply guided model when working on UI surface
+        if station and station.guided:
+            if station_id == "builder" and "ui" not in work_order.surfaces:
+                pass  # Builder not on UI surface, keep configured model
+            else:
+                configured_model = get_design_model_from_routing()
         step_executor = None
         step_executed_model = None
         status = "completed"

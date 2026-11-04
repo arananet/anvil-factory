@@ -66,6 +66,14 @@ GATE LOOPBACK 1 (after run 41768971456, verdict changes_requested, reviews count
 4. Defense in depth on pack loading (approver note): the pack loader rejects paths that resolve into sensitive system locations (for example /etc, /sys, /proc) with a named error at load, covered by a test. The existing whitelist based filename validation stays.
 
 Real tests for the wiring, written by the test-writer station: a run level test proving a design station packet contains the knowledge section and a non design packet does not; a pack loading test proving preference, fallback and report recording; a sensitive path rejection test. The builder must not modify tests/, anvil.json, pipelines/ or .github/workflows/. Keep the whole suite green and every pipeline valid. Update CHANGELOG Unreleased.
+
+GATE LOOPBACK 2 (after run 41771847615, verdict changes_requested, reviews counted 5 of 5; reviewer-tests and reviewer-architecture request changes). The packet and pack wiring from loopback 1 stands (reviewer-spec, reviewer-security and reviewer-design pass). Remaining, verbatim in substance:
+
+1. S10 is declared but not wired into the runtime (reviewer-architecture): the station.json files declare guided and designation for the guided stations, but the Station dataclass in anvil/stations.py has no guided field, so load_registry drops it, and the runner never applies the design model from the routing policy to guided stations. get_design_model_from_routing exists in anvil/knowledge.py and is never called. Fix: add the guided field to the Station dataclass, preserve it in load_registry, and in the runner apply the design model read from the recorded routing policy (the policy's designer entry) at the point of use when a station is guided.
+
+2. Three tests skip instead of testing (reviewer-tests): test_s1_malformed_entry_fails_validation imports a nonexistent load_knowledge and skips; it must import load_builtin_knowledge and actually assert that a malformed entry fails naming the file and entry. test_s10_guide_designation_names_design_model imports a nonexistent load_routing_policy and skips; it must use the real accessor and assert the guided stations resolve to the policy's design model. test_s1_builtin_dataset_exists_and_validates never calls the loader; it must call load_builtin_knowledge() and assert it succeeds. Remove the import failure skip pattern from these tests: a test that cannot import its subject must fail, not skip.
+
+The test-writer station owns the test fixes; the builder owns the stations and runner wiring and must not modify tests/, anvil.json, pipelines/ or .github/workflows/. Keep the whole suite green and every pipeline valid. Update CHANGELOG Unreleased if the change set changes.
 - risk_hints: 
 - status: new
 

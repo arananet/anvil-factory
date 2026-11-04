@@ -21,7 +21,12 @@ from pathlib import Path
 from anvil.scaffold import init_project
 from anvil.model import WorkOrder
 from anvil.stations import load_registry
-from anvil.knowledge import KnowledgeValidationError
+from anvil.knowledge import (
+    KnowledgeValidationError,
+    load_builtin_knowledge,
+    validate_knowledge_entry,
+    get_design_model_from_routing,
+)
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -55,15 +60,17 @@ class BuiltInDatasetTests(unittest.TestCase):
                 else:
                     self.assertGreater(len(data.keys()), 0, f"{filename} must not be empty")
 
+        # Call the loader to ensure it validates all entries successfully
+        knowledge = load_builtin_knowledge()
+        self.assertIsInstance(knowledge, dict, "Loader should return a dict")
+        self.assertIn("styles", knowledge, "Loaded knowledge should contain styles")
+        self.assertIn("palettes", knowledge, "Loaded knowledge should contain palettes")
+        self.assertIn("fonts", knowledge, "Loaded knowledge should contain fonts")
+        self.assertIn("guidelines", knowledge, "Loaded knowledge should contain guidelines")
+        self.assertIn("product_types", knowledge, "Loaded knowledge should contain product_types")
+
     def test_s1_malformed_entry_fails_validation(self):
         """S1: Deliberately malformed entry makes loader fail naming file and entry"""
-        # This test requires the knowledge loader to exist
-        # We'll import it and test validation
-        try:
-            from anvil.knowledge import load_knowledge, validate_knowledge_entry
-        except ImportError:
-            self.skipTest("Knowledge loader not yet implemented")
-
         # Create a temporary malformed data file
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir = Path(tmpdir)
@@ -77,7 +84,7 @@ class BuiltInDatasetTests(unittest.TestCase):
             malformed_file.write_text(json.dumps(malformed_styles), encoding="utf-8")
 
             # Attempt to load and validate - should fail with file and entry named
-            with self.assertRaises(ValueError) as ctx:
+            with self.assertRaises((ValueError, KnowledgeValidationError)) as ctx:
                 validate_knowledge_entry(malformed_file, malformed_styles[1], "styles")
 
             error_msg = str(ctx.exception)
@@ -547,19 +554,9 @@ class GuideDesignationTests(unittest.TestCase):
 
     def test_s10_guide_designation_names_design_model(self):
         """S10: Guide designation names the design model from routing policy"""
-        # Check that the designated model matches the routing policy
-        try:
-            from anvil.routing import load_routing_policy
-        except ImportError:
-            self.skipTest("Routing policy loading not yet implemented")
-
-        # Load routing policy
-        policy = load_routing_policy()
-
-        if "design_model" not in policy:
-            self.skipTest("Design model not yet defined in routing policy")
-
-        design_model = policy["design_model"]
+        # Get the design model from the routing policy
+        design_model = get_design_model_from_routing()
+        self.assertIsNotNone(design_model, "Design model should be defined in routing policy")
 
         # Check that guided design stations reference this model
         reg = load_registry(ROOT / "stations")

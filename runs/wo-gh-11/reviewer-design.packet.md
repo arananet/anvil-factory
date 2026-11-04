@@ -106,6 +106,14 @@ GATE LOOPBACK 1 (after run 41768971456, verdict changes_requested, reviews count
 4. Defense in depth on pack loading (approver note): the pack loader rejects paths that resolve into sensitive system locations (for example /etc, /sys, /proc) with a named error at load, covered by a test. The existing whitelist based filename validation stays.
 
 Real tests for the wiring, written by the test-writer station: a run level test proving a design station packet contains the knowledge section and a non design packet does not; a pack loading test proving preference, fallback and report recording; a sensitive path rejection test. The builder must not modify tests/, anvil.json, pipelines/ or .github/workflows/. Keep the whole suite green and every pipeline valid. Update CHANGELOG Unreleased.
+
+GATE LOOPBACK 2 (after run 41771847615, verdict changes_requested, reviews counted 5 of 5; reviewer-tests and reviewer-architecture request changes). The packet and pack wiring from loopback 1 stands (reviewer-spec, reviewer-security and reviewer-design pass). Remaining, verbatim in substance:
+
+1. S10 is declared but not wired into the runtime (reviewer-architecture): the station.json files declare guided and designation for the guided stations, but the Station dataclass in anvil/stations.py has no guided field, so load_registry drops it, and the runner never applies the design model from the routing policy to guided stations. get_design_model_from_routing exists in anvil/knowledge.py and is never called. Fix: add the guided field to the Station dataclass, preserve it in load_registry, and in the runner apply the design model read from the recorded routing policy (the policy's designer entry) at the point of use when a station is guided.
+
+2. Three tests skip instead of testing (reviewer-tests): test_s1_malformed_entry_fails_validation imports a nonexistent load_knowledge and skips; it must import load_builtin_knowledge and actually assert that a malformed entry fails naming the file and entry. test_s10_guide_designation_names_design_model imports a nonexistent load_routing_policy and skips; it must use the real accessor and assert the guided stations resolve to the policy's design model. test_s1_builtin_dataset_exists_and_validates never calls the loader; it must call load_builtin_knowledge() and assert it succeeds. Remove the import failure skip pattern from these tests: a test that cannot import its subject must fail, not skip.
+
+The test-writer station owns the test fixes; the builder owns the stations and runner wiring and must not modify tests/, anvil.json, pipelines/ or .github/workflows/. Keep the whole suite green and every pipeline valid. Update CHANGELOG Unreleased if the change set changes.
 - risk_hints: 
 - status: new
 
@@ -198,6 +206,47 @@ These bars apply to every product page or interface this project ships.
 - [ ] Touch targets are at least 44x44px on mobile
 - [ ] Text is readable without zooming on any device
 - [ ] No horizontal scrolling on standard viewports
+
+
+## Design knowledge
+
+**Authority**: The project's own design system (design/DESIGN.md, design/tokens.json) is the authority for this project. The knowledge base below is reference material that the design system may draw from. On any conflict, the project's design system wins. A deviation from the knowledge base alone is not a finding; a deviation from the project's design system is.
+
+**Note**: No product type slice matched. General guidelines only.
+
+### Product Type: Undeclared
+
+No specific product type declared. Using general guidelines only.
+
+### UX Guidelines
+
+**Accessibility:**
+- Maintain minimum 4.5:1 contrast ratio for normal text, 3:1 for large text (18pt+)
+- Touch targets must be at least 44x44px on mobile devices
+
+**Feedback:**
+- Loading states should appear after 300ms delay to avoid flashing
+- Provide immediate visual feedback for user actions
+
+**Forms:**
+- Form fields should have clear labels and validation feedback
+- Error messages should explain what went wrong and how to fix it
+
+**Hierarchy:**
+- Establish clear visual hierarchy using size, weight, and color
+- Important actions should be visually prominent and easy to locate
+
+**Motion:**
+- Keep animation durations between 200-400ms for most transitions
+- Provide reduced motion alternatives for users with vestibular sensitivity
+
+**Responsive:**
+- Test layouts at mobile (320-768px), tablet (768-1024px), and desktop (1024px+) breakpoints
+- Avoid horizontal scrolling on standard viewports
+
+**Spacing:**
+- Use consistent spacing scale throughout (e.g., 4px, 8px, 16px, 24px, 32px)
+- Group related elements together with whitespace separating distinct sections
 
 
 ## Rendered evidence

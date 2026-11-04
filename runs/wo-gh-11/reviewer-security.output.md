@@ -1,47 +1,22 @@
 ## Security Review Complete
 
-I have completed the security review of the knowledge pack loading implementation. 
+I've reviewed the changes for security risks and unsafe defaults. The review focused on the gate loopback 2 changes:
 
-### Verdict: **PASS**
+**Changes analyzed:**
+1. **anvil/stations.py**: Added `guided: bool = False` field to Station dataclass and wiring to read it from station.json files
+2. **anvil/runner.py**: Added logic to apply the design model from routing policy when a station has the `guided` flag set
+3. **tests/test_design_knowledge.py**: Fixed test imports and removed skip patterns to actually run tests
 
-The implementation includes appropriate security controls and no critical security risks were found.
+**Security assessment:**
+- ✅ **No unsafe input handling**: Boolean field is safely parsed from trusted configuration files
+- ✅ **No injection vectors**: No command execution, path traversal, or code injection risks
+- ✅ **Safe defaults**: The `guided` field defaults to `False`, which is the secure default
+- ✅ **No privilege escalation**: Changes don't modify access control or permissions
+- ✅ **No information disclosure**: No sensitive data exposure
+- ✅ **Proper data flow**: Config file → boolean field → conditional logic → model selection from routing policy
 
-### Security Controls Verified
+The changes are focused on metadata and model selection logic with no security vulnerabilities identified.
 
-1. **Sensitive System Path Rejection** (anvil/knowledge.py:119-137)
-   - Correctly rejects paths resolving to `/etc`, `/sys`, `/proc`, `/dev`, `/boot`
-   - Path resolution occurs before validation, preventing symlink bypass attacks
-   - Clear error messages identify rejected paths without information leakage
+**Verdict: PASS**
 
-2. **Whitelist-Based Filename Validation** (anvil/knowledge.py:169-179)
-   - Strict whitelist allows only: `styles.json`, `palettes.json`, `fonts.json`, `guidelines.json`, `product-types.json`
-   - Prevents path traversal via malicious filenames in manifest
-
-3. **Input Validation**
-   - Manifest structure validation (required fields: name, format_version, product_types, data_files)
-   - JSON parsing with proper exception handling
-   - Entry-level validation for all loaded data
-
-4. **Pack Isolation**
-   - Pack files never written to project or factory tree
-   - Only read from external operator-supplied location
-   - Tests verify no pack content leaks into repository
-
-5. **Test Coverage** (tests/test_design_knowledge.py:777-856)
-   - Real tests that execute actual code
-   - Cover sensitive path rejection for `/etc`, `/sys`, `/proc`
-   - Verify normal paths still accepted
-
-### Threat Model
-
-The security controls are appropriate for the threat model:
-- Knowledge packs are **operator-supplied** (trusted input)
-- Operator already has filesystem access
-- Defense in depth measures protect against misconfiguration
-
-### Minor Observations (Not Critical)
-
-- No file size limits on JSON files (could theoretically allow memory exhaustion, but acceptable for operator-supplied input)
-- Relies on Python's default JSON nesting depth limits (appropriate for this use case)
-
-The review output has been written to `runs/wo-gh-11/reviewer-security.review.json`.
+Review written to: `runs/wo-gh-11/reviewer-security.review.json`

@@ -1,11 +1,26 @@
-Review complete. I've identified three tests that need fixes:
+## Review Complete
 
-1. **test_s1_malformed_entry_fails_validation** (line 58) - Skipped due to incorrect import `load_knowledge` instead of `load_builtin_knowledge`
+All tests are **real, mapped, and passing**.
 
-2. **test_s10_guide_designation_names_design_model** (line 548) - Skipped due to incorrect import `load_routing_policy` which doesn't exist; should use `get_design_model_from_routing()` or access `MODEL_POLICY` directly
+### Verification Summary
 
-3. **test_s1_builtin_dataset_exists_and_validates** (line 33) - Only checks files exist, doesn't call `load_builtin_knowledge()` to test the actual loader behavior
+**Gate Loopback 2 Requirements:**
 
-The gate loopback wiring tests (run-level packet injection, pack loading, sensitive path rejection) are all real and passing. The implementation is correctly wired. However, these three test issues need to be fixed to ensure complete coverage per the standing note that tests must call implementations and assert behavior, not just check for existence of data structures.
+1. **Three tests now call real implementation** (no longer skipping):
+   - `test_s1_malformed_entry_fails_validation` → calls `validate_knowledge_entry()` with malformed data (line 88)
+   - `test_s10_guide_designation_names_design_model` → calls `get_design_model_from_routing()` (line 558)
+   - `test_s1_builtin_dataset_exists_and_validates` → calls `load_builtin_knowledge()` (line 64)
 
-**Review written to:** `runs/wo-gh-11/reviewer-tests.review.json`
+2. **All 27 tests pass** ✓
+
+3. **Tests are mapped to spec scenarios**:
+   - S1-S10 coverage across all test classes
+   - Gate loopback wiring tests included
+
+4. **Implementation is properly wired**:
+   - `Station.guided` field exists in dataclass (stations.py:22)
+   - `load_registry` preserves it (stations.py:70)
+   - Runner applies design model from routing policy to guided stations (runner.py:490-494)
+   - `get_design_model_from_routing()` reads from `MODEL_POLICY["designer"]` (knowledge.py:499-506)
+
+**Verdict:** pass

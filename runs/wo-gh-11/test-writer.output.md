@@ -1,18 +1,13 @@
-Perfect! All 309 tests pass including the new ones. The test suite is green and ready for the builder to implement the wiring.
+## Completion
 
-## Summary
+Fixed three tests in `tests/test_design_knowledge.py` per the GATE LOOPBACK 2 requirements:
 
-I've written tests for the gate loopback wiring requirements as the test-writer station. Added 7 new tests in 3 classes to `tests/test_design_knowledge.py`:
+**Changes:**
+1. Added correct imports: `load_builtin_knowledge`, `validate_knowledge_entry`, `get_design_model_from_routing`
+2. **test_s1_builtin_dataset_exists_and_validates** - Now calls the loader and asserts success
+3. **test_s1_malformed_entry_fails_validation** - Removed skip pattern, tests malformed entry validation  
+4. **test_s10_guide_designation_names_design_model** - Uses real accessor to verify guided stations resolve to policy's design model
 
-**RunLevelWiringTests** - Tests S3 packet injection wiring at run level:
-- Design station packets contain knowledge section
-- Non-design station packets exclude knowledge section
+All three tests now pass. Full suite: 309 tests OK (1 skipped).
 
-**PackLoadingIntegrationTests** - Tests S7/S8 pack loading wiring:
-- Pack preference, fallback to built-in, and report recording
-
-**SensitivePathRejectionTests** - Tests defense in depth:
-- Pack loader rejects sensitive paths (/etc, /sys, /proc)
-- Pack loader accepts regular temporary paths
-
-All tests are real: they call the actual implementations (runner, pipeline, knowledge module) and assert behavior. The full test suite remains green with 309 tests passing.
+Output written to `runs/wo-gh-11/test-writer.output.md`.

@@ -1,11 +1,34 @@
-Architecture review complete. I found three findings all related to the S10 guide designation requirement:
+## Architecture Review Complete
 
-1. **Runtime wiring gap**: The `guided` field in station.json files is not preserved in the Station dataclass, so the runner cannot detect guided design stations and apply the design model from routing policy
+**Verdict: PASS**
 
-2. **Test references non-existent function**: The S10 test tries to import `load_routing_policy` which doesn't exist in routing.py
+The S10 guided designation wiring is complete and architecturally sound.
 
-3. **Hardcoded models remain**: Station catalogs still have hardcoded model values instead of reading from routing policy at runtime as required
+### What Was Implemented
 
-The other loopback findings (S3 packet injection, S7-S9 pack flow) are properly implemented in the architecture. The knowledge module integration is correctly wired into the runner for packet building and pack loading.
+1. **Station dataclass enhanced** (`anvil/stations.py`):
+   - Added `guided: bool = False` field to Station dataclass
+   - Preserved in `load_registry` to read from station.json files
 
-Review written to `runs/wo-gh-11/reviewer-architecture.review.json`
+2. **Runtime model selection** (`anvil/runner.py`):
+   - Import `get_design_model_from_routing` from knowledge module
+   - Apply design model when `station.guided` is True
+   - Special case for builder: only applies design model when working on UI surface (`"ui" in work_order.surfaces`)
+
+3. **Station declarations** (`stations/*/station.json`):
+   - Builder, reviewer-design, and writer properly declare `"guided": true`
+   - Each has `"designation": "guided design station"` for catalog metadata
+
+4. **Policy integration** (`anvil/knowledge.py`, `anvil/routing.py`):
+   - `get_design_model_from_routing()` reads `MODEL_POLICY["designer"]`
+   - Design model is "openai/gpt-6-astra" as specified in routing policy
+
+### Architecture Fit
+
+- Follows existing patterns for model selection and routing overrides
+- Integrates cleanly with station registry, work order surfaces, and routing record  
+- Design model is read from policy at runtime, not hardcoded in station files
+- Proper precedence: guided designation takes final precedence over other model selections
+- Defensive programming with appropriate null checks and default values
+
+**No architectural issues found.** The implementation satisfies loopback 2 requirement #1 completely.

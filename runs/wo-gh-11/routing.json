@@ -9,9 +9,9 @@
   "routed_out": [],
   "selected_models": {
     "reviewer-tests": "review-balanced",
+    "reviewer-design": "review-balanced",
     "reviewer-architecture": "review-balanced",
     "reviewer-spec": "review-balanced",
-    "reviewer-design": "review-balanced",
     "reviewer-security": "review-strong"
   },
   "reason": "Medium risk: full panel at policy models"

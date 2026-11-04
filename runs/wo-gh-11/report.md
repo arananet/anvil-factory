@@ -11,7 +11,7 @@ Outcome: accepted
 
 Risk: medium
 
-Surfaces: content
+Surfaces: data
 
 ## Routing
 
@@ -26,9 +26,9 @@ Surfaces: content
 
 ## Verdict
 
-Verdict: changes_requested
+Verdict: approved
 
-Reviewers reviewer-tests, reviewer-architecture requested changes.
+All counted reviews passed.
 
 ## Steps
 
@@ -43,7 +43,6 @@ Reviewers reviewer-tests, reviewer-architecture requested changes.
 - reviewer-architecture: executed
 - reviewer-design: executed
 - approver: completed
-- approver: loopback
 - triage-human: completed
 - deployer: packet_ready
 - observer: executed
