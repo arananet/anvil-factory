@@ -1,0 +1,330 @@
+01:46:41 | INFO: Data are loaded, start creating Blender stuff
+01:46:41 | INFO: Blender create Mesh node Crowned silicone shell
+01:46:41 | INFO: Blender create Mesh node Cube
+01:46:41 | INFO: Blender create Mesh node Text
+01:46:41 | INFO: Blender create Mesh node Cube.001
+01:46:41 | INFO: Blender create Mesh node Microcell comfort foam
+01:46:41 | INFO: Blender create Mesh node Cube.005
+01:46:41 | INFO: Blender create Mesh node Cube.003
+01:46:41 | INFO: Blender create Mesh node Cube.094
+01:46:41 | INFO: Blender create Mesh node Cube.002
+01:46:41 | INFO: Blender create Mesh node Cube.034
+01:46:41 | INFO: Blender create Mesh node PCB substrate
+01:46:41 | INFO: Blender create Mesh node Cube.006
+01:46:41 | INFO: Blender create Mesh node Cylinder.002
+01:46:41 | INFO: Blender create Mesh node Cylinder.005
+01:46:41 | INFO: Blender create Mesh node Cylinder.001
+01:46:41 | INFO: Blender create Mesh node Cylinder.004
+01:46:41 | INFO: Blender create Mesh node Cylinder
+01:46:41 | INFO: Blender create Mesh node Cylinder.003
+01:46:41 | INFO: Blender create Mesh node Cube.035
+01:46:41 | INFO: Blender create Mesh node Cylinder.006
+01:46:41 | INFO: Blender create Mesh node Cube.004
+01:46:41 | INFO: Blender create Mesh node Cube.095
+01:46:41 | INFO: Blender create Mesh node Optically translucent adhesive
+01:46:41 | INFO: Blender create Mesh node Peeled release liner
+01:46:41 | INFO: glTF import finished in 0.11s
+Blender 4.5.15 LTS (hash 5afeabba6097 built 2026-10-22 01:33:47)
+Fra:1 Mem:85.91M (Peak 87.59M) | Time:00:18.92 | Rendering 1 / 6 samples
+Fra:1 Mem:85.91M (Peak 87.59M) | Time:00:36.79 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0001.png'
+Time: 00:37.48 (Saving: 00:00.64)
+
+Fra:2 Mem:87.02M (Peak 117.55M) | Time:00:05.67 | Rendering 1 / 6 samples
+Fra:2 Mem:87.02M (Peak 117.55M) | Time:00:23.90 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0002.png'
+Time: 00:24.38 (Saving: 00:00.45)
+
+Fra:3 Mem:87.02M (Peak 118.67M) | Time:00:05.54 | Rendering 1 / 6 samples
+Fra:3 Mem:87.02M (Peak 118.67M) | Time:00:23.06 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0003.png'
+Time: 00:23.88 (Saving: 00:00.75)
+
+Fra:4 Mem:87.02M (Peak 118.67M) | Time:00:04.95 | Rendering 1 / 6 samples
+Fra:4 Mem:87.02M (Peak 118.67M) | Time:00:22.20 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0004.png'
+Time: 00:23.01 (Saving: 00:00.72)
+
+Fra:5 Mem:87.02M (Peak 118.67M) | Time:00:05.81 | Rendering 1 / 6 samples
+Fra:5 Mem:87.02M (Peak 118.67M) | Time:00:25.18 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0005.png'
+Time: 00:25.94 (Saving: 00:00.71)
+
+Fra:6 Mem:87.02M (Peak 118.67M) | Time:00:06.04 | Rendering 1 / 6 samples
+Fra:6 Mem:87.02M (Peak 118.67M) | Time:00:24.33 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0006.png'
+Time: 00:25.19 (Saving: 00:00.76)
+
+Fra:7 Mem:87.02M (Peak 118.67M) | Time:00:05.69 | Rendering 1 / 6 samples
+Fra:7 Mem:87.02M (Peak 118.67M) | Time:00:25.03 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0007.png'
+Time: 00:25.85 (Saving: 00:00.76)
+
+Fra:8 Mem:87.02M (Peak 118.67M) | Time:00:05.84 | Rendering 1 / 6 samples
+Fra:8 Mem:87.02M (Peak 118.67M) | Time:00:25.32 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0008.png'
+Time: 00:26.19 (Saving: 00:00.77)
+
+Fra:9 Mem:87.02M (Peak 118.67M) | Time:00:06.32 | Rendering 1 / 6 samples
+Fra:9 Mem:87.02M (Peak 118.67M) | Time:00:25.34 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0009.png'
+Time: 00:25.90 (Saving: 00:00.52)
+
+Fra:10 Mem:87.02M (Peak 118.67M) | Time:00:05.71 | Rendering 1 / 6 samples
+Fra:10 Mem:87.02M (Peak 118.67M) | Time:00:25.15 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0010.png'
+Time: 00:25.66 (Saving: 00:00.46)
+
+Fra:11 Mem:87.02M (Peak 118.67M) | Time:00:05.96 | Rendering 1 / 6 samples
+Fra:11 Mem:87.02M (Peak 118.67M) | Time:00:25.39 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0011.png'
+Time: 00:26.15 (Saving: 00:00.73)
+
+Fra:12 Mem:87.02M (Peak 118.67M) | Time:00:05.84 | Rendering 1 / 6 samples
+Fra:12 Mem:87.02M (Peak 118.67M) | Time:00:25.60 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0012.png'
+Time: 00:26.33 (Saving: 00:00.69)
+
+Fra:13 Mem:87.02M (Peak 118.67M) | Time:00:06.18 | Rendering 1 / 6 samples
+Fra:13 Mem:87.02M (Peak 118.67M) | Time:00:24.50 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0013.png'
+Time: 00:25.07 (Saving: 00:00.50)
+
+Fra:14 Mem:87.02M (Peak 118.67M) | Time:00:06.20 | Rendering 1 / 6 samples
+Fra:14 Mem:87.02M (Peak 118.67M) | Time:00:25.30 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0014.png'
+Time: 00:25.91 (Saving: 00:00.54)
+
+Fra:15 Mem:87.02M (Peak 118.67M) | Time:00:06.28 | Rendering 1 / 6 samples
+Fra:15 Mem:87.02M (Peak 118.67M) | Time:00:26.88 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0015.png'
+Time: 00:27.41 (Saving: 00:00.49)
+
+Fra:16 Mem:87.02M (Peak 118.67M) | Time:00:06.26 | Rendering 1 / 6 samples
+Fra:16 Mem:87.02M (Peak 118.67M) | Time:00:24.82 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0016.png'
+Time: 00:25.51 (Saving: 00:00.62)
+
+Fra:17 Mem:87.02M (Peak 118.67M) | Time:00:06.37 | Rendering 1 / 6 samples
+Fra:17 Mem:87.02M (Peak 118.67M) | Time:00:26.75 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0017.png'
+Time: 00:27.26 (Saving: 00:00.44)
+
+Fra:18 Mem:87.02M (Peak 118.67M) | Time:00:06.17 | Rendering 1 / 6 samples
+Fra:18 Mem:87.02M (Peak 118.67M) | Time:00:26.13 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0018.png'
+Time: 00:26.80 (Saving: 00:00.62)
+
+Fra:19 Mem:87.02M (Peak 118.67M) | Time:00:06.62 | Rendering 1 / 6 samples
+Fra:19 Mem:87.02M (Peak 118.67M) | Time:00:26.87 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0019.png'
+Time: 00:27.73 (Saving: 00:00.77)
+
+Fra:20 Mem:87.02M (Peak 118.67M) | Time:00:06.26 | Rendering 1 / 6 samples
+Fra:20 Mem:87.02M (Peak 118.67M) | Time:00:25.11 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0020.png'
+Time: 00:25.99 (Saving: 00:00.77)
+
+Fra:21 Mem:87.02M (Peak 118.67M) | Time:00:06.92 | Rendering 1 / 6 samples
+Fra:21 Mem:87.02M (Peak 118.67M) | Time:00:26.66 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0021.png'
+Time: 00:27.41 (Saving: 00:00.68)
+
+Fra:22 Mem:87.02M (Peak 118.67M) | Time:00:06.19 | Rendering 1 / 6 samples
+Fra:22 Mem:87.02M (Peak 118.67M) | Time:00:26.49 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0022.png'
+Time: 00:26.98 (Saving: 00:00.45)
+
+Fra:23 Mem:87.02M (Peak 118.67M) | Time:00:06.30 | Rendering 1 / 6 samples
+Fra:23 Mem:87.02M (Peak 118.67M) | Time:00:26.59 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0023.png'
+Time: 00:27.40 (Saving: 00:00.77)
+
+Fra:24 Mem:87.02M (Peak 118.67M) | Time:00:06.16 | Rendering 1 / 6 samples
+Fra:24 Mem:87.02M (Peak 118.67M) | Time:00:26.07 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0024.png'
+Time: 00:26.71 (Saving: 00:00.57)
+
+Fra:25 Mem:87.02M (Peak 118.67M) | Time:00:05.86 | Rendering 1 / 6 samples
+Fra:25 Mem:87.02M (Peak 118.67M) | Time:00:26.69 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0025.png'
+Time: 00:27.17 (Saving: 00:00.42)
+
+Fra:26 Mem:87.02M (Peak 118.67M) | Time:00:05.94 | Rendering 1 / 6 samples
+Fra:26 Mem:87.02M (Peak 118.67M) | Time:00:26.66 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0026.png'
+Time: 00:27.30 (Saving: 00:00.57)
+
+Fra:27 Mem:87.02M (Peak 118.67M) | Time:00:06.19 | Rendering 1 / 6 samples
+Fra:27 Mem:87.02M (Peak 118.67M) | Time:00:25.25 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0027.png'
+Time: 00:26.05 (Saving: 00:00.71)
+
+Fra:28 Mem:87.02M (Peak 118.67M) | Time:00:06.79 | Rendering 1 / 6 samples
+Fra:28 Mem:87.02M (Peak 118.67M) | Time:00:26.52 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0028.png'
+Time: 00:27.28 (Saving: 00:00.67)
+
+Fra:29 Mem:87.02M (Peak 118.67M) | Time:00:06.38 | Rendering 1 / 6 samples
+Fra:29 Mem:87.02M (Peak 118.67M) | Time:00:26.44 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0029.png'
+Time: 00:27.09 (Saving: 00:00.57)
+
+Fra:30 Mem:87.02M (Peak 118.67M) | Time:00:06.25 | Rendering 1 / 6 samples
+Fra:30 Mem:87.02M (Peak 118.67M) | Time:00:26.15 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0030.png'
+Time: 00:26.72 (Saving: 00:00.55)
+
+Fra:31 Mem:87.02M (Peak 118.67M) | Time:00:06.31 | Rendering 1 / 6 samples
+Fra:31 Mem:87.02M (Peak 118.67M) | Time:00:26.47 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0031.png'
+Time: 00:27.25 (Saving: 00:00.72)
+
+Fra:32 Mem:87.02M (Peak 118.67M) | Time:00:06.81 | Rendering 1 / 6 samples
+Fra:32 Mem:87.02M (Peak 118.67M) | Time:00:25.98 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0032.png'
+Time: 00:26.61 (Saving: 00:00.54)
+
+Fra:33 Mem:87.02M (Peak 118.67M) | Time:00:06.48 | Rendering 1 / 6 samples
+Fra:33 Mem:87.02M (Peak 118.67M) | Time:00:24.84 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0033.png'
+Time: 00:25.51 (Saving: 00:00.63)
+
+Fra:34 Mem:87.02M (Peak 118.67M) | Time:00:06.08 | Rendering 1 / 6 samples
+Fra:34 Mem:87.02M (Peak 118.67M) | Time:00:25.77 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0034.png'
+Time: 00:26.54 (Saving: 00:00.69)
+
+Fra:35 Mem:87.02M (Peak 118.67M) | Time:00:06.32 | Rendering 1 / 6 samples
+Fra:35 Mem:87.02M (Peak 118.67M) | Time:00:26.09 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0035.png'
+Time: 00:27.10 (Saving: 00:00.93)
+
+Fra:36 Mem:87.02M (Peak 118.67M) | Time:00:06.54 | Rendering 1 / 6 samples
+Fra:36 Mem:87.02M (Peak 118.67M) | Time:00:26.79 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0036.png'
+Time: 00:27.27 (Saving: 00:00.42)
+
+Fra:37 Mem:87.02M (Peak 118.67M) | Time:00:06.35 | Rendering 1 / 6 samples
+Fra:37 Mem:87.02M (Peak 118.67M) | Time:00:26.28 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0037.png'
+Time: 00:27.12 (Saving: 00:00.76)
+
+Fra:38 Mem:87.02M (Peak 118.67M) | Time:00:06.45 | Rendering 1 / 6 samples
+Fra:38 Mem:87.02M (Peak 118.67M) | Time:00:26.12 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0038.png'
+Time: 00:27.00 (Saving: 00:00.79)
+
+Fra:39 Mem:87.02M (Peak 118.67M) | Time:00:06.17 | Rendering 1 / 6 samples
+Fra:39 Mem:87.02M (Peak 118.67M) | Time:00:25.08 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0039.png'
+Time: 00:26.15 (Saving: 00:00.98)
+
+Fra:40 Mem:87.02M (Peak 118.67M) | Time:00:06.39 | Rendering 1 / 6 samples
+Fra:40 Mem:87.02M (Peak 118.67M) | Time:00:25.67 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0040.png'
+Time: 00:26.66 (Saving: 00:00.90)
+
+Fra:41 Mem:87.02M (Peak 118.67M) | Time:00:06.62 | Rendering 1 / 6 samples
+Fra:41 Mem:87.02M (Peak 118.67M) | Time:00:25.41 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0041.png'
+Time: 00:26.35 (Saving: 00:00.86)
+
+Fra:42 Mem:87.02M (Peak 118.67M) | Time:00:06.56 | Rendering 1 / 6 samples
+Fra:42 Mem:87.02M (Peak 118.67M) | Time:00:26.45 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0042.png'
+Time: 00:27.01 (Saving: 00:00.53)
+
+Fra:43 Mem:87.02M (Peak 118.67M) | Time:00:06.02 | Rendering 1 / 6 samples
+Fra:43 Mem:87.02M (Peak 118.67M) | Time:00:25.88 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0043.png'
+Time: 00:26.84 (Saving: 00:00.83)
+
+Fra:44 Mem:87.02M (Peak 118.67M) | Time:00:06.46 | Rendering 1 / 6 samples
+Fra:44 Mem:87.02M (Peak 118.67M) | Time:00:25.91 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0044.png'
+Time: 00:26.78 (Saving: 00:00.80)
+
+Fra:45 Mem:87.02M (Peak 118.67M) | Time:00:06.55 | Rendering 1 / 6 samples
+Fra:45 Mem:87.02M (Peak 118.67M) | Time:00:26.97 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0045.png'
+Time: 00:27.87 (Saving: 00:00.82)
+
+Fra:46 Mem:87.02M (Peak 118.67M) | Time:00:06.35 | Rendering 1 / 6 samples
+Fra:46 Mem:87.02M (Peak 118.67M) | Time:00:26.81 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0046.png'
+Time: 00:27.70 (Saving: 00:00.83)
+
+Fra:47 Mem:87.02M (Peak 118.67M) | Time:00:05.90 | Rendering 1 / 6 samples
+Fra:47 Mem:87.02M (Peak 118.67M) | Time:00:25.47 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0047.png'
+Time: 00:26.04 (Saving: 00:00.49)
+
+Fra:48 Mem:87.02M (Peak 118.67M) | Time:00:05.38 | Rendering 1 / 6 samples
+Fra:48 Mem:87.02M (Peak 118.67M) | Time:00:26.84 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0048.png'
+Time: 00:27.69 (Saving: 00:00.76)
+
+Fra:49 Mem:87.02M (Peak 118.67M) | Time:00:06.14 | Rendering 1 / 6 samples
+Fra:49 Mem:87.02M (Peak 118.67M) | Time:00:26.57 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0049.png'
+Time: 00:27.06 (Saving: 00:00.44)
+
+Fra:50 Mem:87.02M (Peak 118.67M) | Time:00:05.64 | Rendering 1 / 6 samples
+Fra:50 Mem:87.02M (Peak 118.67M) | Time:00:26.38 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0050.png'
+Time: 00:26.95 (Saving: 00:00.51)
+
+Fra:51 Mem:87.02M (Peak 118.67M) | Time:00:05.96 | Rendering 1 / 6 samples
+Fra:51 Mem:87.02M (Peak 118.67M) | Time:00:26.24 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0051.png'
+Time: 00:26.80 (Saving: 00:00.53)
+
+Fra:52 Mem:87.02M (Peak 118.67M) | Time:00:06.47 | Rendering 1 / 6 samples
+Fra:52 Mem:87.02M (Peak 118.67M) | Time:00:26.35 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0052.png'
+Time: 00:27.32 (Saving: 00:00.90)
+
+Fra:53 Mem:87.02M (Peak 118.67M) | Time:00:06.36 | Rendering 1 / 6 samples
+Fra:53 Mem:87.02M (Peak 118.67M) | Time:00:25.55 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0053.png'
+Time: 00:26.41 (Saving: 00:00.78)
+
+Fra:54 Mem:87.02M (Peak 118.67M) | Time:00:06.28 | Rendering 1 / 6 samples
+Fra:54 Mem:87.02M (Peak 118.67M) | Time:00:25.92 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0054.png'
+Time: 00:26.72 (Saving: 00:00.72)
+
+Fra:55 Mem:87.02M (Peak 118.67M) | Time:00:06.46 | Rendering 1 / 6 samples
+Fra:55 Mem:87.02M (Peak 118.67M) | Time:00:25.08 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0055.png'
+Time: 00:25.98 (Saving: 00:00.84)
+
+Fra:56 Mem:87.02M (Peak 118.67M) | Time:00:06.31 | Rendering 1 / 6 samples
+Fra:56 Mem:87.02M (Peak 118.67M) | Time:00:25.25 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0056.png'
+Time: 00:26.13 (Saving: 00:00.81)
+
+Fra:57 Mem:87.02M (Peak 118.67M) | Time:00:06.31 | Rendering 1 / 6 samples
+Fra:57 Mem:87.02M (Peak 118.67M) | Time:00:26.35 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0057.png'
+Time: 00:27.04 (Saving: 00:00.61)
+
+Fra:58 Mem:87.02M (Peak 118.67M) | Time:00:06.10 | Rendering 1 / 6 samples
+Fra:58 Mem:87.02M (Peak 118.67M) | Time:00:25.52 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0058.png'
+Time: 00:26.57 (Saving: 00:00.96)
+
+Fra:59 Mem:87.02M (Peak 118.67M) | Time:00:06.45 | Rendering 1 / 6 samples
+Fra:59 Mem:87.02M (Peak 118.67M) | Time:00:24.34 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0059.png'
+Time: 00:25.21 (Saving: 00:00.82)
+
+Fra:60 Mem:87.02M (Peak 118.67M) | Time:00:06.38 | Rendering 1 / 6 samples
+Fra:60 Mem:87.02M (Peak 118.67M) | Time:00:26.30 | Rendering 6 / 6 samples
+Saved: 'frames/s7/f_0060.png'
+Time: 00:26.82 (Saving: 00:00.43)
+
+SECTION_RENDER_DONE s7 frames=60 seconds=1600.7
+
+Blender quit

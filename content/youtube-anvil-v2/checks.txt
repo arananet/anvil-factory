@@ -1,0 +1,20 @@
+PASS S1-resolution (1920x1080)
+PASS S1-framerate (30/1 = 30.00 fps)
+PASS S1-streams (video=1 audio=1)
+PASS S2-duration (83.83s)
+PASS S3-word-count (195 words)
+PASS S3-timings (14 timing marks)
+PASS S5-opening (starts: 'Introducing ANVIL. I am a software facto')
+PASS S5-pronouns (12 first person pronouns)
+PASS S5-no-third-person
+PASS S4-clean-script.md
+PASS S4-clean-storyboard.md
+PASS S4-clean-production-notes.md
+PASS S6-glb-sha256 (daea8110b3568653...)
+PASS S7-contact-sheet (2560x1800)
+PASS S7-still-count (20 sampled stills)
+PASS S7-still-size
+PASS S8-blender-scripts (8 python scripts)
+PASS S8-render-stats (blender version noted: True, frames figure: True)
+RESULT: PASS (0 failing checks)
+CHECKS_EXIT=0
