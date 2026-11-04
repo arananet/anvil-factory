@@ -93,12 +93,16 @@ def load_routing_config(project_dir: Path) -> Dict:
     """Load routing configuration from project.
 
     Loads factory defaults and applies project overrides if present.
+    Validates configuration structure and model assignments against policy ceiling.
 
     Args:
         project_dir: Path to project directory
 
     Returns:
         Routing configuration dict
+
+    Raises:
+        RoutingConfigError: If configuration is invalid or violates policy ceiling
     """
     # Factory default routing configuration
     default_config = {
@@ -128,11 +132,73 @@ def load_routing_config(project_dir: Path) -> Dict:
             project_config = json.loads(project_config_path.read_text(encoding="utf-8"))
             # Merge with defaults
             if isinstance(project_config, dict):
-                default_config.update(project_config)
+                # Deep merge for nested dicts like models and policy_ceilings
+                for key, value in project_config.items():
+                    if key in default_config and isinstance(default_config[key], dict) and isinstance(value, dict):
+                        default_config[key].update(value)
+                    else:
+                        default_config[key] = value
         except (json.JSONDecodeError, OSError):
             pass
 
-    return default_config
+    # Finding C: Apply MODEL_POLICY as fallback when policy_ceilings not in config
+    if "policy_ceilings" not in default_config:
+        default_config["policy_ceilings"] = MODEL_POLICY.copy()
+
+    config = default_config
+
+    # Finding B: Validate reviewer lists contain only valid reviewer station IDs
+    # Valid reviewer station IDs must start with "reviewer-"
+    valid_reviewer_pattern = r"^reviewer-[a-z][a-z0-9-]*$"
+    import re
+
+    for list_name in ["reduced_panel_reviewers", "full_panel_reviewers"]:
+        if list_name in config:
+            for reviewer_id in config[list_name]:
+                if not re.match(valid_reviewer_pattern, reviewer_id):
+                    raise RoutingConfigError(
+                        f"Invalid reviewer station ID '{reviewer_id}' in {list_name}. "
+                        f"Reviewer IDs must match pattern: {valid_reviewer_pattern}"
+                    )
+
+    # Finding B: Validate all model references exist in MODEL_HIERARCHY
+    if "models" in config:
+        for model_key, model_name in config["models"].items():
+            if model_name not in MODEL_HIERARCHY:
+                raise RoutingConfigError(
+                    f"Invalid model reference '{model_name}' in models.{model_key}. "
+                    f"Model must be one of: {', '.join(MODEL_HIERARCHY)}"
+                )
+
+    # Validate policy_ceilings models exist in hierarchy
+    if "policy_ceilings" in config:
+        for station_kind, ceiling_model in config["policy_ceilings"].items():
+            if ceiling_model not in MODEL_HIERARCHY:
+                raise RoutingConfigError(
+                    f"Invalid model reference '{ceiling_model}' in policy_ceilings.{station_kind}. "
+                    f"Model must be one of: {', '.join(MODEL_HIERARCHY)}"
+                )
+
+    # Finding A: Validate model assignments against policy ceiling
+    # Check that configured models don't exceed policy ceilings
+    if "models" in config and "policy_ceilings" in config:
+        # Validate standard reviewer model against reviewer ceiling
+        if "standard" in config["models"] and "reviewer" in config["policy_ceilings"]:
+            validate_model_assignment(
+                "reviewer",
+                config["models"]["standard"],
+                config["policy_ceilings"]["reviewer"]
+            )
+
+        # Validate strong reviewer model against reviewer-security ceiling
+        if "strong" in config["models"] and "reviewer-security" in config["policy_ceilings"]:
+            validate_model_assignment(
+                "reviewer-security",
+                config["models"]["strong"],
+                config["policy_ceilings"]["reviewer-security"]
+            )
+
+    return config
 
 
 def route_reviewers(

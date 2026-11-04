@@ -3,23 +3,8 @@
   "from_station": "reviewer-tests",
   "to_station": "reviewer-architecture",
   "work_order_id": "wo-gh-8",
-  "artifact_path": "runs/wo-gh-8/reviewer-tests.output.md",
-  "status": "executed",
-  "created_at": "2026-11-03T23:54:14.220260+00:00",
-  "review": {
-    "station": "reviewer-tests",
-    "verdict": "changes_requested",
-    "findings": [
-      "S4 test (test_config_above_policy_fails_load_s4) at line 404 is a placeholder that passes without validation. It uses self.assertTrue(True, ...) instead of testing that config loading actually fails when a model exceeds the policy ceiling.",
-      "Two additional tests are placeholders: test_default_routing_table_exists (line 590) and test_project_can_override_routing_config (line 607) both pass without real assertions.",
-      "The routing.py implementation at line 71 defines validate_model_assignment() to enforce the policy ceiling, but this function is never called during config loading, so S4's requirement is not implemented despite having a passing test.",
-      "The test suite uses a mock executor (ROUTING_EXECUTOR) that simulates routing behavior rather than exercising the actual routing.py implementation. While this is an acceptable integration testing pattern, it means routing logic bugs would not be caught."
-    ]
-  },
-  "configured_model": "review-balanced",
-  "executor": {
-    "kind": "command",
-    "detail": "python3"
-  },
-  "executed_model": null
+  "artifact_path": "runs/wo-gh-8/reviewer-tests.packet.md",
+  "status": "skipped",
+  "created_at": "2026-11-04T00:13:14.412399+00:00",
+  "configured_model": "review-balanced"
 }

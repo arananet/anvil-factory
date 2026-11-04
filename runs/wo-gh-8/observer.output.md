@@ -1,7 +1,3 @@
-Observer report completed. The deployer hasn't executed yet, so there's no release record to observe.
+Created the observer output file at `runs/wo-gh-8/observer.output.md`. 
 
-**Created:**
-- `runs/wo-gh-8/observer.output.md` - Reports that the release record is missing
-- Updated `observer.envelope.json` - Status set to "blocked" with reason "missing_release_record"
-
-The observer station requires a release record as input, but the deployer shows status `packet_ready` without having produced `deployer.output.md` yet. Once the deployer executes and creates a release record, the observer can verify the deployment and report what actually happened.
+The observer station is blocked because it requires a release record as input, but the deployer hasn't executed yet (status: `packet_ready`). The output file documents this missing input and states that the deployer must execute first to produce the release record before the observer can proceed.

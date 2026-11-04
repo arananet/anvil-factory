@@ -1,24 +1,13 @@
-I'll assess this work order against the intake criteria.
+Looking at this gate loopback work order - it's focused on fixing 5 specific findings from a previous review of the risk routing feature.
 
-The work order asks for implementation of a risk-based routing system per the spec. The spec is clear and detailed, covering:
-- Routing logic that runs between intake and reviewers
-- Configuration-driven reviewer selection based on risk + surfaces
-- Six testable scenarios
-- Report and swimlane updates
-- Test coverage and documentation
+The scope is clear and buildable: wire validation during config loading (Finding A), add structural validation for reviewer lists and models (Finding B), align policy ceiling configuration (Finding C), replace placeholder tests (Finding D), and address the security reviewer trust issue (Finding E).
 
-This is **one buildable scope** - all scenarios are part of the same routing feature. It doesn't fall into the refusal class. The work touches the core routing pipeline logic and data models for work orders and run reports.
-
-**Risk assessment**: This affects which reviewers run and at what models. Incorrect routing could cause reviews to be skipped, but it's testable, reversible, and requires keeping the suite green. The blast radius is moderate. **Medium risk**.
-
-**Surfaces**: This touches `data` - the work order data model (consuming risk/surfaces fields), routing records, and run report structure.
+All findings are related corrections to the same routing capability. The work touches the factory's CI/CD infrastructure (reviewer routing and model assignment) with moderate blast radius - bad routing could skip reviews or use wrong models, but changes are reversible through git.
 
 ```json
 {
-  "intake_outcome": {
-    "outcome": "accepted"
-  },
+  "intake_outcome": {"outcome": "accepted"},
   "risk": "medium",
-  "surfaces": ["data"]
+  "surfaces": ["deploy"]
 }
 ```

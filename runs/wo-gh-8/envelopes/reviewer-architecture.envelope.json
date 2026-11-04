@@ -3,23 +3,8 @@
   "from_station": "reviewer-architecture",
   "to_station": "reviewer-design",
   "work_order_id": "wo-gh-8",
-  "artifact_path": "runs/wo-gh-8/reviewer-architecture.output.md",
-  "status": "executed",
-  "created_at": "2026-11-03T23:56:24.524125+00:00",
-  "review": {
-    "station": "reviewer-architecture",
-    "verdict": "changes_requested",
-    "findings": [
-      "S4 configuration validation not enforced at load time: The validate_model_assignment function (anvil/routing.py:71) exists but is never called during load_routing_config (anvil/routing.py:92-136). Architecture principle: deterministic gates fail fast. The spec requires 'a project routing configuration that assigns a model above the policy ceiling is rejected at config load with the violation named.' The implementation loads project overrides at line 131 without calling validate_model_assignment for each model in config['models']. This violates the fail-fast principle - invalid configurations will cause runtime failures when routing selects a model that exceeds the policy, instead of failing at configuration load time with a clear error. The test test_config_above_policy_fails_load_s4 (tests/test_risk_routing.py:404) is a placeholder that always passes. To fix: call validate_model_assignment during load_routing_config for each station kind and model pairing before returning the merged config, or add a validate_routing_config step in the CLI/runner that runs before any pipeline execution.",
-      "Configuration validation incomplete against station registry: load_routing_config merges project overrides (anvil/routing.py:131) but doesn't validate that reviewer station IDs in reduced_panel_reviewers and full_panel_reviewers exist in the station registry. Architecture principle: layers have clean contracts. The routing layer should validate configuration references against the station layer's registry before accepting the configuration. Invalid station IDs (e.g., a typo like 'reviewer-secrity' or a removed station like 'reviewer-deprecated') will cause runtime selection errors when route_reviewers tries to match them against pipeline_reviewers (line 173-177), instead of failing at load with a clear error naming the invalid station ID. Add validation in load_routing_config that checks each configured reviewer station ID against load_registry(project / 'stations') if the registry is available at config load time.",
-      "Model policy ceiling is hardcoded instead of configuration-derived: The MODEL_POLICY constant (anvil/routing.py:18-25) hardcodes the policy ceiling, but ROUTING.md documents policy_ceilings as a configurable field in the routing config structure (docs/ROUTING.md:147-150). Architecture principle: configuration over code. The documentation promises 'The model routing policy defines a ceiling' and shows policy_ceilings as part of the project configuration, but the implementation ignores config['policy_ceilings'] and always uses the hardcoded MODEL_POLICY. This creates a mismatch: projects cannot actually configure their policy ceilings as documented. Either remove policy_ceilings from the documentation (if the policy is intentionally fixed), or modify validate_model_assignment and route_reviewers to respect config['policy_ceilings'] when present, falling back to MODEL_POLICY defaults when absent.",
-      "Routing configuration structure mismatch between code and docs: ROUTING.md documents a routing.json structure with policy_ceilings (line 147-150), but the factory default_config in load_routing_config (anvil/routing.py:104-122) includes policy_ceilings only as documentation, not as enforcement. The default_config includes policy_ceilings but they are never used - validate_model_assignment always checks against MODEL_POLICY constant. Additionally, ROUTING.md shows 'reviewer-security' as a key in policy_ceilings with value 'review-strong', but MODEL_POLICY uses 'reviewer-strong' (not 'reviewer-security') as the key. This naming inconsistency means the documented configuration structure doesn't match the code's data model. Align the documentation with the implementation's actual station kind naming (reviewer vs reviewer-strong) or add mapping logic to handle both."
-    ]
-  },
-  "configured_model": "review-balanced",
-  "executor": {
-    "kind": "command",
-    "detail": "python3"
-  },
-  "executed_model": null
+  "artifact_path": "runs/wo-gh-8/reviewer-architecture.packet.md",
+  "status": "skipped",
+  "created_at": "2026-11-04T00:13:14.412943+00:00",
+  "configured_model": "review-balanced"
 }

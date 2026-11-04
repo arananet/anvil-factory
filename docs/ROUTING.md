@@ -153,6 +153,19 @@ Projects can override the default routing table by creating `.anvil/routing.json
 
 **Configuration validation**: Any model assignment that exceeds the policy ceiling for a station kind will cause config loading to fail with a clear error naming the violation.
 
+## Trust model and security considerations
+
+Routing trusts the intake outcomes as authoritative. The risk rating and surfaces list stamped on the work order by intake are consumed as produced without independent verification.
+
+**This is an accepted design choice**: intake owns rating work, routing owns panel selection given that rating.
+
+**Implications**:
+- Routing does not independently analyze file paths, code changes, or work order content to detect security-sensitive changes
+- If intake fails to stamp a security surface on work that touches authentication, credentials, or other security-critical code, routing may select the reduced panel without the security reviewer
+- Unrated work (null risk) defaults to the full panel at policy models as a safe fallback
+
+**Rationale**: This division of responsibility keeps routing deterministic and table-driven. Intake is the sole authority on risk assessment and surface detection; routing is a pure function from those inputs to panel selection. Projects concerned about security surface detection should focus their validation efforts on intake outcomes, not routing logic.
+
 ## Observability
 
 Every routing decision is fully traced:

@@ -3,20 +3,8 @@
   "from_station": "reviewer-spec",
   "to_station": "reviewer-security",
   "work_order_id": "wo-gh-8",
-  "artifact_path": "runs/wo-gh-8/reviewer-spec.output.md",
-  "status": "executed",
-  "created_at": "2026-11-03T23:50:42.524040+00:00",
-  "review": {
-    "station": "reviewer-spec",
-    "verdict": "changes_requested",
-    "findings": [
-      "S4 (Model policy ceiling validation): The validate_model_assignment function exists in anvil/routing.py:71 but is never called during configuration loading. The spec requires that 'a project routing configuration that assigns a station kind a model above the recorded policy, when the configuration is loaded, then loading fails with an error naming the station kind, the configured model and the policy model it exceeds.' The test test_config_above_policy_fails_load_s4 is a placeholder that always passes with 'Config validation will be implemented' comment (tests/test_risk_routing.py:434). To satisfy S4, the validate_model_assignment function must be called in load_routing_config or at the point where routing configurations are applied to station models, with proper error handling that rejects invalid configurations at load time."
-    ]
-  },
-  "configured_model": "review-balanced",
-  "executor": {
-    "kind": "command",
-    "detail": "python3"
-  },
-  "executed_model": null
+  "artifact_path": "runs/wo-gh-8/reviewer-spec.packet.md",
+  "status": "skipped",
+  "created_at": "2026-11-04T00:13:14.411555+00:00",
+  "configured_model": "review-balanced"
 }

@@ -62,6 +62,20 @@ S6: the routing record lands in the run report as its own section (selected set,
 Routing rules live in project configuration with a factory shipped default table. Routing never changes the checks gate or the scenario-to-test gates. Tests covering S1 to S6 in the factory suite style, docs updated, CHANGELOG Unreleased updated. Keep the whole suite green and every pipeline valid.
 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/8
+
+GATE LOOPBACK 1 (after run 41741068693, verdict changes_requested, reviews counted 5 of 5). Fix exactly the counted findings below; nothing else is in scope.
+
+Finding A (all four requesting reviewers; S4 not wired): validate_model_assignment exists at anvil/routing.py:71 but is never called during configuration loading, so a project routing configuration that assigns a model above the policy ceiling loads silently. Wire it: during load_routing_config, validate every model assignment in the merged configuration against the policy ceiling; loading must fail with an error naming the station kind, the configured model and the policy model it exceeds.
+
+Finding B (reviewer-security and reviewer-architecture): load_routing_config merges project overrides without validating the configuration structure. At load time, validate that the reviewer lists (reduced_panel_reviewers and full_panel_reviewers) contain only valid reviewer station ids, and that every model referenced in the configuration exists in MODEL_HIERARCHY. Invalid references fail at load with the offending value named.
+
+Finding C (reviewer-architecture): the policy ceiling is hardcoded in MODEL_POLICY while docs/ROUTING.md documents policy_ceilings as a configurable field, and the docs use a key naming that does not match the code. Align them: load_routing_config honors a policy_ceilings section in the project configuration when present, falling back to MODEL_POLICY when absent, and docs/ROUTING.md names station kinds exactly as the code does.
+
+Finding D (reviewer-tests): three tests in tests/test_risk_routing.py are placeholders that pass without real assertions: test_config_above_policy_fails_load_s4, test_default_routing_table_exists and test_project_can_override_routing_config. Replace them with real tests that exercise the actual routing.py implementation; the S4 test must drive load_routing_config with an over-policy assignment and assert that the load fails naming the violation.
+
+Finding E (reviewer-security, recorded as a by design observation): routing trusts the work order risk and surfaces fields completely. Address it in one of two ways: either keep reviewer-security mandatory whenever the change touches security sensitive paths (auth, credentials, secrets, tokens) regardless of the stamped surfaces, with a routing record entry naming that rule; or record the accepted risk explicitly in docs/ROUTING.md, stating that routing consumes the intake outcomes as produced and that unrated work defaults to the full panel. One of the two, not neither.
+
+Discipline: test changes are written by the test-writer station. The builder implements in anvil/routing.py and the docs only, and must not modify tests/, anvil.json or pipelines/ (protected paths under the checks gate). Keep the whole suite green and every pipeline valid. Update CHANGELOG Unreleased.
 - risk_hints: 
 - status: new
 
@@ -71,9 +85,10 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/8
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: passed
-- reviewer-spec: executed
-- reviewer-security: executed
+- checks-gate: failed
+- loopback: loopback
+- reviewer-spec: skipped
+- reviewer-security: skipped
 
 ## Output contract
 

@@ -2,66 +2,37 @@
 Basis: builder_delta
 Attempt: 1
 
-# Protected Path Additions (Observed, Not Violations)
-Protected path addition (observed): tests/__pycache__/test_gates.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_content.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_review_producer.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_greenfield.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_community.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_statuspage.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_design.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_onboard.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_review_parsing_integrity.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_checks_gate.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_decision.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_supervisor.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_execution.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_anvil.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_intake_outcomes.cpython-312.pyc (matches tests/)
-Protected path addition (observed): tests/__pycache__/test_brain.cpython-312.pyc (matches tests/)
-
 # Check Commands
 ## Command 1: python -m unittest discover -s tests -p 'test_*.py'
-Exit code: 0
+Exit code: 1
 Output:
 ```
-in Git 3.0. To configure the initial branch name
-hint: to use in all of your new repositories, which will suppress this warning,
-hint: call:
-hint:
-hint: 	git config --global init.defaultBranch <name>
-hint:
-hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
-hint: 'development'. The just-created branch can be renamed via this command:
-hint:
-hint: 	git branch -m <name>
-hint:
-hint: Disable this message with "git config set advice.defaultBranchName false"
+ "git config set advice.defaultBranchName false"
 Switched to a new branch 'work-branch'
-.hint: Using 'master' as the name for the initial branch. This default branch name
-hint: will change to "main" in Git 3.0. To configure the initial branch name
-hint: to use in all of your new repositories, which will suppress this warning,
-hint: call:
-hint:
-hint: 	git config --global init.defaultBranch <name>
-hint:
-hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
-hint: 'development'. The just-created branch can be renamed via this command:
-hint:
-hint: 	git branch -m <name>
-hint:
-hint: Disable this message with "git config set advice.defaultBranchName false"
-Switched to a new branch 'work-branch'
-...................................................../opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 39349)>
+...................................................../opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 33355)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-.../opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 42055)>
+.../opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 41735)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-............................................................................................................................................
+...........................................................................................................E.s.....................................
+======================================================================
+ERROR: test_config_above_policy_fails_load_s4 (test_risk_routing.TestModelPolicyCeiling.test_config_above_policy_fails_load_s4)
+S4: configuration assigning model above policy ceiling fails at load
 ----------------------------------------------------------------------
-Ran 235 tests in 14.980s
+Traceback (most recent call last):
+  File "/home/runner/work/anvil-factory/anvil-factory/tests/test_risk_routing.py", line 525, in test_config_above_policy_fails_load_s4
+    config = load_routing_config(proj)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/anvil-factory/anvil-factory/anvil/routing.py", line 187, in load_routing_config
+    validate_model_assignment(
+  File "/home/runner/work/anvil-factory/anvil-factory/anvil/routing.py", line 86, in validate_model_assignment
+    raise RoutingConfigError(
+anvil.routing.RoutingConfigError: Station 'reviewer' configured with model 'review-strong' exceeds policy ceiling 'review-balanced' for reviewer stations
 
-OK
+----------------------------------------------------------------------
+Ran 242 tests in 16.088s
+
+FAILED (errors=1, skipped=1)
 
 ```
