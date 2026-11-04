@@ -1,5 +1,9 @@
 {
   "version": 1,
+  "servable": {
+    "static_root": "status",
+    "page_path": "/index.html"
+  },
   "runtime": {
     "command": "python3 tools/claude_station.py {packet} {output}",
     "kind": "command",

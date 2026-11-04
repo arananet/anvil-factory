@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANVIL run status: anvil-factory</title>
+<style>:root { color-scheme: dark; }
+body { background:#0C0C0C; color:#E8E8E8; font-family:Inter, system-ui, sans-serif; margin:0; padding:32px 20px 64px; }
+main { max-width:1080px; margin:0 auto; }
+h1 { font-size:28px; letter-spacing:.02em; margin:0 0 4px; }
+h1 .accent { color:#FF5C00; }
+h2 { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:17px; margin:0 0 6px; }
+.mono { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.muted { color:#9A9A9A; }
+.snapshot { border-left:3px solid #FF5C00; background:#1E1E1E; padding:10px 14px; margin:18px 0 28px; font-size:14px; }
+.run { background:#1E1E1E; border:1px solid #2A2A2A; border-radius:8px; padding:18px 20px; margin:0 0 22px; }
+.meta { display:flex; flex-wrap:wrap; gap:8px 22px; font-size:13px; color:#C9C9C9; margin:8px 0 14px; }
+.meta b { color:#FFFFFF; font-weight:600; }
+.decision { border-left:3px solid #3A3A3A; padding:8px 12px; margin:0 0 14px; font-size:13.5px; }
+.decision div { margin:2px 0; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { text-align:left; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight:600; color:#9A9A9A; border-bottom:1px solid #3A3A3A; padding:6px 8px; }
+td { border-bottom:1px solid #2A2A2A; padding:6px 8px; vertical-align:top; }
+.status { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space:nowrap; }
+.st-ok { color:#FFFFFF; }
+.st-failed { color:#FF5C00; }
+.st-idle { color:#8A8A8A; }
+.artifacts { color:#9A9A9A; word-break:break-all; }
+footer { color:#8A8A8A; font-size:13px; margin-top:28px; }</style>
+</head>
+<body>
+<main>
+<h1>ANVIL <span class="accent">run status</span></h1>
+<div class="muted mono">project: anvil-factory</div>
+<div class="snapshot">Snapshot generated from the run reports on disk at 2026-11-04 01:38:48 UTC. This page is a snapshot, not a live feed. Regenerate it with <span class="mono">anvil status-page &lt;project&gt;</span>.</div>
+<section class="run">
+<h2>wo-gh-1</h2>
+<div>Add per project design systems to ANVIL (design scaffold, packet injection, reviewer-design)</div>
+<div class="meta"><span>pipeline: <b>sdlc-default</b></span><span>verdict: <b><span class="status st-ok">approved</span></b></span><span>human review required: <b>False</b></span><span>deployment: <b>-</b></span><span>loopbacks: <b>0</b></span></div>
+<div class="decision"><div><span class='mono muted'>approver:</span> All counted reviews passed.</div><div><span class='mono muted'>human gate:</span> Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.</div></div>
+<table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>
+<tr><td class='mono'>intake<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.013</td><td>null</td><td class='artifacts'>runs/wo-gh-1/report.json</td></tr>
+<tr><td class='mono'>spec-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>23475.336</td><td>null</td><td class='artifacts'>runs/wo-gh-1/spec-writer.output.md</td></tr>
+<tr><td class='mono'>test-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>140522.921</td><td>null</td><td class='artifacts'>runs/wo-gh-1/test-writer.output.md</td></tr>
+<tr><td class='mono'>builder<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>390238.902</td><td>null</td><td class='artifacts'>runs/wo-gh-1/builder.output.md</td></tr>
+<tr><td class='mono'>reviewer-spec<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>104513.235</td><td>null</td><td class='artifacts'>runs/wo-gh-1/reviewer-spec.output.md</td></tr>
+<tr><td class='mono'>reviewer-security<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>115634.53</td><td>null</td><td class='artifacts'>runs/wo-gh-1/reviewer-security.output.md</td></tr>
+<tr><td class='mono'>reviewer-tests<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>67835.5</td><td>null</td><td class='artifacts'>runs/wo-gh-1/reviewer-tests.output.md</td></tr>
+<tr><td class='mono'>reviewer-architecture<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>154133.642</td><td>null</td><td class='artifacts'>runs/wo-gh-1/reviewer-architecture.output.md</td></tr>
+<tr><td class='mono'>approver<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.035</td><td>null</td><td class='artifacts'>runs/wo-gh-1/report.json</td></tr>
+<tr><td class='mono'>triage-human<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.012</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>deployer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-idle">packet_ready</span></td><td>0.045</td><td>null</td><td class='artifacts'>runs/wo-gh-1/deployer.packet.md</td></tr>
+<tr><td class='mono'>observer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>162127.099</td><td>null</td><td class='artifacts'>runs/wo-gh-1/observer.output.md</td></tr>
+</tbody></table>
+</section>
+<section class="run">
+<h2>wo-gh-16</h2>
+<div>Review parsing integrity: one authoritative review channel, counted fail closed</div>
+<div class="meta"><span>pipeline: <b>sdlc-default</b></span><span>verdict: <b><span class="status st-ok">approved</span></b></span><span>human review required: <b>False</b></span><span>deployment: <b>-</b></span><span>loopbacks: <b>0</b></span></div>
+<div class="decision"><div><span class='mono muted'>approver:</span> All counted reviews passed. (Counted 2 reviews, expected 5.)</div><div><span class='mono muted'>human gate:</span> Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.</div></div>
+<table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>
+<tr><td class='mono'>intake<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.023</td><td>null</td><td class='artifacts'>runs/wo-gh-16/report.json</td></tr>
+<tr><td class='mono'>spec-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>66198.453</td><td>null</td><td class='artifacts'>runs/wo-gh-16/spec-writer.output.md</td></tr>
+<tr><td class='mono'>test-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>222151.938</td><td>null</td><td class='artifacts'>runs/wo-gh-16/test-writer.output.md</td></tr>
+<tr><td class='mono'>builder<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>251332.159</td><td>null</td><td class='artifacts'>runs/wo-gh-16/builder.output.md</td></tr>
+<tr><td class='mono'>reviewer-spec<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>169009.604</td><td>null</td><td class='artifacts'>runs/wo-gh-16/reviewer-spec.output.md</td></tr>
+<tr><td class='mono'>reviewer-security<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>214645.94</td><td>null</td><td class='artifacts'>runs/wo-gh-16/reviewer-security.output.md</td></tr>
+<tr><td class='mono'>reviewer-tests<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>89140.793</td><td>null</td><td class='artifacts'>runs/wo-gh-16/reviewer-tests.output.md</td></tr>
+<tr><td class='mono'>reviewer-architecture<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>90109.723</td><td>null</td><td class='artifacts'>runs/wo-gh-16/reviewer-architecture.output.md</td></tr>
+<tr><td class='mono'>reviewer-design<div class='muted'>configured: review-balanced</div></td><td><span class="status st-ok">executed</span></td><td>40794.117</td><td>null</td><td class='artifacts'>runs/wo-gh-16/reviewer-design.output.md</td></tr>
+<tr><td class='mono'>approver<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.042</td><td>null</td><td class='artifacts'>runs/wo-gh-16/report.json</td></tr>
+<tr><td class='mono'>triage-human<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.013</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>deployer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-idle">packet_ready</span></td><td>0.194</td><td>null</td><td class='artifacts'>runs/wo-gh-16/deployer.packet.md</td></tr>
+<tr><td class='mono'>observer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>194024.984</td><td>null</td><td class='artifacts'>runs/wo-gh-16/observer.output.md</td></tr>
+</tbody></table>
+</section>
+<section class="run">
+<h2>wo-gh-20</h2>
+<div>Community files by default in every project ANVIL generates</div>
+<div class="meta"><span>pipeline: <b>sdlc-default</b></span><span>verdict: <b><span class="status st-ok">approved</span></b></span><span>human review required: <b>False</b></span><span>deployment: <b>-</b></span><span>loopbacks: <b>0</b></span></div>
+<div class="decision"><div><span class='mono muted'>approver:</span> All counted reviews passed.</div><div><span class='mono muted'>human gate:</span> Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.</div></div>
+<table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>
+<tr><td class='mono'>intake<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.009</td><td>null</td><td class='artifacts'>runs/wo-gh-20/report.json</td></tr>
+<tr><td class='mono'>spec-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>218806.987</td><td>null</td><td class='artifacts'>runs/wo-gh-20/spec-writer.output.md</td></tr>
+<tr><td class='mono'>test-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>112461.873</td><td>null</td><td class='artifacts'>runs/wo-gh-20/test-writer.output.md</td></tr>
+<tr><td class='mono'>builder<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>123756.852</td><td>null</td><td class='artifacts'>runs/wo-gh-20/builder.output.md</td></tr>
+<tr><td class='mono'>reviewer-spec<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>169762.386</td><td>null</td><td class='artifacts'>runs/wo-gh-20/reviewer-spec.output.md</td></tr>
+<tr><td class='mono'>reviewer-security<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>143818.533</td><td>null</td><td class='artifacts'>runs/wo-gh-20/reviewer-security.output.md</td></tr>
+<tr><td class='mono'>reviewer-tests<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>84601.088</td><td>null</td><td class='artifacts'>runs/wo-gh-20/reviewer-tests.output.md</td></tr>
+<tr><td class='mono'>reviewer-architecture<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>152497.216</td><td>null</td><td class='artifacts'>runs/wo-gh-20/reviewer-architecture.output.md</td></tr>
+<tr><td class='mono'>reviewer-design<div class='muted'>configured: review-balanced</div></td><td><span class="status st-ok">executed</span></td><td>72924.375</td><td>null</td><td class='artifacts'>runs/wo-gh-20/reviewer-design.output.md</td></tr>
+<tr><td class='mono'>approver<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.027</td><td>null</td><td class='artifacts'>runs/wo-gh-20/report.json</td></tr>
+<tr><td class='mono'>triage-human<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.011</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>deployer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-idle">packet_ready</span></td><td>0.204</td><td>null</td><td class='artifacts'>runs/wo-gh-20/deployer.packet.md</td></tr>
+<tr><td class='mono'>observer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>40420.084</td><td>null</td><td class='artifacts'>runs/wo-gh-20/observer.output.md</td></tr>
+</tbody></table>
+</section>
+<section class="run">
+<h2>wo-gh-6</h2>
+<div>Deterministic checks gate with protected paths</div>
+<div class="meta"><span>pipeline: <b>sdlc-default</b></span><span>verdict: <b><span class="status st-ok">approved</span></b></span><span>human review required: <b>False</b></span><span>deployment: <b>-</b></span><span>loopbacks: <b>0</b></span></div>
+<div class="decision"><div><span class='mono muted'>approver:</span> All counted reviews passed.</div><div><span class='mono muted'>human gate:</span> Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.</div></div>
+<table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>
+<tr><td class='mono'>intake<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.019</td><td>null</td><td class='artifacts'>runs/wo-gh-6/report.json</td></tr>
+<tr><td class='mono'>spec-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>76046.596</td><td>null</td><td class='artifacts'>runs/wo-gh-6/spec-writer.output.md</td></tr>
+<tr><td class='mono'>test-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>116170.182</td><td>null</td><td class='artifacts'>runs/wo-gh-6/test-writer.output.md</td></tr>
+<tr><td class='mono'>builder<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>156550.487</td><td>null</td><td class='artifacts'>runs/wo-gh-6/builder.output.md</td></tr>
+<tr><td class='mono'>checks-gate<div class='muted'>configured: default</div></td><td><span class="status st-idle">passed</span></td><td>7682.744</td><td>null</td><td class='artifacts'>runs/wo-gh-6/checks-gate.pre-review.output.md</td></tr>
+<tr><td class='mono'>reviewer-spec<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>185573.361</td><td>null</td><td class='artifacts'>runs/wo-gh-6/reviewer-spec.output.md</td></tr>
+<tr><td class='mono'>reviewer-security<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>150210.81</td><td>null</td><td class='artifacts'>runs/wo-gh-6/reviewer-security.output.md</td></tr>
+<tr><td class='mono'>reviewer-tests<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>90696.925</td><td>null</td><td class='artifacts'>runs/wo-gh-6/reviewer-tests.output.md</td></tr>
+<tr><td class='mono'>reviewer-architecture<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>119272.743</td><td>null</td><td class='artifacts'>runs/wo-gh-6/reviewer-architecture.output.md</td></tr>
+<tr><td class='mono'>reviewer-design<div class='muted'>configured: review-balanced</div></td><td><span class="status st-ok">executed</span></td><td>56277.328</td><td>null</td><td class='artifacts'>runs/wo-gh-6/reviewer-design.output.md</td></tr>
+<tr><td class='mono'>approver<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.051</td><td>null</td><td class='artifacts'>runs/wo-gh-6/report.json</td></tr>
+<tr><td class='mono'>triage-human<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.015</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>deployer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-idle">packet_ready</span></td><td>0.165</td><td>null</td><td class='artifacts'>runs/wo-gh-6/deployer.packet.md</td></tr>
+<tr><td class='mono'>observer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>54043.233</td><td>null</td><td class='artifacts'>runs/wo-gh-6/observer.output.md</td></tr>
+</tbody></table>
+</section>
+<section class="run">
+<h2>wo-gh-7</h2>
+<div>Intake outcomes: reject, rescope, needs-info parking, risk and surfaces</div>
+<div class="meta"><span>pipeline: <b>sdlc-default</b></span><span>verdict: <b><span class="status st-ok">approved</span></b></span><span>human review required: <b>False</b></span><span>deployment: <b>-</b></span><span>loopbacks: <b>0</b></span></div>
+<div class="decision"><div><span class='mono muted'>approver:</span> All counted reviews passed.</div><div><span class='mono muted'>human gate:</span> Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.</div></div>
+<table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>
+<tr><td class='mono'>intake<div class='muted'>configured: default</div></td><td><span class="status st-ok">executed</span></td><td>103914.965</td><td>null</td><td class='artifacts'>runs/wo-gh-7/intake.output.md</td></tr>
+<tr><td class='mono'>spec-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>110486.031</td><td>null</td><td class='artifacts'>runs/wo-gh-7/spec-writer.output.md</td></tr>
+<tr><td class='mono'>test-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>90027.826</td><td>null</td><td class='artifacts'>runs/wo-gh-7/test-writer.output.md</td></tr>
+<tr><td class='mono'>builder<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>99415.889</td><td>null</td><td class='artifacts'>runs/wo-gh-7/builder.output.md</td></tr>
+<tr><td class='mono'>checks-gate<div class='muted'>configured: default</div></td><td><span class="status st-idle">passed</span></td><td>13332.799</td><td>null</td><td class='artifacts'>runs/wo-gh-7/checks-gate.pre-review.output.md</td></tr>
+<tr><td class='mono'>reviewer-spec<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>126281.658</td><td>null</td><td class='artifacts'>runs/wo-gh-7/reviewer-spec.output.md</td></tr>
+<tr><td class='mono'>reviewer-security<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>75145.332</td><td>null</td><td class='artifacts'>runs/wo-gh-7/reviewer-security.output.md</td></tr>
+<tr><td class='mono'>reviewer-tests<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>73181.308</td><td>null</td><td class='artifacts'>runs/wo-gh-7/reviewer-tests.output.md</td></tr>
+<tr><td class='mono'>reviewer-architecture<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>135442.202</td><td>null</td><td class='artifacts'>runs/wo-gh-7/reviewer-architecture.output.md</td></tr>
+<tr><td class='mono'>reviewer-design<div class='muted'>configured: review-balanced</div></td><td><span class="status st-ok">executed</span></td><td>105313.022</td><td>null</td><td class='artifacts'>runs/wo-gh-7/reviewer-design.output.md</td></tr>
+<tr><td class='mono'>approver<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.046</td><td>null</td><td class='artifacts'>runs/wo-gh-7/report.json</td></tr>
+<tr><td class='mono'>triage-human<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.014</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>deployer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-idle">packet_ready</span></td><td>0.178</td><td>null</td><td class='artifacts'>runs/wo-gh-7/deployer.packet.md</td></tr>
+<tr><td class='mono'>observer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>53974.747</td><td>null</td><td class='artifacts'>runs/wo-gh-7/observer.output.md</td></tr>
+</tbody></table>
+</section>
+<section class="run">
+<h2>wo-gh-8</h2>
+<div>Risk and surface routing of reviewer sets and station models</div>
+<div class="meta"><span>pipeline: <b>sdlc-default</b></span><span>verdict: <b><span class="status st-ok">approved</span></b></span><span>human review required: <b>False</b></span><span>deployment: <b>-</b></span><span>loopbacks: <b>0</b></span></div>
+<div class="decision"><div><span class='mono muted'>approver:</span> All counted reviews passed.</div><div><span class='mono muted'>human gate:</span> Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.</div></div>
+<table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>
+<tr><td class='mono'>intake<div class='muted'>configured: default</div></td><td><span class="status st-ok">executed</span></td><td>58122.054</td><td>null</td><td class='artifacts'>runs/wo-gh-8/intake.output.md</td></tr>
+<tr><td class='mono'>spec-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>41732.765</td><td>null</td><td class='artifacts'>runs/wo-gh-8/spec-writer.output.md</td></tr>
+<tr><td class='mono'>test-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>57920.584</td><td>null</td><td class='artifacts'>runs/wo-gh-8/test-writer.output.md</td></tr>
+<tr><td class='mono'>builder<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>122546.205</td><td>null</td><td class='artifacts'>runs/wo-gh-8/builder.output.md</td></tr>
+<tr><td class='mono'>checks-gate<div class='muted'>configured: default</div></td><td><span class="status st-idle">passed</span></td><td>16050.852</td><td>null</td><td class='artifacts'>runs/wo-gh-8/checks-gate.pre-review.output.md</td></tr>
+<tr><td class='mono'>reviewer-spec<div class='muted'>configured: review-balanced</div></td><td><span class="status st-ok">executed</span></td><td>86496.514</td><td>null</td><td class='artifacts'>runs/wo-gh-8/reviewer-spec.output.md</td></tr>
+<tr><td class='mono'>reviewer-security<div class='muted'>configured: review-strong</div></td><td><span class="status st-ok">executed</span></td><td>79090.264</td><td>null</td><td class='artifacts'>runs/wo-gh-8/reviewer-security.output.md</td></tr>
+<tr><td class='mono'>reviewer-tests<div class='muted'>configured: review-balanced</div></td><td><span class="status st-ok">executed</span></td><td>68396.702</td><td>null</td><td class='artifacts'>runs/wo-gh-8/reviewer-tests.output.md</td></tr>
+<tr><td class='mono'>reviewer-architecture<div class='muted'>configured: review-balanced</div></td><td><span class="status st-ok">executed</span></td><td>94995.096</td><td>null</td><td class='artifacts'>runs/wo-gh-8/reviewer-architecture.output.md</td></tr>
+<tr><td class='mono'>reviewer-design<div class='muted'>configured: review-balanced</div></td><td><span class="status st-ok">executed</span></td><td>66899.006</td><td>null</td><td class='artifacts'>runs/wo-gh-8/reviewer-design.output.md</td></tr>
+<tr><td class='mono'>approver<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.047</td><td>null</td><td class='artifacts'>runs/wo-gh-8/report.json</td></tr>
+<tr><td class='mono'>triage-human<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.013</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>deployer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-idle">packet_ready</span></td><td>0.238</td><td>null</td><td class='artifacts'>runs/wo-gh-8/deployer.packet.md</td></tr>
+<tr><td class='mono'>observer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>209924.054</td><td>null</td><td class='artifacts'>runs/wo-gh-8/observer.output.md</td></tr>
+</tbody></table>
+</section>
+<footer>Generated by ANVIL from runs/*/report.json. Cost is null unless a runtime reported it; ANVIL never invents a number.
+<br>Skipped run folders with a missing or unreadable report.json: wo-gh-9.
+</footer>
+</main></body></html>
