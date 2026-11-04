@@ -99,6 +99,14 @@ Finding D (reviewer-tests): three tests in tests/test_risk_routing.py are placeh
 Finding E (reviewer-security, recorded as a by design observation): routing trusts the work order risk and surfaces fields completely. Address it in one of two ways: either keep reviewer-security mandatory whenever the change touches security sensitive paths (auth, credentials, secrets, tokens) regardless of the stamped surfaces, with a routing record entry naming that rule; or record the accepted risk explicitly in docs/ROUTING.md, stating that routing consumes the intake outcomes as produced and that unrated work defaults to the full panel. One of the two, not neither.
 
 Discipline: test changes are written by the test-writer station. The builder implements in anvil/routing.py and the docs only, and must not modify tests/, anvil.json or pipelines/ (protected paths under the checks gate). Keep the whole suite green and every pipeline valid. Update CHANGELOG Unreleased.
+
+GATE LOOPBACK 2 (after run 41743622244, verdict no_reviews: the checks gate failed the suite with exactly one error, so no reviews were produced). The loopback 1 implementation is verified correct by direct operator read; the single remaining defect is in the S4 test itself. Fix exactly this; nothing else is in scope.
+
+Defect: tests/test_risk_routing.py, test_config_above_policy_fails_load_s4. Its second half calls load_routing_config(proj) bare (line 525) and only validates manually afterwards. Now that Finding A is wired, load_routing_config raises RoutingConfigError at that bare call: Station 'reviewer' configured with model 'review-strong' exceeds policy ceiling 'review-balanced'. That raise is the required S4 behavior; the test must expect it at the load.
+
+Fix: in that test, wrap the load_routing_config(proj) call in assertRaises(RoutingConfigError) and assert the error message names the station kind (reviewer), the configured model (review-strong) and the policy model (review-balanced). Keep the direct validate_model_assignment assertions in the first half of the test unchanged. The test-writer station writes this fix. The builder changes nothing unless a test failure proves an implementation defect, and must not modify tests/, anvil.json or pipelines/.
+
+Expected outcome: the factory suite passes in full (242 tests at loopback 1 count) and the checks gate passes, so the five reviewers run and judge findings A to E from loopback 1.
 - risk_hints: 
 - status: new
 
@@ -108,12 +116,11 @@ Discipline: test changes are written by the test-writer station. The builder imp
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
-- reviewer-spec: skipped
-- reviewer-security: skipped
-- reviewer-tests: skipped
-- reviewer-architecture: skipped
+- checks-gate: passed
+- reviewer-spec: executed
+- reviewer-security: executed
+- reviewer-tests: executed
+- reviewer-architecture: executed
 
 ## Project design
 

@@ -1,43 +1,47 @@
- .openspec/specs/risk-routing/spec.md               |  11 +-
- CHANGELOG.md                                       |   2 +-
- anvil/routing.py                                   |  70 +++-
- docs/ROUTING.md                                    |  13 +
- runs/wo-gh-8/builder-test-writer-handoff.md        |  72 ++++
- runs/wo-gh-8/builder.output.md                     |  58 ++-
- runs/wo-gh-8/builder.packet.md                     |  14 +
- runs/wo-gh-8/checks-gate.pre-review.output.md      |  71 ++--
- runs/wo-gh-8/deployer.packet.md                    |  28 +-
+ runs/wo-gh-8/builder.output.md                     |  44 +++---
+ runs/wo-gh-8/builder.packet.md                     |   8 ++
+ runs/wo-gh-8/checks-gate.pre-review.output.md      |  72 +++++++---
+ runs/wo-gh-8/deployer.packet.md                    |  21 ++-
  runs/wo-gh-8/envelopes/approver.envelope.json      |   2 +-
  runs/wo-gh-8/envelopes/builder.envelope.json       |   2 +-
- runs/wo-gh-8/envelopes/checks-gate.envelope.json   |  27 +-
+ runs/wo-gh-8/envelopes/checks-gate.envelope.json   |  28 +++-
  runs/wo-gh-8/envelopes/deployer.envelope.json      |   2 +-
  runs/wo-gh-8/envelopes/intake.envelope.json        |   2 +-
  runs/wo-gh-8/envelopes/observer.envelope.json      |   2 +-
- .../envelopes/reviewer-architecture.envelope.json  |  23 +-
- .../envelopes/reviewer-design.envelope.json        |  18 +-
- .../envelopes/reviewer-security.envelope.json      |  22 +-
- runs/wo-gh-8/envelopes/reviewer-spec.envelope.json |  20 +-
- .../wo-gh-8/envelopes/reviewer-tests.envelope.json |  23 +-
+ .../envelopes/reviewer-architecture.envelope.json  |  18 ++-
+ .../envelopes/reviewer-design.envelope.json        |  18 ++-
+ .../envelopes/reviewer-security.envelope.json      |  18 ++-
+ runs/wo-gh-8/envelopes/reviewer-spec.envelope.json |  18 ++-
+ .../wo-gh-8/envelopes/reviewer-tests.envelope.json |  18 ++-
  runs/wo-gh-8/envelopes/spec-writer.envelope.json   |   2 +-
  runs/wo-gh-8/envelopes/test-writer.envelope.json   |   2 +-
  runs/wo-gh-8/envelopes/triage-human.envelope.json  |   2 +-
- runs/wo-gh-8/intake.output.md                      |  21 +-
- runs/wo-gh-8/intake.packet.md                      |  14 +
- runs/wo-gh-8/observer.output.md                    |   8 +-
- runs/wo-gh-8/observer.packet.md                    |  28 +-
- runs/wo-gh-8/report.json                           | 150 +++-----
- runs/wo-gh-8/report.md                             |  20 +-
- runs/wo-gh-8/reviewer-architecture.packet.md       |  23 +-
- runs/wo-gh-8/reviewer-design.packet.md             |  25 +-
- runs/wo-gh-8/reviewer-security.packet.md           |  19 +-
- runs/wo-gh-8/reviewer-spec.packet.md               |  17 +-
- runs/wo-gh-8/reviewer-tests.packet.md              |  21 +-
- runs/wo-gh-8/routing.json                          |   6 +-
- runs/wo-gh-8/spec-writer.output.md                 |  12 +-
- runs/wo-gh-8/spec-writer.packet.md                 |  14 +
- runs/wo-gh-8/swimlane.md                           |  32 +-
- runs/wo-gh-8/test-writer.output.md                 |  31 +-
- runs/wo-gh-8/test-writer.packet.md                 |  14 +
- tests/test_risk_routing.py                         | 397 +++++++++++++++++++--
- work_orders/wo-gh-8.json                           |   4 +-
- 42 files changed, 908 insertions(+), 436 deletions(-)
+ runs/wo-gh-8/intake.output.md                      |  35 ++++-
+ runs/wo-gh-8/intake.packet.md                      |   8 ++
+ runs/wo-gh-8/observer.output.md                    |  21 ++-
+ runs/wo-gh-8/observer.packet.md                    |  21 ++-
+ runs/wo-gh-8/report.json                           | 147 ++++++++++++---------
+ runs/wo-gh-8/report.md                             |  21 ++-
+ runs/wo-gh-8/reviewer-architecture.output.md       |  27 ++--
+ runs/wo-gh-8/reviewer-architecture.packet.md       |  17 ++-
+ runs/wo-gh-8/reviewer-architecture.review.json     |   9 +-
+ runs/wo-gh-8/reviewer-design.output.md             |  29 ++--
+ runs/wo-gh-8/reviewer-design.packet.md             |  19 ++-
+ runs/wo-gh-8/reviewer-security.output.md           |  23 +++-
+ runs/wo-gh-8/reviewer-security.packet.md           |  13 +-
+ runs/wo-gh-8/reviewer-security.review.json         |   8 +-
+ runs/wo-gh-8/reviewer-spec.output.md               |  22 ++-
+ runs/wo-gh-8/reviewer-spec.packet.md               |  11 +-
+ runs/wo-gh-8/reviewer-spec.review.json             |   6 +-
+ runs/wo-gh-8/reviewer-tests.output.md              |  25 ++--
+ runs/wo-gh-8/reviewer-tests.packet.md              |  15 ++-
+ runs/wo-gh-8/reviewer-tests.review.json            |   9 +-
+ runs/wo-gh-8/routing.json                          |  10 +-
+ runs/wo-gh-8/spec-writer.output.md                 |  17 ++-
+ runs/wo-gh-8/spec-writer.packet.md                 |   8 ++
+ runs/wo-gh-8/swimlane.md                           |  33 +++--
+ runs/wo-gh-8/test-writer.output.md                 |  22 +--
+ runs/wo-gh-8/test-writer.packet.md                 |   8 ++
+ tests/test_risk_routing.py                         |  16 +--
+ work_orders/wo-gh-8.json                           |   6 +-
+ 46 files changed, 556 insertions(+), 329 deletions(-)

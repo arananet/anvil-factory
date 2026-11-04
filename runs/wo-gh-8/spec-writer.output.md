@@ -1,11 +1,14 @@
-Spec updated. The revised spec at `.openspec/specs/risk-routing/spec.md` now incorporates all five gate loopback findings:
+Reading the spec and work order. The spec at `.openspec/specs/risk-routing/spec.md` is complete and correct for gate loopback 2.
 
-**Finding A (validation not wired)**: Added explicit requirement that configuration validation happens at load time, with all model assignments validated against the policy ceiling during `load_routing_config`.
+The spec already clearly states the S4 behavior at load time:
+- Line 18: "Configuration validation happens at load time. When routing configuration is loaded, every model assignment in the merged configuration... is validated against the policy ceiling. A configuration that assigns a model above the policy for a station kind fails to load with an error..."
+- S4 scenario (line 43-44): "Given a project routing configuration that assigns a station kind a model above the recorded policy, when the configuration is loaded, then loading fails with an error..."
 
-**Finding B (structure validation missing)**: Added requirement that reviewer lists are validated for valid station IDs and all model references are validated against the model hierarchy. Expanded S4 to cover these validation failures.
+The spec also incorporates all loopback 1 findings:
+- S7 added for policy_ceilings override capability (Finding C)
+- Line 20 documents that routing trusts intake outcomes (Finding E)
+- Configuration validation requirements expanded (Finding B)
 
-**Finding C (policy ceiling config misalignment)**: Added requirement that projects can override policy ceilings via `policy_ceilings` section in configuration, with factory defaults as fallback. New S7 scenario covers this explicitly.
+Gate loopback 2 identifies a test implementation defect, not a spec defect. The test `test_config_above_policy_fails_load_s4` calls `load_routing_config(proj)` bare instead of wrapping it in `assertRaises(RoutingConfigError)`. The work order states "The test-writer station writes this fix."
 
-**Finding D (placeholder tests)**: Expanded S4 with concrete validation cases and added S7 - these provide clear scenarios for proper test implementation with real assertions.
-
-**Finding E (security trust model)**: Added explicit requirement documenting that routing trusts intake outcomes as authoritative - this is the accepted design choice, with intake owning rating and routing owning panel selection. Documented as an intentional decision rather than an oversight.
+**Spec-writer station output**: The spec is complete and requires no revision. The gate loopback 2 defect is in test implementation; the test-writer station owns the fix.

@@ -521,15 +521,15 @@ class TestModelPolicyCeiling(unittest.TestCase):
             config_file = config_dir / "routing.json"
             config_file.write_text(json.dumps(invalid_config))
 
-            # Load config and validate model assignments against policy
-            config = load_routing_config(proj)
+            # Test 2: load_routing_config should raise when config exceeds policy ceiling
+            with self.assertRaises(RoutingConfigError) as ctx:
+                load_routing_config(proj)
 
-            # Verify that when we try to validate this configuration, it raises an error
-            with self.assertRaises(RoutingConfigError):
-                # Validate that standard model doesn't exceed reviewer policy ceiling
-                policy_ceiling = config["policy_ceilings"]["reviewer"]
-                assigned_model = config["models"]["standard"]
-                validate_model_assignment("reviewer-spec", assigned_model, policy_ceiling)
+            # Verify error message names the station kind, configured model, and policy model
+            error_msg = str(ctx.exception)
+            self.assertIn("reviewer", error_msg.lower())
+            self.assertIn("review-strong", error_msg)
+            self.assertIn("review-balanced", error_msg)
 
 
 class TestRoutedOutReviewers(unittest.TestCase):

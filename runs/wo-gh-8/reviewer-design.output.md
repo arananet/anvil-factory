@@ -1,27 +1,18 @@
 ## Design Review Complete
 
-**Verdict: Pass**
+**Verdict**: Pass
 
-This work order implements risk and surface routing for the ANVIL factory - a CLI framework that produces markdown reports and JSON data files, not visual product interfaces.
+**Reasoning**: This work order implements risk and surface routing logic for reviewer selection and model assignment. The changes are entirely backend implementation:
 
-### Review Analysis
+- `anvil/routing.py`: Backend routing logic (Python)
+- `tests/test_risk_routing.py`: Test coverage
+- `docs/ROUTING.md`: Documentation
+- Run artifacts: Execution outputs
 
-The routing feature produces two types of output:
-1. **Markdown section in report.md** - Using standard markdown formatting (## headers, ** bold, - lists)
-2. **One-line swimlane summary** - Plain text summary line
+**No interface output was produced** in this work order. There are no HTML files, React components, CSS, or user-facing UI pages to review against the design system.
 
-### Why This Passes
+While the routing produces text output in report.md and swimlane.md (markdown summaries), these are data outputs, not visual interface components subject to the project's design tokens, component rules, or quality bars for Product Pages.
 
-The project's design quality bars focus on visual interface concerns:
-- Contrast ratios (4.5:1 for text)
-- Touch targets (44x44px on mobile)
-- Responsive layouts (mobile/tablet/desktop)
-- Visual hierarchy with styled components
+The project has a design system defined in `design/DESIGN.md` with quality bars for Visual Hierarchy, Scale Contrast, Spacing Rhythm, and Responsive Behavior. Since no interface artifacts were produced, there are no violations of these quality bars.
 
-These bars apply to "product pages or interfaces" - meaning visual UI with styled components, colors, typography tokens, and interactive elements.
-
-The routing outputs are **markdown documentation text**, not visual product interfaces. They use standard markdown conventions for hierarchy and clarity, which is appropriate for internal build system reports.
-
-The design system itself acknowledges this scope - all design tokens are marked TODO because this CLI tool project doesn't currently need visual design standards for its markdown documentation outputs.
-
-**Review file written to:** `runs/wo-gh-8/reviewer-design.review.json`
+**Review output written to**: `runs/wo-gh-8/reviewer-design.review.json`

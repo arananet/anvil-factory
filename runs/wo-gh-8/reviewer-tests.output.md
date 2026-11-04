@@ -1,17 +1,14 @@
-## Test Review Complete
+Review complete. The test suite comprehensively covers all spec scenarios S1-S7:
 
-I've reviewed the test suite for work order wo-gh-8 (risk routing feature). The review is written to `runs/wo-gh-8/reviewer-tests.review.json`.
+**Test coverage verified:**
+- S1 (low risk reduced panel): 2 tests
+- S2 (security surface): 2 tests  
+- S3 (full panel cases): 4 tests
+- S4 (policy ceiling validation): 3 tests including the corrected test
+- S5 (routed out reviewers): 2 tests
+- S6 (routing in report): 2 tests
+- S7 (policy ceiling overrides): 2 tests
 
-**Verdict: Changes Requested**
+**Gate loopback 2 fix verified:** The critical S4 test defect has been correctly fixed. Lines 525-526 now properly wrap `load_routing_config(proj)` in `assertRaises(RoutingConfigError)`, and lines 529-532 verify the error message names the station kind (reviewer), configured model (review-strong), and policy ceiling (review-balanced) as required.
 
-All 16 tests pass and provide good coverage for scenarios S1-S6, but there are critical issues:
-
-1. **S4 test is a placeholder** (line 404): `test_config_above_policy_fails_load_s4` uses `self.assertTrue(True, ...)` without actually validating that config loading fails when a model exceeds the policy ceiling.
-
-2. **Two additional placeholder tests** (lines 590, 607): `test_default_routing_table_exists` and `test_project_can_override_routing_config` also pass without real assertions.
-
-3. **S4 requirement not implemented**: `validate_model_assignment()` exists in routing.py:71 but is never called during config loading, so the policy ceiling enforcement isn't working.
-
-4. **Tests use mock executor**: The test suite simulates routing behavior rather than exercising the actual `anvil/routing.py` implementation, so implementation bugs wouldn't be caught.
-
-The other scenarios (S1, S2, S3, S5, S6) have proper tests that validate the expected behavior.
+All tests are real with actual assertions, properly mapped to spec scenarios, and the S4 test will now pass with the corrected routing.py implementation.
