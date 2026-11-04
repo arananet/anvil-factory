@@ -107,6 +107,10 @@ C. test_reviewer_ux.test_s5_no_screenshots_declared_in_review fails on its execu
 D. test_anvil.TestRegistry.test_registry_s6 pins the station registry from before this item existed. This item adds a station by design; update the expectation to the registry as it now stands, including reviewer-ux, and nothing else about that test.
 
 Success is a green gate: the full suite passes (319 tests at round 1 count, plus any legitimately added), protected paths pass, and the reviewers judge the whole standing change, pipeline composition included. Keep every pipeline valid.
+
+VERIFICATION RUN (after run 41779746722, verdict no_reviews). Full history, stated plainly for the reviewers who judge this run: round 1's builder added reviewer-ux to the three pipeline files (protected), which blocked its gate. The repair run fixed the prompt contract and the routing surface rule, and its builder also edited two test fixtures in its own delta (tests/test_risk_routing.py: the null risk fixture now describes non UI work, matching what that test asserts; tests/test_supervisor.py: the REVIEWERS constant now includes reviewer-ux, matching the pipeline it validates), which tripped the protected path rule again even though the suite is green. The operator has verified the standing tree directly: 319 tests, all passing, all 8 pipelines valid.
+
+This run changes nothing. The builder and the test-writer verify the standing implementation and make no edits to any file: not tests/, not pipelines/, not anvil.json, not .github/workflows/, and no implementation file unless a genuine defect is found, in which case the run stops and reports it instead of fixing it here. The reviewers judge the whole standing change on its merits: the reviewer-ux station and its contract, the routing surface rule (in for UI work, routed out with the reason recorded otherwise), the prompt contract compliance, the pipeline composition in the three pipeline files, and the fixture updates named above. On an approved verdict this order closes.
 - risk_hints: 
 - status: new
 

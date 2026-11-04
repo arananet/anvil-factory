@@ -1,3 +1,9 @@
-Observer output created at `runs/wo-gh-12/observer.output.md`. The observer station correctly reports that it cannot proceed without the required release record from the deployer station, following the rule that states "If the inputs are not enough, say what is missing instead of guessing."
+Observation report completed. The verification run failed at the checks-gate with protected path violations, so no deployment occurred. The report documents:
 
-The deployer is currently at "packet_ready" status but has not executed yet, so no release record exists to observe.
+- **Gate failure**: Tests passed (319 OK), but protected path check caught modifications to `tests/test_supervisor.py` and `tests/test_risk_routing.py`
+- **Pipeline impact**: Loopback triggered, all six reviewers skipped, approver verdict was `no_reviews`
+- **No release**: Deployer reached packet_ready but never executed
+
+The issue is that the previous repair run's builder modified test fixtures (updating them to match the new reviewer-ux reality), which violated the protected path rule on `tests/`.
+
+Report written to `runs/wo-gh-12/observer.output.md`.

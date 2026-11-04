@@ -83,7 +83,6 @@ Your verdict must be one of: `pass`, `fail`, or `changes_requested`.
 
 Return a JSON object with this structure:
 
-```json
 {
   "station": "reviewer-ux",
   "verdict": "pass | fail | changes_requested",
@@ -92,36 +91,8 @@ Return a JSON object with this structure:
     "Another finding if applicable"
   ]
 }
-```
 
 The station field must equal "reviewer-ux", the verdict must be one of pass, fail, or changes_requested, and findings must be a list of strings.
-
-## Examples
-
-### Example 1: Interface judged without rendered evidence
-
-- verdict: pass
-- findings: ["Note: Judged from source and knowledge slice without rendered evidence. Source review shows labeled form controls and keyboard-accessible navigation."]
-
-### Example 2: Flow breakdown
-
-- verdict: changes_requested
-- findings:
-  * "Flow breakdown: User cannot complete the primary task (search) because the search button is only visible after scrolling, but there is no visual cue that content exists below the fold."
-  * "Usability (visibility of state): Form submission provides no loading indicator or confirmation, leaving users uncertain whether their action succeeded."
-
-### Example 3: Accessibility issues
-
-- verdict: changes_requested
-- findings:
-  * "Accessibility: Primary action button lacks visible focus indicator, preventing keyboard users from knowing where focus is."
-  * "Accessibility (contrast): Error message text at #FF0000 on #FFCCCC background has insufficient contrast (2.1:1, requires minimum 4.5:1 per design system quality bars)."
-  * "Copy clarity: Error message 'Invalid input' does not explain what went wrong or how to fix it."
-
-### Example 4: Usable interface
-
-- verdict: pass
-- findings: []
 
 
 ## Work order
@@ -161,6 +132,10 @@ C. test_reviewer_ux.test_s5_no_screenshots_declared_in_review fails on its execu
 D. test_anvil.TestRegistry.test_registry_s6 pins the station registry from before this item existed. This item adds a station by design; update the expectation to the registry as it now stands, including reviewer-ux, and nothing else about that test.
 
 Success is a green gate: the full suite passes (319 tests at round 1 count, plus any legitimately added), protected paths pass, and the reviewers judge the whole standing change, pipeline composition included. Keep every pipeline valid.
+
+VERIFICATION RUN (after run 41779746722, verdict no_reviews). Full history, stated plainly for the reviewers who judge this run: round 1's builder added reviewer-ux to the three pipeline files (protected), which blocked its gate. The repair run fixed the prompt contract and the routing surface rule, and its builder also edited two test fixtures in its own delta (tests/test_risk_routing.py: the null risk fixture now describes non UI work, matching what that test asserts; tests/test_supervisor.py: the REVIEWERS constant now includes reviewer-ux, matching the pipeline it validates), which tripped the protected path rule again even though the suite is green. The operator has verified the standing tree directly: 319 tests, all passing, all 8 pipelines valid.
+
+This run changes nothing. The builder and the test-writer verify the standing implementation and make no edits to any file: not tests/, not pipelines/, not anvil.json, not .github/workflows/, and no implementation file unless a genuine defect is found, in which case the run stops and reports it instead of fixing it here. The reviewers judge the whole standing change on its merits: the reviewer-ux station and its contract, the routing surface rule (in for UI work, routed out with the reason recorded otherwise), the prompt contract compliance, the pipeline composition in the three pipeline files, and the fixture updates named above. On an approved verdict this order closes.
 - risk_hints: 
 - status: new
 
@@ -170,13 +145,12 @@ Success is a green gate: the full suite passes (319 tests at round 1 count, plus
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
-- reviewer-spec: skipped
-- reviewer-security: skipped
-- reviewer-tests: skipped
-- reviewer-architecture: skipped
-- reviewer-design: skipped
+- checks-gate: passed
+- reviewer-spec: executed
+- reviewer-security: routed_out
+- reviewer-tests: executed
+- reviewer-architecture: routed_out
+- reviewer-design: routed_out
 
 ## Design knowledge
 

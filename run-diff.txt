@@ -1,45 +1,43 @@
- anvil/routing.py                                   |  23 +-
- runs/wo-gh-12/builder.output.md                    |  54 ++---
- runs/wo-gh-12/builder.packet.md                    |  12 ++
- runs/wo-gh-12/checks-gate.pre-review.output.md     |  83 ++++----
- runs/wo-gh-12/deployer.packet.md                   |  13 ++
+ runs/wo-gh-12/builder.output.md                    |  52 ++++----
+ runs/wo-gh-12/builder.packet.md                    |   4 +
+ runs/wo-gh-12/checks-gate.pre-review.output.md     |  14 +--
+ runs/wo-gh-12/deployer.packet.md                   |  19 +--
  runs/wo-gh-12/envelopes/approver.envelope.json     |   2 +-
  runs/wo-gh-12/envelopes/builder.envelope.json      |   2 +-
- runs/wo-gh-12/envelopes/checks-gate.envelope.json  |  14 +-
+ runs/wo-gh-12/envelopes/checks-gate.envelope.json  |  18 +--
  runs/wo-gh-12/envelopes/deployer.envelope.json     |   2 +-
  runs/wo-gh-12/envelopes/intake.envelope.json       |   2 +-
  runs/wo-gh-12/envelopes/observer.envelope.json     |   2 +-
- .../envelopes/reviewer-architecture.envelope.json  |   2 +-
+ .../envelopes/reviewer-architecture.envelope.json  |   6 +-
  .../envelopes/reviewer-design.envelope.json        |   4 +-
- .../envelopes/reviewer-security.envelope.json      |   2 +-
- .../wo-gh-12/envelopes/reviewer-spec.envelope.json |   2 +-
- .../envelopes/reviewer-tests.envelope.json         |   2 +-
- runs/wo-gh-12/envelopes/reviewer-ux.envelope.json  |  10 +
+ .../envelopes/reviewer-security.envelope.json      |   6 +-
+ .../wo-gh-12/envelopes/reviewer-spec.envelope.json |  18 ++-
+ .../envelopes/reviewer-tests.envelope.json         |  18 ++-
+ runs/wo-gh-12/envelopes/reviewer-ux.envelope.json  |   4 +-
  runs/wo-gh-12/envelopes/spec-writer.envelope.json  |   2 +-
  runs/wo-gh-12/envelopes/test-writer.envelope.json  |   2 +-
  runs/wo-gh-12/envelopes/triage-human.envelope.json |   2 +-
- runs/wo-gh-12/intake.output.md                     |  29 +--
- runs/wo-gh-12/intake.packet.md                     |  12 ++
- runs/wo-gh-12/observer.output.md                   |  20 +-
- runs/wo-gh-12/observer.packet.md                   |  13 ++
- runs/wo-gh-12/report.json                          |  59 +++---
- runs/wo-gh-12/report.md                            |  10 +-
- runs/wo-gh-12/reviewer-architecture.packet.md      |  12 ++
- runs/wo-gh-12/reviewer-design.packet.md            |  12 ++
- runs/wo-gh-12/reviewer-security.packet.md          |  12 ++
- runs/wo-gh-12/reviewer-spec.packet.md              |  12 ++
- runs/wo-gh-12/reviewer-tests.packet.md             |  12 ++
- runs/wo-gh-12/reviewer-ux.packet.md                | 234 +++++++++++++++++++++
- runs/wo-gh-12/routing.json                         |  17 +-
- runs/wo-gh-12/spec-writer.output.md                |  15 +-
- runs/wo-gh-12/spec-writer.packet.md                |  12 ++
- runs/wo-gh-12/swimlane.md                          |  33 +--
- runs/wo-gh-12/test-writer.output.md                |  53 ++---
- runs/wo-gh-12/test-writer.packet.md                |  12 ++
- stations/reviewer-ux/PROMPT.md                     |  29 ---
- tests/test_anvil.py                                |   4 +-
- tests/test_reviewer_ux.py                          |  11 +-
- tests/test_risk_routing.py                         |   6 +-
- tests/test_supervisor.py                           |   2 +-
- work_orders/wo-gh-12.json                          |   2 +-
- 44 files changed, 589 insertions(+), 281 deletions(-)
+ runs/wo-gh-12/intake.output.md                     |  26 ++--
+ runs/wo-gh-12/intake.packet.md                     |   4 +
+ runs/wo-gh-12/observer.output.md                   |  10 +-
+ runs/wo-gh-12/observer.packet.md                   |  19 +--
+ runs/wo-gh-12/report.json                          | 139 ++++++++++-----------
+ runs/wo-gh-12/report.md                            |  39 +++---
+ runs/wo-gh-12/reviewer-architecture.packet.md      |  13 +-
+ runs/wo-gh-12/reviewer-design.packet.md            |  15 ++-
+ runs/wo-gh-12/reviewer-security.packet.md          |   9 +-
+ runs/wo-gh-12/reviewer-spec.output.md              |  39 ++++++
+ runs/wo-gh-12/reviewer-spec.packet.md              |   7 +-
+ runs/wo-gh-12/reviewer-spec.review.json            |   5 +
+ runs/wo-gh-12/reviewer-tests.output.md             |  27 ++++
+ runs/wo-gh-12/reviewer-tests.packet.md             |  11 +-
+ runs/wo-gh-12/reviewer-tests.review.json           |   5 +
+ runs/wo-gh-12/reviewer-ux.packet.md                |  46 ++-----
+ runs/wo-gh-12/routing.json                         |  26 ++--
+ runs/wo-gh-12/spec-writer.output.md                |   8 +-
+ runs/wo-gh-12/spec-writer.packet.md                |   4 +
+ runs/wo-gh-12/swimlane.md                          |  39 +++---
+ runs/wo-gh-12/test-writer.output.md                |  33 ++---
+ runs/wo-gh-12/test-writer.packet.md                |   4 +
+ work_orders/wo-gh-12.json                          |   4 +-
+ 42 files changed, 403 insertions(+), 308 deletions(-)

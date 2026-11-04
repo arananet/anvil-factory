@@ -1,21 +1,27 @@
-Looking at the work order and spec to make an intake judgment.
+I'll analyze this work order and produce the intake judgment.
 
-This is a closing and repair run with a well-defined scope: fix 10 specific test failures across 4 categories (prompt contract violation, routing surface rule defects, test simulation fix, and registry expectation update). The work is buildable as stated with clear success criteria (green gate suite) and explicit constraints about protected paths.
+This is a verification run for work order wo-gh-12. The operator has explicitly stated that:
+- The standing tree is verified green (319 tests passing, all 8 pipelines valid)
+- This run should change nothing
+- Builder and test-writer only verify the standing implementation
+- Reviewers judge the complete standing change
 
-The work order asks to:
-- Fix implementation defects (prompt contract, routing logic)  
-- Fix test defects (simulation, registry expectation)
+The work is clearly defined and buildable as stated - it's a verification pass where the implementation is already complete and gate-verified.
 
-All focused on completing the reviewer-ux feature integration. This is a coherent unit of repair work, not multiple separate changes.
+**Risk assessment**: Low
+- This is a verification run with no changes planned
+- The standing implementation is reversible and already tested green
+- Limited blast radius (adds a reviewer station to the factory system)
+- No credentials, payments, or production deploy paths involved
 
-**Risk assessment**: Medium - this touches internal review tooling and test infrastructure with moderate complexity, but has limited blast radius and doesn't involve production deployment, credentials, or data deletion.
-
-**Surfaces touched**: The work modifies a prompt file (documentation/content), routing logic, and test code. From the surfaces vocabulary, `content` is the clearest match for the PROMPT.md changes.
+**Surfaces**: Content
+- Work includes station prompts, documentation, and test fixtures
+- The prompts and documentation are content artifacts
 
 ```json
 {
   "intake_outcome": {"outcome": "accepted"},
-  "risk": "medium",
+  "risk": "low",
   "surfaces": ["content"]
 }
 ```

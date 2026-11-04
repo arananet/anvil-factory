@@ -1,30 +1,36 @@
-## Summary
+Perfect. I've completed the verification. Let me document my findings.
 
-Fixed all 10 gate failures from the closing brief. The full test suite is now green (319 tests pass).
+## Verification Summary
 
-### Implementation defects (builder-owned):
+I have verified the standing implementation for work order wo-gh-12. All components are correct and the full test suite passes.
 
-**A. PROMPT.md JSON examples** - Fixed `stations/reviewer-ux/PROMPT.md`:
-- Removed ```json fencing from Output Format section
-- Removed entire Examples section with parseable JSON
-- Now matches the canonical contract shape (plain text format with pipe alternatives)
+### Verification Results
 
-**B. Routing surface rule** - Fixed routing logic in `anvil/routing.py`:
-- Modified to only route out `reviewer-ux` when no UI surface (lines 348-367)
-- Removed incorrect logic that also routed out `reviewer-design` (was lines 374-384)
-- `reviewer-design` is part of the classic full panel and stays regardless of surface
-- `reviewer-ux` is the new surface-dependent station that activates only with UI work
+**Test Suite**: ✅ All 319 tests pass (1 skipped)
 
-**B. Test fixtures** - Updated test fixtures to match "non-UI work" requirement:
-- `tests/test_risk_routing.py`: Changed null_risk mode from surfaces=["ui"] to surfaces=["api"], and test_medium_risk_uses_full_panel_s3 to use medium_security_surface
-- `tests/test_supervisor.py`: Updated REVIEWERS constant to include reviewer-ux (constitution check validates proposals don't drop base pipeline reviewers)
+**Pipeline Validation**: ✅ All 8 pipelines are valid JSON
 
-### Test defects (test-writer-owned, already passing):
-- C. test_s5_no_screenshots_declared_in_review ✅
-- D. test_registry_s6 ✅
+**Implementation Verification**:
 
-### Validation:
-- ✅ All 319 tests pass (1 skipped)
-- ✅ All 8 pipelines valid
-- ✅ No protected paths modified (pipelines/, anvil.json, .github/workflows/)
-- ✅ Pipeline composition from round 1 stands as core deliverable
+1. **reviewer-ux Station** (S1):
+   - `stations/reviewer-ux/station.json`: Correct agent kind, review output format, guided design designation
+   - `stations/reviewer-ux/PROMPT.md`: Contract compliance verified - no JSON examples, canonical Output Format structure only, covers four judgment areas (flows, heuristics, accessibility, copy), explicitly excludes visual system compliance, addresses S5 no-screenshots scenario
+
+2. **Pipeline Composition** (S2):
+   - `pipelines/sdlc-default.json`: reviewer-ux present (line 26)
+   - `pipelines/content-default.json`: reviewer-ux present (line 9)
+   - `pipelines/content-short.json`: reviewer-ux present (line 7)
+
+3. **Routing Surface Rule** (S2, S3):
+   - `anvil/routing.py`: Surface rule correctly implemented
+   - reviewer-ux in full_panel_reviewers (lines 115-116)
+   - Routes in when UI surface present (lines 282-289, 351-356)
+   - Routes out with reason "Routed out: no UI surface" when no UI surface (lines 357-369)
+
+4. **Test Fixtures**:
+   - `tests/test_risk_routing.py`: Null risk fixture correctly describes non-UI work (surfaces: ["api"])
+   - `tests/test_supervisor.py`: REVIEWERS constant includes reviewer-ux
+   - `tests/test_reviewer_ux.py`: S5 test properly simulates no-screenshots scenario
+   - `tests/test_anvil.py`: test_registry_s6 correctly expects 27 stations including reviewer-ux
+
+**No defects found.** The implementation is complete and correct. Ready for reviewer judgment.

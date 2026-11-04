@@ -4,8 +4,8 @@
   "to_station": "reviewer-spec",
   "work_order_id": "wo-gh-12",
   "artifact_path": "runs/wo-gh-12/checks-gate.pre-review.output.md",
-  "status": "failed",
-  "created_at": "2026-11-04T05:48:19.381229+00:00",
+  "status": "passed",
+  "created_at": "2026-11-04T05:58:52.184845+00:00",
   "phase": "pre-review",
   "commands": [
     "python -m unittest discover -s tests -p 'test_*.py'"
@@ -18,16 +18,10 @@
     "anvil.json",
     "pipelines/"
   ],
-  "protected_path_verdict": "fail",
-  "protected_path_findings": [
-    "Protected path violation: tests/test_supervisor.py (base ref file modified/deleted, matches tests/)",
-    "Protected path violation: tests/test_risk_routing.py (base ref file modified/deleted, matches tests/)"
-  ],
-  "observed_additions": [
-    "Protected path addition (observed): tests/__pycache__/test_risk_routing.cpython-312.pyc (matches tests/)",
-    "Protected path addition (observed): tests/__pycache__/test_supervisor.cpython-312.pyc (matches tests/)"
-  ],
+  "protected_path_verdict": "pass",
+  "protected_path_findings": [],
+  "observed_additions": [],
   "basis": "builder_delta (attempt 1)",
-  "gate_verdict": "fail",
+  "gate_verdict": "pass",
   "configured_model": "default"
 }
