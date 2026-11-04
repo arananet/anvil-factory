@@ -111,9 +111,9 @@ Discipline: the test-writer station writes the new and changed tests (the link s
 - builder: executed
 - checks-gate: passed
 - reviewer-spec: executed
-- reviewer-security: executed
-- reviewer-tests: failed
-- reviewer-architecture: failed
+- reviewer-security: routed_out
+- reviewer-tests: executed
+- reviewer-architecture: routed_out
 
 ## Project design
 

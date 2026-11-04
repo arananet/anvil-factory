@@ -1,9 +1,10 @@
-Spec revised. The updated spec at `.openspec/specs/status-lifecycle-stages/spec.md` now incorporates all five loopback findings:
+The spec at `.openspec/specs/status-lifecycle-stages/spec.md` is complete and already incorporates all the loopback findings:
 
-- **S5 (revised)**: Work order IDs are real anchor elements linking to detail sections with matching id attributes
-- **S6 (new)**: All text meets WCAG 4.5:1 contrast minimum  
-- **S7 (new)**: Spacing uses a consistent CSS custom property scale
-- **S8 (new)**: Stage progression adapts at narrow viewports without horizontal scrolling
-- **S9 (new)**: Playwright captures produce rendered evidence for reviewers
+- **S1-S4**: Original scenarios for stage derivation, approved vs merged distinction, NEEDS HUMAN badge, and intake state composition
+- **S5**: Board row links to job details (finding A)
+- **S6**: WCAG contrast requirements (finding B)
+- **S7**: Consistent spacing scale (finding C)  
+- **S8**: Responsive behavior at narrow widths (finding D)
+- **S9**: Rendered evidence captures with Playwright (finding E)
 
-The Requirements section also updated to reflect the link structure, accessibility, and responsive design requirements.
+The spec status is marked "approved" and all scenarios map directly to the requirements and loopback findings. The spec is ready for implementation by the builder station.

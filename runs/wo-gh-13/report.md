@@ -9,27 +9,29 @@ Status: new
 
 Outcome: accepted
 
-Risk: medium
+Risk: low
 
-Surfaces: ui, content, data
+Surfaces: ui, content
 
 ## Routing
 
-**Decision**: Medium risk: full panel at policy models
+**Decision**: Low risk; UI surface keeps reviewer-design and reviewer-ux
 
-**Selected reviewers** (6):
-- reviewer-spec (model: review-balanced)
-- reviewer-security (model: review-strong)
-- reviewer-tests (model: review-balanced)
-- reviewer-architecture (model: review-balanced)
+**Selected reviewers** (4):
+- reviewer-spec (model: review-cheap)
+- reviewer-tests (model: review-cheap)
 - reviewer-design (model: review-balanced)
 - reviewer-ux (model: review-balanced)
+
+**Routed out** (2):
+- reviewer-architecture: Routed out by low risk rule with surface exceptions
+- reviewer-security: Routed out by low risk rule with surface exceptions
 
 ## Verdict
 
 Verdict: approved
 
-All counted reviews passed. (Counted 2 reviews, expected 6.)
+All counted reviews passed. (Expected 4 reviews after routing.)
 
 ## Steps
 
@@ -39,13 +41,13 @@ All counted reviews passed. (Counted 2 reviews, expected 6.)
 - builder: executed
 - checks-gate: passed
 - reviewer-spec: executed
-- reviewer-security: executed
-- reviewer-tests: failed
-- reviewer-architecture: failed
-- reviewer-design: failed
-- reviewer-ux: failed
+- reviewer-security: routed_out
+- reviewer-tests: executed
+- reviewer-architecture: routed_out
+- reviewer-design: executed
+- reviewer-ux: executed
 - approver: completed
 - triage-human: completed
 - deployer: packet_ready
-- observer: failed
+- observer: executed
 

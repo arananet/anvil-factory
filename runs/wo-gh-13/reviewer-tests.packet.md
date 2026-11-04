@@ -87,7 +87,7 @@ Discipline: the test-writer station writes the new and changed tests (the link s
 - builder: executed
 - checks-gate: passed
 - reviewer-spec: executed
-- reviewer-security: executed
+- reviewer-security: routed_out
 
 ## Output contract
 

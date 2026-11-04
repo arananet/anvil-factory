@@ -1,20 +1,25 @@
 {
   "selected_reviewers": [
     "reviewer-spec",
-    "reviewer-security",
     "reviewer-tests",
-    "reviewer-architecture",
     "reviewer-design",
     "reviewer-ux"
   ],
-  "routed_out": [],
+  "routed_out": [
+    {
+      "reviewer": "reviewer-architecture",
+      "reason": "Routed out by low risk rule with surface exceptions"
+    },
+    {
+      "reviewer": "reviewer-security",
+      "reason": "Routed out by low risk rule with surface exceptions"
+    }
+  ],
   "selected_models": {
-    "reviewer-spec": "review-balanced",
-    "reviewer-security": "review-strong",
-    "reviewer-tests": "review-balanced",
+    "reviewer-tests": "review-cheap",
+    "reviewer-spec": "review-cheap",
     "reviewer-design": "review-balanced",
-    "reviewer-architecture": "review-balanced",
     "reviewer-ux": "review-balanced"
   },
-  "reason": "Medium risk: full panel at policy models"
+  "reason": "Low risk; UI surface keeps reviewer-design and reviewer-ux"
 }

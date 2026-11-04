@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 24157.726,
+      "duration_ms": 27381.079,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/intake.output.md"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-13/spec-writer.output.md",
-      "duration_ms": 99010.233,
+      "duration_ms": 21672.558,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/spec-writer.output.md"
@@ -40,7 +40,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-13/test-writer.output.md",
-      "duration_ms": 218552.408,
+      "duration_ms": 340161.983,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/test-writer.output.md"
@@ -56,7 +56,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-13/builder.output.md",
-      "duration_ms": 215340.91,
+      "duration_ms": 217136.856,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/builder.output.md"
@@ -72,7 +72,7 @@
       "station": "checks-gate",
       "status": "passed",
       "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 30947.496,
+      "duration_ms": 35122.175,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/checks-gate.pre-review.output.md"
@@ -100,12 +100,12 @@
       "station": "reviewer-spec",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-spec.output.md",
-      "duration_ms": 118679.17,
+      "duration_ms": 77050.346,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/reviewer-spec.output.md"
       ],
-      "configured_model": "review-balanced",
+      "configured_model": "review-cheap",
       "executed_model": null,
       "executor": {
         "kind": "command",
@@ -114,30 +114,27 @@
     },
     {
       "station": "reviewer-security",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-security.output.md",
-      "duration_ms": 160030.984,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out by low risk rule with surface exceptions",
+      "duration_ms": 0.225,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-13/reviewer-security.output.md"
+        "runs/wo-gh-13/reviewer-security.packet.md"
       ],
-      "configured_model": "review-strong",
+      "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-tests",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-tests: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.59. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
-      "duration_ms": 50805.255,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-tests.output.md",
+      "duration_ms": 151198.786,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-13/reviewer-tests.packet.md"
+        "runs/wo-gh-13/reviewer-tests.output.md"
       ],
-      "configured_model": "review-balanced",
+      "configured_model": "review-cheap",
       "executed_model": null,
       "executor": {
         "kind": "command",
@@ -146,28 +143,25 @@
     },
     {
       "station": "reviewer-architecture",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-architecture: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.53. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
-      "duration_ms": 13228.47,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out by low risk rule with surface exceptions",
+      "duration_ms": 0.223,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/reviewer-architecture.packet.md"
       ],
-      "configured_model": "review-balanced",
+      "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-design",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-design: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.49. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
-      "duration_ms": 7679.806,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-design.output.md",
+      "duration_ms": 90760.743,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-13/reviewer-design.packet.md"
+        "runs/wo-gh-13/reviewer-design.output.md"
       ],
       "configured_model": "openai/gpt-6-astra",
       "executed_model": null,
@@ -178,12 +172,12 @@
     },
     {
       "station": "reviewer-ux",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-ux: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.49. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
-      "duration_ms": 518.853,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-ux.output.md",
+      "duration_ms": 203710.871,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-13/reviewer-ux.packet.md"
+        "runs/wo-gh-13/reviewer-ux.output.md"
       ],
       "configured_model": "openai/gpt-6-astra",
       "executed_model": null,
@@ -196,7 +190,7 @@
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: approved",
-      "duration_ms": 0.058,
+      "duration_ms": 0.06,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/report.json"
@@ -209,7 +203,7 @@
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: not_required",
-      "duration_ms": 0.016,
+      "duration_ms": 0.018,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -220,7 +214,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-13/deployer.packet.md",
-      "duration_ms": 0.165,
+      "duration_ms": 0.21,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/deployer.packet.md"
@@ -231,12 +225,12 @@
     },
     {
       "station": "observer",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station observer: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.45. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
-      "duration_ms": 12797.071,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-13/observer.output.md",
+      "duration_ms": 122553.817,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-13/observer.packet.md"
+        "runs/wo-gh-13/observer.output.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
@@ -261,19 +255,25 @@
           "verdict": "pass"
         },
         {
-          "station": "reviewer-security",
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-ux",
           "verdict": "pass"
         }
       ],
       "reviews_expected": [
         "reviewer-spec",
-        "reviewer-security",
         "reviewer-tests",
-        "reviewer-architecture",
         "reviewer-design",
         "reviewer-ux"
       ],
-      "rule": "All counted reviews passed. (Counted 2 reviews, expected 6.)"
+      "rule": "All counted reviews passed. (Expected 4 reviews after routing.)"
     },
     "human_gate": {
       "required": false,
@@ -282,7 +282,7 @@
     }
   },
   "warnings": [],
-  "base_ref": "f4cde5b8846ec855aa886abdba1787147b8af031",
+  "base_ref": "6933ff6d469bdab4aa6337e080d9c55b447f5537",
   "evidence": [
     {
       "type": "screenshot",
@@ -302,6 +302,6 @@
   "cost": {
     "total": 0,
     "measured_steps": 0,
-    "unmeasured_steps": 6
+    "unmeasured_steps": 9
   }
 }

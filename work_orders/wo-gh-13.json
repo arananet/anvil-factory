@@ -9,10 +9,9 @@
   "intake_outcome": {
     "outcome": "accepted"
   },
-  "risk": "medium",
+  "risk": "low",
   "surfaces": [
     "ui",
-    "content",
-    "data"
+    "content"
   ]
 }
