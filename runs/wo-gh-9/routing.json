@@ -15,8 +15,8 @@
     }
   ],
   "selected_models": {
-    "reviewer-tests": "review-cheap",
     "reviewer-spec": "review-cheap",
+    "reviewer-tests": "review-cheap",
     "reviewer-security": "review-strong"
   },
   "reason": "Low risk; security surface keeps reviewer-security"

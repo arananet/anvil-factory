@@ -28,9 +28,9 @@ Surfaces: security
 
 ## Verdict
 
-Verdict: rejected
+Verdict: approved
 
-Reviewer reviewer-tests returned fail. (Expected 3 reviews after routing.)
+All counted reviews passed. (Expected 3 reviews after routing.)
 
 ## Steps
 
@@ -45,7 +45,6 @@ Reviewer reviewer-tests returned fail. (Expected 3 reviews after routing.)
 - reviewer-architecture: routed_out
 - reviewer-design: routed_out
 - approver: completed
-- approver: loopback
 - triage-human: completed
 - deployer: packet_ready
 - observer: executed
