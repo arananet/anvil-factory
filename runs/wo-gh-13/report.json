@@ -1,0 +1,307 @@
+{
+  "work_order_id": "wo-gh-13",
+  "pipeline": "sdlc-default",
+  "title": "Status dashboard shows the lifecycle stage per work order",
+  "kind": "feature",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "executed",
+      "detail": "Executed by command; outcome: accepted",
+      "duration_ms": 27381.079,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/intake.output.md"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-13/spec-writer.output.md",
+      "duration_ms": 21672.558,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/spec-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "test-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-13/test-writer.output.md",
+      "duration_ms": 340161.983,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/test-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-13/builder.output.md",
+      "duration_ms": 217136.856,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/builder.output.md"
+      ],
+      "configured_model": "openai/gpt-6-astra",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "checks-gate",
+      "status": "passed",
+      "detail": "Gate passed: 1 checks, protected paths: pass",
+      "duration_ms": 35122.175,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/checks-gate.pre-review.output.md"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null,
+      "phase": "pre-review",
+      "commands": [
+        "python -m unittest discover -s tests -p 'test_*.py'"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "protected_paths": [
+        "tests/",
+        "anvil.json",
+        "pipelines/"
+      ],
+      "protected_path_verdict": "pass",
+      "protected_path_findings": [],
+      "gate_verdict": "pass"
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-spec.output.md",
+      "duration_ms": 77050.346,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/reviewer-spec.output.md"
+      ],
+      "configured_model": "review-cheap",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-security",
+      "status": "routed_out",
+      "detail": "Routed out: Routed out by low risk rule with surface exceptions",
+      "duration_ms": 0.225,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/reviewer-security.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-tests.output.md",
+      "duration_ms": 151198.786,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/reviewer-tests.output.md"
+      ],
+      "configured_model": "review-cheap",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "routed_out",
+      "detail": "Routed out: Routed out by low risk rule with surface exceptions",
+      "duration_ms": 0.223,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/reviewer-architecture.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-design.output.md",
+      "duration_ms": 90760.743,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/reviewer-design.output.md"
+      ],
+      "configured_model": "openai/gpt-6-astra",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-ux",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-ux.output.md",
+      "duration_ms": 203710.871,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/reviewer-ux.output.md"
+      ],
+      "configured_model": "openai/gpt-6-astra",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.06,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: not_required",
+      "duration_ms": 0.018,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "detail": "Packet written to runs/wo-gh-13/deployer.packet.md",
+      "duration_ms": 0.21,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/deployer.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-13/observer.output.md",
+      "duration_ms": 122553.817,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-13/observer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    }
+  ],
+  "verdict": "approved",
+  "human_required": false,
+  "max_loopbacks": 2,
+  "loopbacks": 0,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [
+        {
+          "station": "reviewer-spec",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-ux",
+          "verdict": "pass"
+        }
+      ],
+      "reviews_expected": [
+        "reviewer-spec",
+        "reviewer-tests",
+        "reviewer-design",
+        "reviewer-ux"
+      ],
+      "rule": "All counted reviews passed. (Expected 4 reviews after routing.)"
+    },
+    "human_gate": {
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": [],
+  "base_ref": "6933ff6d469bdab4aa6337e080d9c55b447f5537",
+  "evidence": [
+    {
+      "type": "screenshot",
+      "breakpoint": "390x844",
+      "path": "runs/wo-gh-13/evidence/screenshot-390x844.png",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "type": "screenshot",
+      "breakpoint": "1440x900",
+      "path": "runs/wo-gh-13/evidence/screenshot-1440x900.png",
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "cost": {
+    "total": 0,
+    "measured_steps": 0,
+    "unmeasured_steps": 9
+  }
+}

@@ -8,6 +8,11 @@ The page is a snapshot of the reports on disk at generation time. Nothing is
 invented: cost stays null, and missing fields render as a dash. Runs whose
 report is missing or unreadable are skipped and the skip is noted in the
 page footer.
+
+The page includes a lifecycle board showing each work order's progression
+through stages: SPEC, BUILD, REVIEW, APPROVED, MERGED. Stages are derived
+from evidence in the run reports and merge records. Intake states (PARKED,
+REJECTED) and NEEDS HUMAN flags are also shown when applicable.
 """
 
 import html
@@ -15,30 +20,66 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Lifecycle stage vocabulary in order
+LIFECYCLE_STAGES = ["SPEC", "BUILD", "REVIEW", "APPROVED", "MERGED"]
+
 CSS = """
-:root { color-scheme: dark; }
-body { background:#0C0C0C; color:#E8E8E8; font-family:Inter, system-ui, sans-serif; margin:0; padding:32px 20px 64px; }
+:root {
+  color-scheme: dark;
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+}
+body { background:#0C0C0C; color:#E8E8E8; font-family:Inter, system-ui, sans-serif; margin:0; padding:var(--space-32) var(--space-20) var(--space-64); }
 main { max-width:1080px; margin:0 auto; }
-h1 { font-size:28px; letter-spacing:.02em; margin:0 0 4px; }
+h1 { font-size:28px; letter-spacing:.02em; margin:0 0 var(--space-4); }
 h1 .accent { color:#FF5C00; }
-h2 { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:17px; margin:0 0 6px; }
+h2 { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:17px; margin:0 0 var(--space-8); }
 .mono { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 .muted { color:#9A9A9A; }
-.snapshot { border-left:3px solid #FF5C00; background:#1E1E1E; padding:10px 14px; margin:18px 0 28px; font-size:14px; }
-.run { background:#1E1E1E; border:1px solid #2A2A2A; border-radius:8px; padding:18px 20px; margin:0 0 22px; }
-.meta { display:flex; flex-wrap:wrap; gap:8px 22px; font-size:13px; color:#C9C9C9; margin:8px 0 14px; }
+.snapshot { border-left:3px solid #FF5C00; background:#1E1E1E; padding:var(--space-12) var(--space-16); margin:var(--space-20) 0 var(--space-32); font-size:14px; }
+.run { background:#1E1E1E; border:1px solid #2A2A2A; border-radius:var(--space-8); padding:var(--space-20); margin:0 0 var(--space-24); }
+.meta { display:flex; flex-wrap:wrap; gap:var(--space-8) var(--space-24); font-size:13px; color:#C9C9C9; margin:var(--space-8) 0 var(--space-16); }
 .meta b { color:#FFFFFF; font-weight:600; }
-.decision { border-left:3px solid #3A3A3A; padding:8px 12px; margin:0 0 14px; font-size:13.5px; }
-.decision div { margin:2px 0; }
+.decision { border-left:3px solid #3A3A3A; padding:var(--space-8) var(--space-12); margin:0 0 var(--space-16); font-size:13.5px; }
+.decision div { margin:var(--space-4) 0; }
 table { width:100%; border-collapse:collapse; font-size:13px; }
-th { text-align:left; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight:600; color:#9A9A9A; border-bottom:1px solid #3A3A3A; padding:6px 8px; }
-td { border-bottom:1px solid #2A2A2A; padding:6px 8px; vertical-align:top; }
+th { text-align:left; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight:600; color:#9A9A9A; border-bottom:1px solid #3A3A3A; padding:var(--space-8); }
+td { border-bottom:1px solid #2A2A2A; padding:var(--space-8); vertical-align:top; }
 .status { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space:nowrap; }
 .st-ok { color:#FFFFFF; }
 .st-failed { color:#FF5C00; }
 .st-idle { color:#8A8A8A; }
 .artifacts { color:#9A9A9A; word-break:break-all; }
-footer { color:#8A8A8A; font-size:13px; margin-top:28px; }
+.lifecycle-board { background:#1E1E1E; border:1px solid #2A2A2A; border-radius:var(--space-8); padding:var(--space-20); margin:0 0 var(--space-32); }
+.board-title { font-size:20px; margin:0 0 var(--space-8); color:#FFFFFF; }
+.board-description { font-size:13px; color:#9A9A9A; margin:0 0 var(--space-20); }
+.board-row { background:#0C0C0C; border:1px solid #2A2A2A; border-radius:var(--space-8); padding:var(--space-16); margin:0 0 var(--space-12); }
+.board-row:last-child { margin-bottom:0; }
+.board-row-header { margin:0 0 var(--space-12); }
+.board-wo-id { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:15px; font-weight:600; margin:0 0 var(--space-4); color:#FFFFFF; text-decoration:none; }
+.board-wo-id:hover { text-decoration:underline; }
+.board-wo-title { font-size:14px; color:#C9C9C9; }
+.board-stages { display:flex; flex-wrap:wrap; gap:var(--space-8); align-items:center; margin:0 0 var(--space-8); }
+.board-stage { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; padding:var(--space-4) var(--space-12); border-radius:var(--space-4); background:#2A2A2A; color:#8A8A8A; white-space:nowrap; }
+.board-stage.stage-reached { background:#3A3A3A; color:#C9C9C9; }
+.board-stage.stage-current { background:#FF5C00; color:#FFFFFF; font-weight:600; }
+.board-badge { display:inline-block; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:11px; font-weight:700; padding:var(--space-4) var(--space-8); border-radius:var(--space-4); text-transform:uppercase; letter-spacing:.03em; }
+.board-badge.needs-human { background:#FFD700; color:#0C0C0C; }
+.board-intake-state { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:13px; font-weight:600; padding:var(--space-8) var(--space-12); border-radius:var(--space-4); display:inline-block; }
+.board-intake-state.state-parked { background:#5A5A2A; color:#FFD700; }
+.board-intake-state.state-rejected { background:#5A2A2A; color:#FF5C00; }
+footer { color:#8A8A8A; font-size:13px; margin-top:var(--space-32); }
+@media (max-width: 400px) {
+  .board-stages { gap:var(--space-4); }
+  .board-stage { font-size:11px; padding:var(--space-4) var(--space-8); }
+}
 """.strip()
 
 STATUS_CLASS = {"completed": "st-ok", "executed": "st-ok", "approved": "st-ok",
@@ -126,9 +167,170 @@ def collect_runs(project):
     return runs, skipped
 
 
+def load_merge_records(project):
+    """Load merge records from merge_records/ folder.
+
+    Returns dict mapping work_order_id to merge record (dict with 'merged' bool).
+    """
+    merge_records = {}
+    merge_dir = Path(project) / "merge_records"
+    if merge_dir.is_dir():
+        for record_file in merge_dir.glob("*.json"):
+            try:
+                data = json.loads(record_file.read_text(encoding="utf-8"))
+                if isinstance(data, dict) and "work_order_id" in data:
+                    merge_records[data["work_order_id"]] = data
+            except Exception:
+                pass
+    return merge_records
+
+
+def derive_lifecycle_stage(report, merge_records):
+    """Derive lifecycle stage and state from a run report.
+
+    Returns dict with:
+        - stages_reached: list of stages reached (subset of LIFECYCLE_STAGES)
+        - current_stage: the furthest stage reached, or None
+        - needs_human: bool, True if decision.human_gate.required is True
+        - intake_state: "PARKED" if verdict is waiting_info, "REJECTED" if rejected, else None
+
+    Stages are derived from evidence:
+        - SPEC: spec-writer step executed
+        - BUILD: builder step executed
+        - REVIEW: at least one reviewer-* step executed
+        - APPROVED: verdict is "approved"
+        - MERGED: work order has a merge record with merged=True
+
+    Intake states override stage progression when present.
+    """
+    verdict = report.get("verdict")
+    steps = report.get("steps", []) or []
+    work_order_id = report.get("work_order_id", "")
+
+    # Check for intake states first
+    intake_state = None
+    if verdict == "waiting_info":
+        intake_state = "PARKED"
+    elif verdict == "rejected":
+        intake_state = "REJECTED"
+
+    # If in intake state, skip stage progression
+    if intake_state:
+        return {
+            "stages_reached": [],
+            "current_stage": None,
+            "needs_human": False,
+            "intake_state": intake_state,
+        }
+
+    # Derive stages from evidence
+    stages_reached = []
+
+    # SPEC: spec-writer step executed
+    if any(s.get("station") == "spec-writer" and s.get("status") == "executed" for s in steps):
+        stages_reached.append("SPEC")
+
+    # BUILD: builder step executed
+    if any(s.get("station") == "builder" and s.get("status") == "executed" for s in steps):
+        stages_reached.append("BUILD")
+
+    # REVIEW: at least one reviewer-* step executed
+    if any(str(s.get("station", "")).startswith("reviewer") and s.get("status") == "executed" for s in steps):
+        stages_reached.append("REVIEW")
+
+    # APPROVED: verdict is "approved"
+    if verdict == "approved":
+        stages_reached.append("APPROVED")
+
+    # MERGED: merge record exists with merged=True
+    merge_record = merge_records.get(work_order_id)
+    if merge_record and merge_record.get("merged"):
+        stages_reached.append("MERGED")
+
+    # Current stage is the furthest reached
+    current_stage = None
+    for stage in reversed(LIFECYCLE_STAGES):
+        if stage in stages_reached:
+            current_stage = stage
+            break
+
+    # Check for needs_human flag
+    needs_human = False
+    decision = report.get("decision")
+    if isinstance(decision, dict):
+        human_gate = decision.get("human_gate", {})
+        needs_human = human_gate.get("required", False)
+    # Fallback to top-level human_required for older reports
+    if not needs_human:
+        needs_human = report.get("human_required", False)
+
+    return {
+        "stages_reached": stages_reached,
+        "current_stage": current_stage,
+        "needs_human": needs_human,
+        "intake_state": None,
+    }
+
+
+def render_lifecycle_board(runs, merge_records):
+    """Render the lifecycle board HTML showing stage progression for all work orders.
+
+    Returns HTML string with one row per work order showing:
+        - Work order ID and title
+        - Stage progression (all stages with reached ones marked, current highlighted)
+        - NEEDS HUMAN badge when applicable
+        - Intake state (PARKED, REJECTED) when applicable
+    """
+    if not runs:
+        return ""
+
+    parts = ['<section class="lifecycle-board">']
+    parts.append('<h2 class="board-title">Lifecycle Board</h2>')
+    parts.append('<div class="board-description">Stage progression for each work order. Stages: SPEC → BUILD → REVIEW → APPROVED → MERGED.</div>')
+
+    for report in runs:
+        work_order_id = report.get("work_order_id", "-")
+        title = report.get("title", "")
+
+        stage_info = derive_lifecycle_stage(report, merge_records)
+
+        parts.append(f'<div class="board-row">')
+        parts.append(f'<div class="board-row-header">')
+        parts.append(f'<h3 class="board-wo-id"><a href="#{_esc(work_order_id)}-detail" class="board-wo-id">{_esc(work_order_id)}</a></h3>')
+        parts.append(f'<div class="board-wo-title">{_dash(title)}</div>')
+        parts.append('</div>')
+
+        # Show intake state if present
+        if stage_info["intake_state"]:
+            parts.append(f'<div class="board-intake-state state-{stage_info["intake_state"].lower()}">{stage_info["intake_state"]}</div>')
+        else:
+            # Show stage progression
+            parts.append('<div class="board-stages">')
+            for stage in LIFECYCLE_STAGES:
+                reached = stage in stage_info["stages_reached"]
+                is_current = stage == stage_info["current_stage"]
+                classes = ["board-stage"]
+                if reached:
+                    classes.append("stage-reached")
+                if is_current:
+                    classes.append("stage-current")
+                parts.append(f'<span class="{" ".join(classes)}">{stage}</span>')
+            parts.append('</div>')
+
+            # Show NEEDS HUMAN badge if applicable
+            if stage_info["needs_human"]:
+                parts.append('<div class="board-badge needs-human">NEEDS HUMAN</div>')
+
+        parts.append('</div>')  # board-row
+
+    parts.append('</section>')
+    return "\n".join(parts)
+
+
 def render_status_page(project, generated_at=None):
     project = Path(project)
     runs, skipped = collect_runs(project)
+    merge_records = load_merge_records(project)
     generated = generated_at or datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
     name = project.name
     anvil_json = project / "anvil.json"
@@ -148,9 +350,13 @@ def render_status_page(project, generated_at=None):
              '<span class="mono">anvil status-page &lt;project&gt;</span>.</div>']
     if not runs:
         parts.append('<div class="run">No readable run reports found under runs/.</div>')
+    else:
+        # Render lifecycle board
+        parts.append(render_lifecycle_board(runs, merge_records))
     for report in runs:
-        parts.append('<section class="run">')
-        parts.append(f"<h2>{_esc(report.get('work_order_id', '-'))}</h2>")
+        work_order_id = report.get('work_order_id', '-')
+        parts.append(f'<section class="run" id="{_esc(work_order_id)}-detail">')
+        parts.append(f"<h2>{_esc(work_order_id)}</h2>")
         parts.append(f'<div>{_dash(report.get("title"))}</div>')
         deployment = report.get("deployment_status")
         meta = [
