@@ -1,1 +1,11 @@
-Work order accepted. This is a verification-only pass with no code changes - the builder will verify the standing tree against spec scenarios S1-S7 and the round 1 findings list. Risk is low (no modifications), touching ui/security/deploy/content surfaces through verification activities.
+Looking at this gate loopback round 4 work order. It has clear, bounded scope: document the S7 same-subject test duty in reviewer-design's prompt, make the duty travel with packets when identity_reference/deliverable_set are declared, and prove it with a new test.
+
+```json
+{
+  "intake_outcome": {
+    "outcome": "accepted"
+  },
+  "risk": "medium",
+  "surfaces": ["content", "api"]
+}
+```

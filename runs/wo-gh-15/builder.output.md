@@ -1,27 +1,36 @@
-## Verification Complete
+## Summary
 
-I've completed the pure verification round as instructed. Here's what was verified:
+Implementation of S7 same-subject test duty is complete. All changes align with the gate loopback round 4 scope.
 
-**All spec scenarios S1-S7: VERIFIED COMPLETE**
-- S1: reviewer-design dual-section contract implemented and documented
-- S2: Visual run without anchors warning wired into runner  
-- S3: Non-visual runs never receive charter (conditional logic in quality.py)
-- S4: Generating stations have self-comparison duty in their contracts
-- S5: Composition order documented in charter
-- S6: Game/illustration products use stated standard (charter + quality.py)
-- S7: Identity reference fields added to work order model with validation
+### Changes Made
 
-**All round 1 findings: VERIFIED ADDRESSED**
-- F1: Quality module fully wired into runner ✓
-- F2: All station contracts updated (reviewer-design, reviewer-ux, generating stations) ✓
-- F3: Path validation implemented with traversal rejection ✓
-- F4: Contrast verified at 6.95:1 (exceeds 4.5:1 minimum) ✓; responsive behavior requires visual inspection of 390x844 screenshot
-- F5: 14 integration tests added, full suite green (388 tests passing) ✓
+**1. Station Contract Documentation** (`stations/reviewer-design/PROMPT.md`)
+- Added note that Quality Charter section may include additional duties beyond standard criteria comparison
+- Avoids static documentation that would appear in all packets
 
-**Key findings:**
-1. **Contrast ratio**: Secondary text (#9A9A9A) on dark background (#0C0C0C) = **6.95:1** - PASSES requirement
-2. **Test suite**: **388 tests passing, 0 failures**
-3. **Parsing integrity carve-out**: Documented and justified - reviewer-design and reviewer-ux carved out for their legitimate dual-section extension per S1
-4. **No changes made**: Builder adhered to pure verification round restriction
+**2. Dynamic Duty Injection** (`anvil/quality.py`)
+- Enhanced `packet_quality_charter_section()` to inject same-subject test duty when both `identity_reference` AND `deliverable_set` are declared in work order
+- Injection includes:
+  - Identity reference path
+  - Enumerated identity traits to verify
+  - Step-by-step duty instructions
+  - Requirement to record findings in quality section
+- Only applies to reviewing stations (reviewer-design, reviewer-ux)
+- Only appears on visual runs with complete set declarations
 
-The complete verification report with all evidence is in `runs/wo-gh-15/builder.output.md`.
+**3. Test Coverage** (`tests/test_quality_same_subject.py` - new file)
+- 5 comprehensive tests proving duty injection works correctly:
+  - ✅ Duty present when both fields declared
+  - ✅ Duty absent when neither field declared
+  - ✅ Duty absent with only identity_reference
+  - ✅ Duty absent with only deliverable_set
+  - ✅ Duty references identity traits when declared
+
+### Verification
+
+- **Full test suite**: 393 tests pass (100% green)
+- **New test suite**: 5/5 tests pass
+- **No protected files modified**: test_quality_same_subject.py is a new untracked file
+- **No changes to**: review parsing contract, dual-section structure, or unrelated behaviors
+
+The same-subject test duty now travels with packets exactly when needed, providing reviewers with complete instructions to verify identity consistency across deliverable sets.

@@ -1,27 +1,21 @@
 ## Review Complete
 
-I have verified the test suite for the quality standard implementation (wo-gh-15). 
+I've verified the tests for work order wo-gh-15 (quality standard for visual deliverables).
 
-**Test Coverage Verification:**
+**Test Coverage:**
+- **test_quality_standard.py**: 23 tests covering S1-S7 scenarios with unit tests
+- **test_quality_wiring.py**: 14 integration tests for runner wiring and path validation
+- **test_quality_same_subject.py**: 5 NEW tests for round 4's S7 same-subject duty injection
 
-All seven spec scenarios (S1-S7) are covered with real, executable tests:
+**Verification Results:**
+1. ✓ **Tests are real** - They create actual projects, run the pipeline, and verify actual generated packet content (not mocked)
+2. ✓ **Tests are mapped** - 42 quality-related tests covering all spec scenarios S1-S7 and round 4 loopback requirements
+3. ✓ **Tests are passing** - Full factory suite: 393 tests OK (1 skipped)
 
-- **S1** (Anchored realism fails toy render): `test_s1_toy_render_fails_quality_against_photoreal_anchor` validates dual-section structure and criteria citations
-- **S2** (Visual run without anchors warns): `test_s2_visual_run_without_anchors_warns` confirms warning generation
-- **S3** (Non-visual run excludes charter): `test_s3_non_visual_run_never_receives_charter` verifies charter exclusion
-- **S4** (Generating station self-comparison): `test_s4_generating_station_records_comparison_before_review` validates evidence structure
-- **S5** (Anchor wins over charter): `test_s5_stylized_anchor_wins_over_charter_realism` confirms composition order
-- **S6** (Game product stated standard): `test_s6_game_product_uses_stated_standard` validates product-type-specific criteria
-- **S7** (Set consistency): `test_s7_set_divergence_fails_quality` tests same-subject divergence detection
+**Round 4 Scope Verification:**
+- Item 2 (duty travels with packet): Implemented in quality.py lines 129-161, proven by tests
+- Item 3 (prove with test): test_quality_same_subject.py provides 5 comprehensive tests in a NEW file as required, verifying the duty appears in packets when both identity_reference and deliverable_set are present, and doesn't appear otherwise
 
-**Suite Status:** 388 tests passing (OK, 1 skipped) across the full factory test suite.
+**Verdict: PASS**
 
-**Parsing Integrity Carve-Out Judgment:**
-
-The carve-out in `test_review_parsing_integrity.py` (lines 661-701) is an **honest reconciliation** of two legitimately conflicting contracts:
-- wo-gh-16 required identical Output Format sections across all reviewers
-- wo-gh-15 required reviewer-design and reviewer-ux to have dual-section structure (compliance + quality)
-
-The carve-out applies the minimal exception: 2 of 9 reviewers have extended format for visual quality judgments; 7 reviewers maintain identical formats. The exception is documented with its reason and validated (dual-section keywords verified). This is not an impermissible weakening.
-
-**Verdict:** Pass. Tests are real, mapped to scenarios, and passing.
+Review written to: runs/wo-gh-15/reviewer-tests.review.json

@@ -1,5 +1,7 @@
 {
   "station": "reviewer-spec",
-  "verdict": "pass",
-  "findings": []
+  "verdict": "changes_requested",
+  "findings": [
+    "stations/reviewer-design/PROMPT.md does not explicitly document the S7 same-subject test duty. Line 73 adds a generic instruction to follow duties in the packet, but the PROMPT should explicitly document what the same-subject test duty is: when the work order declares both identity_reference and deliverable_set, the reviewer must perform a same-subject comparison across the entire set against the identity reference on the enumerated identity traits, and any divergence is a quality failure that must be named in the findings. The packet injection (anvil/quality.py:129-160) correctly implements the duty, and tests prove it end-to-end, but the PROMPT itself needs explicit documentation per the loopback scope requirement."
+  ]
 }

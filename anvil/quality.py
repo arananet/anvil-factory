@@ -88,6 +88,9 @@ def packet_quality_charter_section(project, station_id, work_order):
     Injects charter criteria into packets for stations that generate or
     review imagery, but only on visual runs. Returns "" for non-visual
     runs or non-imagery stations.
+
+    When the work order declares identity_reference or deliverable_set,
+    also injects the same-subject test duty for reviewing stations.
     """
     # TODO: Implement charter injection logic
     # Only inject for visual runs
@@ -122,6 +125,38 @@ def packet_quality_charter_section(project, station_id, work_order):
         lines.append(f"- **{criterion.replace('_', ' ').title()}**: {description}")
 
     lines.append("")
+
+    # Inject same-subject test duty when BOTH identity_reference AND deliverable_set present
+    has_identity_ref = hasattr(work_order, "identity_reference") and work_order.identity_reference
+    has_deliverable_set = hasattr(work_order, "deliverable_set") and work_order.deliverable_set
+
+    if (has_identity_ref and has_deliverable_set) and station_id in {"reviewer-design", "reviewer-ux"}:
+        lines.append("## Same-Subject Test Duty")
+        lines.append("")
+        lines.append("This run produces a set of related visual deliverables.")
+        lines.append("")
+
+        # Reference the canonical identity source
+        lines.append(f"**Identity reference**: `{work_order.identity_reference}`")
+        lines.append("")
+
+        # List identity traits to check
+        if hasattr(work_order, "identity_traits") and work_order.identity_traits:
+            lines.append("**Identity traits to verify** (must remain constant across all deliverables):")
+            for trait in work_order.identity_traits:
+                lines.append(f"- {trait}")
+            lines.append("")
+
+        # State the duty
+        lines.append("**Your duty**: Perform a same-subject comparison across the entire deliverable set.")
+        lines.append("")
+        lines.append("1. Compare every deliverable against the identity reference on each identity trait listed above")
+        lines.append("2. Any divergence in identity traits is a quality failure, even when every asset individually passes the anchor comparison")
+        lines.append("3. Record the same-subject test ruling and its evidence in the quality section of your review")
+        lines.append("4. If divergence is found, name the specific divergent asset and trait in your findings")
+        lines.append("")
+        lines.append("This test is part of the quality section judgment, not a separate verdict.")
+        lines.append("")
 
     return "\n".join(lines)
 

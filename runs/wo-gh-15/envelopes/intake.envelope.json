@@ -5,7 +5,7 @@
   "work_order_id": "wo-gh-15",
   "artifact_path": "runs/wo-gh-15/intake.output.md",
   "status": "executed",
-  "created_at": "2026-11-04T18:14:11.617070+00:00",
+  "created_at": "2026-11-04T18:51:16.607801+00:00",
   "configured_model": "default",
   "executor": {
     "kind": "command",

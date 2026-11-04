@@ -1,14 +1,22 @@
-Verification complete. I've documented the test coverage status in the output file. 
+I've completed the test-writer task for wo-gh-15 gate loopback round 4.
 
-## Summary
+## Tests Created
 
-**Test Coverage Verified:**
-- 37 tests covering all spec scenarios S1-S7
-- All 388 tests in the suite passing
-- Integration tests verify the runner wiring
-- Unit tests cover each scenario requirement
+Created `tests/test_quality_same_subject.py` with 5 integration tests proving the S7 same-subject test duty requirement:
 
-**Parsing Integrity Carve-Out Assessment:**
-The modification to `test_review_parsing_integrity.py` that carves out `reviewer-design` and `reviewer-ux` from the identity assertion is an **honest reconciliation** of two contracts. The wo-gh-15 spec S1 deliberately extends these visual reviewers with a dual-section structure, which is incompatible with requiring identical Output Format sections across all reviewers. The carve-out maintains contract integrity by scoping the identity requirement to standard (non-visual) reviewers only.
+1. **test_same_subject_duty_injected_when_identity_reference_declared** - Verifies duty appears in packet when both identity_reference and deliverable_set are declared
+2. **test_same_subject_duty_absent_when_fields_not_declared** - Verifies duty is absent when fields are not declared
+3. **test_same_subject_duty_with_only_identity_reference** - Verifies identity_reference alone doesn't trigger duty (both fields required)
+4. **test_same_subject_duty_with_only_deliverable_set** - Verifies deliverable_set alone doesn't trigger duty (both fields required)
+5. **test_same_subject_duty_references_identity_traits** - Verifies identity_traits are referenced in the duty when declared
 
-**Status:** No changes made (as required in pure verification round). Standing tree has complete, passing test coverage.
+These tests exercise the requirement end-to-end: work order → runner → packet content validation, matching the factory suite style from `test_quality_wiring.py`.
+
+## Hard Constraints Met
+
+- NEW test file (avoids protected path violations)
+- No modifications to existing test files
+- Tests only the S7 same-subject duty scope
+- Syntactically valid (verified with py_compile)
+
+Output documented in `runs/wo-gh-15/test-writer.output.md`.

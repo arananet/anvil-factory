@@ -2,24 +2,26 @@
 
 **Verdict: changes_requested**
 
-I've verified the standing tree against spec scenarios S1-S7 and the round 1 findings.
+The round 4 loopback scope has three items:
 
-### Compliance Section: PASS
-The factory's interface meets its stated quality bars. The rendered evidence shows adequate contrast, responsive behavior at both breakpoints, consistent spacing, and clear visual hierarchy.
+1. ✗ **PROMPT.md documentation** - INCOMPLETE
+2. ✓ **Packet injection** - Complete (anvil/quality.py:130-160)
+3. ✓ **Tests** - Complete (tests/test_quality_same_subject.py, 5 tests passing, full suite green at 393 tests)
 
-### Quality Section: CHANGES_REQUESTED
+### The Finding
 
-**Parsing Integrity Test Carve-Out (Explicit Judgment):**
-**HONEST RECONCILIATION** - The test at lines 663-702 of test_review_parsing_integrity.py carves out reviewer-design and reviewer-ux from the Output Format identity requirement. This correctly reconciles two conflicting contracts: wo-gh-16 requires identical formats across all reviewers, while wo-gh-15 S1 requires dual-section structure for visual reviewers. The carve-out maintains identity for the 7 standard reviewers while allowing the 2 visual reviewers their required extension. This is documented with its reason.
+**S7 same-subject test duty documentation incomplete in stations/reviewer-design/PROMPT.md**
 
-**S7 Implementation Gap:**
-S7 is partially implemented. The WorkOrder model has the required fields (identity_reference, identity_traits, deliverable_set) with path validation. The docs/QUALITY_CHARTER.md documents the same-subject test requirement. However, the reviewer-design PROMPT.md doesn't document this duty, and the packet_quality_charter_section only injects criteria, not the full charter with station duties. A reviewer wouldn't know to perform the same-subject test.
+The loopback scope item 1 requires explicit documentation of the same-subject test duty in the station prompt: when it applies, what the reviewer must do, and how to record the ruling.
 
-**Round 1 Findings Status:**
-- F1 (runner wiring): ✓ FIXED - Lines 499-500 in runner.py call quality functions
-- F2 (station contracts): ✓ FIXED - Dual-section format documented, generating stations have S4 duty
-- F3 (path validation): ✓ FIXED - All path fields validated in WorkOrder.from_dict
-- F4 (rendered surface): ✓ FIXED - Screenshots show adequate contrast and responsive layout
-- F5 (tests): ✓ FIXED - 14 integration tests pass, full suite green (388 tests OK)
+Current state at PROMPT.md:73: "When the Quality Charter section in your packet includes additional duties beyond the standard criteria comparison, follow those instructions as part of your quality section judgment."
 
-Review written to runs/wo-gh-15/reviewer-design.review.json
+This is a generic fallback statement that tells the reviewer to follow additional duties IF they appear in the packet, but it does not document:
+- What the same-subject test duty is
+- When it applies (when identity_reference + deliverable_set are declared)  
+- What specifically must be compared (identity traits across deliverable set against canonical reference)
+- How to record the ruling (in quality section with divergent asset and trait named)
+
+A reviewer reading the prompt would not know what a same-subject test is or what it requires. The duty must be explicitly documented in the prompt itself, not just injected via packet.
+
+The packet injection and tests are working correctly - only the prompt documentation remains to close this loopback round.

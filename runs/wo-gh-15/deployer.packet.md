@@ -72,6 +72,18 @@ One round 2 change is named here for explicit reviewer judgment: tests/test_revi
 
 The standing tree at this round's start contains the complete item with the suite green. THIS ROUND MAKES NO CHANGES. The builder is barred from modifying, adding or deleting any file; its task is verification and reporting only. Reviewers: judge the standing tree against the spec scenarios S1 to S7 and the round 1 findings list (runner wiring, station contracts, path and input validation, rendered surface contrast and 390x844 responsive behavior with this run's rendered evidence). The verdict of this round is the item's verdict of record. If a reviewer finds the standing tree genuinely incomplete against the spec, name the specific gap for the record rather than requesting changes this round is barred from making.
 
+
+GATE LOOPBACK (round 4). Round 3 was a pure verification round of the standing tree: verdict changes_requested, 5 of 5 counted after routing (reviewer-ux routed out). reviewer-spec, reviewer-security, reviewer-tests and reviewer-architecture all PASS: the round 1 findings (orphaned module, station contracts, path validation, rendered surface contrast and responsive behavior) are resolved. The parsing integrity carve-out for reviewer-design and reviewer-ux was explicitly judged by reviewer-design: HONEST RECONCILIATION, the correct resolution of the two conflicting contracts. That question is closed; do not revisit it.
+
+Exactly one finding remains, from reviewer-design's quality section, verbatim in substance: S7 is incompletely implemented. The WorkOrder model carries identity_reference, identity_traits and deliverable_set with path validation (complete), and docs/QUALITY_CHARTER.md documents the same-subject test requirement (complete). However, stations/reviewer-design/PROMPT.md does not document the same-subject test duty that S7 requires reviewer-design to perform, and packet_quality_charter_section injects only the observable criteria, not the station duties. A reviewer receiving a work order with identity_reference and deliverable_set would not know from the packet or the prompt that a same-subject test is required.
+
+Loopback scope, exactly this and nothing else:
+1. Document the S7 same-subject test duty in stations/reviewer-design/PROMPT.md: when the run declares an identity reference and a deliverable set, the review performs the same-subject comparison across the set against the identity reference and records the ruling with its evidence in the review's quality section.
+2. Make the duty travel with the packet: when a work order declares identity_reference or deliverable_set, the quality sections injected into the reviewer-design packet state the same-subject test duty explicitly (not only the observable criteria).
+3. Prove it with a test that exercises the duty's presence end to end (packet content when the fields are declared, and its absence when they are not).
+
+HARD CONSTRAINTS: the full factory suite must remain green. Do NOT modify or delete any existing file under tests/ (the checks gate treats base ref test files as protected; two earlier rounds died on exactly that). Any new test goes in a NEW test file. Do not change the review parsing contract, the dual-section structure, or any behavior outside this finding.
+
 - risk_hints: 
 - status: new
 

@@ -5,9 +5,17 @@ Title: A standing quality standard for visual deliverables
 Kind: feature
 Status: new
 
+## Intake Outcome
+
+Outcome: accepted
+
+Risk: medium
+
+Surfaces: content, api
+
 ## Routing
 
-**Decision**: Default applied: work is unrated, using full panel at policy models
+**Decision**: Medium risk: full panel at policy models
 
 **Selected reviewers** (5):
 - reviewer-spec (model: review-balanced)
@@ -23,7 +31,7 @@ Status: new
 
 Verdict: changes_requested
 
-Reviewer reviewer-design requested changes. (Expected 5 reviews after routing.)
+Reviewers reviewer-spec, reviewer-security, reviewer-design requested changes. (Expected 5 reviews after routing.)
 
 ## Steps
 

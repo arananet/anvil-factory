@@ -1,46 +1,18 @@
-Given that Write/Edit tools are disabled for this verification-only round, I'll provide the spec-writer verification report as text output:
+The spec is complete and requires no revision for this gate loopback round.
 
-# Spec Writer Verification: wo-gh-15
+**Assessment:**
 
-## Task
-Verify that the existing spec at `.openspec/specs/quality-standard/spec.md` correctly captures all work order requirements for this pure verification round.
+The spec at `.openspec/specs/quality-standard/spec.md` fully describes the S7 same-subject test requirement:
 
-## Verification Results
+- **Requirements section (lines 39-45)** "Consistency within a deliverable set" explicitly states: "reviewer-design's anchor comparison gains the same subject test for set work: the reviewer compares every asset of the set against the identity reference on each enumerated trait. Any divergence fails the quality judgment, with the divergent asset and the trait it diverges on named in the review."
 
-The existing spec is **complete and correct**. All work order requirements are properly captured:
+- **Scenario S7 (lines 71-73)** provides the complete test case: when two assets diverge on an enumerated trait, "reviewer-design's same subject test fails the quality judgment, naming the divergent asset and the trait."
 
-### Scenario Coverage (S1-S7)
+The round 4 finding identifies an **implementation gap**, not a spec gap. The spec correctly assigns the same-subject test duty to reviewer-design; the implementation (PROMPT.md documentation and packet injection) has not yet wired up that duty completely.
 
-✓ **S1** (lines 53-54): Anchored realism scenario with dual-section review structure, gap naming by category (materials, light, scale, contact), reviewer-ux duty included
+The work order asks for implementation changes:
+1. Document the duty in stations/reviewer-design/PROMPT.md
+2. Make the duty travel in packets
+3. Add tests
 
-✓ **S2** (lines 56-57): No-anchors scenario with charter floor judgment and visible warning requirement
-
-✓ **S3** (lines 59-60): Non-visual run scenario with charter exclusion requirement
-
-✓ **S4** (lines 62-63): Generation duty scenario with pre-review self-verification and evidence recording
-
-✓ **S5** (lines 65-66): Composition order scenario with anchor precedence and floor gap naming
-
-✓ **S6** (lines 68-69): Game product scenario with stated-standard judgment
-
-✓ **S7** (lines 71-72): Set consistency scenario with same-subject test and identity reference (added via amendment 2026-10-30)
-
-### Requirements Sections
-
-✓ **The quality charter** (lines 18-22): Factory-level versioned document, production quality bar, observable criteria per product type, inclusion by reference
-
-✓ **Reference anchors** (lines 24-27): design/reference/ storage, scaffolding discipline, work order naming/inheritance, packet inclusion
-
-✓ **Reviewer duty** (lines 29-32): Dual-section structure, anchor comparison, gap naming, reviewer-ux parity
-
-✓ **Generation duty** (lines 34-37): Pre-review self-verification, evidence recording, regeneration discipline
-
-✓ **Consistency within a deliverable set** (lines 39-44): Identity reference, enumerated traits, same-subject test
-
-✓ **Composition with design systems and learnings** (lines 46-49): Precedence order, charter injection rules, non-visual exclusion
-
-## Conclusion
-
-The spec is verified complete. All seven scenarios have acceptance criteria, all charter and implementation requirements are specified. No gaps identified. The spec properly supports the implementation that round 2 completed.
-
-**Status**: Spec verified, no changes needed (and none permitted in this verification round).
+These are implementation tasks against an already-complete spec. No spec revision is needed.

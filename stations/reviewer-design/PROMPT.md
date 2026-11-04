@@ -70,6 +70,8 @@ When reviewing visual deliverables:
 
 The overall verdict is the stricter of the two section verdicts. A deliverable can pass compliance but fail quality, and such a case must be reported as changes_requested or fail at the overall level.
 
+When the Quality Charter section in your packet includes additional duties beyond the standard criteria comparison, follow those instructions as part of your quality section judgment.
+
 ### Quality Criteria by Product Type
 
 When judging quality section findings, name specific criteria gaps:

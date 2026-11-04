@@ -5,11 +5,13 @@
   "work_order_id": "wo-gh-15",
   "artifact_path": "runs/wo-gh-15/reviewer-security.output.md",
   "status": "executed",
-  "created_at": "2026-11-04T18:28:54.739299+00:00",
+  "created_at": "2026-11-04T19:07:15.220775+00:00",
   "review": {
     "station": "reviewer-security",
-    "verdict": "pass",
-    "findings": []
+    "verdict": "changes_requested",
+    "findings": [
+      "Control character injection vulnerability in anvil/quality.py lines 140 and 146-147. Round 1 finding F3 explicitly required: 'Work order controlled strings interpolated into packet output are sanitized of control characters.' The new same-subject test duty injection code directly interpolates work_order.identity_reference (line 140) and work_order.identity_traits items (line 147) into packet markdown without sanitization. While these fields have path validation against traversal, they lack control character sanitization. An attacker could craft a work order with embedded control characters (ANSI escape codes, null bytes, etc.) that would be injected into reviewer packets. Fix: import and apply the existing _sanitize_control_chars function from anvil.runner (or define an equivalent in quality.py) to sanitize identity_reference and each trait in identity_traits before interpolation."
+    ]
   },
   "configured_model": "review-strong",
   "executor": {

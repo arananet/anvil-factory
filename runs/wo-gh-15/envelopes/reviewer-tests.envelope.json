@@ -5,7 +5,7 @@
   "work_order_id": "wo-gh-15",
   "artifact_path": "runs/wo-gh-15/reviewer-tests.output.md",
   "status": "executed",
-  "created_at": "2026-11-04T18:31:16.406869+00:00",
+  "created_at": "2026-11-04T19:11:31.543635+00:00",
   "review": {
     "station": "reviewer-tests",
     "verdict": "pass",

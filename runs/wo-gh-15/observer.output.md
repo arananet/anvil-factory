@@ -1,1 +1,1 @@
-Observer output created at runs/wo-gh-15/observer.output.md. The deployer station hasn't executed yet (status: packet_ready), so there's no release record to observe. The output reports this missing input per the station's rules.
+Observation report created. The deployer hasn't executed yet - its status shows "packet_ready" which means the deployment packet is prepared but the actual deployment hasn't occurred. Without a release record, I cannot observe what actually happened, so the report documents this missing input condition.

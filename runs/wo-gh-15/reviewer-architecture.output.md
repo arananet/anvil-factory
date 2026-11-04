@@ -1,43 +1,21 @@
-## Architecture Review Complete
+## Architecture Review: PASS
 
-I've verified the standing tree against the spec scenarios S1-S7 and all round 1 findings. The implementation is architecturally sound and complete.
+The round 4 loopback correctly implements the S7 same-subject test duty within the project's architectural patterns:
 
-### Key Verifications:
+**1. Documentation (PROMPT.md line 73)**: Establishes the pattern that packet duties must be followed. This is architecturally sound - the prompt defines the output structure, while the packet dynamically carries input duties.
 
-**1. Runner Wiring (F1)** ✓
-- `anvil/quality.py` properly integrated into `anvil/runner.py`
-- `packet_quality_charter_section()` and `packet_anchor_section()` called in `packet_step()`
-- Results passed to `_packet_text()` following the established pattern of `design_section`, `knowledge_section`
-- S2 warning wired into warnings list (lines 476-482)
+**2. Packet injection (quality.py:130-160)**: The same-subject test duty is correctly injected when both `identity_reference` AND `deliverable_set` are present, only for reviewer-design/reviewer-ux stations. The duty explicitly:
+- References the identity reference
+- Lists identity traits to verify
+- States the comparison requirement
+- Explains failure conditions
 
-**2. Station Contracts (F2)** ✓
-- `reviewer-design` and `reviewer-ux`: Dual-section structure documented with quality section citing anchors and criteria
-- `builder`, `media-producer`, `brief-writer`: S4 self-comparison duty with evidence format
-- All contracts follow the composable stations pattern (brain/decisions/0001)
+**3. Test coverage**: New file `tests/test_quality_same_subject.py` with 5 comprehensive tests proving the duty appears when both fields are present and is absent otherwise. All tests pass.
 
-**3. Path Validation (F3)** ✓
-- `WorkOrder.from_dict()` validates `anchors`, `identity_reference`, `deliverable_set` using `validate_relative_path()`
-- Rejects parent traversal, backslashes, absolute paths
-- Control character sanitization in packet output
+**4. Constraints respected**:
+- Full suite green: 393 tests OK
+- No existing test files modified
+- No changes outside finding scope
+- Follows established quality.py patterns
 
-**4. Rendered Surface (F4)** ✓
-- Screenshots at 390x844 and 1440x900 exist in `runs/wo-gh-15/evidence/`
-- 390x844 shows responsive treatment with no horizontal scrolling
-- Secondary text visible and readable
-
-**5. Tests (F5)** ✓
-- 14 integration tests in `tests/test_quality_wiring.py`
-- Suite green: 388 tests OK per checks gate output
-
-**6. Spec Scenarios S1-S7** ✓
-All scenarios verified complete in the standing tree.
-
-### Parsing Integrity Carve-out Judgment:
-
-The carve-out in `tests/test_review_parsing_integrity.py` (lines 662-701) is **an honest reconciliation**:
-- Scopes identity assertion to non-visual reviewers
-- Separately validates visual reviewers have dual-section structure
-- Documented with reason: "dual-section structure per quality standard work order wo-gh-15"
-- Maintains contract integrity while allowing the deliberate spec extension
-
-**Verdict: PASS**
+The implementation correctly addresses the sole remaining finding from round 3.
