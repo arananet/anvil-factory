@@ -557,7 +557,7 @@ def prepare_reviewer_design_step(project, work_order, files_changed, captures, r
     # R3: Pass declared evidence paths for packet listing
     packet, allowlist = build_reviewer_design_packet(
         project, work_order, files_changed, contact_sheet_path, prompt=prompt,
-        declared_evidence_paths=[str(p.relative_to(project)) for p in declared_evidence_paths]
+        declared_evidence_paths=[str(p.relative_to(project_resolved)) for p in declared_evidence_paths]
     )
 
     # Loopback gate round 3, finding 1: Verify packet allowlist by provenance

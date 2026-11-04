@@ -434,5 +434,96 @@ class TestReviewOnlyPipeline(unittest.TestCase):
                 self.fail(f"Pipeline {pipeline_file.name} failed to load: {e}")
 
 
+class TestRelativeProjectPathSupport(unittest.TestCase):
+    """T6: Regression test for relative project path in CLI shape (wo-gh-27 crash)"""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.project = Path(self.tmp.name) / "proj"
+        self.project.mkdir(parents=True)
+
+        # Setup project structure
+        (self.project / "design").mkdir()
+        (self.project / "design" / "DESIGN.md").write_text("# Design\n")
+        (self.project / "design" / "tokens.json").write_text("{}")
+        (self.project / "brain").mkdir()
+        (self.project / "brain" / "learnings.json").write_text("[]")
+        (self.project / ".openspec" / "specs" / "test-feature").mkdir(parents=True)
+        (self.project / ".openspec" / "specs" / "test-feature" / "spec.md").write_text("# Test\n")
+
+        # Create evidence directory with test PNGs
+        self.evidence_dir = self.project / "evidence"
+        self.evidence_dir.mkdir()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _create_test_png(self, path, width, height):
+        """Helper to create a minimal test PNG"""
+        signature = b'\x89PNG\r\n\x1a\n'
+        ihdr_data = struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0)
+        ihdr_chunk = self._make_png_chunk(b'IHDR', ihdr_data)
+        scanline = b'\x00' + (b'\xff\x00\x00' * width)
+        compressed = zlib.compress(scanline * height)
+        idat_chunk = self._make_png_chunk(b'IDAT', compressed)
+        iend_chunk = self._make_png_chunk(b'IEND', b'')
+        path.write_bytes(signature + ihdr_chunk + idat_chunk + iend_chunk)
+        return path
+
+    def _make_png_chunk(self, chunk_type, data):
+        """Create a PNG chunk with CRC"""
+        length = struct.pack('>I', len(data))
+        chunk = chunk_type + data
+        crc = struct.pack('>I', zlib.crc32(chunk) & 0xffffffff)
+        return length + chunk + crc
+
+    def test_relative_project_path_with_declared_evidence(self):
+        """T6: Relative project path (CLI shape) with declared evidence succeeds without ValueError"""
+        import os
+
+        # Create declared evidence images
+        evidence1 = self._create_test_png(self.evidence_dir / "evidence1.png", 100, 100)
+        evidence2 = self._create_test_png(self.evidence_dir / "evidence2.png", 100, 100)
+
+        # Work order with declared evidence
+        wo = WorkOrder(
+            id="wo-relative-path-001",
+            kind="feature",
+            title="Relative path test",
+            source="test",
+            description="Test relative project path works with declared evidence",
+            spec_path=".openspec/specs/test-feature/spec.md",
+            evidence_images=[
+                "evidence/evidence1.png",
+                "evidence/evidence2.png"
+            ]
+        )
+
+        # Create run directory
+        run_dir = self.project / "runs" / wo.id
+        run_dir.mkdir(parents=True)
+
+        files_changed = [{"file": "src/app.py", "added": 5, "removed": 2}]
+
+        # Save current directory and change to project directory
+        saved_cwd = os.getcwd()
+        try:
+            os.chdir(self.project)
+
+            # Call prepare_reviewer_design_step with relative project path '.'
+            # This is the CLI shape: python3 -m anvil.cli run . --pipeline ...
+            packet, contact_sheet_path = prepare_reviewer_design_step(
+                Path('.'), wo, files_changed, captures=[]
+            )
+
+            # Verify packet was built successfully (no ValueError raised)
+            self.assertIsNotNone(packet, "Packet must be built successfully")
+            self.assertIn("evidence1.png", packet, "Packet must list declared evidence paths")
+            self.assertIn("evidence2.png", packet, "Packet must list declared evidence paths")
+
+        finally:
+            os.chdir(saved_cwd)
+
+
 if __name__ == '__main__':
     unittest.main()
