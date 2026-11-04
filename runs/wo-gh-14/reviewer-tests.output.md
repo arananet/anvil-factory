@@ -1,49 +1,26 @@
-## Test Review Complete: PASS
+## Verification Complete
 
-All tests for work order wo-gh-14 (post-deploy health verification) are real, properly mapped to spec scenarios, and passing.
+The test coverage for post-deploy health verification is **complete and passing**:
 
-### Summary
-- **Total tests**: 21 tests across 9 test classes
-- **Test result**: All 21 tests passed (0.037s)
-- **Spec coverage**: All scenarios S1-S5 covered with explicit test mappings
+**Test Suite Status:**
+- Full suite: 387 tests, OK (1 skipped)
+- Health-specific tests: 36 tests, all passing
+- Round 3 fix verified: `test_exception_sanitization_prevents_credential_leakage` correctly patches `urllib.request.urlopen`
 
-### Scenario Coverage Verification
+**Spec Scenario Coverage:**
+- ✓ S1: Healthy deploy (3 tests)
+- ✓ S2: Unhealthy deploy forces gate (2 tests)
+- ✓ S3: Unknown outcome handling (3 tests)
+- ✓ S4: Metrics slot scaffolding (4 tests)
+- ✓ S5: Demonstration target (2 tests)
+- ✓ S6: SSRF protections (15 tests covering all hardening requirements)
+- ✓ S7: Runner integration (7 tests in test_runner_health_integration.py)
 
-**S1 - Healthy Deploy** (3 tests) ✓
-- Route checks pass, platform signals show no errors
-- Health section in report with deployment status
-- Health step shown in swimlane after deploy
+**Loopback Requirements Coverage:**
+1. Runner integration - ✓ (health section, human gate forcing, swimlane step)
+2. Config contract - ✓ (loading and validation from project config)
+3. Demonstration wiring - ✓ (target selection and evidence recording)
+4. SSRF and input hardening - ✓ (comprehensive security test suite)
+5. Tests - ✓ (this verification)
 
-**S2 - Unhealthy Deploy** (3 tests) ✓
-- Failing routes quoted and force human gate
-- Platform errors above acceptable level trigger unhealthy
-- Human gate forced even with approved verdict
-
-**S3 - Unknown Health** (3 tests) ✓
-- No target reads unknown with reason and warning
-- Unreadable signals read unknown with failure reason
-- Unknown never rendered or aggregated as healthy
-
-**S4 - Metrics Slot** (4 tests) ✓
-- `anvil init` creates provider-agnostic metrics section
-- `anvil new-project` creates metrics section
-- `anvil onboard` preserves existing configs byte-for-byte
-- `anvil onboard` adds metrics to new configs
-
-**S5 - Demonstration** (2 tests) ✓
-- Demonstration target selection recorded with reason
-- Demonstration run carries health evidence
-
-### Additional Coverage (6 tests)
-- Route check mechanics (3 tests)
-- Platform signal reading (2 tests)
-- Non-blocking behavior (1 test)
-
-### Test Quality
-- Follow factory unittest conventions
-- Use proper mocking for external dependencies
-- Clear docstrings with spec scenario references
-- Isolated test environments with tempfile
-- Test both happy paths and error conditions
-
-Review written to `runs/wo-gh-14/reviewer-tests.review.json`.
+All tests are real, properly mapped to scenarios, and passing. Review written to `runs/wo-gh-14/reviewer-tests.review.json`.

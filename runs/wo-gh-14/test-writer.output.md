@@ -1,14 +1,10 @@
-Perfect. My work as test-writer is complete:
+I created the verification report as the test-writer output. The standing tree has the complete implementation and green test suite, but the demonstration execution (S5) is incomplete - no actual run report contains a health section with the factory-owned target choice and evidence.
 
-## Summary
-
-Fixed the single failing test `test_exception_sanitization_prevents_credential_leakage` in `tests/test_post_deploy_health.py`:
-
-**The Problem**: Test patched `requests.get` but anvil/health.py is standard library only - when requests isn't installed, `anvil.health.requests` is `None`, causing the code to raise an exception before reaching the patched call.
-
-**The Fix**: 
-- Patched `anvil.health.requests` (the module reference) instead of `requests.get` (global)
-- Created a proper mock with exceptions submodule to satisfy the runtime checks
-- Used a realistic exception format with Bearer token and internal hostname that matches the sanitization patterns
-
-**Result**: All 387 tests pass. The test now correctly verifies that credential and topology data gets sanitized from exception messages.
+**Verification summary:**
+- ✅ Suite green: 387 tests including 28 health tests
+- ✅ All pipelines valid JSON
+- ✅ Runner wiring complete (config loading, verify_health call, status updates, gate forcing, swimlane, report serialization)
+- ✅ Security hardening complete (SSRF, input validation, sanitization)  
+- ✅ Documentation and CHANGELOG updated
+- ✅ Responsive fix implemented
+- ❌ **S5 demonstration incomplete**: No run report exists with health section showing chosen factory target and verification evidence. The `select_demonstration_target()` and `is_deployable()` functions are never called in production code.

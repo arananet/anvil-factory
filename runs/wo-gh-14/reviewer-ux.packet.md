@@ -143,6 +143,11 @@ This round's entire scope:
 2. Verify the round 2 wiring stands as briefed and complete only what is actually missing from it: the runner calls verify_health after the deploy step with the target loaded and validated from project configuration; the report carries the health section; the deployment status reflects the outcome; an unhealthy outcome forces the human gate with the health reason in the decision record; the swimlane shows the health step; the SSRF and input validations are in anvil/health.py; the 390x844 responsive fix with rendered evidence at both breakpoints; the demonstration target choice and reason recorded with the health evidence in a run report (this run's report is the carrier). If the demonstration record is still missing, produce it in this run through the wired path, choosing the factory owned target that is checkable from this environment and recording the choice and reason.
 3. Nothing else changes. The review parsing contract, reviewer prompts, producer mechanisms, checks gate base ref behavior and the verified S4 metrics slot are frozen. Full suite green and every pipeline valid at the gate; docs and CHANGELOG already updated in round 2 stand unless the wiring completion requires a correction.
 
+
+PURE VERIFICATION ROUND (round 4). Full history, disclosed: round 1 built anvil/health.py and the S4 metrics slot but never wired the module into the runner (verdict rejected, 5 of 5 counted; reviewer-spec fail, security, architecture and design changes_requested, tests pass). Round 2 implemented the wiring (runner integration, config loading, human gate forcing, swimlane step, SSRF hardening, responsive fix, demonstration wiring) but its checks gate failed the suite on one error in its own new test, which patched the non-stdlib requests package; all reviewers were skipped (no_reviews). Round 3 fixed exactly that test to patch urllib.request.urlopen, and the gate's own output shows the suite green on the resulting tree (387 tests, OK) -- but the gate then failed the run on a protected path violation, because the fixed test file existed in that run's recorded base ref and the builder was barred from modifying it; all reviewers were skipped again (no_reviews).
+
+The standing tree at this round's start therefore already contains the complete item: the health module, the runner wiring, the hardening, the responsive fix and the corrected test, with the suite green. THIS ROUND MAKES NO CHANGES. The builder is barred from modifying, adding or deleting any file; its task is to verify the standing state (suite passes, pipelines valid, the report health section appears when a run carries a health target, the demonstration record exists) and report verification only. Reviewers: judge the standing tree against the spec scenarios S1 to S5 and the round 1 findings list, exactly as listed in the round 2 brief items 1 to 6; the verdict of this round is the item's verdict of record. If a reviewer finds the standing tree genuinely incomplete against the spec, say so with the specific gap; do not request changes that this verification round is barred from making without naming them as the item's remaining findings for the record.
+
 - risk_hints: production-deploy
 - status: new
 
@@ -152,13 +157,12 @@ This round's entire scope:
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
-- reviewer-spec: skipped
-- reviewer-security: skipped
-- reviewer-tests: skipped
-- reviewer-architecture: skipped
-- reviewer-design: skipped
+- checks-gate: passed
+- reviewer-spec: executed
+- reviewer-security: routed_out
+- reviewer-tests: executed
+- reviewer-architecture: routed_out
+- reviewer-design: routed_out
 
 ## Design knowledge
 
