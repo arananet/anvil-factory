@@ -10,7 +10,7 @@
 - Intake layer: intake-worker/ is a small Cloudflare Worker that normalizes incoming requests into work orders. The intake station judges each work order (accept, reject, rescope, or wait for information), assigns risk ratings, and records surfaces touched.
 
 ## Artifact flow
-A work order enters, a spec is written under .openspec/specs/, tests map to spec scenarios, a builder changes code, four reviewers write JSON reviews under reviews/, the approver aggregates them, human triage checks risk, and a run leaves its report, packets, envelopes and swimlane under runs/.
+A work order enters, intake assigns risk and surfaces, routing selects which reviewers run and which models to use, a spec is written under .openspec/specs/, tests map to spec scenarios, a builder changes code, the selected reviewers write JSON reviews under reviews/, the approver aggregates them, human triage checks risk, and a run leaves its report, packets, envelopes and swimlane under runs/.
 
 ## Gates
 - Spec gate: a spec exists, has a Status line and at least one Scenario line.
@@ -28,6 +28,18 @@ Intake judges every work order and produces one of four outcomes:
 - **Waiting for information**: Intake lacks information to judge the work. Questions are recorded, work order status becomes waiting_info, and the runner stops. When answers are provided and status returns to runnable, a new run proceeds from intake.
 
 Risk ratings guide deployment decisions (high risk for payments, credentials, data deletion, production deploys; low for small reversible changes). Surfaces name what the work touches, not what it's about. Both appear in run reports and guide downstream review and approval.
+
+## Risk and surface routing
+
+After intake stamps a work order with risk (low, medium, high, or null) and surfaces (ui, security, data, payments, deploy, content, api), a deterministic routing step runs before any reviewers. Routing selects which reviewers run and which model each uses, following a configuration table:
+
+- Low risk + no UI + no security → reduced panel (reviewer-spec, reviewer-tests) at cheaper model
+- Security surface → always keep reviewer-security at strong model
+- UI surface → keep reviewer-design when present
+- Medium/high risk → full panel at policy models
+- Null (unrated) → full panel at policy models (default)
+
+Routing decisions are written to `runs/<work-order-id>/routing.json` with reasons for each selection. Routed out reviewers are recorded as expected absences, never as failures. The approver counts only reviews from selected reviewers. Model policy defines a ceiling: routing may reduce but never exceed it. See docs/ROUTING.md.
 
 ## Risk triage
 Risk hints are explicit strings on the work order: auth, payments, data-deletion, production-deploy and secrets. Any match means human review is required. A verdict that is not approved also forces human review.

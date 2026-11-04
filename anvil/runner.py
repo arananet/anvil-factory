@@ -10,6 +10,7 @@ from .design import packet_design_section, load_design_system
 from .gates import human_gate, checks_gate, resolve_base_ref_config, _run_shell
 from .approver import aggregate, needs_human, aggregate_explained, needs_human_explained, matched_risk_hints, RISK_SCAN_ORDER
 from .executor import ExecutorError
+from .routing import route_reviewers, write_routing_record, render_routing_section, routing_swimlane_summary
 
 def _escape_markdown(text):
     """Escape markdown special characters to prevent content injection.
@@ -354,6 +355,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     # from brain/learnings.md, never inbox proposals (see anvil/brain.py).
     learnings_section = packet_learnings_section(project)
 
+    # Routing record: will be populated after intake
+    routing_record = None
+
     # Snapshot base ref configuration for checks gate (S4)
     # Configuration is resolved from the base ref through git where a repo is
     # present, never from the working tree file (which may have been modified by
@@ -419,6 +423,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         # recorded in every mode. Executed fields stay null until a runtime
         # actually runs the station (agent-execution S8).
         configured_model = station.model if station is not None and station.model else default_model(station_id)
+        # Apply routing model overrides if routing selected a specific model for this station
+        if routing_record and station_id in routing_record.selected_models:
+            configured_model = routing_record.selected_models[station_id]
         step_executor = None
         step_executed_model = None
         status = "completed"
@@ -485,6 +492,15 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     wo_file = wo_dir / f"{work_order.id}.json"
                     wo_file.write_text(json.dumps(work_order.to_dict(), indent=2) + "\n", encoding="utf-8")
 
+                    # Run routing after intake to determine reviewer selection
+                    # Get all reviewer stations from the pipeline
+                    pipeline_reviewers = [sid for sid in order if sid.startswith("reviewer")]
+                    if pipeline_reviewers:
+                        routing_record = route_reviewers(work_order, pipeline_reviewers, project)
+                        write_routing_record(run_dir, routing_record)
+                        # Update reviews_expected to only include selected reviewers
+                        reviews_expected = routing_record.selected_reviewers
+
                     status = "executed"
                     detail = f"Executed by {executor.name}; outcome: {work_order.intake_outcome.get('outcome', 'unknown')}"
                     artifact = str(output_file)
@@ -504,12 +520,16 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 verdict_rule = ("No reviews were produced in this run, so the verdict is no_reviews; "
                                 "standing project reviews are never counted.")
                 counted = []
-            # When execution was attempted and counted reviews are fewer than expected,
-            # state both numbers to flag the shrinkage
+            # When execution was attempted, state the review counts
+            # This is especially important when routing reduced the panel (S5)
             counted_len = len(counted)
             expected_len = len(reviews_expected)
-            if execute_mode and counted_len < expected_len:
-                verdict_rule += f" (Counted {counted_len} reviews, expected {expected_len}.)"
+            if execute_mode:
+                if counted_len < expected_len:
+                    verdict_rule += f" (Counted {counted_len} reviews, expected {expected_len}.)"
+                elif routing_record and routing_record.routed_out:
+                    # When routing reduced the panel, mention the expected count after routing
+                    verdict_rule += f" (Expected {expected_len} reviews after routing.)"
             decision_approver = {"reviews_counted": counted,
                                  "reviews_expected": list(reviews_expected),
                                  "rule": verdict_rule}
@@ -688,6 +708,13 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             if gate_failed and station_id.startswith("reviewer"):
                 status = "skipped"
                 detail = "Skipped due to gate failure"
+                packet = packet_step(station, station_id)
+                artifact = str(packet)
+            # Skip reviewers that were routed out
+            elif station_id.startswith("reviewer") and routing_record and station_id not in routing_record.selected_reviewers:
+                status = "routed_out"
+                routed_reason = next((r["reason"] for r in routing_record.routed_out if r["reviewer"] == station_id), "Not in selected panel")
+                detail = f"Routed out: {routed_reason}"
                 packet = packet_step(station, station_id)
                 artifact = str(packet)
             else:
@@ -895,6 +922,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             lines.append("**Status**: waiting for information")
             lines.append("")
 
+    # Add routing summary if present
+    if routing_record:
+        lines.append(routing_swimlane_summary(routing_record))
+        lines.append("")
+
     lines.append("Cost is reported as null here. Model runtimes report cost when they run a station; ANVIL never invents a number.")
     lines.append("")
     lines.append("| Station | Status | Duration ms | Artifacts | Cost |")
@@ -973,11 +1005,20 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         report_lines.append(f"Surfaces: {', '.join(work_order.surfaces)}")
         report_lines.append("")
 
+    # Include routing section if present
+    if routing_record:
+        report_lines.append(render_routing_section(routing_record))
+
     # Include verdict
     report_lines.append(f"## Verdict")
     report_lines.append("")
     report_lines.append(f"Verdict: {verdict}")
     report_lines.append("")
+
+    # Include approver decision rule if present
+    if decision and "approver" in decision and "rule" in decision["approver"]:
+        report_lines.append(decision["approver"]["rule"])
+        report_lines.append("")
 
     # Include steps
     report_lines.append("## Steps")
