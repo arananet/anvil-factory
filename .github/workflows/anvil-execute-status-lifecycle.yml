@@ -60,6 +60,11 @@ jobs:
           fi
           echo "Gateway smoke passed: the gateway answered through the Anthropic endpoint."
 
+      - name: Install Playwright and Chromium (operator staged)
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
       - name: Run the ANVIL sdlc-default line in execute mode
         id: line
         run: |
