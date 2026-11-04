@@ -9,17 +9,17 @@
       "reason": "Routed out by low risk rule (not in reduced panel)"
     },
     {
-      "reviewer": "reviewer-design",
+      "reviewer": "reviewer-architecture",
       "reason": "Routed out by low risk rule (not in reduced panel)"
     },
     {
-      "reviewer": "reviewer-architecture",
+      "reviewer": "reviewer-design",
       "reason": "Routed out by low risk rule (not in reduced panel)"
     }
   ],
   "selected_models": {
-    "reviewer-tests": "review-cheap",
-    "reviewer-spec": "review-cheap"
+    "reviewer-spec": "review-cheap",
+    "reviewer-tests": "review-cheap"
   },
   "reason": "Low risk with no UI and no security surface: reduced panel at cheaper model"
 }

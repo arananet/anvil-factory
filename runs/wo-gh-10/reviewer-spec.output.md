@@ -1,13 +1,14 @@
-Review complete. The implementation correctly matches all scenarios in the spec:
+The test corrections pass spec review.
 
-**S1 - Transcript usage**: Steps with reported usage are measured and priced using the configured price table ✓
+**Test 1: test_gateway_response_with_usage (S2)**
+- Corrected to test the builder station (model: fast-builder, priced) instead of intake (model: default, unpriced)
+- Now properly exercises S2: gateway usage is consumed and priced when the model has a price table entry
+- Assertions correctly expect non-null cost and verify the calculated amount
 
-**S2 - Gateway usage**: Both transcript format (input_tokens/output_tokens) and gateway format (prompt_tokens/completion_tokens) are handled correctly ✓
+**Test 2: test_run_report_includes_cost_section (S4)**  
+- Corrected expectations to measured_steps=1, unmeasured_steps=1 for the intake+builder pipeline
+- Intake station uses model 'default' (no price entry) → unmeasured per S3
+- Builder station uses model 'fast-builder' (priced) → measured per S1/S2
+- Total correctly equals only the measured step's cost per S4
 
-**S3 - Unmeasured steps**: Steps with no usage or missing price entries record measured=false with stated reasons ("no usage reported" or "no price recorded for model") ✓
-
-**S4 - Report total**: Cost section shows total as sum of measured steps only, with measured and unmeasured counts. Swimlane displays coverage (e.g., "$3.5000 (2 of 8 steps measured)") ✓
-
-**S5 - Price validation**: Price table entries require source and date_recorded fields; loader rejects missing fields ✓
-
-All tests are real (call actual implementation), documentation is complete, CHANGELOG updated, and cost measurement never affects verdicts.
+Both corrections align with the spec scenarios. The review JSON has been written to runs/wo-gh-10/reviewer-spec.review.json with verdict "pass".

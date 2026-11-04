@@ -11,6 +11,8 @@ Outcome: accepted
 
 Risk: low
 
+Surfaces: content
+
 ## Routing
 
 **Decision**: Low risk with no UI and no security surface: reduced panel at cheaper model
@@ -21,14 +23,14 @@ Risk: low
 
 **Routed out** (3):
 - reviewer-security: Routed out by low risk rule (not in reduced panel)
-- reviewer-design: Routed out by low risk rule (not in reduced panel)
 - reviewer-architecture: Routed out by low risk rule (not in reduced panel)
+- reviewer-design: Routed out by low risk rule (not in reduced panel)
 
 ## Verdict
 
-Verdict: no_reviews
+Verdict: approved
 
-No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 2.)
+All counted reviews passed. (Expected 2 reviews after routing.)
 
 ## Steps
 
@@ -36,13 +38,12 @@ No reviews were produced in this run, so the verdict is no_reviews; standing pro
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
-- reviewer-spec: skipped
-- reviewer-security: skipped
-- reviewer-tests: skipped
-- reviewer-architecture: skipped
-- reviewer-design: skipped
+- checks-gate: passed
+- reviewer-spec: executed
+- reviewer-security: routed_out
+- reviewer-tests: executed
+- reviewer-architecture: routed_out
+- reviewer-design: routed_out
 - approver: completed
 - triage-human: completed
 - deployer: packet_ready

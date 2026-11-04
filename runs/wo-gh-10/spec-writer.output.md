@@ -1,3 +1,7 @@
-Spec review complete. The cost measurement spec at `.openspec/specs/cost-measurement/spec.md` is correct and requires no revision. All five scenarios align with the work order, and the legacy cost override removal (completed in the previous round) matches the spec's transparency design.
+## Spec Review Complete
 
-Output written to `runs/wo-gh-10/spec-writer.output.md`.
+The cost measurement spec requires no revision. The spec is unambiguous: **S3 explicitly states that a step whose model has no price table entry records `measured: false` with a null amount**.
+
+The test failures occurred because tests asserted the opposite of what S3 specifies. Since the intake station's model is 'default' (which has no price table entry), per S3 it must be unmeasured. The tests contradicted this clear specification.
+
+Output written to `runs/wo-gh-10/spec-writer.output.md` — the spec is fit for purpose, and test corrections are correctly scoped to the test-writer station.

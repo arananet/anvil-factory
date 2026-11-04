@@ -82,6 +82,14 @@ CLOSING VERIFICATION RUN (after run 41764193801, verdict no_reviews: the checks 
 3. Everything else stands as audited: anvil/cost.py, the price table configuration, the cost section in run reports, and the removed legacy override (anvil/runner.py no longer lets usage.cost override the calculated cost).
 
 On an approved verdict this order closes. Keep the whole suite green and every pipeline valid.
+
+TEST CORRECTION RUN (after run 41765781560, verdict no_reviews: protected paths passed and the intake revert landed, but the gate suite failed on exactly two of the test-writer's new tests). Operator audit against .openspec/specs/cost-measurement/spec.md: both failures come from the tests pricing the intake step. The intake station's configured model is 'default', which has no price table entry; per spec S3, a step whose model has no price entry records measured false with a null amount. The tests contradict the spec, not the implementation:
+
+1. test_gateway_response_with_usage (S2) runs only the intake station through a usage-reporting gateway executor and asserts its cost is not None. Correct the test to exercise S2 with a station whose configured model has a price table entry (the priced amount and measured true are then asserted on that step), or assert the intake step as the S3 unmeasured case. Do not change the intake station's production configuration (anvil/config.py DEFAULT_MODELS and stations/intake/station.json stay as reverted).
+
+2. test_run_report_includes_cost_section (S4) asserts measured_steps equals 2 for an intake plus builder pipeline. Per S4's own premise (a mix of measured and unmeasured steps), correct the expectation to the spec: the builder step measured, the intake step unmeasured, measured_steps 1, unmeasured_steps 1, and the total equal to the measured step's amount only.
+
+The test-writer station makes these corrections in its own step. The builder changes nothing unless a corrected test exposes an implementation defect, and must not modify tests/, anvil.json, pipelines/ or .github/workflows/. Everything else stands as audited (cost implementation, removed legacy override, reverted intake configuration). Keep the whole suite green and every pipeline valid. On an approved verdict this order closes.
 - risk_hints: 
 - status: new
 
@@ -91,10 +99,9 @@ On an approved verdict this order closes. Keep the whole suite green and every p
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
-- reviewer-spec: skipped
-- reviewer-security: skipped
+- checks-gate: passed
+- reviewer-spec: executed
+- reviewer-security: routed_out
 
 ## Output contract
 

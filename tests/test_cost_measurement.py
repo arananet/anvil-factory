@@ -257,9 +257,14 @@ class TestCostInRunReport(unittest.TestCase):
             self.assertIn("measured_steps", cost)
             self.assertIn("unmeasured_steps", cost)
 
-            # Both intake and builder should be measured
-            self.assertEqual(cost["measured_steps"], 2)
-            self.assertGreater(cost["total"], 0)
+            # Per S3 and S4: intake uses 'default' model (no price entry) so unmeasured,
+            # builder uses 'fast-builder' (priced) so measured
+            self.assertEqual(cost["measured_steps"], 1)
+            self.assertEqual(cost["unmeasured_steps"], 1)
+
+            # Total equals measured step cost only: (1000 * 1.0 + 500 * 5.0) / 1_000_000
+            expected_builder_cost = (1000 * 1.0 + 500 * 5.0) / 1_000_000
+            self.assertAlmostEqual(cost["total"], expected_builder_cost, places=6)
 
 
 class TestGatewayUsageHandling(unittest.TestCase):
@@ -279,11 +284,11 @@ class TestGatewayUsageHandling(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             proj = make_project(tmp)
 
-            # Add price table
+            # Add price table with fast-builder (builder station's model)
             config_path = proj / "anvil.yaml"
             config = json.loads(config_path.read_text())
             config["prices"] = {
-                "reasoning-strong": {
+                "fast-builder": {
                     "input_per_million": 3.0,
                     "output_per_million": 15.0,
                     "source": "anthropic-pricing-2024-01",
@@ -295,7 +300,7 @@ class TestGatewayUsageHandling(unittest.TestCase):
             executor = GatewayWithUsageExecutor()
 
             pipe_path = Path(tmp) / "test_pipe.json"
-            pipe_data = {"name": "test", "stages": [{"station": "intake"}]}
+            pipe_data = {"name": "test", "stages": [{"station": "builder"}]}
             pipe_path.write_text(json.dumps(pipe_data))
 
             reg = load_registry(ROOT / "stations")
@@ -304,16 +309,21 @@ class TestGatewayUsageHandling(unittest.TestCase):
 
             report = run_pipeline(proj, pipe, wo, registry=reg, executor=executor)
 
-            # Find intake step and check it has cost
-            intake_step = next((s for s in report.steps if s["station"] == "intake"), None)
-            self.assertIsNotNone(intake_step)
-            self.assertIsNotNone(intake_step.get("cost"))
+            # Find builder step and verify S2: gateway usage is priced
+            builder_step = next((s for s in report.steps if s["station"] == "builder"), None)
+            self.assertIsNotNone(builder_step)
+            self.assertIsNotNone(builder_step.get("cost"))
+            self.assertGreater(builder_step.get("cost"), 0)
 
-            # Check usage was recorded
-            self.assertIn("usage", intake_step)
-            usage = intake_step["usage"]
+            # Check usage was recorded with expected cost
+            self.assertIn("usage", builder_step)
+            usage = builder_step["usage"]
             self.assertIn("prompt_tokens", usage)
             self.assertIn("completion_tokens", usage)
+
+            # Verify the cost calculation: (1500 * 3.0 + 750 * 15.0) / 1_000_000
+            expected_cost = (1500 * 3.0 + 750 * 15.0) / 1_000_000
+            self.assertAlmostEqual(builder_step["cost"], expected_cost, places=6)
 
     def test_gateway_response_without_usage_unmeasured_s2(self):
         """cost-measurement S2: gateway response with no usage records unmeasured"""

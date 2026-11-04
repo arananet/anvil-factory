@@ -1,1 +1,1 @@
-Observation report created. The observer station executed but found its required input missing - the deployer hasn't released the change yet, so there's no release record to observe. The report documents this per station rules and explains what's needed to complete observation.
+Observer output complete. The deployer hasn't executed yet, so there's no release record to observe. The observer output documents this missing input as required by the station rules.

@@ -4,7 +4,7 @@
   "to_station": "reviewer-tests",
   "work_order_id": "wo-gh-10",
   "artifact_path": "runs/wo-gh-10/reviewer-security.packet.md",
-  "status": "skipped",
-  "created_at": "2026-11-04T03:29:30.593795+00:00",
+  "status": "routed_out",
+  "created_at": "2026-11-04T03:40:29.447268+00:00",
   "configured_model": "claude-sonnet-4-5"
 }

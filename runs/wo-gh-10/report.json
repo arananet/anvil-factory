@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 28809.81,
+      "duration_ms": 41499.34,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/intake.output.md"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-10/spec-writer.output.md",
-      "duration_ms": 116538.458,
+      "duration_ms": 87115.681,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/spec-writer.output.md"
@@ -40,7 +40,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-10/test-writer.output.md",
-      "duration_ms": 392977.811,
+      "duration_ms": 90755.46,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/test-writer.output.md"
@@ -56,7 +56,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-10/builder.output.md",
-      "duration_ms": 367040.704,
+      "duration_ms": 161744.692,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/builder.output.md"
@@ -70,9 +70,9 @@
     },
     {
       "station": "checks-gate",
-      "status": "failed",
-      "detail": "Gate failed: 1 checks, protected paths: pass",
-      "duration_ms": 29700.563,
+      "status": "passed",
+      "detail": "Gate passed: 1 checks, protected paths: pass",
+      "duration_ms": 25109.232,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/checks-gate.pre-review.output.md"
@@ -85,7 +85,7 @@
         "python -m unittest discover -s tests -p 'test_*.py'"
       ],
       "exit_codes": [
-        1
+        0
       ],
       "protected_paths": [
         "tests/",
@@ -94,41 +94,29 @@
       ],
       "protected_path_verdict": "pass",
       "protected_path_findings": [],
-      "gate_verdict": "fail"
-    },
-    {
-      "station": "loopback",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: Gate checks failed",
-      "reason": "Gate checks failed",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null,
-      "feedback": "",
-      "from_station": "checks-gate"
+      "gate_verdict": "pass"
     },
     {
       "station": "reviewer-spec",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.234,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-10/reviewer-spec.output.md",
+      "duration_ms": 66334.658,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-10/reviewer-spec.packet.md"
+        "runs/wo-gh-10/reviewer-spec.output.md"
       ],
       "configured_model": "review-cheap",
       "executed_model": null,
-      "executor": null
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
     },
     {
       "station": "reviewer-security",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.2,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out by low risk rule (not in reduced panel)",
+      "duration_ms": 0.252,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/reviewer-security.packet.md"
@@ -139,22 +127,25 @@
     },
     {
       "station": "reviewer-tests",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.258,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-10/reviewer-tests.output.md",
+      "duration_ms": 54739.478,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-10/reviewer-tests.packet.md"
+        "runs/wo-gh-10/reviewer-tests.output.md"
       ],
       "configured_model": "review-cheap",
       "executed_model": null,
-      "executor": null
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
     },
     {
       "station": "reviewer-architecture",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.181,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out by low risk rule (not in reduced panel)",
+      "duration_ms": 0.238,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/reviewer-architecture.packet.md"
@@ -165,9 +156,9 @@
     },
     {
       "station": "reviewer-design",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.674,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out by low risk rule (not in reduced panel)",
+      "duration_ms": 0.416,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/reviewer-design.packet.md"
@@ -179,8 +170,8 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.032,
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.033,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/report.json"
@@ -192,8 +183,8 @@
     {
       "station": "triage-human",
       "status": "completed",
-      "detail": "Human review: required",
-      "duration_ms": 0.01,
+      "detail": "Human review: not_required",
+      "duration_ms": 0.015,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -204,7 +195,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-10/deployer.packet.md",
-      "duration_ms": 0.191,
+      "duration_ms": 0.208,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/deployer.packet.md"
@@ -217,7 +208,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-10/observer.output.md",
-      "duration_ms": 66496.542,
+      "duration_ms": 64017.94,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/observer.output.md"
@@ -230,34 +221,43 @@
       }
     }
   ],
-  "verdict": "no_reviews",
-  "human_required": true,
+  "verdict": "approved",
+  "human_required": false,
   "max_loopbacks": 2,
-  "loopbacks": 1,
+  "loopbacks": 0,
   "deployment_status": null,
   "verify_results": [],
   "risk_hints": [],
   "decision": {
     "approver": {
-      "reviews_counted": [],
+      "reviews_counted": [
+        {
+          "station": "reviewer-spec",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        }
+      ],
       "reviews_expected": [
         "reviewer-spec",
         "reviewer-tests"
       ],
-      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 2.)"
+      "rule": "All counted reviews passed. (Expected 2 reviews after routing.)"
     },
     "human_gate": {
-      "required": true,
-      "rule": "Verdict is no_reviews, not approved, so a human is required.",
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
       "hints_matched": []
     }
   },
   "warnings": [],
-  "base_ref": "d103ccfddcd63dcd3a0d6382346bd57df1725615",
+  "base_ref": "4a09f0a20dfb8746db3f48119f290ca79be32306",
   "evidence": [],
   "cost": {
     "total": 0,
     "measured_steps": 0,
-    "unmeasured_steps": 5
+    "unmeasured_steps": 7
   }
 }

@@ -1,18 +1,17 @@
-Looking at this work order for the closing verification run.
+Looking at this TEST CORRECTION RUN work order for wo-gh-10.
 
-The scope is clear and specific:
-1. Revert exactly two intake configuration changes that were out-of-scope
-2. The test-writer station will author the cost measurement tests
-3. Everything else (the core cost measurement implementation) stands as audited
+This is a narrowly scoped request to correct exactly two failing tests that contradict the spec. The work order clearly identifies:
+- Which tests need correction
+- Why they're wrong (they expect the intake step to be measured when it should be unmeasured per spec S3)
+- What the corrections should be
+- Clear constraints (test-writer makes changes, builder only acts if tests reveal bugs)
 
-This is buildable as stated - it's a minimal, focused fix to close out finding #2 from the loopback review.
+This is buildable as stated with minimal blast radius.
 
 ```json
 {
-  "intake_outcome": {
-    "outcome": "accepted"
-  },
+  "intake_outcome": {"outcome": "accepted"},
   "risk": "low",
-  "surfaces": []
+  "surfaces": ["content"]
 }
 ```
