@@ -16,5 +16,7 @@
   ],
   "model": "writing-strong",
   "prompt": "stations/writer/PROMPT.md",
-  "tools": []
+  "tools": [],
+  "guided": true,
+  "designation": "guided design station"
 }

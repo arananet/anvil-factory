@@ -21,7 +21,7 @@ MODEL_POLICY = {
     "builder": "fast-builder",  # Builder model
     "builder-strong": "reasoning-strong",  # Strong builder model
     "writer": "writing-strong",  # Writer model
-    "designer": "media-gen",  # Design/UI model
+    "designer": "openai/gpt-6-astra",  # Design model for UX module guided stations
 }
 
 # Model hierarchy for ceiling validation (lower index = cheaper/weaker)
