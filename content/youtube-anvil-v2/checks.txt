@@ -11,8 +11,8 @@ PASS S4-clean-script.md
 PASS S4-clean-storyboard.md
 PASS S4-clean-production-notes.md
 PASS S6-glb-sha256 (daea8110b3568653...)
-PASS S7-contact-sheet (2560x1440)
-PASS S7-still-count (15 sampled stills)
+PASS S7-contact-sheet (2560x1800)
+PASS S7-still-count (20 sampled stills)
 PASS S7-still-size
 PASS S8-blender-scripts (8 python scripts)
 PASS S8-render-stats (blender version noted: True, frames figure: True)

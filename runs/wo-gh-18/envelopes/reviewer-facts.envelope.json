@@ -5,18 +5,18 @@
   "work_order_id": "wo-gh-18",
   "artifact_path": "runs/wo-gh-18/reviewer-facts.output.md",
   "status": "executed",
-  "created_at": "2026-11-03T04:10:20.605160+00:00",
+  "created_at": "2026-11-04T03:32:38.845446+00:00",
   "review": {
     "station": "reviewer-facts",
     "verdict": "pass",
     "findings": [
-      "script.md, storyboard.md, brief.md, durations.json and audio/ have no diff against HEAD. Only production-notes.md and source-pack.md changed under content/youtube-anvil-v2, so the frozen inputs are intact. I did not run a byte-for-byte comparison against the previous round's files.",
-      "The script's claim table still maps every spoken claim to C1\u2013C11, each with a source in source-pack.md. Nothing in this round adds a spoken or on-screen claim. The scene fixes change only placement, scale, color and timing. Wording is stated as unchanged.",
-      "The one source-pack.md edit replaces 'Committed in 7344863' with a reference to the setup commit. The spec text says only 'Committed in the setup commit' and does not name a hash. `git cat-file -t 7344863` returns 'Not a valid object name', so the old hash could not be verified. The edit corrects a concrete error and is accepted.",
-      "source-pack.md C11 and flag F5 still say the artifacts that evidence C11 are 'produced later in this run' and that this pack can only cite the pipeline and the work order. That is an accurate description of the authoring pass. C11 is not confirmed here. It must be re-judged in the film review pass against the new film, checks.txt, render-stats.json and the reviews.",
-      "production-notes.md states that the render budget is unchanged. I confirmed setup_render in blender/common.py: taa_render_samples defaults to 6, use_raytracing is False and use_shadows is False. I did not check that no call site passes a larger samples value, and I did not check the 30 fps setting.",
-      "production-notes.md describes the four fixes with projected pixel figures from arithmetic through the cameras, not from viewing frames. These are authoring-time estimates, not verified facts about the film. The design review of the finished film must confirm them. Do not treat them as evidence for C11 or for the advisories being closed.",
-      "The production-notes.md render statistics block is outside the diff hunks I reviewed, which cover the header and the sections around the block. That is consistent with it being preserved. Confirm after the statistics step rewrites it."
+      "Frozen inputs are unchanged. git shows no modification to brief.md, source-pack.md, script.md, storyboard.md, durations.json, audio/ or assets/patch-one.glb against HEAD. The GLB sha256 daea8110... matches the spec.",
+      "Every spoken claim maps to C1 to C11 with the same wording as the previous round. Section 5 states five reviewers for the factory in general. Section 7 gives no reviewer count, which respects flag F1. The three intake kinds are listed without a count.",
+      "On-screen text in blender/scene_line.py stays inside the closed claim list. The strings are ANVIL, One intake, The spec comes first, Stations build, Five reviewers in parallel, A human approves. and Verified memory. The polish edits change placement, scale, timing and flight only. They add no factual claim, name, employer or extra count.",
+      "Narration is 190 words, which matches production-notes.md. checks.txt reports 195 words because it counts the whole script file, not only the narration. This is a labeling difference, not a claim error.",
+      "The render budget in common.py is unchanged. Eevee TAA render samples are 6, never above 8, and shadows and raytracing are off. This matches the production-notes.md statement. I did not run any render.",
+      "The production-notes.md statistics block records 2515 frames and Blender 4.5.15, consistent with render-stats.json and durations.json. The proof still name frame-proof-s1-title.png and the sampling line in assemble.py are present. The film itself is not judged in this pass.",
+      "Open item: claim C11 cannot be judged until the second pass against the finished film, checks and run record. The source pack flags this as F5. Minor: source-pack.md still cites setup commit 7344863 for the asset, which has no effect on any spoken claim. The review is written to content/youtube-anvil-v2/review-facts.md."
     ]
   },
   "configured_model": "claude-sonnet-5-5",

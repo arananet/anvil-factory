@@ -1,70 +1,77 @@
-# Observation report: ANVIL the video v2 (wo-gh-18, gate loopback)
+# Observation report: ANVIL the video v2 (wo-gh-18, polish round)
 
-**Observation date: 2026-11-01**  
+**Observation date: 2026-11-04**  
 **Work order: wo-gh-18**  
-**Change: gate loopback round, production re-architecture**  
-**Pass: Second pass (film review) completed**
+**Change: Polish loopback round**  
+**Pass: First pass (authoring) and deterministic steps completed. Second pass (film review) did NOT run.**
 
 ## What was released
 
 **Nothing was published anywhere.** No video was uploaded, no URL exists, and no external service was contacted.
 
-The publisher correctly stopped at the human gate and did not publish. This matches the work order's explicit instruction: "the finished video stops at the human gate, and nothing is posted anywhere."
+The publisher correctly stopped because the workflow is incomplete: the second pass (film review) did not run, so the four polish advisories have not been ruled on against the finished film.
 
 ## Why the publisher stopped
 
-The publisher stopped because the human gate is required (from publish-record.md):
+From `publish-record.md`, the publisher identified multiple blocking conditions:
 
-1. **Publishing risk hint**: The work order carries the `publishing` risk hint. The approver verdict is `approved` and all four reviews passed, but `report.json` records `human_required: true`.
+1. **Incomplete workflow**: "I found no second-pass (film review) output in the tree. reviewer-design has therefore not ruled on the four advisories against the finished stills, and reviewer-facts has not re-judged claim C11 against this film."
 
-2. **Human gate rule**: "Verdict approved, but the work order carries the risk hint 'publishing', so a human is required."
+2. **Advisories still open**: All four polish advisories remain unresolved until the second pass rules on them against the finished film.
 
-3. **No human approval recorded**: The `triage-human` step shows "completed" with detail "Human review: required". That is routing logic, not an actual human approval. No explicit human approval was found.
+3. **Human gate requirement**: The work order carries the `publishing` risk hint and `triage-human` requires human review. No explicit human approval is recorded.
 
-The publisher correctly interpreted the human gate requirement and did not publish. All three reasons are valid. The publisher followed the rules.
+The publisher made the correct decision. Publishing requires the second pass to confirm all four advisories are closed, followed by human approval.
 
 ## What exists after this run
 
-### Completed (both passes)
+### Completed
 
-**Finished video**:
-- `anvil-youtube-v2.mp4`: 21MB, 1920x1080, 30fps, h264+aac, 83.83s
-- sha256: `62a3137df17fb512331e0cff3ed85fae0597cafa0530bd03cdcd0052f512ff22`
+**Finished video** (re-rendered):
+- `anvil-youtube-v2.mp4`: 21,401,761 bytes, 1920x1080, 30fps, h264+aac, 83.83s
+- sha256: `a277ce32c3ac7c30de5679524f49b1017ff028cfea2d38277deed73c4b44ecac`
+- This is a NEW render. Previous round sha256: `62a3137d...ff22`
 
 **Supporting evidence**:
-- `contact-sheet.png`: 2560x1440, grid visualization at section midpoints and transitions
-- 15 sampled stills (still-*.png)
-- `render-stats.json`: 2515 frames rendered, Blender 4.5.15, render time recorded
+- `contact-sheet.png`: 2560x1800 (note: dimension changed from previous 2560x1440)
+- 20 sampled stills (increased from 15 in previous round), including new `frame-proof-s1-title.png`
+- Transition pair stills for cuts after sections 1-6 (newly complete)
+- `render-stats.json`: 2515 frames rendered, Blender 4.5.15
 - `ffprobe.json`: video stream analysis
-- `production-notes.md`: complete production record including render statistics
+- `production-notes.md`: records the four scene fixes with locations
 
-**Audio files**:
-- `audio/s1.mp3` through `s7.mp3` (narration, synthetic speech)
+**Audio files** (unchanged):
+- `audio/s1.mp3` through `s7.mp3` (narration, verified unchanged)
 - `audio/bed.wav` (sound bed)
 - `durations.json`: 2515 frames total, 83.833 seconds
 
-**Review records**:
-- `review-facts.md`: all claims C1-C11 mapped and verified, including C11 against finished film
-- Reviewer outputs in `runs/wo-gh-18-pass1/`: facts, voice, brand, design all passed
+**Review records** (first pass only):
+- First-pass reviews in `runs/wo-gh-18/`: facts, voice, brand, design (all reviewed scene scripts, not the finished film)
+- NO second-pass film review outputs found in the tree
 
-**Content source files** (frozen from round 1):
-- `brief.md`, `source-pack.md`, `script.md`, `storyboard.md`
-- Blender scene scripts under `blender/` (8 scripts)
+**Content source files** (verified unchanged):
+- `brief.md`, `source-pack.md`, `script.md`, `storyboard.md` all byte-identical to previous round
+- Blender scene scripts under `blender/`: modified per the four polish fixes
 
 **Deterministic checks**:
-- `checks.txt`: PASS (0 failing checks), 19 checks total covering resolution, framerate, duration, word count, first-person discipline, file integrity, contact sheet, stills, and render stats
+- `checks.txt`: PASS (0 failing checks), 19 checks total
 
-## Architecture change verification
+### Not completed
 
-The production re-architecture succeeded completely:
+**Second pass (film review)**: Did not run. No station judged the finished film against the four polish advisories. This is the blocking issue.
 
-1. **First pass (authoring)**: media-producer authored production inputs (narration, durations, sound bed, scene verification) but did NOT render. Duration: ~3.5 minutes.
+## The four polish advisories (status: OPEN)
 
-2. **Deterministic workflow steps**: all frames rendered by parallel chunked headless Blender 4.5.15 outside any model session. Render logs committed under `frames/logs/`. No station session timeouts occurred.
+The publish record lists all four advisories. None have been ruled on against the finished film:
 
-3. **Second pass (film review)**: producing stations verified and held (no content changes). Reviewers judged the finished film. media-producer confirmed the film matches the storyboard and spec.
+1. **Section 4**: "Stations build" title clear of the posts, caps, arms and tips.
+2. **Section 6**: "Verified memory." and "A human approves." legible, not overlapping each other or the geometry, not one stacked column.
+3. **Section 1**: "ANVIL" title in full ink and near full scale from early in the section.
+4. **Section 2**: The card reads as the subject through the flight, including the midpoint, with no dead air elsewhere.
 
-The round 1 timeout problem (media-producer session killed at 133/~2400 frames) cannot recur because rendering is now entirely outside model sessions.
+**Expected**: reviewer-design rules on each advisory separately (closed or not) citing the still or stills that prove each ruling. All four must be closed before approval.
+
+**Actual**: No film review pass ran, so no rulings exist.
 
 ## Observations on deterministic checks
 
@@ -72,86 +79,92 @@ All 19 checks in `checks.txt` passed:
 
 - **Technical specs**: 1920x1080 ✓, 30fps ✓, h264+aac streams ✓, 83.83s duration ✓
 - **Content compliance**: 195 words ✓, 14 timing marks ✓, first-person pronouns (12) ✓, no third-person ✓
-- **Script/storyboard integrity**: script.md and storyboard.md unchanged ✓
-- **Asset integrity**: GLB sha256 verified ✓
-- **Evidence files**: contact sheet (2560x1440) ✓, 15 sampled stills ✓, render stats complete ✓
-- **Production notes**: render stats recorded ✓, Blender version noted ✓
+- **Script/storyboard integrity**: script.md and storyboard.md clean (unchanged from previous round) ✓
+- **Asset integrity**: GLB sha256 verified (daea8110b3568653...) ✓
+- **Evidence files**: contact sheet (2560x1800) ✓, 20 sampled stills ✓, still size correct ✓
+- **Production notes**: render stats recorded ✓, Blender version noted ✓, 8 Blender scripts ✓
 
-Zero failing checks. The finished video meets all technical and content requirements.
+Zero failing checks. The deterministic portion of the workflow completed successfully.
 
-## Observations on reviews (second pass)
+## Observations on first-pass reviews
 
-All four reviewers passed:
+All four first-pass reviewers passed (scene script review, not film review):
 
-1. **reviewer-facts**: Re-judged claim C11 ("what the rendered result looks like") against the finished film. All claims C1-C11 now verified. Two wording edits from round 1 confirmed applied. Minor note: `source-pack.md` cites wrong commit for GLB (7344863 vs f6476d6), but no spoken claim affected. Pass.
+1. **reviewer-facts**: Verified the scene script changes against the spec. No claims affected by scene changes. Pass.
+2. **reviewer-voice**: Re-confirmed script.md and storyboard.md byte-identical to previous round. Pass.
+3. **reviewer-brand**: Re-confirmed naming compliance. Pass.
+4. **reviewer-design**: Reviewed scene script changes against the four advisories. Noted the finished film must be judged in the second pass. Pass.
 
-2. **reviewer-voice**: Re-confirmed final script text end to end. First person discipline maintained. Voice consistency verified. Pass.
+**Approver verdict** (first pass): approved, with `human_required: true`.
 
-3. **reviewer-brand**: Re-confirmed naming compliance. No employer, factory, product, video, or person named. "ANVIL" used correctly. Pass.
+These reviews are valid but insufficient for publishing. The spec requires the second pass to judge the finished film.
 
-4. **reviewer-design**: Judged finished film via contact sheet and sampled stills. Motion continuity verified, no frozen beats, brand consistency checked. Advisory items flagged for human review (see below). Pass.
+## Production observations
 
-**Approver verdict**: approved (all 4 reviews counted as pass).
+From `production-notes.md` and the publisher's audit item:
 
-## Advisory items for human review
+1. **media-producer reported no edits**: "The scene fixes specified in the polish amendment were already present in the tree when I executed. I made no edits to any Blender scripts or assembly configuration."
 
-reviewer-design flagged these items for the human at the gate to confirm against the final contact sheet and stills. They are advisory and did not block the pass verdict:
+2. **HEAD is an empty commit**: `e9d346f` states "Empty commit: the crash tolerant render wrapper from wo-gh-25 is already staged at fb44bc3d; no content changes."
 
-1. "Stations build" — a station post runs through the word "Stations"
-2. "Verified memory." and "A human approves." overlap in one frame
-3. The first-frame "ANVIL" title is small and low contrast on the paper background
-4. One contact sheet cell is nearly empty
+3. **Publisher's audit request**: "Confirm the fixes were committed before this round."
 
-The publisher also noted that `design/DESIGN.md` and `design/tokens.json` are still placeholders, so brand consistency can only be checked internally.
+**Observation**: The four scene fixes were committed before this round ran. media-producer correctly verified them and held. The deterministic workflow re-rendered the film with those fixes already in the scripts.
 
-## Observations on compliance
+## Minor notes
 
-1. **Voice and claim discipline**: First person throughout. No employer, factory, product, video, or person named. All claims mapped and verified. Script kept byte for byte from round 1 final (with two approved wording edits applied in setup commit).
+1. **Source pack citation**: `source-pack.md` cites setup commit 7344863 for the GLB, which does not resolve in this checkout. The publisher notes no spoken claim is affected. (Carried over from previous round.)
 
-2. **Frozen inputs**: Script and storyboard unchanged from committed versions. No station rewrote, rephrased, or reformatted either file in either pass.
-
-3. **Risk hint respected**: The `publishing` risk hint correctly triggered the human gate requirement. The approver verdict is `approved`, but `human_required: true` in `report.json`. The publisher did not bypass the gate.
-
-4. **Disclosure ready**: Production notes state the narration is synthetic speech, requiring the YouTube AI-generated content label at publish time.
-
-5. **Model routing**: writer ran claude-opus-5-5. All other producing stations ran claude-sonnet-5-5. Both models passed the exact-reply smoke gate before the line ran.
-
-6. **Render budget**: Eevee TAA render samples at 6 (within authored budget, under the spec limit of 8). Shadows and raytracing off. Background element resolution as authored. No frame, framerate, or motion cuts.
+2. **Design system placeholders**: `design/DESIGN.md` and `design/tokens.json` are still placeholders. Brand consistency can only be checked internally. (Carried over from previous round.)
 
 ## State verification against publish record
 
 The publisher's `publish-record.md` accurately reflects the actual state:
 
-- **Video exists**: Confirmed. sha256 matches: `62a3137df17fb512331e0cff3ed85fae0597cafa0530bd03cdcd0052f512ff22`
-- **Video properties**: Confirmed. 1920x1080, 30fps, h264+aac, 83.83s
-- **Supporting files**: Confirmed. Contact sheet, sampled stills, render stats, ffprobe, production notes all present
-- **Deterministic checks**: Confirmed. `checks.txt` reports PASS (0 failing checks)
-- **Approver verdict**: Confirmed. `report.json` shows `verdict: "approved"`, all 4 reviews passed
-- **Human gate**: Confirmed. `human_required: true` in `report.json`
-- **Not published**: Confirmed. No YouTube URL, no publish logs, no external service contact
+- **Video exists**: Confirmed. sha256 matches: `a277ce32c3ac7c30de5679524f49b1017ff028cfea2d38277deed73c4b44ecac`
+- **Video is new**: Confirmed. Different sha256 from previous round.
+- **Deterministic checks passed**: Confirmed. `checks.txt` reports PASS (0 failing checks).
+- **New sampled stills**: Confirmed. `frame-proof-s1-title.png` exists, transition pairs complete.
+- **Second pass did not run**: Confirmed. No film review outputs in the tree.
+- **Four advisories open**: Confirmed. No rulings against the finished film.
+- **Not published**: Confirmed. No YouTube URL, no publish logs, no external service contact.
 
 The publish record is accurate. No discrepancies observed.
 
 ## Observed outcome
 
-The gate loopback completed successfully:
+The polish round is **INCOMPLETE**. Here's what happened:
 
-1. **Architecture goal achieved**: Rendering moved outside model sessions. No session timeouts. First pass (authoring): ~3.5 minutes. Deterministic render: completed in parallel chunks.
+1. **First pass (authoring)**: brief-writer, researcher, writer, media-producer, and all four reviewers executed successfully. media-producer verified the four scene fixes were already in the tree and made no edits. Reviewers passed the scene scripts.
 
-2. **Authoring pass (pass 1)**: brief-writer, researcher, writer, media-producer, and all four reviewers executed successfully. Audio files and production inputs authored. No rendering in station sessions.
+2. **Deterministic workflow steps**: 2515 frames rendered by headless Blender 4.5.15 with the scene fixes applied. ffmpeg assembled the new film with contact sheet and 20 sampled stills. All checks passed. New film sha256: `a277ce32...ecac`.
 
-3. **Deterministic workflow steps**: 2515 frames rendered by headless Blender 4.5.15 in parallel chunks. ffmpeg assembled the film with contact sheet and stills. All checks passed.
+3. **Second pass (film review)**: **DID NOT RUN**. Producing stations did not verify and hold. Reviewers did not judge the finished film. The four advisories were not ruled on.
 
-4. **Film review pass (pass 2)**: Producing stations verified and held. Reviewers judged the finished film. All four reviews passed. Approver verdict: approved.
+4. **Publisher**: Correctly stopped and did not publish. The workflow is incomplete and the human gate requires explicit approval.
 
-5. **Human gate**: Publisher correctly stopped. No explicit human approval found. Nothing published anywhere.
+The work order specifies: "The line runs again with the finished film in the tree. Producing stations verify and hold: no content file changes in this pass. media-producer confirms the film... reviewer-design judges the finished film... and rules on each of the four polish advisories separately, closed or not."
 
-The work order stated: "the finished video stops at the human gate, and nothing is posted anywhere." This is exactly what happened. The publisher followed the rules.
+This did not happen. The second pass must run before this round can be considered complete.
 
-**Status: HELD AT HUMAN GATE, NOTHING PUBLISHED**
+**Status: INCOMPLETE - SECOND PASS REQUIRED**
+
+## Blocking issues
+
+1. **Second pass did not run**: The film review pass must execute with the finished film in the tree.
+2. **Four advisories unresolved**: reviewer-design must rule on each advisory separately, citing stills.
+3. **Claim C11 not re-verified**: reviewer-facts must re-judge C11 against the new film.
+4. **No human approval**: After the second pass confirms all advisories closed, a human must explicitly approve.
 
 ## Next steps (from publish record)
 
-1. A human reviews the film end to end and records an explicit approval at the gate, or sends it back with changes.
-2. After approval, the publisher records the live URL and publish date in `publish-record.md`.
-3. At YouTube upload time, the AI-generated content label must be set (narration is synthetic speech).
+1. **Run the second pass** on the finished film (sha256 `a277ce32...ecac`).
+2. **Confirm it**: Require all four advisories ruled closed, each with its still.
+3. **Human approval**: A human records an explicit approval at the gate.
+4. **Then publish**: After approval, the publisher records the live URL and date.
+
+Until the second pass runs and confirms all four advisories are closed, the polish round remains incomplete and nothing can be published.
+
+---
+
+**Observer verdict: The workflow stopped after the deterministic render step. The second pass (film review) did not run, leaving the four polish advisories unresolved. The publisher correctly refused to publish an incomplete workflow. This is not a release; it is a blocking state requiring the second pass to execute.**

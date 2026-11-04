@@ -5,18 +5,16 @@
   "work_order_id": "wo-gh-18",
   "artifact_path": "runs/wo-gh-18/reviewer-voice.output.md",
   "status": "executed",
-  "created_at": "2026-11-03T04:10:36.438505+00:00",
+  "created_at": "2026-11-03T23:46:22.150630+00:00",
   "review": {
     "station": "reviewer-voice",
     "verdict": "pass",
     "findings": [
-      "script.md is unchanged on this branch. `git diff HEAD` shows no changes to script.md, brief.md or storyboard.md, so the spoken text is the frozen text.",
-      "The narration reads as first person factory voice, in plain sentences with no filler cadence. The script has no em dashes or en dashes.",
-      "The spoken claims match the C1 to C11 trace in script.md. Section 5 says 'Five of my reviewers' in general terms with no tie to this video's own panel, as flag F1 requires. Section 7 gives no reviewer count.",
-      "The AI generated disclosure is present. production-notes.md lines 57 and 86 say the narration is synthetic speech and that the YouTube AI generated content label must be set at publish time. publish-record.md line 23 repeats it. Nothing is posted.",
-      "The script names no employer and no other factory, product, video or person. Sentia, Cloudflare AI Gateway, GitHub and Apache 2.0 are the closed-list claims C8 to C10, not outside references.",
-      "The brain files (project.md, learnings.md, glossary.md, worklog.md) contain no voice, em dash or disclosure rules, so I checked against the spec's voice discipline only. I did not read the spec itself.",
-      "This pass judges text only. On screen text placement and timing in the Blender scripts is for reviewer-design. I have no voice findings on those scripts, and the finished film is judged in the second pass."
+      "I did not edit script.md or storyboard.md. git shows no diff against HEAD for either file in the working tree. Their last commit is e9d346f, the empty re-fire commit, so they are unchanged from the previous round. I did not compare the bytes against the previous round's copy.",
+      "script.md narration is first person ('I am a software factory', 'my reviewers', 'my gate'). The grammar is natural and the cadence is plain, with no filler. It has no em or en dashes and contains no employer name or other named factory, product, video or person. Sentia is the author's own product, which the spec's claim list covers.",
+      "Claim discipline holds. Sections 1 to 7 map to claims C1 to C11 in the claim trace. Section 5 states five reviewers for the factory in general, with no tie to this video's panel (flag F1). Section 7 gives no reviewer count. The address is spoken as written.",
+      "The AI generated disclosure is present for the narration, but only in the publisher record: publish-record.md line 23 says the narration is synthetic speech and to set the YouTube AI-generated content label at upload. The spoken text also says outright that the factory's content line wrote, rendered and reviewed the film. Neither brief.md, storyboard.md nor the brain states a disclosure rule, so I found no further requirement to check. Advisory for the human gate: confirm the label is set at upload.",
+      "This pass changes only scene scripts. The frozen text is unchanged, so the voice review of the final text carries over from the previous round and nothing blocks. I did not judge the four polish advisories, which are for reviewer-design, and I did not view the film."
     ]
   },
   "configured_model": "claude-sonnet-5-5",

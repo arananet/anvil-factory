@@ -65,8 +65,8 @@ ffmpeg was on PATH in this pass. blender/durations.py was re-run and reproduced 
 
 Rendered with Blender 4.5.15, Eevee, at 1920x1080 and 30 fps by the workflow's deterministic render step (parallel chunked headless Blender, at most 4 processes at once), outside any model station session.
 Total frames rendered: 2515 frames.
-Per section: section 1: 302 frames in 4178.6 s across 6 chunks, section 2: 207 frames in 3736.5 s across 4 chunks, section 3: 194 frames in 7361.7 s across 4 chunks, section 4: 205 frames in 3350.0 s across 4 chunks, section 5: 173 frames in 2841.0 s across 3 chunks, section 6: 498 frames in 7943.2 s across 9 chunks, section 7: 936 frames in 23423.5 s across 16 chunks.
-Logged render time in total: 52834.5 s of Blender render time summed across chunks (chunks ran in parallel, so wall time was lower).
+Per section: section 1: 302 frames in 4138.5 s across 6 chunks, section 2: 207 frames in 3519.0 s across 4 chunks, section 3: 194 frames in 7451.0 s across 4 chunks, section 4: 205 frames in 3229.4 s across 4 chunks, section 5: 173 frames in 2838.0 s across 3 chunks, section 6: 498 frames in 7942.8 s across 9 chunks, section 7: 936 frames in 23359.6 s across 16 chunks.
+Logged render time in total: 52478.3 s of Blender render time summed across chunks (chunks ran in parallel, so wall time was lower).
 The full record is in render-stats.json next to this file.
 <!-- render-stats:end -->
 

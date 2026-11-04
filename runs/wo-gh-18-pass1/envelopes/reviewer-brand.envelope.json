@@ -5,18 +5,17 @@
   "work_order_id": "wo-gh-18",
   "artifact_path": "runs/wo-gh-18/reviewer-brand.output.md",
   "status": "executed",
-  "created_at": "2026-11-03T04:10:52.223092+00:00",
+  "created_at": "2026-11-03T23:46:36.459825+00:00",
   "review": {
     "station": "reviewer-brand",
     "verdict": "pass",
     "findings": [
-      "Scene text is limited to spec wording: titles read ANVIL, Stations build, One intake, Verified memory., A human approves. Scene scripts name no employer, other factory, product, video or person.",
-      "A grep of the markdown files for employer and company names matched only the rule text and prior review records. Sentia appears only as the claim-listed layer name.",
-      "Fix 2 changes only placement, size and timing. Fix 1 is a placement change in scene_line.py. Fix 3 and fix 4 are scale, color and path changes. None adds a promise the piece cannot keep.",
-      "assemble.py keeps the existing still names and adds frame-proof-s1-title.png at about 30 percent of section 1. All six cut pairs are present.",
-      "Render budget in common.py is unchanged: BLENDER_EEVEE_NEXT, TAA samples 6, shadows off, raytracing off.",
-      "git diff against HEAD shows no change to script.md, storyboard.md, audio or durations.json.",
-      "Limit of this pass: I judged the scene scripts and notes only. The finished film is not in this pass and is judged in the second pass."
+      "Naming in the frozen text: script.md and storyboard.md name only ANVIL, Sentia, Cloudflare AI Gateway, GitHub, Apache 2.0 and edge-tts. These are the claim-list items (C1 to C11) and the narration tool. No employer, other factory, other product, other video or person appears. `git diff HEAD` on content/ shows no change to either file.",
+      "Promises: every spoken claim is traced in script.md to C1 to C11. Section 5 (five reviewers) is stated for the factory in general, with no tie to this video's own panel. The closing line says the video stopped at the human gate, and nothing here is published.",
+      "Scene scripts: the on-screen text I read is the ANVIL title (scene_line.py:184), 'Stations build' (:311), 'One intake', 'Verified memory.' and 'A human approves.' (:423, :425). None adds a new name or claim. The polish changes touch only placement, scale, ink and timing, with no wording change. The title now has full ink and a scale of 0.97 rising to 1.0 by 0.15 of the section, which meets advisory 3.",
+      "Render budget: sc.eevee.taa_render_samples is set from a parameter in blender/common.py:34 and shadows are off (:36). I did not check the authored value of 6 or the cap of 8. I also did not check that raytracing is off. Neither is a brand matter.",
+      "assemble.py still lists frame-proof-s1-title.png at 30 percent of section 1 (line 51).",
+      "Not checked: whether the dash rule is respected inside production-notes.md. A grep for em and en dashes across script.md, storyboard.md and production-notes.md returned nothing. I made no judgment on the finished film, which the second pass covers."
     ]
   },
   "configured_model": "claude-sonnet-5-5",

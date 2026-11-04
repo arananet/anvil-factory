@@ -1,15 +1,15 @@
-I checked `content/youtube-anvil-v2/brief.md` against the spec, including the gate loopback and polish amendments, and kept it unchanged. I found no concrete error against the spec, so I corrected nothing. I didn't re-read `brain/` or the repo sources behind the claims (C1–C11), only the spec.
+I checked `content/youtube-anvil-v2/brief.md` against the spec, including the polish loopback amendment. It has no concrete error against the spec, so I kept it and made no edits (`git diff HEAD` shows it unchanged).
 
-What I checked in the brief:
-- **Format:** it matches the spec on 1920x1080, H.264 plus AAC, 30 fps, 60 to 90 seconds, 150 to 200 words and the narration voice.
-- **Claims:** the closed list C1 to C11 and the allowed counts are unchanged.
-- **Voice rules and section plan:** both are consistent with the spec.
-- **Polish amendment:** it only changes scene and layout, so audience, angle, claims and sources are unaffected.
+What I compared:
+- **Claims:** C1 to C11 match the spec's closed claim list word for word, and the allowed counts are unchanged (three intake kinds, five reviewers, five Sentia layers).
+- **Voice rules:** The first words "Introducing ANVIL", first person throughout, and the no-dash rule match. A search for em and en dash characters in the brief found none.
+- **Section plan:** The seven sections, their order and the exact on-screen text match the spec's structure.
+- **Format and constraints:** 1920x1080, H.264 with AAC, 30 fps, 60 to 90 seconds, 150 to 200 words, the edge-tts voice and `assets/patch-one.glb` all match.
 
-The brief doesn't list the four polish advisories or the extra stills (the added transition pairs and `frame-proof-s1-title.png`). The polish amendment in the spec is the authority for those, and the media-producer works from it.
+The amendment changes scene and layout only. It adds no claims, changes no wording and leaves the on-screen text strings as they are. Its four advisories are on text placement, size and timing in sections 1, 4 and 6, and on section 2's flight and camera. All four are production-notes and scene-script matters for the media-producer, so nothing in the brief needs to change for them.
 
-The brief's open points for the researcher still stand. One is C5, five reviewers versus the four in this content variant. The other is the sources for C8, C9 and C10.
+The brief already carries two open points for the researcher: the five-reviewer claim (C5) against the four-reviewer content pipeline, and the brain files not covering C8 to C10. I left both as they are.
 
-I wrote a record of this verification to `runs/wo-gh-18/brief-writer.output.md`. That file was showing as deleted in git status, so it now reappears as a change. I didn't approve my own work.
+Nothing is missing from the inputs. The design tokens in the packet are all TODO, so the brief takes the visual language (paper, ink green, teal) from the spec, as it did last round. I did not write a new output file. The brief stays in place as the content brief.
 
 {"model": "claude-sonnet-5-5", "runtime": "claude-code"}

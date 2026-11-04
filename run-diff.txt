@@ -1,112 +1,176 @@
- .../youtube-anvil-v2/frames/logs/render-s1-1.log   | 362 +++++++++---------
+ content/youtube-anvil-v2/anvil-youtube-v2.mp4      | Bin 21960238 -> 21401761 bytes
+ content/youtube-anvil-v2/checks.txt                |   4 +-
+ content/youtube-anvil-v2/contact-sheet.png         | Bin 1310579 -> 1710637 bytes
+ content/youtube-anvil-v2/ffprobe.json              |   6 +-
+ .../youtube-anvil-v2/frames/frame-cut-1-last.png   | Bin 1772921 -> 1772921 bytes
+ .../youtube-anvil-v2/frames/frame-cut-2-first.png  | Bin 1671886 -> 1681081 bytes
+ .../youtube-anvil-v2/frames/frame-cut-2-last.png   | Bin 0 -> 1702304 bytes
+ .../youtube-anvil-v2/frames/frame-cut-3-first.png  | Bin 0 -> 1731584 bytes
+ .../youtube-anvil-v2/frames/frame-cut-3-last.png   | Bin 1733679 -> 1733679 bytes
+ .../youtube-anvil-v2/frames/frame-cut-4-first.png  | Bin 1700496 -> 1697523 bytes
+ .../youtube-anvil-v2/frames/frame-cut-4-last.png   | Bin 0 -> 1718453 bytes
+ .../youtube-anvil-v2/frames/frame-cut-5-first.png  | Bin 0 -> 1752649 bytes
+ .../youtube-anvil-v2/frames/frame-cut-5-last.png   | Bin 1724535 -> 1724535 bytes
+ .../youtube-anvil-v2/frames/frame-cut-6-first.png  | Bin 1696110 -> 1696019 bytes
+ .../youtube-anvil-v2/frames/frame-cut-6-last.png   | Bin 1741244 -> 1757629 bytes
+ .../youtube-anvil-v2/frames/frame-cut-7-first.png  | Bin 1711772 -> 1711772 bytes
+ content/youtube-anvil-v2/frames/frame-mid-1.png    | Bin 1745679 -> 1751771 bytes
+ content/youtube-anvil-v2/frames/frame-mid-2.png    | Bin 1683139 -> 1615499 bytes
+ content/youtube-anvil-v2/frames/frame-mid-3.png    | Bin 1765541 -> 1765541 bytes
+ content/youtube-anvil-v2/frames/frame-mid-4.png    | Bin 1729990 -> 1722052 bytes
+ content/youtube-anvil-v2/frames/frame-mid-5.png    | Bin 1718616 -> 1718616 bytes
+ content/youtube-anvil-v2/frames/frame-mid-6.png    | Bin 1731539 -> 1751136 bytes
+ content/youtube-anvil-v2/frames/frame-mid-7.png    | Bin 1838774 -> 1838774 bytes
+ .../frames/frame-proof-s1-title.png                | Bin 0 -> 1720835 bytes
+ .../youtube-anvil-v2/frames/logs/outcome-s1-1.json |   1 +
+ .../frames/logs/outcome-s1-121.json                |   1 +
+ .../frames/logs/outcome-s1-181.json                |   1 +
+ .../frames/logs/outcome-s1-241.json                |   1 +
+ .../frames/logs/outcome-s1-301.json                |   1 +
+ .../frames/logs/outcome-s1-61.json                 |   1 +
+ .../youtube-anvil-v2/frames/logs/outcome-s2-1.json |   1 +
+ .../frames/logs/outcome-s2-121.json                |   1 +
+ .../frames/logs/outcome-s2-181.json                |   1 +
+ .../frames/logs/outcome-s2-61.json                 |   1 +
+ .../youtube-anvil-v2/frames/logs/outcome-s3-1.json |   1 +
+ .../frames/logs/outcome-s3-121.json                |   1 +
+ .../frames/logs/outcome-s3-181.json                |   1 +
+ .../frames/logs/outcome-s3-61.json                 |   1 +
+ .../youtube-anvil-v2/frames/logs/outcome-s4-1.json |   1 +
+ .../frames/logs/outcome-s4-121.json                |   1 +
+ .../frames/logs/outcome-s4-181.json                |   1 +
+ .../frames/logs/outcome-s4-61.json                 |   1 +
+ .../youtube-anvil-v2/frames/logs/outcome-s5-1.json |   1 +
+ .../frames/logs/outcome-s5-121.json                |   1 +
+ .../frames/logs/outcome-s5-61.json                 |   1 +
+ .../youtube-anvil-v2/frames/logs/outcome-s6-1.json |   1 +
+ .../frames/logs/outcome-s6-121.json                |   1 +
+ .../frames/logs/outcome-s6-181.json                |   1 +
+ .../frames/logs/outcome-s6-241.json                |   1 +
+ .../frames/logs/outcome-s6-301.json                |   1 +
+ .../frames/logs/outcome-s6-361.json                |   1 +
+ .../frames/logs/outcome-s6-421.json                |   1 +
+ .../frames/logs/outcome-s6-481.json                |   1 +
+ .../frames/logs/outcome-s6-61.json                 |   1 +
+ .../youtube-anvil-v2/frames/logs/outcome-s7-1.json |   1 +
+ .../frames/logs/outcome-s7-121.json                |   1 +
+ .../frames/logs/outcome-s7-181.json                |   1 +
+ .../frames/logs/outcome-s7-241.json                |   1 +
+ .../frames/logs/outcome-s7-301.json                |   1 +
+ .../frames/logs/outcome-s7-361.json                |   1 +
+ .../frames/logs/outcome-s7-421.json                |   1 +
+ .../frames/logs/outcome-s7-481.json                |   1 +
+ .../frames/logs/outcome-s7-541.json                |   1 +
+ .../frames/logs/outcome-s7-601.json                |   1 +
+ .../frames/logs/outcome-s7-61.json                 |   1 +
+ .../frames/logs/outcome-s7-661.json                |   1 +
+ .../frames/logs/outcome-s7-721.json                |   1 +
+ .../frames/logs/outcome-s7-781.json                |   1 +
+ .../frames/logs/outcome-s7-841.json                |   1 +
+ .../frames/logs/outcome-s7-901.json                |   1 +
+ .../youtube-anvil-v2/frames/logs/render-s1-1.log   | 360 +++++++++---------
  .../youtube-anvil-v2/frames/logs/render-s1-121.log | 362 +++++++++---------
- .../youtube-anvil-v2/frames/logs/render-s1-181.log | 362 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s1-181.log | 358 +++++++++---------
  .../youtube-anvil-v2/frames/logs/render-s1-241.log | 362 +++++++++---------
- .../youtube-anvil-v2/frames/logs/render-s1-301.log |  14 +-
- .../youtube-anvil-v2/frames/logs/render-s1-61.log  | 362 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s1-301.log |  12 +-
+ .../youtube-anvil-v2/frames/logs/render-s1-61.log  | 358 +++++++++---------
  .../youtube-anvil-v2/frames/logs/render-s2-1.log   | 362 +++++++++---------
  .../youtube-anvil-v2/frames/logs/render-s2-121.log | 362 +++++++++---------
- .../youtube-anvil-v2/frames/logs/render-s2-181.log | 164 ++++----
- .../youtube-anvil-v2/frames/logs/render-s2-61.log  | 362 +++++++++---------
- .../youtube-anvil-v2/frames/logs/render-s3-1.log   | 362 +++++++++---------
- .../youtube-anvil-v2/frames/logs/render-s3-121.log | 362 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s2-181.log | 162 ++++----
+ .../youtube-anvil-v2/frames/logs/render-s2-61.log  | 360 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s3-1.log   | 360 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s3-121.log | 366 +++++++++---------
  .../youtube-anvil-v2/frames/logs/render-s3-181.log |  86 ++---
- .../youtube-anvil-v2/frames/logs/render-s3-61.log  | 362 +++++++++---------
- .../youtube-anvil-v2/frames/logs/render-s4-1.log   | 362 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s3-61.log  | 364 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s4-1.log   | 360 +++++++++---------
  .../youtube-anvil-v2/frames/logs/render-s4-121.log | 362 +++++++++---------
  .../youtube-anvil-v2/frames/logs/render-s4-181.log | 152 ++++----
  .../youtube-anvil-v2/frames/logs/render-s4-61.log  | 362 +++++++++---------
- .../youtube-anvil-v2/frames/logs/render-s5-1.log   | 362 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s5-1.log   | 364 +++++++++---------
  .../youtube-anvil-v2/frames/logs/render-s5-121.log | 324 ++++++++--------
- .../youtube-anvil-v2/frames/logs/render-s5-61.log  | 362 +++++++++---------
- .../youtube-anvil-v2/frames/logs/render-s6-1.log   | 362 +++++++++---------
- .../youtube-anvil-v2/frames/logs/render-s6-121.log | 362 +++++++++---------
- .../youtube-anvil-v2/frames/logs/render-s6-181.log | 358 +++++++++---------
- .../youtube-anvil-v2/frames/logs/render-s6-241.log | 362 +++++++++---------
- .../youtube-anvil-v2/frames/logs/render-s6-301.log | 356 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s5-61.log  | 360 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s6-1.log   | 364 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s6-121.log | 360 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s6-181.log | 356 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s6-241.log | 358 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s6-301.log | 362 +++++++++---------
  .../youtube-anvil-v2/frames/logs/render-s6-361.log | 358 +++++++++---------
  .../youtube-anvil-v2/frames/logs/render-s6-421.log | 360 +++++++++---------
- .../youtube-anvil-v2/frames/logs/render-s6-481.log | 110 +++---
- .../youtube-anvil-v2/frames/logs/render-s6-61.log  | 362 +++++++++---------
+ .../youtube-anvil-v2/frames/logs/render-s6-481.log | 108 +++---
+ .../youtube-anvil-v2/frames/logs/render-s6-61.log  | 360 +++++++++---------
  .../youtube-anvil-v2/frames/logs/render-s7-1.log   | 414 ++++++++++----------
  .../youtube-anvil-v2/frames/logs/render-s7-121.log | 414 ++++++++++----------
- .../youtube-anvil-v2/frames/logs/render-s7-181.log | 414 ++++++++++----------
- .../youtube-anvil-v2/frames/logs/render-s7-241.log | 410 ++++++++++----------
- .../youtube-anvil-v2/frames/logs/render-s7-301.log | 410 ++++++++++----------
- .../youtube-anvil-v2/frames/logs/render-s7-361.log | 412 ++++++++++----------
- .../youtube-anvil-v2/frames/logs/render-s7-421.log | 414 ++++++++++----------
- .../youtube-anvil-v2/frames/logs/render-s7-481.log | 410 ++++++++++----------
- .../youtube-anvil-v2/frames/logs/render-s7-541.log | 416 ++++++++++-----------
- .../youtube-anvil-v2/frames/logs/render-s7-601.log | 414 ++++++++++----------
- .../youtube-anvil-v2/frames/logs/render-s7-61.log  | 410 ++++++++++----------
- .../youtube-anvil-v2/frames/logs/render-s7-661.log | 412 ++++++++++----------
+ .../youtube-anvil-v2/frames/logs/render-s7-181.log | 412 ++++++++++----------
+ .../youtube-anvil-v2/frames/logs/render-s7-241.log | 414 ++++++++++----------
+ .../youtube-anvil-v2/frames/logs/render-s7-301.log | 412 ++++++++++----------
+ .../youtube-anvil-v2/frames/logs/render-s7-361.log | 410 ++++++++++----------
+ .../youtube-anvil-v2/frames/logs/render-s7-421.log | 412 ++++++++++----------
+ .../youtube-anvil-v2/frames/logs/render-s7-481.log | 412 ++++++++++----------
+ .../youtube-anvil-v2/frames/logs/render-s7-541.log | 418 ++++++++++-----------
+ .../youtube-anvil-v2/frames/logs/render-s7-601.log | 412 ++++++++++----------
+ .../youtube-anvil-v2/frames/logs/render-s7-61.log  | 414 ++++++++++----------
+ .../youtube-anvil-v2/frames/logs/render-s7-661.log | 410 ++++++++++----------
  .../youtube-anvil-v2/frames/logs/render-s7-721.log | 414 ++++++++++----------
- content/youtube-anvil-v2/production-notes.md       |  27 +-
- content/youtube-anvil-v2/source-pack.md            |   2 +-
- runs/wo-gh-18-pass1/brief-writer.output.md         |  19 +-
+ .../youtube-anvil-v2/frames/logs/render-s7-781.log | 414 ++++++++++----------
+ .../youtube-anvil-v2/frames/logs/render-s7-841.log | 408 ++++++++++----------
+ .../youtube-anvil-v2/frames/logs/render-s7-901.log | 268 ++++++-------
+ content/youtube-anvil-v2/observation-report.md     | 175 +++++----
+ content/youtube-anvil-v2/production-notes.md       |   4 +-
+ content/youtube-anvil-v2/publish-record.md         |  36 +-
+ content/youtube-anvil-v2/render-stats.json         | 306 ++++++++++++++-
+ content/youtube-anvil-v2/review-brand.md           |  16 +
+ content/youtube-anvil-v2/review-facts.md           |  27 +-
+ content/youtube-anvil-v2/review-voice.md           |  12 +
+ runs/wo-gh-18-pass1/brief-writer.output.md         |  18 +-
  .../envelopes/approver.envelope.json               |   2 +-
  .../envelopes/brief-writer.envelope.json           |   2 +-
  runs/wo-gh-18-pass1/envelopes/intake.envelope.json |   2 +-
- .../envelopes/media-producer.envelope.json         |   9 +-
- .../envelopes/observer.envelope.json               |   9 +-
- .../envelopes/publisher.envelope.json              |   9 +-
+ .../envelopes/media-producer.envelope.json         |   2 +-
+ .../envelopes/observer.envelope.json               |   2 +-
+ .../envelopes/publisher.envelope.json              |   2 +-
  .../envelopes/researcher.envelope.json             |   2 +-
- .../envelopes/reviewer-brand.envelope.json         |  22 +-
- .../envelopes/reviewer-design.envelope.json        |  23 +-
- .../envelopes/reviewer-facts.envelope.json         |  22 +-
- .../envelopes/reviewer-voice.envelope.json         |  22 +-
+ .../envelopes/reviewer-brand.envelope.json         |  15 +-
+ .../envelopes/reviewer-design.envelope.json        |  18 +-
+ .../envelopes/reviewer-facts.envelope.json         |  15 +-
+ .../envelopes/reviewer-voice.envelope.json         |  14 +-
  .../envelopes/triage-human.envelope.json           |   2 +-
- runs/wo-gh-18-pass1/envelopes/writer.envelope.json |   9 +-
- runs/wo-gh-18-pass1/media-producer.output.md       |  23 ++
- runs/wo-gh-18-pass1/media-producer.packet.md       |   2 +-
- runs/wo-gh-18-pass1/observer.output.md             |   5 +
- runs/wo-gh-18-pass1/observer.packet.md             |  14 +-
- runs/wo-gh-18-pass1/publisher.output.md            |  16 +
- runs/wo-gh-18-pass1/publisher.packet.md            |  12 +-
- runs/wo-gh-18-pass1/report.json                    | 121 +++---
- runs/wo-gh-18-pass1/researcher.output.md           |  15 +-
- runs/wo-gh-18-pass1/reviewer-brand.output.md       |   3 +
- runs/wo-gh-18-pass1/reviewer-brand.packet.md       |   8 +-
- runs/wo-gh-18-pass1/reviewer-design.output.md      |   3 +
- runs/wo-gh-18-pass1/reviewer-design.packet.md      |  10 +-
- runs/wo-gh-18-pass1/reviewer-facts.output.md       |   3 +
- runs/wo-gh-18-pass1/reviewer-facts.packet.md       |   4 +-
- runs/wo-gh-18-pass1/reviewer-voice.output.md       |   3 +
- runs/wo-gh-18-pass1/reviewer-voice.packet.md       |   6 +-
- runs/wo-gh-18-pass1/swimlane.md                    |  30 +-
- runs/wo-gh-18-pass1/writer.output.md               |  11 +
- runs/wo-gh-18/brief-writer.output.md               |  19 +-
+ runs/wo-gh-18-pass1/envelopes/writer.envelope.json |   2 +-
+ runs/wo-gh-18-pass1/media-producer.output.md       |  28 +-
+ runs/wo-gh-18-pass1/observer.output.md             |   4 +-
+ runs/wo-gh-18-pass1/publisher.output.md            |  18 +-
+ runs/wo-gh-18-pass1/report.json                    |  24 +-
+ runs/wo-gh-18-pass1/researcher.output.md           |  14 +-
+ runs/wo-gh-18-pass1/reviewer-brand.output.md       |   2 +-
+ runs/wo-gh-18-pass1/reviewer-design.output.md      |   2 +-
+ runs/wo-gh-18-pass1/reviewer-facts.output.md       |   2 +-
+ runs/wo-gh-18-pass1/reviewer-voice.output.md       |   2 +-
+ runs/wo-gh-18-pass1/swimlane.md                    |  24 +-
+ runs/wo-gh-18-pass1/writer.output.md               |  12 +-
+ runs/wo-gh-18/brief-writer.output.md               |  24 +-
  runs/wo-gh-18/envelopes/approver.envelope.json     |   2 +-
  runs/wo-gh-18/envelopes/brief-writer.envelope.json |   2 +-
  runs/wo-gh-18/envelopes/intake.envelope.json       |   2 +-
- .../envelopes/media-producer.envelope.json         |   9 +-
- runs/wo-gh-18/envelopes/observer.envelope.json     |   9 +-
- runs/wo-gh-18/envelopes/publisher.envelope.json    |   9 +-
+ .../envelopes/media-producer.envelope.json         |   2 +-
+ runs/wo-gh-18/envelopes/observer.envelope.json     |   2 +-
+ runs/wo-gh-18/envelopes/publisher.envelope.json    |   2 +-
  runs/wo-gh-18/envelopes/researcher.envelope.json   |   2 +-
- .../envelopes/reviewer-brand.envelope.json         |  22 +-
- .../envelopes/reviewer-design.envelope.json        |  23 +-
- .../envelopes/reviewer-facts.envelope.json         |  22 +-
- .../envelopes/reviewer-voice.envelope.json         |  22 +-
+ .../envelopes/reviewer-brand.envelope.json         |  16 +-
+ .../envelopes/reviewer-design.envelope.json        |  18 +-
+ .../envelopes/reviewer-facts.envelope.json         |  16 +-
+ .../envelopes/reviewer-voice.envelope.json         |  16 +-
  runs/wo-gh-18/envelopes/triage-human.envelope.json |   2 +-
- runs/wo-gh-18/envelopes/writer.envelope.json       |   9 +-
- runs/wo-gh-18/media-producer.output.md             |  23 ++
- runs/wo-gh-18/media-producer.packet.md             |   2 +-
- runs/wo-gh-18/observer.output.md                   |   5 +
- runs/wo-gh-18/observer.packet.md                   |  14 +-
- runs/wo-gh-18/publisher.output.md                  |  16 +
- runs/wo-gh-18/publisher.packet.md                  |  12 +-
- runs/wo-gh-18/report.json                          | 121 +++---
- runs/wo-gh-18/researcher.output.md                 |  15 +-
- runs/wo-gh-18/reviewer-brand.output.md             |   3 +
- runs/wo-gh-18/reviewer-brand.packet.md             |   8 +-
- runs/wo-gh-18/reviewer-design.output.md            |   3 +
- runs/wo-gh-18/reviewer-design.packet.md            |  10 +-
- runs/wo-gh-18/reviewer-facts.output.md             |   3 +
- runs/wo-gh-18/reviewer-facts.packet.md             |   4 +-
- runs/wo-gh-18/reviewer-voice.output.md             |   3 +
- runs/wo-gh-18/reviewer-voice.packet.md             |   6 +-
- runs/wo-gh-18/swimlane.md                          |  30 +-
- runs/wo-gh-18/writer.output.md                     |  11 +
+ runs/wo-gh-18/envelopes/writer.envelope.json       |   2 +-
+ runs/wo-gh-18/media-producer.output.md             |  34 +-
+ runs/wo-gh-18/observer.output.md                   |  19 +-
+ runs/wo-gh-18/publisher.output.md                  |  27 +-
+ runs/wo-gh-18/report.json                          |  26 +-
+ runs/wo-gh-18/researcher.output.md                 |  23 +-
+ runs/wo-gh-18/reviewer-brand.output.md             |   2 +-
+ runs/wo-gh-18/reviewer-design.output.md            |   2 +-
+ runs/wo-gh-18/reviewer-facts.output.md             |   2 +-
+ runs/wo-gh-18/reviewer-voice.output.md             |   2 +-
+ runs/wo-gh-18/swimlane.md                          |  26 +-
+ runs/wo-gh-18/writer.output.md                     |  19 +-
  suite-output.txt                                   |   2 +-
  suite-result.txt                                   |   1 +
- 111 files changed, 8032 insertions(+), 7772 deletions(-)
+ 175 files changed, 8749 insertions(+), 8368 deletions(-)

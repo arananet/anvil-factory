@@ -6,43 +6,43 @@
   "sections": {
     "1": {
       "frames_rendered": 302,
-      "render_seconds": 4178.6,
+      "render_seconds": 4138.5,
       "chunks": 6,
       "frames_on_disk": 302
     },
     "2": {
       "frames_rendered": 207,
-      "render_seconds": 3736.5,
+      "render_seconds": 3519.0,
       "chunks": 4,
       "frames_on_disk": 207
     },
     "3": {
       "frames_rendered": 194,
-      "render_seconds": 7361.7,
+      "render_seconds": 7451.0,
       "chunks": 4,
       "frames_on_disk": 194
     },
     "4": {
       "frames_rendered": 205,
-      "render_seconds": 3350.0,
+      "render_seconds": 3229.4,
       "chunks": 4,
       "frames_on_disk": 205
     },
     "5": {
       "frames_rendered": 173,
-      "render_seconds": 2841.0,
+      "render_seconds": 2838.0,
       "chunks": 3,
       "frames_on_disk": 173
     },
     "6": {
       "frames_rendered": 498,
-      "render_seconds": 7943.2,
+      "render_seconds": 7942.8,
       "chunks": 9,
       "frames_on_disk": 498
     },
     "7": {
       "frames_rendered": 936,
-      "render_seconds": 23423.5,
+      "render_seconds": 23359.6,
       "chunks": 16,
       "frames_on_disk": 936
     }
@@ -57,6 +57,294 @@
     "7": 936
   },
   "total_frames_on_disk": 2515,
-  "total_render_seconds_logged": 52834.5,
-  "rendered_by": "deterministic workflow step (parallel chunked headless Blender, at most 4 processes)"
+  "total_render_seconds_logged": 52478.3,
+  "rendered_by": "deterministic workflow step (parallel chunked headless Blender, at most 4 processes)",
+  "clean_exit": [
+    {
+      "section": "1",
+      "first_frame": 1,
+      "last_frame": 60,
+      "frames": 60
+    },
+    {
+      "section": "1",
+      "first_frame": 121,
+      "last_frame": 180,
+      "frames": 60
+    },
+    {
+      "section": "1",
+      "first_frame": 181,
+      "last_frame": 240,
+      "frames": 60
+    },
+    {
+      "section": "1",
+      "first_frame": 241,
+      "last_frame": 300,
+      "frames": 60
+    },
+    {
+      "section": "1",
+      "first_frame": 301,
+      "last_frame": 302,
+      "frames": 2
+    },
+    {
+      "section": "1",
+      "first_frame": 61,
+      "last_frame": 120,
+      "frames": 60
+    },
+    {
+      "section": "2",
+      "first_frame": 1,
+      "last_frame": 60,
+      "frames": 60
+    },
+    {
+      "section": "2",
+      "first_frame": 121,
+      "last_frame": 180,
+      "frames": 60
+    },
+    {
+      "section": "2",
+      "first_frame": 181,
+      "last_frame": 207,
+      "frames": 27
+    },
+    {
+      "section": "2",
+      "first_frame": 61,
+      "last_frame": 120,
+      "frames": 60
+    },
+    {
+      "section": "3",
+      "first_frame": 1,
+      "last_frame": 60,
+      "frames": 60
+    },
+    {
+      "section": "3",
+      "first_frame": 181,
+      "last_frame": 194,
+      "frames": 14
+    },
+    {
+      "section": "4",
+      "first_frame": 1,
+      "last_frame": 60,
+      "frames": 60
+    },
+    {
+      "section": "4",
+      "first_frame": 121,
+      "last_frame": 180,
+      "frames": 60
+    },
+    {
+      "section": "4",
+      "first_frame": 181,
+      "last_frame": 205,
+      "frames": 25
+    },
+    {
+      "section": "4",
+      "first_frame": 61,
+      "last_frame": 120,
+      "frames": 60
+    },
+    {
+      "section": "5",
+      "first_frame": 61,
+      "last_frame": 120,
+      "frames": 60
+    },
+    {
+      "section": "6",
+      "first_frame": 121,
+      "last_frame": 180,
+      "frames": 60
+    },
+    {
+      "section": "6",
+      "first_frame": 181,
+      "last_frame": 240,
+      "frames": 60
+    },
+    {
+      "section": "6",
+      "first_frame": 241,
+      "last_frame": 300,
+      "frames": 60
+    },
+    {
+      "section": "6",
+      "first_frame": 301,
+      "last_frame": 360,
+      "frames": 60
+    },
+    {
+      "section": "6",
+      "first_frame": 361,
+      "last_frame": 420,
+      "frames": 60
+    },
+    {
+      "section": "6",
+      "first_frame": 421,
+      "last_frame": 480,
+      "frames": 60
+    },
+    {
+      "section": "6",
+      "first_frame": 481,
+      "last_frame": 498,
+      "frames": 18
+    },
+    {
+      "section": "6",
+      "first_frame": 61,
+      "last_frame": 120,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 1,
+      "last_frame": 60,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 121,
+      "last_frame": 180,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 181,
+      "last_frame": 240,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 301,
+      "last_frame": 360,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 361,
+      "last_frame": 420,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 421,
+      "last_frame": 480,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 481,
+      "last_frame": 540,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 541,
+      "last_frame": 600,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 601,
+      "last_frame": 660,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 61,
+      "last_frame": 120,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 661,
+      "last_frame": 720,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 721,
+      "last_frame": 780,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 781,
+      "last_frame": 840,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 841,
+      "last_frame": 900,
+      "frames": 60
+    },
+    {
+      "section": "7",
+      "first_frame": 901,
+      "last_frame": 936,
+      "frames": 36
+    }
+  ],
+  "tolerated_crash": [
+    {
+      "section": "3",
+      "first_frame": 121,
+      "last_frame": 180,
+      "frames": 60,
+      "exit_code": 139
+    },
+    {
+      "section": "3",
+      "first_frame": 61,
+      "last_frame": 120,
+      "frames": 60,
+      "exit_code": 139
+    },
+    {
+      "section": "5",
+      "first_frame": 1,
+      "last_frame": 60,
+      "frames": 60,
+      "exit_code": 139
+    },
+    {
+      "section": "5",
+      "first_frame": 121,
+      "last_frame": 173,
+      "frames": 53,
+      "exit_code": 139
+    },
+    {
+      "section": "6",
+      "first_frame": 1,
+      "last_frame": 60,
+      "frames": 60,
+      "exit_code": 139
+    },
+    {
+      "section": "7",
+      "first_frame": 241,
+      "last_frame": 300,
+      "frames": 60,
+      "exit_code": 139
+    }
+  ],
+  "requeued": [],
+  "failed": []
 }
