@@ -1,5 +1,4 @@
 {
-  "station": "test-writer",
   "verdict": "pass",
-  "findings": []
+  "summary": "All six scenario tests delivered from round 1 are correct and green. Tests map to spec scenarios T1-T5 covering S1-S5. Full factory suite passes 203 tests with zero failures. Tests use temp directory fixtures only, write nothing under content/, and never run render_stats.py without VIDEO_CONTENT_DIR, satisfying F1. The four render crash tolerance tests that failed in round 1 now pass with durations.json removed from the staged tree, satisfying F2."
 }

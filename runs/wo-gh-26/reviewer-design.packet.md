@@ -206,11 +206,36 @@ Deterministic tests in the factory suite (tests/), named for their scenarios, us
 
 ## Diff summary
 
-- CHANGELOG.md: +1, -0
-- anvil/runner.py: +68, -8
-- content/youtube-anvil-v2/production-notes.md: +3, -3
-- content/youtube-anvil-v2/render-stats.json: +9, -9
-- tests/test_review_parsing_integrity.py: +3, -3
+- runs/wo-gh-26/builder.output.md: +15, -19
+- runs/wo-gh-26/builder.packet.md: +14, -0
+- runs/wo-gh-26/envelopes/builder.envelope.json: +1, -1
+- runs/wo-gh-26/envelopes/intake.envelope.json: +1, -1
+- runs/wo-gh-26/envelopes/reviewer-architecture.envelope.json: +2, -13
+- runs/wo-gh-26/envelopes/reviewer-security.envelope.json: +1, -1
+- runs/wo-gh-26/envelopes/reviewer-spec.envelope.json: +3, -5
+- runs/wo-gh-26/envelopes/reviewer-tests.envelope.json: +3, -8
+- runs/wo-gh-26/envelopes/spec-writer.envelope.json: +1, -1
+- runs/wo-gh-26/envelopes/test-writer.envelope.json: +1, -1
+- runs/wo-gh-26/reviewer-architecture.output.md: +34, -1
+- runs/wo-gh-26/reviewer-architecture.packet.md: +14, -0
+- runs/wo-gh-26/reviewer-architecture.review.json: +1, -12
+- runs/wo-gh-26/reviewer-security.output.md: +13, -25
+- runs/wo-gh-26/reviewer-security.packet.md: +14, -0
+- runs/wo-gh-26/reviewer-spec.output.md: +6, -13
+- runs/wo-gh-26/reviewer-spec.packet.md: +14, -0
+- runs/wo-gh-26/reviewer-spec.review.json: +2, -4
+- runs/wo-gh-26/reviewer-tests.output.md: +15, -6
+- runs/wo-gh-26/reviewer-tests.packet.md: +14, -0
+- runs/wo-gh-26/reviewer-tests.review.json: +2, -7
+- runs/wo-gh-26/spec-writer.output.md: +11, -1
+- runs/wo-gh-26/spec-writer.packet.md: +14, -0
+- runs/wo-gh-26/test-writer.output.md: +1, -23
+- runs/wo-gh-26/test-writer.packet.md: +14, -0
+- runs/wo-gh-26/test-writer.review.json: +1, -2
+- tests/test_render_crash_tolerance_s1.py: +1, -1
+- tests/test_render_crash_tolerance_s3.py: +1, -0
+- tests/test_render_crash_tolerance_s4.py: +1, -0
+- tests/test_render_crash_tolerance_s5.py: +1, -0
 
 ## File access allowlist
 
@@ -218,8 +243,33 @@ This packet may only embed content from:
 - design/DESIGN.md
 - design/tokens.json
 - .openspec/specs/declared-evidence-review/spec.md
-- CHANGELOG.md
-- anvil/runner.py
-- content/youtube-anvil-v2/production-notes.md
-- content/youtube-anvil-v2/render-stats.json
-- tests/test_review_parsing_integrity.py
+- runs/wo-gh-26/builder.output.md
+- runs/wo-gh-26/builder.packet.md
+- runs/wo-gh-26/envelopes/builder.envelope.json
+- runs/wo-gh-26/envelopes/intake.envelope.json
+- runs/wo-gh-26/envelopes/reviewer-architecture.envelope.json
+- runs/wo-gh-26/envelopes/reviewer-security.envelope.json
+- runs/wo-gh-26/envelopes/reviewer-spec.envelope.json
+- runs/wo-gh-26/envelopes/reviewer-tests.envelope.json
+- runs/wo-gh-26/envelopes/spec-writer.envelope.json
+- runs/wo-gh-26/envelopes/test-writer.envelope.json
+- runs/wo-gh-26/reviewer-architecture.output.md
+- runs/wo-gh-26/reviewer-architecture.packet.md
+- runs/wo-gh-26/reviewer-architecture.review.json
+- runs/wo-gh-26/reviewer-security.output.md
+- runs/wo-gh-26/reviewer-security.packet.md
+- runs/wo-gh-26/reviewer-spec.output.md
+- runs/wo-gh-26/reviewer-spec.packet.md
+- runs/wo-gh-26/reviewer-spec.review.json
+- runs/wo-gh-26/reviewer-tests.output.md
+- runs/wo-gh-26/reviewer-tests.packet.md
+- runs/wo-gh-26/reviewer-tests.review.json
+- runs/wo-gh-26/spec-writer.output.md
+- runs/wo-gh-26/spec-writer.packet.md
+- runs/wo-gh-26/test-writer.output.md
+- runs/wo-gh-26/test-writer.packet.md
+- runs/wo-gh-26/test-writer.review.json
+- tests/test_render_crash_tolerance_s1.py
+- tests/test_render_crash_tolerance_s3.py
+- tests/test_render_crash_tolerance_s4.py
+- tests/test_render_crash_tolerance_s5.py

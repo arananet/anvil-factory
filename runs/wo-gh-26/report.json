@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "completed",
       "detail": "Work order normalized",
-      "duration_ms": 0.012,
+      "duration_ms": 0.011,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/report.json"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/spec-writer.output.md",
-      "duration_ms": 81704.655,
+      "duration_ms": 72595.795,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/spec-writer.output.md"
@@ -35,7 +35,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 1485,
+      "measured_tokens": 2698,
       "budget": 0,
       "budget_action": "none"
     },
@@ -43,7 +43,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/test-writer.output.md",
-      "duration_ms": 132036.867,
+      "duration_ms": 126974.997,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/test-writer.output.md"
@@ -54,7 +54,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 1491,
+      "measured_tokens": 2704,
       "budget": 0,
       "budget_action": "none"
     },
@@ -62,7 +62,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/builder.output.md",
-      "duration_ms": 272919.253,
+      "duration_ms": 208128.925,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/builder.output.md"
@@ -73,7 +73,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2024,
+      "measured_tokens": 3236,
       "budget": 50000,
       "budget_action": "sent"
     },
@@ -81,7 +81,7 @@
       "station": "reviewer-spec",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/reviewer-spec.output.md",
-      "duration_ms": 105386.04,
+      "duration_ms": 115293.347,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/reviewer-spec.output.md"
@@ -92,7 +92,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 1689,
+      "measured_tokens": 2901,
       "budget": 0,
       "budget_action": "none"
     },
@@ -100,7 +100,7 @@
       "station": "reviewer-security",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/reviewer-security.output.md",
-      "duration_ms": 107732.794,
+      "duration_ms": 213919.763,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/reviewer-security.output.md"
@@ -111,7 +111,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 1700,
+      "measured_tokens": 2912,
       "budget": 0,
       "budget_action": "none"
     },
@@ -119,7 +119,7 @@
       "station": "reviewer-tests",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/reviewer-tests.output.md",
-      "duration_ms": 200448.897,
+      "duration_ms": 206093.862,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/reviewer-tests.output.md"
@@ -130,7 +130,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 1702,
+      "measured_tokens": 2914,
       "budget": 0,
       "budget_action": "none"
     },
@@ -138,7 +138,7 @@
       "station": "reviewer-architecture",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/reviewer-architecture.output.md",
-      "duration_ms": 100618.184,
+      "duration_ms": 179038.811,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/reviewer-architecture.output.md"
@@ -149,7 +149,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 1726,
+      "measured_tokens": 2938,
       "budget": 0,
       "budget_action": "none"
     },
@@ -157,7 +157,7 @@
       "station": "reviewer-design",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/reviewer-design.output.md; review output did not parse as a review JSON",
-      "duration_ms": 64620.669,
+      "duration_ms": 42381.598,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/reviewer-design.output.md"
@@ -168,15 +168,15 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 3763,
+      "measured_tokens": 4494,
       "budget": 50000,
       "budget_action": "sent"
     },
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: changes_requested",
-      "duration_ms": 0.035,
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.038,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/report.json"
@@ -189,23 +189,10 @@
       "budget_action": "none"
     },
     {
-      "station": "approver",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: R5 violation: content/ directory was modified despite frozen surface requirement. Spec states 'no station in THIS order modifies anything under content/' and work order explicitly says 'Do not modify anything under content/'. Files content/youtube-anvil-v2/production-notes.md and content/youtube-anvil-v2/render-stats.json show frame count changes (2515 frames to 0 frames, Blender version 4.5.15 to unknown). These modifications must be reverted.; Test implementation quality is high: all 6 tests in test_declared_evidence_review.py are real, deterministic, and correctly mapped to spec scenarios T1-T5. Tests use small PNG fixtures created with standard library (struct, zlib) as specified, with no model calls or network access.; Tests are passing: all 6 new tests pass, and all 21 tests in the modified test_review_parsing_integrity.py pass. The 27 tests directly related to this work order are green.; Full suite requirement not met: work order requires 'Full factory suite green' but test_render_crash_tolerance_s5.py has 1 failure and 3 errors. These failures are environmental (Blender not available in test environment, not a code defect) and unrelated to the declared evidence feature. The render test file was not modified in this work order.; Files under content/ were modified: content/youtube-anvil-v2/production-notes.md and content/youtube-anvil-v2/render-stats.json show changes (frames_on_disk values changed from actual counts to 0, blender_version changed from 4.5.15 to unknown). Work order frozen surfaces explicitly state 'No file under content/ changes.' These modifications must be reverted before approval.; The implementation correctly follows Decision 0001 (Composable stations): the new content-film-review pipeline reuses existing stations (reviewer-design, reviewer-facts, approver, triage-human, publisher, observer) and is defined as a small JSON file ordering stations, not redefining them.; The declared evidence feature aligns with Decision 0003 (Production shape evidence): it enables work orders to reference evidence exercising the production shape (like finished films) rather than only source captures, addressing the gap demonstrated by wo-gh-21 and wo-gh-18.; The prepare_reviewer_design_step function correctly places packet assembly logic in anvil/runner.py (the runner module) where orchestration happens, not in station definitions, maintaining the separation of concerns between runner orchestration and station execution.; The implementation reuses the PNG security hardening from wo-gh-21 (size caps, CRC verification, decompression bounds checking, path validation) without weakening it, maintaining the security posture established in prior work.; The R4 implementation uses station_id.startswith('reviewer') as a convention-based check for adding the Declared evidence inputs section. This pattern is consistent with existing code at line 813 for output contracts, fitting the established architectural style.; The DeclaredEvidenceMissing exception is properly defined at the module level (line 30-32) alongside other domain exceptions (PacketBudgetError, ContactSheetError, AllowlistViolation, PathValidationError), following the project's error handling pattern.; The WorkOrder model's evidence_images field (already present at line 46 in model.py) is correctly extended without modifying the model structure, maintaining backward compatibility.; Tests follow the established pattern from test_astra_consumption.py with small PNG fixtures, deterministic execution, no model calls, and no network, consistent with the project's test architecture.; The CHANGELOG entry correctly documents the feature in the Unreleased section following the project's changelog format and style.; Nine pipelines now exist (verified in pipelines/ directory), correctly increasing from the previous eight, with content-film-review.json following the same structure as other pipeline definitions.",
-      "reason": "R5 violation: content/ directory was modified despite frozen surface requirement. Spec states 'no station in THIS order modifies anything under content/' and work order explicitly says 'Do not modify anything under content/'. Files content/youtube-anvil-v2/production-notes.md and content/youtube-anvil-v2/render-stats.json show frame count changes (2515 frames to 0 frames, Blender version 4.5.15 to unknown). These modifications must be reverted.; Test implementation quality is high: all 6 tests in test_declared_evidence_review.py are real, deterministic, and correctly mapped to spec scenarios T1-T5. Tests use small PNG fixtures created with standard library (struct, zlib) as specified, with no model calls or network access.; Tests are passing: all 6 new tests pass, and all 21 tests in the modified test_review_parsing_integrity.py pass. The 27 tests directly related to this work order are green.; Full suite requirement not met: work order requires 'Full factory suite green' but test_render_crash_tolerance_s5.py has 1 failure and 3 errors. These failures are environmental (Blender not available in test environment, not a code defect) and unrelated to the declared evidence feature. The render test file was not modified in this work order.; Files under content/ were modified: content/youtube-anvil-v2/production-notes.md and content/youtube-anvil-v2/render-stats.json show changes (frames_on_disk values changed from actual counts to 0, blender_version changed from 4.5.15 to unknown). Work order frozen surfaces explicitly state 'No file under content/ changes.' These modifications must be reverted before approval.; The implementation correctly follows Decision 0001 (Composable stations): the new content-film-review pipeline reuses existing stations (reviewer-design, reviewer-facts, approver, triage-human, publisher, observer) and is defined as a small JSON file ordering stations, not redefining them.; The declared evidence feature aligns with Decision 0003 (Production shape evidence): it enables work orders to reference evidence exercising the production shape (like finished films) rather than only source captures, addressing the gap demonstrated by wo-gh-21 and wo-gh-18.; The prepare_reviewer_design_step function correctly places packet assembly logic in anvil/runner.py (the runner module) where orchestration happens, not in station definitions, maintaining the separation of concerns between runner orchestration and station execution.; The implementation reuses the PNG security hardening from wo-gh-21 (size caps, CRC verification, decompression bounds checking, path validation) without weakening it, maintaining the security posture established in prior work.; The R4 implementation uses station_id.startswith('reviewer') as a convention-based check for adding the Declared evidence inputs section. This pattern is consistent with existing code at line 813 for output contracts, fitting the established architectural style.; The DeclaredEvidenceMissing exception is properly defined at the module level (line 30-32) alongside other domain exceptions (PacketBudgetError, ContactSheetError, AllowlistViolation, PathValidationError), following the project's error handling pattern.; The WorkOrder model's evidence_images field (already present at line 46 in model.py) is correctly extended without modifying the model structure, maintaining backward compatibility.; Tests follow the established pattern from test_astra_consumption.py with small PNG fixtures, deterministic execution, no model calls, and no network, consistent with the project's test architecture.; The CHANGELOG entry correctly documents the feature in the Unreleased section following the project's changelog format and style.; Nine pipelines now exist (verified in pipelines/ directory), correctly increasing from the previous eight, with content-film-review.json following the same structure as other pipeline definitions.",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null
-    },
-    {
       "station": "triage-human",
       "status": "completed",
-      "detail": "Human review: required",
-      "duration_ms": 0.006,
+      "detail": "Human review: not_required",
+      "duration_ms": 0.011,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -219,7 +206,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-26/deployer.packet.md",
-      "duration_ms": 0.069,
+      "duration_ms": 0.234,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/deployer.packet.md"
@@ -227,7 +214,7 @@
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
       "executor": null,
-      "measured_tokens": 1570,
+      "measured_tokens": 2776,
       "budget": 0,
       "budget_action": "none"
     },
@@ -235,7 +222,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-26/observer.output.md",
-      "duration_ms": 159509.181,
+      "duration_ms": 138445.224,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-26/observer.output.md"
@@ -246,15 +233,15 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 1577,
+      "measured_tokens": 2783,
       "budget": 0,
       "budget_action": "none"
     }
   ],
-  "verdict": "changes_requested",
-  "human_required": true,
+  "verdict": "approved",
+  "human_required": false,
   "max_loopbacks": 2,
-  "loopbacks": 1,
+  "loopbacks": 0,
   "deployment_status": null,
   "verify_results": [],
   "risk_hints": [],
@@ -263,7 +250,7 @@
       "reviews_counted": [
         {
           "station": "reviewer-spec",
-          "verdict": "changes_requested"
+          "verdict": "pass"
         },
         {
           "station": "reviewer-security",
@@ -271,7 +258,7 @@
         },
         {
           "station": "reviewer-tests",
-          "verdict": "changes_requested"
+          "verdict": "pass"
         },
         {
           "station": "reviewer-architecture",
@@ -285,14 +272,14 @@
         "reviewer-architecture",
         "reviewer-design"
       ],
-      "rule": "Reviewers reviewer-spec, reviewer-tests requested changes. (Counted 4 reviews, expected 5.)"
+      "rule": "All counted reviews passed. (Counted 4 reviews, expected 5.)"
     },
     "human_gate": {
-      "required": true,
-      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
       "hints_matched": []
     }
   },
   "warnings": [],
-  "astra_measured_tokens_total": 5787
+  "astra_measured_tokens_total": 7730
 }

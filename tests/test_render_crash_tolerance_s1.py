@@ -75,7 +75,7 @@ exit 0
             subprocess.run(
                 ["python3", str(FACTORY / "tools" / "render_stats.py")],
                 cwd=FACTORY,
-                env={"PYTHONPATH": str(FACTORY)},
+                env={"PYTHONPATH": str(FACTORY), "VIDEO_CONTENT_DIR": str(work)},
                 check=True
             )
 
