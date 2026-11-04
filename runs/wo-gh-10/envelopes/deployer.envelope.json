@@ -1,0 +1,10 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "deployer",
+  "to_station": "observer",
+  "work_order_id": "wo-gh-10",
+  "artifact_path": "runs/wo-gh-10/deployer.packet.md",
+  "status": "packet_ready",
+  "created_at": "2026-11-04T02:57:07.759550+00:00",
+  "configured_model": "claude-sonnet-4-5"
+}

@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 from .model import WorkOrder, Review
-from .config import default_model
+from .config import default_model, load_anvil_config
 from .brain import packet_learnings_section
 from .design import packet_design_section, load_design_system
 from .capture import capture_breakpoints, packet_rendered_evidence_section
@@ -12,6 +12,7 @@ from .gates import human_gate, checks_gate, resolve_base_ref_config, _run_shell
 from .approver import aggregate, needs_human, aggregate_explained, needs_human_explained, matched_risk_hints, RISK_SCAN_ORDER
 from .executor import ExecutorError
 from .routing import route_reviewers, write_routing_record, render_routing_section, routing_swimlane_summary
+from .cost import load_price_table, calculate_cost, build_cost_section
 
 def _escape_markdown(text):
     """Escape markdown special characters to prevent content injection.
@@ -47,13 +48,24 @@ class RunReport:
     base_ref: str = None
     evidence: list = field(default_factory=list)
     def to_dict(self):
+        # Build cost section from steps
+        measured_steps = [s for s in self.steps if s.get("cost") is not None]
+        executed_steps = [s for s in self.steps if s.get("status") == "executed"]
+        unmeasured_steps = [s for s in executed_steps if s.get("cost") is None]
+        cost_total = sum(s["cost"] for s in measured_steps)
+        cost_section = {
+            "total": cost_total,
+            "measured_steps": len(measured_steps),
+            "unmeasured_steps": len(unmeasured_steps)
+        }
+
         return {"work_order_id": self.work_order_id, "pipeline": self.pipeline,
                 "title": self.title, "kind": self.kind,
                 "steps": self.steps, "verdict": self.verdict, "human_required": self.human_required,
                 "max_loopbacks": self.max_loopbacks, "loopbacks": self.loopbacks,
                 "deployment_status": self.deployment_status, "verify_results": self.verify_results,
                 "risk_hints": self.risk_hints, "decision": self.decision, "warnings": self.warnings,
-                "base_ref": self.base_ref, "evidence": self.evidence}
+                "base_ref": self.base_ref, "evidence": self.evidence, "cost": cost_section}
 
 def parse_review(text, station_id):
     """Parse exactly one review JSON object from the authoritative channel.
@@ -341,6 +353,15 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     loopbacks = 0
     order = pipeline.topological_order()
     execute_mode = executor is not None
+
+    # Load price table for cost measurement
+    config = load_anvil_config(project / "anvil.yaml")
+    try:
+        price_table = load_price_table(config)
+    except ValueError as e:
+        # Price table validation failed - log warning but continue
+        price_table = {}
+        print(f"Warning: {e}")
     # Run scoped reviews: only reviews produced during this run feed the
     # approver. Standing project reviews under reviews/<slug>/ are the project
     # record read by `anvil check`, never inputs to a run.
@@ -829,6 +850,18 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 "executor": step_executor}
         if step_usage is not None:
             step["usage"] = step_usage
+            # Calculate cost from usage and price table
+            # Use executed model if available, otherwise configured model
+            cost_model = step_executed_model or configured_model
+            cost_record = calculate_cost(step_usage, cost_model, price_table)
+            step["cost"] = cost_record["cost"]
+            # Optionally include detailed cost record
+            if not cost_record["measured"]:
+                step["cost_record"] = {
+                    "measured": cost_record["measured"],
+                    "reason": cost_record["reason"]
+                }
+            # Legacy: if usage itself contains cost, use that instead
             if isinstance(step_usage.get("cost"), (int, float)):
                 step["cost"] = step_usage["cost"]
         # Add extra fields from checks-gate to the step itself
@@ -959,7 +992,14 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         lines.append(routing_swimlane_summary(routing_record))
         lines.append("")
 
-    lines.append("Cost is reported as null here. Model runtimes report cost when they run a station; ANVIL never invents a number.")
+    # Add cost summary
+    report_dict = report.to_dict()
+    cost_section = report_dict["cost"]
+    total_steps = cost_section["measured_steps"] + cost_section["unmeasured_steps"]
+    if cost_section["measured_steps"] > 0:
+        lines.append(f"**Cost**: ${cost_section['total']:.4f} ({cost_section['measured_steps']} of {total_steps} steps measured)")
+    else:
+        lines.append(f"**Cost**: No measured steps ({total_steps} executed steps)")
     lines.append("")
     lines.append("| Station | Status | Duration ms | Artifacts | Cost |")
     lines.append("|---|---|---|---|---|")

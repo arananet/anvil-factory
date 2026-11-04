@@ -13,7 +13,7 @@
     "brain/project.md",
     ".openspec/specs/"
   ],
-  "model": "default",
+  "model": "reasoning-strong",
   "prompt": "stations/intake/PROMPT.md",
   "tools": []
 }
