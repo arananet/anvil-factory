@@ -11,11 +11,11 @@ Outcome: accepted
 
 Risk: medium
 
-Surfaces: content, api
+Surfaces: security, content
 
 ## Routing
 
-**Decision**: Medium risk: full panel at policy models
+**Decision**: Medium risk: full panel at policy models; Security surface: reviewer-security at strong model
 
 **Selected reviewers** (5):
 - reviewer-spec (model: review-balanced)
@@ -29,9 +29,9 @@ Surfaces: content, api
 
 ## Verdict
 
-Verdict: changes_requested
+Verdict: approved
 
-Reviewers reviewer-spec, reviewer-security, reviewer-design requested changes. (Expected 5 reviews after routing.)
+All counted reviews passed. (Expected 5 reviews after routing.)
 
 ## Steps
 
@@ -47,7 +47,6 @@ Reviewers reviewer-spec, reviewer-security, reviewer-design requested changes. (
 - reviewer-design: executed
 - reviewer-ux: routed_out
 - approver: completed
-- approver: loopback
 - triage-human: completed
 - deployer: packet_ready
 - observer: executed

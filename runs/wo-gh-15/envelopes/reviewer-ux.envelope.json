@@ -5,6 +5,6 @@
   "work_order_id": "wo-gh-15",
   "artifact_path": "runs/wo-gh-15/reviewer-ux.packet.md",
   "status": "routed_out",
-  "created_at": "2026-11-04T19:17:37.918301+00:00",
+  "created_at": "2026-11-04T21:28:42.845263+00:00",
   "configured_model": "openai/gpt-6-astra"
 }

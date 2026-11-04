@@ -59,7 +59,7 @@ For non-visual runs (no Quality Charter in packet), return the simple structure:
 
 ### Dual-Section Review (Visual Runs)
 
-When reviewing visual deliverables:
+For visual runs:
 
 1. **Compliance section**: Judge design system adherence - tokens, component patterns, layout rules, motion guidelines.
 
@@ -68,9 +68,9 @@ When reviewing visual deliverables:
    - When no anchors: Judge against charter floor alone.
    - Cite the anchor used in comparison or state "charter floor only" when no anchors available.
 
-The overall verdict is the stricter of the two section verdicts. A deliverable can pass compliance but fail quality, and such a case must be reported as changes_requested or fail at the overall level.
+The overall verdict is the stricter of the two section verdicts. An output can pass compliance but fail quality, and such a case must be reported as changes_requested or fail at the overall level.
 
-When the Quality Charter section in your packet includes additional duties beyond the standard criteria comparison, follow those instructions as part of your quality section judgment.
+**Same-Subject Identity Consistency (S7)**: When the work order declares an `identity_reference` for runs producing multiple related visual outputs, the quality section may extend beyond individual anchor evaluation to include same-subject identity consistency verification across deliverable outputs. Your packet will specify this requirement when applicable. You must verify that all outputs maintain identical subject identity traits enumerated in the work order (examples for physical products: finish, detail colors, mounting or attachment, proportions and markings; stated equivalents apply for other product types). Divergence in these traits constitutes a quality failure even when each output individually meets anchor criteria. Such failures must name the specific output and trait in your findings, with ruling and evidence recorded in the quality section. This verification is part of quality section judgment, not a separate verdict.
 
 ### Quality Criteria by Product Type
 

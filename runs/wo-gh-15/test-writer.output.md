@@ -1,22 +1,21 @@
-I've completed the test-writer task for wo-gh-15 gate loopback round 4.
+## Summary
 
-## Tests Created
+Created comprehensive test coverage for wo-gh-15 round 5 final loopback defects.
 
-Created `tests/test_quality_same_subject.py` with 5 integration tests proving the S7 same-subject test duty requirement:
+**Test files created:**
+- `tests/test_quality_final_loopback.py` - 5 tests proving both defects exist
+- `tests/test_quality_final_loopback_coverage.md` - Test documentation
+- `runs/wo-gh-15/test-writer.output.md` - Station output
 
-1. **test_same_subject_duty_injected_when_identity_reference_declared** - Verifies duty appears in packet when both identity_reference and deliverable_set are declared
-2. **test_same_subject_duty_absent_when_fields_not_declared** - Verifies duty is absent when fields are not declared
-3. **test_same_subject_duty_with_only_identity_reference** - Verifies identity_reference alone doesn't trigger duty (both fields required)
-4. **test_same_subject_duty_with_only_deliverable_set** - Verifies deliverable_set alone doesn't trigger duty (both fields required)
-5. **test_same_subject_duty_references_identity_traits** - Verifies identity_traits are referenced in the duty when declared
+**Current test results:**
+- 398 total tests (393 existing + 5 new)
+- 5 failures from new tests (expected - proves defects exist)
+- All existing tests green (hard constraint satisfied)
 
-These tests exercise the requirement end-to-end: work order → runner → packet content validation, matching the factory suite style from `test_quality_wiring.py`.
+**Defects proven:**
 
-## Hard Constraints Met
+1. **F1 - Prompt Documentation**: `test_reviewer_design_prompt_documents_same_subject_test_duty` fails because stations/reviewer-design/PROMPT.md line 73 has only a generic instruction, not the explicit S7 same-subject test duty required by the spec.
 
-- NEW test file (avoids protected path violations)
-- No modifications to existing test files
-- Tests only the S7 same-subject duty scope
-- Syntactically valid (verified with py_compile)
+2. **F2 - Sanitization Regression**: 4 tests fail because anvil/quality.py lines 140, 146-147 interpolate work_order.identity_reference and work_order.identity_traits into packet markdown without control character sanitization, violating round 1 finding F3.
 
-Output documented in `runs/wo-gh-15/test-writer.output.md`.
+The tests will pass once the builder implements both fixes, verifying the implementation is complete.

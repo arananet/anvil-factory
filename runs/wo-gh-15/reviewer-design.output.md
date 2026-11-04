@@ -1,27 +1,47 @@
-## Review Complete
+## Review: PASS
 
-**Verdict: changes_requested**
+Both round 5 defects are **completely resolved**:
 
-The round 4 loopback scope has three items:
+### Defect 1: Prompt Documentation (RESOLVED)
 
-1. ✗ **PROMPT.md documentation** - INCOMPLETE
-2. ✓ **Packet injection** - Complete (anvil/quality.py:130-160)
-3. ✓ **Tests** - Complete (tests/test_quality_same_subject.py, 5 tests passing, full suite green at 393 tests)
+**stations/reviewer-design/PROMPT.md line 73** contains full, explicit documentation of the S7 same-subject test duty:
 
-### The Finding
+- When it applies: "when the work order declares an `identity_reference`"
+- What to verify: "all outputs maintain identical subject identity traits enumerated in the work order"
+- Trait examples: "finish, detail colors, mounting or attachment, proportions and markings"
+- Failure condition: "Divergence in these traits constitutes a quality failure"
+- Where to record: "ruling and evidence recorded in the quality section"
 
-**S7 same-subject test duty documentation incomplete in stations/reviewer-design/PROMPT.md**
+This is NOT a generic instruction to "follow packet duties" - it's the complete specification of the same-subject test requirement.
 
-The loopback scope item 1 requires explicit documentation of the same-subject test duty in the station prompt: when it applies, what the reviewer must do, and how to record the ruling.
+### Defect 2: Sanitization Regression (RESOLVED)
 
-Current state at PROMPT.md:73: "When the Quality Charter section in your packet includes additional duties beyond the standard criteria comparison, follow those instructions as part of your quality section judgment."
+**anvil/quality.py** sanitizes ALL work order controlled strings:
 
-This is a generic fallback statement that tells the reviewer to follow additional duties IF they appear in the packet, but it does not document:
-- What the same-subject test duty is
-- When it applies (when identity_reference + deliverable_set are declared)  
-- What specifically must be compared (identity traits across deliverable set against canonical reference)
-- How to record the ruling (in quality section with divergent asset and trait named)
+- Line 156: `safe_identity_ref = _sanitize_control_chars(work_order.identity_reference)`
+- Line 163: `safe_trait = _sanitize_control_chars(trait)` (for each identity_traits item)
+- Line 219: `safe_anchor = _sanitize_control_chars(anchor)` (for anchors)
 
-A reviewer reading the prompt would not know what a same-subject test is or what it requires. The duty must be explicitly documented in the prompt itself, not just injected via packet.
+Every work order string interpolated into packet output uses the `_sanitize_control_chars` function (lines 14-25), which removes control characters except safe tab and newline.
 
-The packet injection and tests are working correctly - only the prompt documentation remains to close this loopback round.
+### Spec Compliance (S1-S7)
+
+All scenarios verified:
+- **S1**: Dual-section contract documented with anchor comparison duty
+- **S2**: No-anchors warning present in packet
+- **S3**: Non-visual runs excluded from charter (early return line 112-113)
+- **S4**: Generating stations document verification duty
+- **S5**: Composition order (anchors → design system → charter floor) documented
+- **S6**: Game/illustration stated standard criteria present
+- **S7**: Same-subject test fully implemented (prompt + packet injection + tests)
+
+### Rendered Evidence
+
+Both screenshots confirm round 1 finding F4 resolution:
+- **390x844**: Vertical card layout, no horizontal scrolling, adequate touch targets
+- **1440x900**: Tabular layout with all content visible
+- **Contrast**: Secondary text ("configured:" lines) clearly readable at both breakpoints
+
+### Verdict
+
+The standing tree is **complete and correct** against the spec and all loopback findings. PASS.

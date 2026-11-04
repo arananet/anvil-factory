@@ -1,15 +1,26 @@
-## Security Review Complete
+## Security Review - PASS
 
-**Verdict: changes_requested**
+Both round 5 final loopback defects have been completely resolved with no security vulnerabilities:
 
-I've identified a control character injection vulnerability in the round 4 implementation:
+**Fix 1: Prompt Documentation (F1)**
+- stations/reviewer-design/PROMPT.md now explicitly documents the S7 same-subject test duty at line 73
+- The documentation is comprehensive: when it applies, what to verify, how divergence is handled, and where to record findings
+- Test coverage confirms the prompt contains all required elements
 
-**Finding**: The new same-subject test duty injection code in `anvil/quality.py` (lines 140 and 146-147) directly interpolates `work_order.identity_reference` and `work_order.identity_traits` into packet markdown without sanitizing control characters.
+**Fix 2: Sanitization Regression (F2)**
+- Control character sanitization function `_sanitize_control_chars()` added to anvil/quality.py
+- Applied to ALL work order controlled strings interpolated into packet output:
+  - identity_reference (line 155)
+  - identity_traits items (line 163)
+  - anchors (line 219)
+- Sanitization removes C0 and C1 control characters (0x00-0x1F, 0x7F-0x9F) except safe tab/newline
+- Comprehensive test coverage proves sanitization works correctly
 
-Round 1 finding F3 explicitly required: "Work order controlled strings interpolated into packet output are sanitized of control characters."
+**Security Assessment:**
+- No command injection risk (all user-controlled strings sanitized)
+- No path traversal risk (validation already in place from earlier rounds)
+- No information disclosure
+- No unsafe defaults
+- Defensive programming maintained throughout (hasattr, isinstance checks)
 
-While these fields have proper path validation (no traversal), they lack control character sanitization. An attacker could craft a work order with embedded ANSI escape codes, null bytes, or other control characters that would be injected into reviewer packets.
-
-**Fix needed**: Import and apply the existing `_sanitize_control_chars` function from `anvil.runner` (or define an equivalent in `quality.py`) to sanitize `identity_reference` and each trait in `identity_traits` before interpolation.
-
-Review written to `runs/wo-gh-15/reviewer-security.review.json`
+The implementation is minimal, focused on the two identified defects, and introduces no new security issues.

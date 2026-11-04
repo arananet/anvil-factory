@@ -1,7 +1,11 @@
-Review complete. Written to `runs/wo-gh-15/reviewer-spec.review.json`.
+## Review Complete
 
-**Verdict: changes_requested**
+Both round 4 defects have been fully resolved:
 
-**Finding:** The PROMPT.md does not explicitly document the S7 same-subject test duty as required by the loopback scope. While line 73 adds a generic instruction to "follow duties in the packet", the PROMPT should explicitly state what the same-subject test duty is, when it applies (both identity_reference and deliverable_set declared), and what it requires (cross-set comparison against identity reference on enumerated traits, with divergence as quality failure).
+**Defect 1 - PROMPT DOCUMENTATION**: stations/reviewer-design/PROMPT.md line 73 now contains the complete S7 same-subject test duty documentation. It explicitly states when the duty applies (identity_reference + deliverable_set declared), what to verify (identical subject identity traits across all deliverables), what constitutes failure (any divergence in enumerated traits), what to report (specific output and trait), and where to record it (quality section). This is the full duty documented in the prompt itself, not a generic instruction.
 
-The packet injection (anvil/quality.py:129-160) is correct and comprehensive. The tests (test_quality_same_subject.py) prove it end-to-end. The suite is green at 393 tests. But the PROMPT itself needs explicit same-subject test documentation, not just the meta-instruction at line 73.
+**Defect 2 - SANITIZATION REGRESSION**: anvil/quality.py correctly sanitizes all work order controlled strings before packet interpolation. Both work_order.identity_reference (line 155) and each item in work_order.identity_traits (line 163) are sanitized using _sanitize_control_chars() before being interpolated into packet markdown, satisfying the round 1 finding F3 requirement.
+
+The implementation correctly addresses spec scenarios S1-S7.
+
+**Verdict: pass**

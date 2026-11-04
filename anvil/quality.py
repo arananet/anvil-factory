@@ -7,7 +7,22 @@ charter criteria.
 """
 
 import json
+import re
 from pathlib import Path
+
+
+def _sanitize_control_chars(text):
+    """Sanitize control characters from text to prevent injection.
+
+    Removes or replaces control characters that could be used for
+    injection attacks (F3).
+    """
+    if not isinstance(text, str):
+        return str(text)
+    # Remove control characters (except tab and newline which are safe in markdown)
+    # Keep \t (tab) and \n (newline), remove other control chars
+    sanitized = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]', '', text)
+    return sanitized
 
 
 # Product types with different quality criteria
@@ -137,14 +152,16 @@ def packet_quality_charter_section(project, station_id, work_order):
         lines.append("")
 
         # Reference the canonical identity source
-        lines.append(f"**Identity reference**: `{work_order.identity_reference}`")
+        safe_identity_ref = _sanitize_control_chars(work_order.identity_reference)
+        lines.append(f"**Identity reference**: `{safe_identity_ref}`")
         lines.append("")
 
         # List identity traits to check
         if hasattr(work_order, "identity_traits") and work_order.identity_traits:
             lines.append("**Identity traits to verify** (must remain constant across all deliverables):")
             for trait in work_order.identity_traits:
-                lines.append(f"- {trait}")
+                safe_trait = _sanitize_control_chars(trait)
+                lines.append(f"- {safe_trait}")
             lines.append("")
 
         # State the duty
@@ -199,7 +216,8 @@ def packet_anchor_section(project, station_id, work_order):
 
     if anchors:
         for anchor in anchors:
-            lines.append(f"- {anchor}")
+            safe_anchor = _sanitize_control_chars(anchor)
+            lines.append(f"- {safe_anchor}")
         lines.append("")
 
     return "\n".join(lines)

@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 36217.018,
+      "duration_ms": 98961.18,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/intake.output.md"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/spec-writer.output.md",
-      "duration_ms": 69961.455,
+      "duration_ms": 112680.427,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/spec-writer.output.md"
@@ -40,7 +40,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/test-writer.output.md",
-      "duration_ms": 143708.013,
+      "duration_ms": 246167.93,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/test-writer.output.md"
@@ -56,7 +56,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/builder.output.md",
-      "duration_ms": 386124.427,
+      "duration_ms": 676512.262,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/builder.output.md"
@@ -72,7 +72,7 @@
       "station": "checks-gate",
       "status": "passed",
       "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 34433.861,
+      "duration_ms": 32149.709,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/checks-gate.pre-review.output.md"
@@ -100,7 +100,7 @@
       "station": "reviewer-spec",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-spec.output.md",
-      "duration_ms": 191514.906,
+      "duration_ms": 79181.83,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/reviewer-spec.output.md"
@@ -116,7 +116,7 @@
       "station": "reviewer-security",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-security.output.md",
-      "duration_ms": 130178.848,
+      "duration_ms": 109259.496,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/reviewer-security.output.md"
@@ -132,7 +132,7 @@
       "station": "reviewer-tests",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-tests.output.md",
-      "duration_ms": 256322.575,
+      "duration_ms": 147326.813,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/reviewer-tests.output.md"
@@ -148,7 +148,7 @@
       "station": "reviewer-architecture",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-architecture.output.md",
-      "duration_ms": 112089.764,
+      "duration_ms": 48952.99,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/reviewer-architecture.output.md"
@@ -164,7 +164,7 @@
       "station": "reviewer-design",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-design.output.md",
-      "duration_ms": 254282.756,
+      "duration_ms": 97815.394,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/reviewer-design.output.md"
@@ -180,7 +180,7 @@
       "station": "reviewer-ux",
       "status": "routed_out",
       "detail": "Routed out: Routed out: no UI surface",
-      "duration_ms": 1.335,
+      "duration_ms": 1.323,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/reviewer-ux.packet.md"
@@ -192,8 +192,8 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: changes_requested",
-      "duration_ms": 0.043,
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.05,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/report.json"
@@ -203,23 +203,10 @@
       "executor": null
     },
     {
-      "station": "approver",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: stations/reviewer-design/PROMPT.md does not explicitly document the S7 same-subject test duty. Line 73 adds a generic instruction to follow duties in the packet, but the PROMPT should explicitly document what the same-subject test duty is: when the work order declares both identity_reference and deliverable_set, the reviewer must perform a same-subject comparison across the entire set against the identity reference on the enumerated identity traits, and any divergence is a quality failure that must be named in the findings. The packet injection (anvil/quality.py:129-160) correctly implements the duty, and tests prove it end-to-end, but the PROMPT itself needs explicit documentation per the loopback scope requirement.; Control character injection vulnerability in anvil/quality.py lines 140 and 146-147. Round 1 finding F3 explicitly required: 'Work order controlled strings interpolated into packet output are sanitized of control characters.' The new same-subject test duty injection code directly interpolates work_order.identity_reference (line 140) and work_order.identity_traits items (line 147) into packet markdown without sanitization. While these fields have path validation against traversal, they lack control character sanitization. An attacker could craft a work order with embedded control characters (ANSI escape codes, null bytes, etc.) that would be injected into reviewer packets. Fix: import and apply the existing _sanitize_control_chars function from anvil.runner (or define an equivalent in quality.py) to sanitize identity_reference and each trait in identity_traits before interpolation.",
-      "reason": "stations/reviewer-design/PROMPT.md does not explicitly document the S7 same-subject test duty. Line 73 adds a generic instruction to follow duties in the packet, but the PROMPT should explicitly document what the same-subject test duty is: when the work order declares both identity_reference and deliverable_set, the reviewer must perform a same-subject comparison across the entire set against the identity reference on the enumerated identity traits, and any divergence is a quality failure that must be named in the findings. The packet injection (anvil/quality.py:129-160) correctly implements the duty, and tests prove it end-to-end, but the PROMPT itself needs explicit documentation per the loopback scope requirement.; Control character injection vulnerability in anvil/quality.py lines 140 and 146-147. Round 1 finding F3 explicitly required: 'Work order controlled strings interpolated into packet output are sanitized of control characters.' The new same-subject test duty injection code directly interpolates work_order.identity_reference (line 140) and work_order.identity_traits items (line 147) into packet markdown without sanitization. While these fields have path validation against traversal, they lack control character sanitization. An attacker could craft a work order with embedded control characters (ANSI escape codes, null bytes, etc.) that would be injected into reviewer packets. Fix: import and apply the existing _sanitize_control_chars function from anvil.runner (or define an equivalent in quality.py) to sanitize identity_reference and each trait in identity_traits before interpolation.",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null
-    },
-    {
       "station": "triage-human",
       "status": "completed",
-      "detail": "Human review: required",
-      "duration_ms": 0.006,
+      "detail": "Human review: not_required",
+      "duration_ms": 0.016,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -230,7 +217,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-15/deployer.packet.md",
-      "duration_ms": 0.314,
+      "duration_ms": 0.417,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/deployer.packet.md"
@@ -243,7 +230,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/observer.output.md",
-      "duration_ms": 47140.787,
+      "duration_ms": 42150.534,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/observer.output.md"
@@ -256,10 +243,10 @@
       }
     }
   ],
-  "verdict": "changes_requested",
-  "human_required": true,
+  "verdict": "approved",
+  "human_required": false,
   "max_loopbacks": 2,
-  "loopbacks": 1,
+  "loopbacks": 0,
   "deployment_status": null,
   "verify_results": [],
   "risk_hints": [],
@@ -268,11 +255,11 @@
       "reviews_counted": [
         {
           "station": "reviewer-spec",
-          "verdict": "changes_requested"
+          "verdict": "pass"
         },
         {
           "station": "reviewer-security",
-          "verdict": "changes_requested"
+          "verdict": "pass"
         },
         {
           "station": "reviewer-tests",
@@ -284,7 +271,7 @@
         },
         {
           "station": "reviewer-design",
-          "verdict": "changes_requested"
+          "verdict": "pass"
         }
       ],
       "reviews_expected": [
@@ -294,16 +281,16 @@
         "reviewer-architecture",
         "reviewer-design"
       ],
-      "rule": "Reviewers reviewer-spec, reviewer-security, reviewer-design requested changes. (Expected 5 reviews after routing.)"
+      "rule": "All counted reviews passed. (Expected 5 reviews after routing.)"
     },
     "human_gate": {
-      "required": true,
-      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
       "hints_matched": []
     }
   },
   "warnings": [],
-  "base_ref": "2094d0d8fdfac94bb43f658192417c6015b389a5",
+  "base_ref": "74d8c9705018c03c6857e56aeebe5338bb0cef98",
   "evidence": [
     {
       "type": "screenshot",

@@ -85,6 +85,15 @@ Loopback scope, exactly this and nothing else:
 
 HARD CONSTRAINTS: the full factory suite must remain green. Do NOT modify or delete any existing file under tests/ (the checks gate treats base ref test files as protected; two earlier rounds died on exactly that). Any new test goes in a NEW test file. Do not change the review parsing contract, the dual-section structure, or any behavior outside this finding.
 
+
+GATE LOOPBACK (round 5, final). Round 4 verdict: changes_requested, 5 of 5 counted after routing, checks gate passed. reviewer-tests and reviewer-architecture PASS. The packet injection and its tests are confirmed complete and correct by all three dissenting reviewers. Exactly two defects remain, both precisely located:
+
+1. PROMPT DOCUMENTATION (reviewer-spec and reviewer-design, same point): stations/reviewer-design/PROMPT.md line 73 only adds a generic instruction to follow duties stated in the packet. Loopback scope item 1 requires the prompt itself to document the S7 same-subject test duty explicitly. Write the duty into the prompt in full: it applies when the work order declares both identity_reference and deliverable_set; the reviewer performs a same-subject comparison across the entire deliverable set against the identity reference on the enumerated identity traits; any divergence is a quality failure that must be named in the findings; the ruling and its evidence are recorded in the review's quality section.
+
+2. SANITIZATION REGRESSION (reviewer-security): the same-subject duty injection in anvil/quality.py (around lines 140 and 146-147) interpolates work_order.identity_reference and work_order.identity_traits items into packet markdown without control character sanitization, violating this item's round 1 finding F3 requirement that work order controlled strings interpolated into packet output are sanitized of control characters. Apply the existing control character sanitization used elsewhere in the codebase (anvil.runner's _sanitize_control_chars or the equivalent already used for other packet interpolations) to every work order string the quality packet sections emit, not only the new lines.
+
+HARD CONSTRAINTS, unchanged: the full factory suite must remain green; do NOT modify or delete any existing file under tests/ (new tests only in new files); no changes to the review parsing contract, the dual-section structure, or any behavior outside these two defects. This is the item's final loopback: implement exactly these two fixes and nothing else.
+
 - risk_hints: 
 - status: new
 

@@ -1,21 +1,25 @@
-## Review Complete
+## Review Complete: PASS
 
-I've verified the tests for work order wo-gh-15 (quality standard for visual deliverables).
+Both round 5 defects are fully resolved:
 
-**Test Coverage:**
-- **test_quality_standard.py**: 23 tests covering S1-S7 scenarios with unit tests
-- **test_quality_wiring.py**: 14 integration tests for runner wiring and path validation
-- **test_quality_same_subject.py**: 5 NEW tests for round 4's S7 same-subject duty injection
+**1. Prompt Documentation** (stations/reviewer-design/PROMPT.md:73)
+- S7 same-subject test duty is now explicitly documented in full
+- Covers: when it applies, what to verify, failure conditions, where to record findings
+- Test validates presence: `test_reviewer_design_prompt_documents_same_subject_test_duty` ✓
 
-**Verification Results:**
-1. ✓ **Tests are real** - They create actual projects, run the pipeline, and verify actual generated packet content (not mocked)
-2. ✓ **Tests are mapped** - 42 quality-related tests covering all spec scenarios S1-S7 and round 4 loopback requirements
-3. ✓ **Tests are passing** - Full factory suite: 393 tests OK (1 skipped)
+**2. Sanitization Regression** (anvil/quality.py)
+- All work order controlled strings sanitized via `_sanitize_control_chars()`
+- Applied to: identity_reference (line 155), identity_traits (line 163), anchors (line 219)
+- Tests prove sanitization: 4 comprehensive tests covering all interpolations ✓
 
-**Round 4 Scope Verification:**
-- Item 2 (duty travels with packet): Implemented in quality.py lines 129-161, proven by tests
-- Item 3 (prove with test): test_quality_same_subject.py provides 5 comprehensive tests in a NEW file as required, verifying the duty appears in packets when both identity_reference and deliverable_set are present, and doesn't appear otherwise
+**Tests Status**
+- New file: tests/test_quality_final_loopback.py (5 tests, all passing)
+- Full suite: 398 tests OK (1 skipped) - GREEN
+- Coverage: S1-S7 scenarios fully tested across test_quality_standard.py, test_quality_wiring.py, test_quality_same_subject.py, and test_quality_final_loopback.py
 
-**Verdict: PASS**
+**Constraints Met**
+- No existing test files modified ✓
+- No changes outside the two defects ✓
+- Full suite green ✓
 
-Review written to: runs/wo-gh-15/reviewer-tests.review.json
+Tests are real, mapped to spec scenarios and round 5 defects, and passing.
