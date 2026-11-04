@@ -1,19 +1,9 @@
-The spec file already exists and is complete at `.openspec/specs/status-lifecycle-stages/spec.md`.
+Spec revised. The updated spec at `.openspec/specs/status-lifecycle-stages/spec.md` now incorporates all five loopback findings:
 
-I've verified that the spec covers all five scenarios from the work order:
+- **S5 (revised)**: Work order IDs are real anchor elements linking to detail sections with matching id attributes
+- **S6 (new)**: All text meets WCAG 4.5:1 contrast minimum  
+- **S7 (new)**: Spacing uses a consistent CSS custom property scale
+- **S8 (new)**: Stage progression adapts at narrow viewports without horizontal scrolling
+- **S9 (new)**: Playwright captures produce rendered evidence for reviewers
 
-- **S1**: Stage derivation from run evidence → Scenario 1 "Stages derive from the run report's evidence"
-- **S2**: MERGED only from merge records → Scenario 2 "Approved is not merged"
-- **S3**: NEEDS HUMAN from decision flag → Scenario 3 "Needs human comes from the decision object"
-- **S4**: Intake states (PARKED/REJECTED) → Scenario 4 "Intake states compose with the stage model"
-- **S5**: Board layout and rendering → Scenario 5 "One row per job, progression in the row, swimlane one click away"
-
-The spec includes:
-- Clear purpose statement explaining why lifecycle stages are needed
-- Comprehensive requirements covering stage vocabulary, evidence-based derivation, presentation rules, and implementation scope
-- Five concrete scenarios matching the work order requirements
-- Status marked as "approved"
-
-**Output:** `.openspec/specs/status-lifecycle-stages/spec.md` (already in repository, committed in 826cc26)
-
-The spec-writer deliverable is complete and ready for the next station.
+The Requirements section also updated to reflect the link structure, accessibility, and responsive design requirements.

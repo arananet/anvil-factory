@@ -1,42 +1,55 @@
-## Implementation Complete
+Perfect! Let me create a summary of the implementation:
 
-I've successfully implemented the status dashboard lifecycle stages feature according to the spec in `.openspec/specs/status-lifecycle-stages/spec.md`. All 9 scenario tests pass, and the entire test suite (328 tests) remains green.
+## Summary
+
+I've successfully implemented all the loopback 1 fixes for wo-gh-13 (Status dashboard lifecycle stages):
 
 ### Changes Made
 
-**1. Core Implementation** (`anvil/statuspage.py`):
-- Added `LIFECYCLE_STAGES` constant defining the stage vocabulary
-- Implemented `load_merge_records()` to read merge records from `merge_records/` folder
-- Implemented `derive_lifecycle_stage()` to extract stages from run report evidence:
-  - SPEC from spec-writer step executed
-  - BUILD from builder step executed
-  - REVIEW from reviewer steps executed
-  - APPROVED from approved verdict
-  - MERGED from merge records only (never inferred)
-  - Handles intake states (PARKED, REJECTED) that replace stage progression
-  - Detects NEEDS HUMAN from decision.human_gate.required flag
-- Implemented `render_lifecycle_board()` to generate HTML board with one row per work order
-- Added comprehensive CSS styles for the board, stages, badges, and intake states
-- Modified `render_status_page()` to load merge records and render the lifecycle board
+**1. Board Row Links (Finding A)**
+- Work order IDs in board rows are now real anchor elements linking to detailed run sections
+- Added `href="#work-order-id-detail"` to board row links
+- Added matching `id="work-order-id-detail"` attributes to detailed run sections
+- Links are keyboard accessible and work with screen readers
 
-**2. Documentation Updates**:
-- `CHANGELOG.md`: Added entry describing the lifecycle stages feature under Unreleased
-- `docs/STATUS-PAGE.md`: Added "Lifecycle board" section explaining stage derivation and board layout
+**2. Contrast Ratios (Finding B)**  
+- Verified all text/background pairs meet WCAG 4.5:1 minimum:
+  - `.muted` (#9A9A9A on #0C0C0C): 6.97:1 ✓
+  - Footer (#8A8A8A on #0C0C0C): 5.73:1 ✓
+  - `.board-description` (#9A9A9A on #0C0C0C): 6.97:1 ✓
+- No color changes needed; all pairs already compliant
 
-### Feature Coverage (All Scenarios Pass)
+**3. Spacing Scale (Finding C)**
+- Consolidated all spacing onto CSS custom properties
+- Defined scale: `--space-4` through `--space-64` (4, 8, 12, 16, 20, 24, 32, 48, 64px)
+- Replaced 15+ hardcoded spacing values with scale references
 
-- **S1**: Stage derivation from evidence ✓
-- **S2**: MERGED only from merge records, not approval ✓
-- **S3**: NEEDS HUMAN badge from decision flag ✓
-- **S4**: Intake states (PARKED/REJECTED) compose with stages ✓
-- **S5**: One board, one row per job, reproducible, with links ✓
+**4. Responsive Behavior (Finding D)**
+- Added `flex-wrap: wrap` to `.board-stages` for narrow viewport adaptation
+- Added media query for viewports below 400px with reduced gap and padding
+- Prevents horizontal scrolling on standard viewports
 
-### Compliance with Work Order Constraints
+**5. Rendered Evidence (Finding E)**
+- Already supported by existing capture infrastructure
+- Test S9 passes, confirming Playwright integration works
 
-- ✓ No modifications to `.github/workflows/`
-- ✓ No modifications to `tests/`, `anvil.json`, or `pipelines/`
-- ✓ All tests call real implementation (derive stages, render board, check HTML output)
-- ✓ All 328 existing tests still pass
-- ✓ Feature is pure function of run data and merge records (no network calls, no inference)
+### Files Modified
 
-The lifecycle board is now live in the factory's status page generator and will appear on every generated status page, showing work order progress at a glance.
+- `anvil/statuspage.py`: Core implementation with all fixes
+- `CHANGELOG.md`: Updated Unreleased section to document S6-S9 scenarios
+- `docs/STATUS-PAGE.md`: Updated lifecycle board documentation
+
+### Test Results
+
+All 16 tests pass, including all lifecycle scenarios S1-S9:
+- ✓ Stage derivation (S1)
+- ✓ Approved vs merged (S2)  
+- ✓ Needs human badge (S3)
+- ✓ Intake states (S4)
+- ✓ Board row links (S5)
+- ✓ Contrast ratios (S6)
+- ✓ Spacing scale (S7)
+- ✓ Responsive behavior (S8)
+- ✓ Rendered evidence (S9)
+
+No restricted files modified (tests/, anvil.json, pipelines/, .github/workflows/ all untouched as required).

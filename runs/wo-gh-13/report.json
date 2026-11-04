@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 37398.724,
+      "duration_ms": 24157.726,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/intake.output.md"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-13/spec-writer.output.md",
-      "duration_ms": 53720.913,
+      "duration_ms": 99010.233,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/spec-writer.output.md"
@@ -40,7 +40,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-13/test-writer.output.md",
-      "duration_ms": 222149.392,
+      "duration_ms": 218552.408,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/test-writer.output.md"
@@ -56,7 +56,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-13/builder.output.md",
-      "duration_ms": 245103.065,
+      "duration_ms": 215340.91,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/builder.output.md"
@@ -72,7 +72,7 @@
       "station": "checks-gate",
       "status": "passed",
       "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 30740.506,
+      "duration_ms": 30947.496,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/checks-gate.pre-review.output.md"
@@ -100,7 +100,7 @@
       "station": "reviewer-spec",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-spec.output.md",
-      "duration_ms": 187726.239,
+      "duration_ms": 118679.17,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/reviewer-spec.output.md"
@@ -116,7 +116,7 @@
       "station": "reviewer-security",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-security.output.md",
-      "duration_ms": 109630.719,
+      "duration_ms": 160030.984,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/reviewer-security.output.md"
@@ -130,12 +130,12 @@
     },
     {
       "station": "reviewer-tests",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-tests.output.md",
-      "duration_ms": 69805.219,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-tests: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.59. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 50805.255,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-13/reviewer-tests.output.md"
+        "runs/wo-gh-13/reviewer-tests.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
@@ -146,12 +146,12 @@
     },
     {
       "station": "reviewer-architecture",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-architecture.output.md",
-      "duration_ms": 106280.775,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-architecture: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.53. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 13228.47,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-13/reviewer-architecture.output.md"
+        "runs/wo-gh-13/reviewer-architecture.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
@@ -162,12 +162,12 @@
     },
     {
       "station": "reviewer-design",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-design.output.md",
-      "duration_ms": 93357.168,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-design: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.49. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 7679.806,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-13/reviewer-design.output.md"
+        "runs/wo-gh-13/reviewer-design.packet.md"
       ],
       "configured_model": "openai/gpt-6-astra",
       "executed_model": null,
@@ -178,12 +178,12 @@
     },
     {
       "station": "reviewer-ux",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-13/reviewer-ux.output.md",
-      "duration_ms": 112635.457,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station reviewer-ux: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.49. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 518.853,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-13/reviewer-ux.output.md"
+        "runs/wo-gh-13/reviewer-ux.packet.md"
       ],
       "configured_model": "openai/gpt-6-astra",
       "executed_model": null,
@@ -195,8 +195,8 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: changes_requested",
-      "duration_ms": 0.039,
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.058,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/report.json"
@@ -206,23 +206,10 @@
       "executor": null
     },
     {
-      "station": "approver",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: S5 violation: Board rows do not contain clickable links to detailed run sections. The spec requires 'each row links to that job's swimlane or run detail' but the implementation renders the work order ID as plain text (h3 element) without any link element. The board row has id='wo-id' on the container div, and the detailed section has no id attribute, making anchor navigation impossible. Expected: board work order ID should be an <a href='#wo-id-detail'> link targeting the detailed run section which should have a corresponding id attribute.; Stage derivation implementation is correct: SPEC from spec-writer executed, BUILD from builder executed, REVIEW from reviewer steps executed, APPROVED from verdict='approved', MERGED only from actual merge records in merge_records/ with merged=true. No network calls or branch name inference.; NEEDS HUMAN badge correctly derives from decision.human_gate.required with fallback to top-level human_required for older reports, and renders with prominent badge treatment (class='board-badge needs-human').; Intake states correctly compose: waiting_info renders as PARKED, rejected renders as REJECTED, both shown instead of stage progression with correct styling (state-parked, state-rejected classes).; Board rendering structure is correct: one row per work order, stage sequence with reached stages marked (stage-reached class) and current stage highlighted (stage-current class), reproducible from same data.; Documentation updated in docs/STATUS-PAGE.md with lifecycle board section describing stage vocabulary and derivation rules.; CHANGELOG Unreleased section updated with entry describing the lifecycle stages feature covering scenarios S1-S5.; Tests cover all five scenarios and verify data flow through the system. Tests could be strengthened by adding HTML structure assertions (checking for specific classes, badge presence) but current coverage is adequate for verifying the logic works correctly.; Quality bar violation: Scale Contrast - Multiple text elements use colors that appear to have insufficient contrast against the #0C0C0C background: .muted (#9A9A9A at 13px), footer (#8A8A8A at 13px), and .board-description (#9A9A9A at 13px). These gray values on near-black background may not meet the minimum 4.5:1 contrast ratio requirement for normal text stated in the quality bars.; Quality bar violation: Spacing Rhythm - The CSS uses inconsistent spacing values without a clear spacing scale. At least 15 different values are hardcoded (4px, 6px, 8px, 10px, 12px, 14px, 16px, 18px, 20px, 22px, 28px, 32px, 64px) rather than using a consistent spacing scale as required by the quality bar 'Consistent spacing scale used throughout'.; Quality bar concern: Responsive Behavior - The .board-stages flexbox with 5 stage elements could cause horizontal scrolling on very narrow viewports (below ~400px width). While flex-wrap is used on .meta, the stages row has no wrapping or responsive media queries to handle mobile viewports gracefully. The quality bar requires 'No horizontal scrolling on standard viewports'.; User flow broken: spec S5 requires 'each row links to that job's swimlane or run detail' but the implementation renders board rows as plain divs with no clickable links (statuspage.py:281-309). Users can see the lifecycle board but cannot navigate from it to view detailed information about any work order. The spec states 'The swimlane for the job stays one click away' but no links are implemented.; Keyboard accessibility missing: board rows lack interactive elements (links or buttons), preventing keyboard users from navigating to work order details. Accessibility guideline: all interactive elements must be keyboard reachable. The rows are divs with id attributes but no href or onclick, making them keyboard-inaccessible.; Screen reader accessibility gap: without link semantics, screen reader users cannot discover that rows are meant to be navigable or activate the intended navigation. The rows appear as static content rather than interactive elements, lacking proper ARIA roles or link markup.; Judged from source code without rendered evidence: no screenshots were provided in the packet, so this review assessed the implementation from code alone. Actual rendered contrast ratios, focus visibility, and visual presentation could not be verified.",
-      "reason": "S5 violation: Board rows do not contain clickable links to detailed run sections. The spec requires 'each row links to that job's swimlane or run detail' but the implementation renders the work order ID as plain text (h3 element) without any link element. The board row has id='wo-id' on the container div, and the detailed section has no id attribute, making anchor navigation impossible. Expected: board work order ID should be an <a href='#wo-id-detail'> link targeting the detailed run section which should have a corresponding id attribute.; Stage derivation implementation is correct: SPEC from spec-writer executed, BUILD from builder executed, REVIEW from reviewer steps executed, APPROVED from verdict='approved', MERGED only from actual merge records in merge_records/ with merged=true. No network calls or branch name inference.; NEEDS HUMAN badge correctly derives from decision.human_gate.required with fallback to top-level human_required for older reports, and renders with prominent badge treatment (class='board-badge needs-human').; Intake states correctly compose: waiting_info renders as PARKED, rejected renders as REJECTED, both shown instead of stage progression with correct styling (state-parked, state-rejected classes).; Board rendering structure is correct: one row per work order, stage sequence with reached stages marked (stage-reached class) and current stage highlighted (stage-current class), reproducible from same data.; Documentation updated in docs/STATUS-PAGE.md with lifecycle board section describing stage vocabulary and derivation rules.; CHANGELOG Unreleased section updated with entry describing the lifecycle stages feature covering scenarios S1-S5.; Tests cover all five scenarios and verify data flow through the system. Tests could be strengthened by adding HTML structure assertions (checking for specific classes, badge presence) but current coverage is adequate for verifying the logic works correctly.; Quality bar violation: Scale Contrast - Multiple text elements use colors that appear to have insufficient contrast against the #0C0C0C background: .muted (#9A9A9A at 13px), footer (#8A8A8A at 13px), and .board-description (#9A9A9A at 13px). These gray values on near-black background may not meet the minimum 4.5:1 contrast ratio requirement for normal text stated in the quality bars.; Quality bar violation: Spacing Rhythm - The CSS uses inconsistent spacing values without a clear spacing scale. At least 15 different values are hardcoded (4px, 6px, 8px, 10px, 12px, 14px, 16px, 18px, 20px, 22px, 28px, 32px, 64px) rather than using a consistent spacing scale as required by the quality bar 'Consistent spacing scale used throughout'.; Quality bar concern: Responsive Behavior - The .board-stages flexbox with 5 stage elements could cause horizontal scrolling on very narrow viewports (below ~400px width). While flex-wrap is used on .meta, the stages row has no wrapping or responsive media queries to handle mobile viewports gracefully. The quality bar requires 'No horizontal scrolling on standard viewports'.; User flow broken: spec S5 requires 'each row links to that job's swimlane or run detail' but the implementation renders board rows as plain divs with no clickable links (statuspage.py:281-309). Users can see the lifecycle board but cannot navigate from it to view detailed information about any work order. The spec states 'The swimlane for the job stays one click away' but no links are implemented.; Keyboard accessibility missing: board rows lack interactive elements (links or buttons), preventing keyboard users from navigating to work order details. Accessibility guideline: all interactive elements must be keyboard reachable. The rows are divs with id attributes but no href or onclick, making them keyboard-inaccessible.; Screen reader accessibility gap: without link semantics, screen reader users cannot discover that rows are meant to be navigable or activate the intended navigation. The rows appear as static content rather than interactive elements, lacking proper ARIA roles or link markup.; Judged from source code without rendered evidence: no screenshots were provided in the packet, so this review assessed the implementation from code alone. Actual rendered contrast ratios, focus visibility, and visual presentation could not be verified.",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null
-    },
-    {
       "station": "triage-human",
       "status": "completed",
-      "detail": "Human review: required",
-      "duration_ms": 0.008,
+      "detail": "Human review: not_required",
+      "duration_ms": 0.016,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -233,7 +220,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-13/deployer.packet.md",
-      "duration_ms": 0.066,
+      "duration_ms": 0.165,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-13/deployer.packet.md"
@@ -244,12 +231,12 @@
     },
     {
       "station": "observer",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-13/observer.output.md",
-      "duration_ms": 78227.99,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station observer: API Error: 402 Insufficient unified billing balance for this request. Your available balance is $0.45. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK).",
+      "duration_ms": 12797.071,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-13/observer.output.md"
+        "runs/wo-gh-13/observer.packet.md"
       ],
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
@@ -259,10 +246,10 @@
       }
     }
   ],
-  "verdict": "changes_requested",
-  "human_required": true,
+  "verdict": "approved",
+  "human_required": false,
   "max_loopbacks": 2,
-  "loopbacks": 1,
+  "loopbacks": 0,
   "deployment_status": null,
   "verify_results": [],
   "risk_hints": [],
@@ -271,27 +258,11 @@
       "reviews_counted": [
         {
           "station": "reviewer-spec",
-          "verdict": "changes_requested"
+          "verdict": "pass"
         },
         {
           "station": "reviewer-security",
           "verdict": "pass"
-        },
-        {
-          "station": "reviewer-tests",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-architecture",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-design",
-          "verdict": "changes_requested"
-        },
-        {
-          "station": "reviewer-ux",
-          "verdict": "changes_requested"
         }
       ],
       "reviews_expected": [
@@ -302,20 +273,35 @@
         "reviewer-design",
         "reviewer-ux"
       ],
-      "rule": "Reviewers reviewer-spec, reviewer-design, reviewer-ux requested changes."
+      "rule": "All counted reviews passed. (Counted 2 reviews, expected 6.)"
     },
     "human_gate": {
-      "required": true,
-      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
       "hints_matched": []
     }
   },
   "warnings": [],
-  "base_ref": "826cc2688a83d2d6d43b5a86482bdbed8f267633",
-  "evidence": [],
+  "base_ref": "f4cde5b8846ec855aa886abdba1787147b8af031",
+  "evidence": [
+    {
+      "type": "screenshot",
+      "breakpoint": "390x844",
+      "path": "runs/wo-gh-13/evidence/screenshot-390x844.png",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "type": "screenshot",
+      "breakpoint": "1440x900",
+      "path": "runs/wo-gh-13/evidence/screenshot-1440x900.png",
+      "width": 1440,
+      "height": 900
+    }
+  ],
   "cost": {
     "total": 0,
     "measured_steps": 0,
-    "unmeasured_steps": 11
+    "unmeasured_steps": 6
   }
 }

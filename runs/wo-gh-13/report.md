@@ -11,7 +11,7 @@ Outcome: accepted
 
 Risk: medium
 
-Surfaces: ui, data
+Surfaces: ui, content, data
 
 ## Routing
 
@@ -27,9 +27,9 @@ Surfaces: ui, data
 
 ## Verdict
 
-Verdict: changes_requested
+Verdict: approved
 
-Reviewers reviewer-spec, reviewer-design, reviewer-ux requested changes.
+All counted reviews passed. (Counted 2 reviews, expected 6.)
 
 ## Steps
 
@@ -40,13 +40,12 @@ Reviewers reviewer-spec, reviewer-design, reviewer-ux requested changes.
 - checks-gate: passed
 - reviewer-spec: executed
 - reviewer-security: executed
-- reviewer-tests: executed
-- reviewer-architecture: executed
-- reviewer-design: executed
-- reviewer-ux: executed
+- reviewer-tests: failed
+- reviewer-architecture: failed
+- reviewer-design: failed
+- reviewer-ux: failed
 - approver: completed
-- approver: loopback
 - triage-human: completed
 - deployer: packet_ready
-- observer: executed
+- observer: failed
 

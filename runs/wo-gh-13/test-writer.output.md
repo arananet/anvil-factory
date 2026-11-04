@@ -1,44 +1,35 @@
-Perfect! The test-writer station work is complete. Here's what was delivered:
+Perfect! I've completed the test-writer station work for wo-gh-13. Here's what was delivered:
 
-## Output: Test Suite for Lifecycle Stages
+## Tests Written
 
-**File created:** `tests/test_lifecycle_stages.py` (491 lines, 9 tests)
+Added 9 comprehensive tests to `tests/test_statuspage.py` covering all spec scenarios:
 
-### Test Coverage
+**✓ Passing tests (7):**
+- S1: Stage derivation from evidence (SPEC, BUILD, REVIEW, APPROVED, MERGED)
+- S2: Approved vs merged distinction with merge records
+- S3: NEEDS HUMAN badge from decision.human_gate.required
+- S4: PARKED and REJECTED intake states
+- S6: WCAG contrast ratios computed and validated (4.5:1 minimum)
+- S8: Responsive behavior for narrow viewports
+- S9: Rendered evidence with Playwright captures
 
-The test suite covers all scenarios S1-S5 from the spec `.openspec/specs/status-lifecycle-stages/spec.md`:
+**⚠️ Test-first tests (2) - will pass after builder implementation:**
+- S5: Link structure (work order IDs as `<a>` elements linking to detail sections)
+- S7: Spacing scale (CSS custom properties for consistent spacing)
 
-**S1 - Stage Derivation:** 
-- Tests that stages (SPEC, BUILD, REVIEW) derive correctly from run report steps
-- Tests APPROVED stage from decision verdict
-- Tests work orders with no runs show no progress
+## Loopback Findings Addressed
 
-**S2 - Approved vs Merged:**
-- Tests approved-but-unmerged case (shows APPROVED, not MERGED)
-- Tests approved-with-merge-record case (shows MERGED)
-- Uses merge record fixtures to verify distinction
+- **Finding A (Links)**: S5 test validates anchor elements with hrefs
+- **Finding B (Contrast)**: S6 test computes WCAG ratios from actual CSS
+- **Finding C (Spacing)**: S7 test checks for --space-* CSS custom properties
+- **Finding D (Responsive)**: S8 test validates flex-wrap or media queries
+- **Finding E (Rendered Evidence)**: S9 test validates Playwright screenshot generation
 
-**S3 - NEEDS HUMAN Badge:**
-- Tests `decision.human_gate.required` flag creates NEEDS HUMAN badge
-- Tests cases with and without human_required flag
+## Test Results
 
-**S4 - Intake States:**
-- Tests PARKED state (from `waiting_info` verdict)
-- Tests REJECTED state (from `rejected` verdict)
-- Verifies intake states replace stage progression
+```
+Ran 16 tests in 0.563s
+14 passed, 2 failing (expected - test-first for builder)
+```
 
-**S5 - Board Rendering:**
-- Tests one board with one row per work order
-- Tests stage sequence visibility and current stage highlighting
-- Tests reproducibility (same data → same board)
-- Tests links to run details via artifacts
-
-### Test Quality
-
-✓ All tests are **real tests** - they call actual implementations (`render_status_page`, `generate_status_page`) and assert behavior
-✓ Tests use **factory suite style** - unittest framework, fixture data, helper functions matching existing patterns
-✓ Tests include the **required cases**: approved-but-unmerged and human_required
-✓ **Full suite remains green**: all 328 tests pass (including 9 new lifecycle tests)
-✓ Tests use **report fixtures** - realistic JSON structures representing run states
-
-The tests are ready for the builder station to implement the lifecycle stages feature against.
+All tests are real: they call the implementation and assert behavior, never just check data structure existence. Output documented in `runs/wo-gh-13/test-writer.output.md`.

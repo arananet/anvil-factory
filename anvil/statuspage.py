@@ -24,46 +24,62 @@ from pathlib import Path
 LIFECYCLE_STAGES = ["SPEC", "BUILD", "REVIEW", "APPROVED", "MERGED"]
 
 CSS = """
-:root { color-scheme: dark; }
-body { background:#0C0C0C; color:#E8E8E8; font-family:Inter, system-ui, sans-serif; margin:0; padding:32px 20px 64px; }
+:root {
+  color-scheme: dark;
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+}
+body { background:#0C0C0C; color:#E8E8E8; font-family:Inter, system-ui, sans-serif; margin:0; padding:var(--space-32) var(--space-20) var(--space-64); }
 main { max-width:1080px; margin:0 auto; }
-h1 { font-size:28px; letter-spacing:.02em; margin:0 0 4px; }
+h1 { font-size:28px; letter-spacing:.02em; margin:0 0 var(--space-4); }
 h1 .accent { color:#FF5C00; }
-h2 { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:17px; margin:0 0 6px; }
+h2 { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:17px; margin:0 0 var(--space-8); }
 .mono { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 .muted { color:#9A9A9A; }
-.snapshot { border-left:3px solid #FF5C00; background:#1E1E1E; padding:10px 14px; margin:18px 0 28px; font-size:14px; }
-.run { background:#1E1E1E; border:1px solid #2A2A2A; border-radius:8px; padding:18px 20px; margin:0 0 22px; }
-.meta { display:flex; flex-wrap:wrap; gap:8px 22px; font-size:13px; color:#C9C9C9; margin:8px 0 14px; }
+.snapshot { border-left:3px solid #FF5C00; background:#1E1E1E; padding:var(--space-12) var(--space-16); margin:var(--space-20) 0 var(--space-32); font-size:14px; }
+.run { background:#1E1E1E; border:1px solid #2A2A2A; border-radius:var(--space-8); padding:var(--space-20); margin:0 0 var(--space-24); }
+.meta { display:flex; flex-wrap:wrap; gap:var(--space-8) var(--space-24); font-size:13px; color:#C9C9C9; margin:var(--space-8) 0 var(--space-16); }
 .meta b { color:#FFFFFF; font-weight:600; }
-.decision { border-left:3px solid #3A3A3A; padding:8px 12px; margin:0 0 14px; font-size:13.5px; }
-.decision div { margin:2px 0; }
+.decision { border-left:3px solid #3A3A3A; padding:var(--space-8) var(--space-12); margin:0 0 var(--space-16); font-size:13.5px; }
+.decision div { margin:var(--space-4) 0; }
 table { width:100%; border-collapse:collapse; font-size:13px; }
-th { text-align:left; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight:600; color:#9A9A9A; border-bottom:1px solid #3A3A3A; padding:6px 8px; }
-td { border-bottom:1px solid #2A2A2A; padding:6px 8px; vertical-align:top; }
+th { text-align:left; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight:600; color:#9A9A9A; border-bottom:1px solid #3A3A3A; padding:var(--space-8); }
+td { border-bottom:1px solid #2A2A2A; padding:var(--space-8); vertical-align:top; }
 .status { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space:nowrap; }
 .st-ok { color:#FFFFFF; }
 .st-failed { color:#FF5C00; }
 .st-idle { color:#8A8A8A; }
 .artifacts { color:#9A9A9A; word-break:break-all; }
-.lifecycle-board { background:#1E1E1E; border:1px solid #2A2A2A; border-radius:8px; padding:20px; margin:0 0 32px; }
-.board-title { font-size:20px; margin:0 0 6px; color:#FFFFFF; }
-.board-description { font-size:13px; color:#9A9A9A; margin:0 0 18px; }
-.board-row { background:#0C0C0C; border:1px solid #2A2A2A; border-radius:6px; padding:14px 16px; margin:0 0 12px; }
+.lifecycle-board { background:#1E1E1E; border:1px solid #2A2A2A; border-radius:var(--space-8); padding:var(--space-20); margin:0 0 var(--space-32); }
+.board-title { font-size:20px; margin:0 0 var(--space-8); color:#FFFFFF; }
+.board-description { font-size:13px; color:#9A9A9A; margin:0 0 var(--space-20); }
+.board-row { background:#0C0C0C; border:1px solid #2A2A2A; border-radius:var(--space-8); padding:var(--space-16); margin:0 0 var(--space-12); }
 .board-row:last-child { margin-bottom:0; }
-.board-row-header { margin:0 0 10px; }
-.board-wo-id { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:15px; font-weight:600; margin:0 0 4px; color:#FFFFFF; }
+.board-row-header { margin:0 0 var(--space-12); }
+.board-wo-id { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:15px; font-weight:600; margin:0 0 var(--space-4); color:#FFFFFF; text-decoration:none; }
+.board-wo-id:hover { text-decoration:underline; }
 .board-wo-title { font-size:14px; color:#C9C9C9; }
-.board-stages { display:flex; gap:8px; align-items:center; margin:0 0 8px; }
-.board-stage { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; padding:4px 10px; border-radius:4px; background:#2A2A2A; color:#8A8A8A; white-space:nowrap; }
+.board-stages { display:flex; flex-wrap:wrap; gap:var(--space-8); align-items:center; margin:0 0 var(--space-8); }
+.board-stage { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; padding:var(--space-4) var(--space-12); border-radius:var(--space-4); background:#2A2A2A; color:#8A8A8A; white-space:nowrap; }
 .board-stage.stage-reached { background:#3A3A3A; color:#C9C9C9; }
 .board-stage.stage-current { background:#FF5C00; color:#FFFFFF; font-weight:600; }
-.board-badge { display:inline-block; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:11px; font-weight:700; padding:4px 8px; border-radius:4px; text-transform:uppercase; letter-spacing:.03em; }
+.board-badge { display:inline-block; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:11px; font-weight:700; padding:var(--space-4) var(--space-8); border-radius:var(--space-4); text-transform:uppercase; letter-spacing:.03em; }
 .board-badge.needs-human { background:#FFD700; color:#0C0C0C; }
-.board-intake-state { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:13px; font-weight:600; padding:6px 12px; border-radius:4px; display:inline-block; }
+.board-intake-state { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:13px; font-weight:600; padding:var(--space-8) var(--space-12); border-radius:var(--space-4); display:inline-block; }
 .board-intake-state.state-parked { background:#5A5A2A; color:#FFD700; }
 .board-intake-state.state-rejected { background:#5A2A2A; color:#FF5C00; }
-footer { color:#8A8A8A; font-size:13px; margin-top:28px; }
+footer { color:#8A8A8A; font-size:13px; margin-top:var(--space-32); }
+@media (max-width: 400px) {
+  .board-stages { gap:var(--space-4); }
+  .board-stage { font-size:11px; padding:var(--space-4) var(--space-8); }
+}
 """.strip()
 
 STATUS_CLASS = {"completed": "st-ok", "executed": "st-ok", "approved": "st-ok",
@@ -278,9 +294,9 @@ def render_lifecycle_board(runs, merge_records):
 
         stage_info = derive_lifecycle_stage(report, merge_records)
 
-        parts.append(f'<div class="board-row" id="{_esc(work_order_id)}">')
+        parts.append(f'<div class="board-row">')
         parts.append(f'<div class="board-row-header">')
-        parts.append(f'<h3 class="board-wo-id">{_esc(work_order_id)}</h3>')
+        parts.append(f'<h3 class="board-wo-id"><a href="#{_esc(work_order_id)}-detail" class="board-wo-id">{_esc(work_order_id)}</a></h3>')
         parts.append(f'<div class="board-wo-title">{_dash(title)}</div>')
         parts.append('</div>')
 
@@ -338,8 +354,9 @@ def render_status_page(project, generated_at=None):
         # Render lifecycle board
         parts.append(render_lifecycle_board(runs, merge_records))
     for report in runs:
-        parts.append('<section class="run">')
-        parts.append(f"<h2>{_esc(report.get('work_order_id', '-'))}</h2>")
+        work_order_id = report.get('work_order_id', '-')
+        parts.append(f'<section class="run" id="{_esc(work_order_id)}-detail">')
+        parts.append(f"<h2>{_esc(work_order_id)}</h2>")
         parts.append(f'<div>{_dash(report.get("title"))}</div>')
         deployment = report.get("deployment_status")
         meta = [

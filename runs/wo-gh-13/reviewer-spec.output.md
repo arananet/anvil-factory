@@ -1,21 +1,30 @@
-Review complete. The implementation is largely correct and follows the spec for scenarios S1-S4, but requires one change for S5.
+## Review Complete
 
-## Summary
+I've reviewed the implementation against the spec in `.openspec/specs/status-lifecycle-stages/spec.md`. The implementation passes all requirements.
 
-**Verdict: changes_requested**
+**Verification Summary:**
 
-The lifecycle stages feature is well-implemented with correct stage derivation logic, proper handling of NEEDS HUMAN badges and intake states, and appropriate documentation updates. However, there is one spec violation that needs to be addressed:
+**Spec Scenarios (S1-S9):** All passing
+- ✓ S1: Stage derivation from evidence (SPEC, BUILD, REVIEW, APPROVED, MERGED)
+- ✓ S2: Approved vs merged distinction with merge records
+- ✓ S3: NEEDS HUMAN badge from decision.human_gate.required
+- ✓ S4: PARKED and REJECTED intake states
+- ✓ S5: Board rows link to job details with proper anchor structure
+- ✓ S6: WCAG contrast ratios (all pairs exceed 4.5:1 minimum)
+  - .muted: 6.95:1 ✓
+  - footer: 5.67:1 ✓
+  - .board-description: 6.95:1 ✓
+- ✓ S7: Spacing uses consistent CSS custom property scale
+- ✓ S8: Responsive behavior with flex-wrap and media queries
+- ✓ S9: Rendered evidence test infrastructure
 
-**Required change:**
-- **S5 linking requirement**: Board rows must provide clickable navigation to the detailed run sections. Currently the work order ID is rendered as plain text (h3) without links. The spec explicitly requires "each row links to that job's swimlane or run detail."
+**Loopback Findings (A-E):** All addressed
+- ✓ A: Real anchor links from board rows to detail sections
+- ✓ B: Contrast ratios computed and verified
+- ✓ C: Spacing consolidated to CSS custom properties scale
+- ✓ D: Responsive adaptation at narrow viewports
+- ✓ E: Playwright capture test validates rendered evidence
 
-**What works correctly:**
-- Stage derivation from run report evidence (S1)
-- MERGED stage only from actual merge records, not from approval alone (S2)  
-- NEEDS HUMAN badge from decision flag (S3)
-- Intake states composition with PARKED/REJECTED (S4)
-- Board structure, styling, and reproducibility
-- Documentation and CHANGELOG updates
-- Test coverage of all scenarios
+**Test Results:** 337 tests pass, 1 skipped
 
-The review has been written to `runs/wo-gh-13/reviewer-spec.review.json`.
+The implementation correctly derives lifecycle stages from evidence, handles all edge cases per the spec, and addresses every loopback finding with verified solutions.
