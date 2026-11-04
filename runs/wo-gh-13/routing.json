@@ -1,0 +1,20 @@
+{
+  "selected_reviewers": [
+    "reviewer-spec",
+    "reviewer-security",
+    "reviewer-tests",
+    "reviewer-architecture",
+    "reviewer-design",
+    "reviewer-ux"
+  ],
+  "routed_out": [],
+  "selected_models": {
+    "reviewer-ux": "review-balanced",
+    "reviewer-design": "review-balanced",
+    "reviewer-tests": "review-balanced",
+    "reviewer-architecture": "review-balanced",
+    "reviewer-spec": "review-balanced",
+    "reviewer-security": "review-strong"
+  },
+  "reason": "Medium risk: full panel at policy models"
+}

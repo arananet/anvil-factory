@@ -1,0 +1,25 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-ux",
+  "to_station": "approver",
+  "work_order_id": "wo-gh-13",
+  "artifact_path": "runs/wo-gh-13/reviewer-ux.output.md",
+  "status": "executed",
+  "created_at": "2026-11-04T06:27:58.593669+00:00",
+  "review": {
+    "station": "reviewer-ux",
+    "verdict": "changes_requested",
+    "findings": [
+      "User flow broken: spec S5 requires 'each row links to that job's swimlane or run detail' but the implementation renders board rows as plain divs with no clickable links (statuspage.py:281-309). Users can see the lifecycle board but cannot navigate from it to view detailed information about any work order. The spec states 'The swimlane for the job stays one click away' but no links are implemented.",
+      "Keyboard accessibility missing: board rows lack interactive elements (links or buttons), preventing keyboard users from navigating to work order details. Accessibility guideline: all interactive elements must be keyboard reachable. The rows are divs with id attributes but no href or onclick, making them keyboard-inaccessible.",
+      "Screen reader accessibility gap: without link semantics, screen reader users cannot discover that rows are meant to be navigable or activate the intended navigation. The rows appear as static content rather than interactive elements, lacking proper ARIA roles or link markup.",
+      "Judged from source code without rendered evidence: no screenshots were provided in the packet, so this review assessed the implementation from code alone. Actual rendered contrast ratios, focus visibility, and visual presentation could not be verified."
+    ]
+  },
+  "configured_model": "openai/gpt-6-astra",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
+}

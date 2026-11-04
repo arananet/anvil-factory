@@ -1,0 +1,14 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "changes_requested",
+  "findings": [
+    "S5 violation: Board rows do not contain clickable links to detailed run sections. The spec requires 'each row links to that job's swimlane or run detail' but the implementation renders the work order ID as plain text (h3 element) without any link element. The board row has id='wo-id' on the container div, and the detailed section has no id attribute, making anchor navigation impossible. Expected: board work order ID should be an <a href='#wo-id-detail'> link targeting the detailed run section which should have a corresponding id attribute.",
+    "Stage derivation implementation is correct: SPEC from spec-writer executed, BUILD from builder executed, REVIEW from reviewer steps executed, APPROVED from verdict='approved', MERGED only from actual merge records in merge_records/ with merged=true. No network calls or branch name inference.",
+    "NEEDS HUMAN badge correctly derives from decision.human_gate.required with fallback to top-level human_required for older reports, and renders with prominent badge treatment (class='board-badge needs-human').",
+    "Intake states correctly compose: waiting_info renders as PARKED, rejected renders as REJECTED, both shown instead of stage progression with correct styling (state-parked, state-rejected classes).",
+    "Board rendering structure is correct: one row per work order, stage sequence with reached stages marked (stage-reached class) and current stage highlighted (stage-current class), reproducible from same data.",
+    "Documentation updated in docs/STATUS-PAGE.md with lifecycle board section describing stage vocabulary and derivation rules.",
+    "CHANGELOG Unreleased section updated with entry describing the lifecycle stages feature covering scenarios S1-S5.",
+    "Tests cover all five scenarios and verify data flow through the system. Tests could be strengthened by adding HTML structure assertions (checking for specific classes, badge presence) but current coverage is adequate for verifying the logic works correctly."
+  ]
+}
