@@ -51,9 +51,14 @@ def is_visual_run(work_order):
     Visual work has 'ui' or 'content' in surfaces. API-only, data-only,
     security-only work is not visual.
     """
-    # TODO: Implement proper visual run detection
+    # Defensive: handle missing or invalid surfaces attribute
+    if not hasattr(work_order, "surfaces"):
+        return False
+    surfaces = work_order.surfaces
+    if not isinstance(surfaces, (list, set, tuple)):
+        return False
     visual_surfaces = {"ui", "content"}
-    return bool(set(work_order.surfaces) & visual_surfaces)
+    return bool(set(surfaces) & visual_surfaces)
 
 
 def get_product_type(work_order):
@@ -62,11 +67,16 @@ def get_product_type(work_order):
     Returns one of PRODUCT_TYPES. Defaults to 'physical_product' for
     visual UI work.
     """
-    # TODO: Implement product type extraction from work order
-    description = work_order.description.lower()
-    if "game" in description:
+    # Defensive: handle missing or invalid description attribute
+    if not hasattr(work_order, "description"):
+        return "physical_product"
+    description = work_order.description
+    if not isinstance(description, str):
+        return "physical_product"
+    description_lower = description.lower()
+    if "game" in description_lower:
         return "game"
-    elif "illustration" in description:
+    elif "illustration" in description_lower:
         return "illustration"
     else:
         return "physical_product"
@@ -116,12 +126,27 @@ def packet_quality_charter_section(project, station_id, work_order):
     return "\n".join(lines)
 
 
-def packet_anchor_section(project, work_order):
+def packet_anchor_section(project, station_id, work_order):
     """Render the reference anchors section for station packets.
 
     Returns anchor paths and a warning if no anchors are available.
+    Only for visual runs and imagery stations.
     """
-    # TODO: Implement anchor section with proper anchor loading
+    # Only inject for visual runs
+    if not is_visual_run(work_order):
+        return ""
+
+    # Only inject for imagery stations
+    imagery_stations = {
+        "builder",
+        "media-producer",
+        "reviewer-design",
+        "reviewer-ux",
+    }
+
+    if station_id not in imagery_stations:
+        return ""
+
     project_path = Path(project)
     ref_dir = project_path / "design" / "reference"
 

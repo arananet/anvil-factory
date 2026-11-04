@@ -4,20 +4,17 @@
     "reviewer-security",
     "reviewer-tests",
     "reviewer-architecture",
-    "reviewer-design"
+    "reviewer-design",
+    "reviewer-ux"
   ],
-  "routed_out": [
-    {
-      "reviewer": "reviewer-ux",
-      "reason": "Routed out: no UI surface"
-    }
-  ],
+  "routed_out": [],
   "selected_models": {
+    "reviewer-ux": "review-balanced",
     "reviewer-design": "review-balanced",
-    "reviewer-architecture": "review-balanced",
+    "reviewer-security": "review-strong",
     "reviewer-spec": "review-balanced",
     "reviewer-tests": "review-balanced",
-    "reviewer-security": "review-strong"
+    "reviewer-architecture": "review-balanced"
   },
-  "reason": "Medium risk: full panel at policy models"
+  "reason": "Medium risk: full panel at policy models; Security surface: reviewer-security at strong model"
 }

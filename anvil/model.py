@@ -36,6 +36,32 @@ def validate_path_component(component, name):
         raise ValueError(f"{name} looks like an absolute path")
     return component
 
+def validate_relative_path(path, name):
+    """Validate that a relative path does not contain traversal attempts.
+
+    Similar to validate_path_component but allows forward slashes for
+    multi-level relative paths. Rejects parent directory references (..)
+    backslashes, and absolute paths.
+    """
+    if not path:
+        raise ValueError(f"{name} is empty")
+    # Reject parent directory traversal
+    if ".." in path:
+        raise ValueError(f"{name} contains dangerous path component: ..")
+    # Reject backslashes (Windows-style, could be traversal attempt)
+    if "\\" in path:
+        raise ValueError(f"{name} contains dangerous path component: \\")
+    # Reject absolute paths (Unix-style)
+    if path.startswith("/"):
+        raise ValueError(f"{name} looks like an absolute path")
+    # Reject absolute paths (Windows-style)
+    if len(path) > 1 and path[1] == ":":
+        raise ValueError(f"{name} looks like an absolute path")
+    # Reject tilde expansion
+    if "~" in path:
+        raise ValueError(f"{name} contains dangerous path component: ~")
+    return path
+
 class IntakeValidationError(ValueError):
     """Raised when intake_outcome validation fails."""
     pass
@@ -135,6 +161,15 @@ class WorkOrder:
         _validate_intake_outcome(self.intake_outcome)
         _validate_risk(self.risk)
         _validate_surfaces(self.surfaces)
+        # Validate quality field paths (F3: path traversal protection)
+        for anchor in self.anchors:
+            if anchor:  # Skip empty strings
+                validate_relative_path(anchor, "anchor path")
+        if self.identity_reference:
+            validate_relative_path(self.identity_reference, "identity_reference")
+        for deliverable in self.deliverable_set:
+            if deliverable:  # Skip empty strings
+                validate_relative_path(deliverable, "deliverable_set path")
     
     def __setattr__(self, name, value):
         # Validate fields on assignment to catch runtime modifications
@@ -148,6 +183,21 @@ class WorkOrder:
     
     @classmethod
     def from_dict(cls, data):
+        # Validate path fields for security (F3: path traversal protection)
+        anchors = list(data.get("anchors", []))
+        for anchor in anchors:
+            if anchor:  # Skip empty strings
+                validate_relative_path(anchor, "anchor path")
+
+        identity_reference = data.get("identity_reference")
+        if identity_reference:
+            validate_relative_path(identity_reference, "identity_reference")
+
+        deliverable_set = list(data.get("deliverable_set", []))
+        for deliverable in deliverable_set:
+            if deliverable:  # Skip empty strings
+                validate_relative_path(deliverable, "deliverable_set path")
+
         return cls(id=data["id"], kind=data["kind"], title=data["title"],
                    source=data.get("source", "manual"), description=data.get("description", ""),
                    risk_hints=list(data.get("risk_hints", [])), status=data.get("status", "new"),
@@ -155,10 +205,10 @@ class WorkOrder:
                    risk=data.get("risk"),
                    surfaces=list(data.get("surfaces", [])),
                    knowledge_pack=data.get("knowledge_pack"),
-                   anchors=list(data.get("anchors", [])),
-                   identity_reference=data.get("identity_reference"),
+                   anchors=anchors,
+                   identity_reference=identity_reference,
                    identity_traits=list(data.get("identity_traits", [])),
-                   deliverable_set=list(data.get("deliverable_set", [])))
+                   deliverable_set=deliverable_set)
     def to_dict(self):
         result = {"id": self.id, "kind": self.kind, "title": self.title, "source": self.source,
                 "description": self.description, "risk_hints": list(self.risk_hints), "status": self.status}

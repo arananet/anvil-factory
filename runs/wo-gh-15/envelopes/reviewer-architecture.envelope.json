@@ -3,26 +3,8 @@
   "from_station": "reviewer-architecture",
   "to_station": "reviewer-design",
   "work_order_id": "wo-gh-15",
-  "artifact_path": "runs/wo-gh-15/reviewer-architecture.output.md",
-  "status": "executed",
-  "created_at": "2026-11-04T17:40:36.589030+00:00",
-  "review": {
-    "station": "reviewer-architecture",
-    "verdict": "changes_requested",
-    "findings": [
-      "Integration gap in anvil/runner.py: The quality functions packet_quality_charter_section() and packet_anchor_section() are defined in anvil/quality.py but never called. The packet_step() function (line 456) must call these functions and pass their results to _packet_text(), following the pattern established by packet_design_section, packet_rendered_evidence_section, and packet_knowledge_section.",
-      "Missing parameters in _packet_text(): The function signature (line 324) needs quality_charter_section and anchor_section parameters added to match the pattern of other section parameters. Without these, the quality information cannot reach station packets.",
-      "Station contract not updated: stations/reviewer-design/PROMPT.md describes only a single-verdict output format with a findings list. Per spec requirements and S1, the prompt must document the dual-section structure (compliance section and separate quality section), the anchor comparison duty, and the requirement to name gap categories by criterion (materials, light, scale, contact).",
-      "Output format mismatch: The reviewer-design prompt shows {verdict, findings} but the spec and tests expect {compliance: {verdict, findings}, quality: {verdict, findings, anchor}}. The station's contract must match what the validation functions check (validate_reviewer_quality_section in quality.py:180).",
-      "Generating station prompts not updated: Per S4, stations that produce imagery (builder, media-producer, brief-writer per QUALITY_CHARTER.md:70) must verify outputs before review and record comparisons in run evidence. Their prompts in stations/builder/, stations/media-producer/, stations/brief-writer/ need the self-comparison duty added to their contracts.",
-      "Run report warning mechanism undefined: S2 requires a visible warning in the run report when a visual run has no anchors. The quality module generates the warning text (quality.py:134) but there's no evidence of integration with the run report generation in runner.py or approver.py.",
-      "Decision 0001 composable stations: The implementation correctly defines quality.py as a reusable module following the composable pattern, but the module is orphaned - pipelines will not apply it until runner.py calls its functions. The composition is structurally sound but functionally disconnected."
-    ]
-  },
-  "configured_model": "review-balanced",
-  "executor": {
-    "kind": "command",
-    "detail": "python3"
-  },
-  "executed_model": null
+  "artifact_path": "runs/wo-gh-15/reviewer-architecture.packet.md",
+  "status": "skipped",
+  "created_at": "2026-11-04T18:07:15.384049+00:00",
+  "configured_model": "review-balanced"
 }

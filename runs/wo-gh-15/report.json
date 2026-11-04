@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 42195.947,
+      "duration_ms": 41873.225,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/intake.output.md"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/spec-writer.output.md",
-      "duration_ms": 50328.853,
+      "duration_ms": 80435.658,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/spec-writer.output.md"
@@ -40,7 +40,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/test-writer.output.md",
-      "duration_ms": 474496.204,
+      "duration_ms": 212939.12,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/test-writer.output.md"
@@ -56,12 +56,12 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/builder.output.md",
-      "duration_ms": 234340.651,
+      "duration_ms": 584884.329,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/builder.output.md"
       ],
-      "configured_model": "claude-sonnet-4-5",
+      "configured_model": "openai/gpt-6-astra",
       "executed_model": null,
       "executor": {
         "kind": "command",
@@ -70,9 +70,9 @@
     },
     {
       "station": "checks-gate",
-      "status": "passed",
-      "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 34328.901,
+      "status": "failed",
+      "detail": "Gate failed: 1 checks, protected paths: fail",
+      "duration_ms": 26861.883,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/checks-gate.pre-review.output.md"
@@ -92,95 +92,99 @@
         "anvil.json",
         "pipelines/"
       ],
-      "protected_path_verdict": "pass",
-      "protected_path_findings": [],
-      "gate_verdict": "pass"
+      "protected_path_verdict": "fail",
+      "protected_path_findings": [
+        "Protected path violation: tests/test_quality_standard_coverage.md (base ref file modified/deleted, matches tests/)",
+        "Protected path violation: tests/test_review_parsing_integrity.py (base ref file modified/deleted, matches tests/)",
+        "Protected path violation: tests/test_quality_standard.py (base ref file modified/deleted, matches tests/)"
+      ],
+      "gate_verdict": "fail"
+    },
+    {
+      "station": "loopback",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Gate failure: Protected path violation: tests/test_quality_standard_coverage.md (base ref file modified/deleted, matches tests/); Protected path violation: tests/test_review_parsing_integrity.py (base ref file modified/deleted, matches tests/); Protected path violation: tests/test_quality_standard.py (base ref file modified/deleted, matches tests/)",
+      "reason": "Gate failure: Protected path violation: tests/test_quality_standard_coverage.md (base ref file modified/deleted, matches tests/); Protected path violation: tests/test_review_parsing_integrity.py (base ref file modified/deleted, matches tests/); Protected path violation: tests/test_quality_standard.py (base ref file modified/deleted, matches tests/)",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null,
+      "feedback": "",
+      "from_station": "checks-gate"
     },
     {
       "station": "reviewer-spec",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-spec.output.md",
-      "duration_ms": 171114.681,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 1.494,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-15/reviewer-spec.output.md"
+        "runs/wo-gh-15/reviewer-spec.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-security",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-security.output.md",
-      "duration_ms": 105107.84,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.311,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-15/reviewer-security.output.md"
+        "runs/wo-gh-15/reviewer-security.packet.md"
       ],
       "configured_model": "review-strong",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-tests",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-tests.output.md",
-      "duration_ms": 101333.88,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.316,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-15/reviewer-tests.output.md"
+        "runs/wo-gh-15/reviewer-tests.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-architecture",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-architecture.output.md",
-      "duration_ms": 104457.533,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.286,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-15/reviewer-architecture.output.md"
+        "runs/wo-gh-15/reviewer-architecture.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-design",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-design.output.md",
-      "duration_ms": 80972.478,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 1.16,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-15/reviewer-design.output.md"
+        "runs/wo-gh-15/reviewer-design.packet.md"
       ],
       "configured_model": "openai/gpt-6-astra",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-ux",
-      "status": "routed_out",
-      "detail": "Routed out: Routed out: no UI surface",
-      "duration_ms": 0.92,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 1.066,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/reviewer-ux.packet.md"
@@ -192,8 +196,8 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: changes_requested",
-      "duration_ms": 0.041,
+      "detail": "Approver verdict: no_reviews",
+      "duration_ms": 0.039,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/report.json"
@@ -203,23 +207,10 @@
       "executor": null
     },
     {
-      "station": "approver",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: Path traversal vulnerability: The anchors, identity_reference, and deliverable_set fields in WorkOrder (model.py:123-126) accept arbitrary path strings from JSON without validation. Since work orders can originate from external sources (github-issue), an attacker could inject paths like '../../etc/passwd' or '../../../sensitive/data'. While currently only used for display in packet_anchor_section (quality.py:131-143), these unvalidated paths persist in work order storage and could enable unauthorized file access if future code uses them for file operations. Mitigation: Add path validation in WorkOrder.from_dict to ensure paths are relative, within expected boundaries, and contain no traversal sequences.; Missing input validation in quality.py: Functions is_visual_run (line 48) and get_product_type (line 59) access work_order.surfaces and work_order.description without checking these attributes exist or validating their types. While this creates robustness issues rather than exploitable vulnerabilities, malformed work orders could cause AttributeError exceptions. Mitigation: Add defensive checks using getattr with defaults or validate work order structure.; No sanitization of user-controlled strings: Anchor paths and other work order fields are directly interpolated into packet output (quality.py:142, design.py output). While the output format is markdown (not HTML), malicious content in these fields could include misleading information or control characters. Mitigation: Consider basic sanitization of paths and strings used in output, especially if packet content could be rendered in contexts beyond plain text.; Integration gap in anvil/runner.py: The quality functions packet_quality_charter_section() and packet_anchor_section() are defined in anvil/quality.py but never called. The packet_step() function (line 456) must call these functions and pass their results to _packet_text(), following the pattern established by packet_design_section, packet_rendered_evidence_section, and packet_knowledge_section.; Missing parameters in _packet_text(): The function signature (line 324) needs quality_charter_section and anchor_section parameters added to match the pattern of other section parameters. Without these, the quality information cannot reach station packets.; Station contract not updated: stations/reviewer-design/PROMPT.md describes only a single-verdict output format with a findings list. Per spec requirements and S1, the prompt must document the dual-section structure (compliance section and separate quality section), the anchor comparison duty, and the requirement to name gap categories by criterion (materials, light, scale, contact).; Output format mismatch: The reviewer-design prompt shows {verdict, findings} but the spec and tests expect {compliance: {verdict, findings}, quality: {verdict, findings, anchor}}. The station's contract must match what the validation functions check (validate_reviewer_quality_section in quality.py:180).; Generating station prompts not updated: Per S4, stations that produce imagery (builder, media-producer, brief-writer per QUALITY_CHARTER.md:70) must verify outputs before review and record comparisons in run evidence. Their prompts in stations/builder/, stations/media-producer/, stations/brief-writer/ need the self-comparison duty added to their contracts.; Run report warning mechanism undefined: S2 requires a visible warning in the run report when a visual run has no anchors. The quality module generates the warning text (quality.py:134) but there's no evidence of integration with the run report generation in runner.py or approver.py.; Decision 0001 composable stations: The implementation correctly defines quality.py as a reusable module following the composable pattern, but the module is orphaned - pipelines will not apply it until runner.py calls its functions. The composition is structurally sound but functionally disconnected.; Scale Contrast quality bar violation: Secondary text (e.g., 'configured: default', 'configured: claude-sonnet-4-5') uses gray that appears to fall below the minimum 4.5:1 contrast ratio required for normal text against the dark background. Visible in both screenshot-1440x900.png and screenshot-390x844.png.; Responsive Behavior quality bar concern: The station data table in screenshot-390x844.png (mobile view) displays all columns (Station, Status, Duration ms, Cost, Artifacts) on a 390px viewport. This creates potential violations: (1) table cells may contain touch targets smaller than the required 44x44px minimum, and (2) the table may require horizontal scrolling, violating the 'No horizontal scrolling on standard viewports' requirement. The quality bars require 'Layout works on mobile, tablet, and desktop' \u2014 data tables typically need responsive treatment (card layouts, scrollable regions with clear affordance, or progressive disclosure) on mobile viewports.",
-      "reason": "Path traversal vulnerability: The anchors, identity_reference, and deliverable_set fields in WorkOrder (model.py:123-126) accept arbitrary path strings from JSON without validation. Since work orders can originate from external sources (github-issue), an attacker could inject paths like '../../etc/passwd' or '../../../sensitive/data'. While currently only used for display in packet_anchor_section (quality.py:131-143), these unvalidated paths persist in work order storage and could enable unauthorized file access if future code uses them for file operations. Mitigation: Add path validation in WorkOrder.from_dict to ensure paths are relative, within expected boundaries, and contain no traversal sequences.; Missing input validation in quality.py: Functions is_visual_run (line 48) and get_product_type (line 59) access work_order.surfaces and work_order.description without checking these attributes exist or validating their types. While this creates robustness issues rather than exploitable vulnerabilities, malformed work orders could cause AttributeError exceptions. Mitigation: Add defensive checks using getattr with defaults or validate work order structure.; No sanitization of user-controlled strings: Anchor paths and other work order fields are directly interpolated into packet output (quality.py:142, design.py output). While the output format is markdown (not HTML), malicious content in these fields could include misleading information or control characters. Mitigation: Consider basic sanitization of paths and strings used in output, especially if packet content could be rendered in contexts beyond plain text.; Integration gap in anvil/runner.py: The quality functions packet_quality_charter_section() and packet_anchor_section() are defined in anvil/quality.py but never called. The packet_step() function (line 456) must call these functions and pass their results to _packet_text(), following the pattern established by packet_design_section, packet_rendered_evidence_section, and packet_knowledge_section.; Missing parameters in _packet_text(): The function signature (line 324) needs quality_charter_section and anchor_section parameters added to match the pattern of other section parameters. Without these, the quality information cannot reach station packets.; Station contract not updated: stations/reviewer-design/PROMPT.md describes only a single-verdict output format with a findings list. Per spec requirements and S1, the prompt must document the dual-section structure (compliance section and separate quality section), the anchor comparison duty, and the requirement to name gap categories by criterion (materials, light, scale, contact).; Output format mismatch: The reviewer-design prompt shows {verdict, findings} but the spec and tests expect {compliance: {verdict, findings}, quality: {verdict, findings, anchor}}. The station's contract must match what the validation functions check (validate_reviewer_quality_section in quality.py:180).; Generating station prompts not updated: Per S4, stations that produce imagery (builder, media-producer, brief-writer per QUALITY_CHARTER.md:70) must verify outputs before review and record comparisons in run evidence. Their prompts in stations/builder/, stations/media-producer/, stations/brief-writer/ need the self-comparison duty added to their contracts.; Run report warning mechanism undefined: S2 requires a visible warning in the run report when a visual run has no anchors. The quality module generates the warning text (quality.py:134) but there's no evidence of integration with the run report generation in runner.py or approver.py.; Decision 0001 composable stations: The implementation correctly defines quality.py as a reusable module following the composable pattern, but the module is orphaned - pipelines will not apply it until runner.py calls its functions. The composition is structurally sound but functionally disconnected.; Scale Contrast quality bar violation: Secondary text (e.g., 'configured: default', 'configured: claude-sonnet-4-5') uses gray that appears to fall below the minimum 4.5:1 contrast ratio required for normal text against the dark background. Visible in both screenshot-1440x900.png and screenshot-390x844.png.; Responsive Behavior quality bar concern: The station data table in screenshot-390x844.png (mobile view) displays all columns (Station, Status, Duration ms, Cost, Artifacts) on a 390px viewport. This creates potential violations: (1) table cells may contain touch targets smaller than the required 44x44px minimum, and (2) the table may require horizontal scrolling, violating the 'No horizontal scrolling on standard viewports' requirement. The quality bars require 'Layout works on mobile, tablet, and desktop' \u2014 data tables typically need responsive treatment (card layouts, scrollable regions with clear affordance, or progressive disclosure) on mobile viewports.",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null
-    },
-    {
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: required",
-      "duration_ms": 0.006,
+      "duration_ms": 0.007,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -230,7 +221,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-15/deployer.packet.md",
-      "duration_ms": 0.073,
+      "duration_ms": 0.275,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/deployer.packet.md"
@@ -243,7 +234,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-15/observer.output.md",
-      "duration_ms": 51805.021,
+      "duration_ms": 55509.635,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-15/observer.output.md"
@@ -256,7 +247,7 @@
       }
     }
   ],
-  "verdict": "changes_requested",
+  "verdict": "no_reviews",
   "human_required": true,
   "max_loopbacks": 2,
   "loopbacks": 1,
@@ -265,45 +256,25 @@
   "risk_hints": [],
   "decision": {
     "approver": {
-      "reviews_counted": [
-        {
-          "station": "reviewer-spec",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-security",
-          "verdict": "changes_requested"
-        },
-        {
-          "station": "reviewer-tests",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-architecture",
-          "verdict": "changes_requested"
-        },
-        {
-          "station": "reviewer-design",
-          "verdict": "changes_requested"
-        }
-      ],
+      "reviews_counted": [],
       "reviews_expected": [
         "reviewer-spec",
         "reviewer-security",
         "reviewer-tests",
         "reviewer-architecture",
-        "reviewer-design"
+        "reviewer-design",
+        "reviewer-ux"
       ],
-      "rule": "Reviewers reviewer-security, reviewer-architecture, reviewer-design requested changes. (Expected 5 reviews after routing.)"
+      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 6.)"
     },
     "human_gate": {
       "required": true,
-      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "rule": "Verdict is no_reviews, not approved, so a human is required.",
       "hints_matched": []
     }
   },
   "warnings": [],
-  "base_ref": "afcd69a3b28cce51f03ce976dcd4b70fa8b881e1",
+  "base_ref": "cf2501cf25620bab53a3a271f6d0b8185e9fe091",
   "evidence": [
     {
       "type": "screenshot",
@@ -323,6 +294,6 @@
   "cost": {
     "total": 0,
     "measured_steps": 0,
-    "unmeasured_steps": 10
+    "unmeasured_steps": 5
   }
 }

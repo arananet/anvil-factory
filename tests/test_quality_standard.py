@@ -170,8 +170,8 @@ class PacketInjectionTests(unittest.TestCase):
             # Add anchors to work order
             wo.anchors = [anchors["photoreal"]]
 
-            # Packets should include anchor section
-            section = packet_anchor_section(proj, wo)
+            # Packets should include anchor section (for imagery stations)
+            section = packet_anchor_section(proj, "builder", wo)
             self.assertNotEqual(section, "")
             self.assertIn("Reference Anchors", section)
             self.assertIn(anchors["photoreal"], section)
@@ -191,8 +191,8 @@ class PacketInjectionTests(unittest.TestCase):
             # No anchors directory exists
             self.assertFalse(ref_dir.exists())
 
-            # Anchor section should warn about missing anchors
-            section = packet_anchor_section(proj, wo)
+            # Anchor section should warn about missing anchors (for imagery stations)
+            section = packet_anchor_section(proj, "builder", wo)
             self.assertIn("WARNING", section)
             self.assertIn("no reference anchors", section.lower())
 

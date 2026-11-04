@@ -11,27 +11,25 @@ Outcome: accepted
 
 Risk: medium
 
-Surfaces: data, content
+Surfaces: security, ui, content
 
 ## Routing
 
-**Decision**: Medium risk: full panel at policy models
+**Decision**: Medium risk: full panel at policy models; Security surface: reviewer-security at strong model
 
-**Selected reviewers** (5):
+**Selected reviewers** (6):
 - reviewer-spec (model: review-balanced)
 - reviewer-security (model: review-strong)
 - reviewer-tests (model: review-balanced)
 - reviewer-architecture (model: review-balanced)
 - reviewer-design (model: review-balanced)
-
-**Routed out** (1):
-- reviewer-ux: Routed out: no UI surface
+- reviewer-ux (model: review-balanced)
 
 ## Verdict
 
-Verdict: changes_requested
+Verdict: no_reviews
 
-Reviewers reviewer-security, reviewer-architecture, reviewer-design requested changes. (Expected 5 reviews after routing.)
+No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 6.)
 
 ## Steps
 
@@ -39,15 +37,15 @@ Reviewers reviewer-security, reviewer-architecture, reviewer-design requested ch
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: passed
-- reviewer-spec: executed
-- reviewer-security: executed
-- reviewer-tests: executed
-- reviewer-architecture: executed
-- reviewer-design: executed
-- reviewer-ux: routed_out
+- checks-gate: failed
+- loopback: loopback
+- reviewer-spec: skipped
+- reviewer-security: skipped
+- reviewer-tests: skipped
+- reviewer-architecture: skipped
+- reviewer-design: skipped
+- reviewer-ux: skipped
 - approver: completed
-- approver: loopback
 - triage-human: completed
 - deployer: packet_ready
 - observer: executed

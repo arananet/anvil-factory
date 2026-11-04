@@ -27,18 +27,57 @@ Judge interface output against the project's own design system: its design token
 
 ## Output Format
 
-Return a JSON object with this structure:
+For visual runs (when Quality Charter is present in your packet), return a JSON object with dual-section structure:
+
+{
+  "station": "reviewer-design",
+  "verdict": "pass | fail | changes_requested",
+  "compliance": {
+    "verdict": "pass | fail | changes_requested",
+    "findings": [
+      "Design system compliance findings (tokens, rules, component patterns)"
+    ]
+  },
+  "quality": {
+    "verdict": "pass | fail | changes_requested",
+    "findings": [
+      "Quality findings comparing output against reference anchors and charter criteria"
+    ],
+    "anchor": "path/to/anchor/file or 'charter floor only' when no anchors"
+  }
+}
+
+For non-visual runs (no Quality Charter in packet), return the simple structure:
 
 {
   "station": "reviewer-design",
   "verdict": "pass | fail | changes_requested",
   "findings": [
-    "Specific finding with reference to design system rule or quality bar",
-    "Another finding if applicable"
+    "Specific finding with reference to design system rule or quality bar"
   ]
 }
 
-The station field must equal "reviewer-design", the verdict must be one of pass, fail, or changes_requested, and findings must be a list of strings.
+### Dual-Section Review (Visual Runs)
+
+When reviewing visual deliverables:
+
+1. **Compliance section**: Judge design system adherence - tokens, component patterns, layout rules, motion guidelines.
+
+2. **Quality section**: Judge visual quality by comparing the output against reference anchors and charter criteria. This is a separate judgment from compliance.
+   - When reference anchors are present: Compare the output against the anchors. Name gap categories from the charter criteria (materials, light, scale, contact for physical products; stated criteria for games/illustrations).
+   - When no anchors: Judge against charter floor alone.
+   - Cite the anchor used in comparison or state "charter floor only" when no anchors available.
+
+The overall verdict is the stricter of the two section verdicts. A deliverable can pass compliance but fail quality, and such a case must be reported as changes_requested or fail at the overall level.
+
+### Quality Criteria by Product Type
+
+When judging quality section findings, name specific criteria gaps:
+
+**Physical products**: materials, light, contact, scale
+**Games/Illustrations**: Apply the project's stated standard from the design system
+
+The station field must equal "reviewer-design", and both the overall verdict and section verdicts must be one of pass, fail, or changes_requested.
 
 ## Examples
 

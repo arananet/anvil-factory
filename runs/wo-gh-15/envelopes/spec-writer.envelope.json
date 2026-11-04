@@ -5,7 +5,7 @@
   "work_order_id": "wo-gh-15",
   "artifact_path": "runs/wo-gh-15/spec-writer.output.md",
   "status": "executed",
-  "created_at": "2026-11-04T17:20:08.758518+00:00",
+  "created_at": "2026-11-04T17:53:28.366114+00:00",
   "configured_model": "claude-sonnet-4-5",
   "executor": {
     "kind": "command",

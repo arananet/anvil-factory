@@ -20,10 +20,29 @@ from .knowledge import (
     get_design_model_from_routing,
     KnowledgeValidationError,
 )
+from .quality import (
+    packet_quality_charter_section,
+    packet_anchor_section,
+    is_visual_run,
+)
+
+def _sanitize_control_chars(text):
+    """Sanitize control characters from text to prevent injection.
+
+    Removes or replaces control characters that could be used for
+    injection attacks (F3).
+    """
+    if not isinstance(text, str):
+        return str(text)
+    # Remove control characters (except tab and newline which are safe in markdown)
+    import re
+    # Keep \t (tab) and \n (newline), remove other control chars
+    sanitized = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]', '', text)
+    return sanitized
 
 def _escape_markdown(text):
     """Escape markdown special characters to prevent content injection.
-    
+
     Escapes characters that could be used to inject markdown formatting,
     links, or other content into generated reports.
     """
@@ -321,16 +340,21 @@ def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None, b
     return set()
 
 
-def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section="", rendered_evidence_section="", knowledge_section=""):
+def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section="", rendered_evidence_section="", knowledge_section="", quality_charter_section="", anchor_section=""):
     upstream = "\n".join(f"- {s['station']}: {s['status']}" for s in steps) or "- (none)"
     # Use rescoped description if intake rescoped the work
     description = work_order.description
     if work_order.intake_outcome.get("outcome") == "rescoped" and work_order.intake_outcome.get("rescoped_description"):
         description = work_order.intake_outcome["rescoped_description"]
+    # Sanitize work order controlled strings (F3: control character sanitization)
+    safe_title = _sanitize_control_chars(work_order.title)
+    safe_description = _sanitize_control_chars(description)
+    safe_source = _sanitize_control_chars(work_order.source)
+    safe_risk_hints = ', '.join(_sanitize_control_chars(hint) for hint in work_order.risk_hints)
     text = (f"# Task packet: {station_id}\n\n## Station prompt\n\n{prompt}\n\n## Work order\n\n"
-            f"- id: {work_order.id}\n- kind: {work_order.kind}\n- title: {work_order.title}\n"
-            f"- source: {work_order.source}\n- description: {description}\n"
-            f"- risk_hints: {', '.join(work_order.risk_hints)}\n- status: {work_order.status}\n\n"
+            f"- id: {work_order.id}\n- kind: {work_order.kind}\n- title: {safe_title}\n"
+            f"- source: {safe_source}\n- description: {safe_description}\n"
+            f"- risk_hints: {safe_risk_hints}\n- status: {work_order.status}\n\n"
             f"## Upstream steps\n\n{upstream}\n")
     if learnings_section:
         text += f"\n{learnings_section}\n"
@@ -338,6 +362,10 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
         text += f"\n{design_section}\n"
     if knowledge_section:
         text += f"\n{knowledge_section}\n"
+    if quality_charter_section:
+        text += f"\n{quality_charter_section}\n"
+    if anchor_section:
+        text += f"\n{anchor_section}\n"
     if rendered_evidence_section:
         text += f"\n{rendered_evidence_section}\n"
     # Reviewer stations have a specific output contract
@@ -445,6 +473,14 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                        "but the project has no design/DESIGN.md. Define the design system to enable "
                        "design review.")
 
+    # S2: Add warning for visual runs with no reference anchors
+    if is_visual_run(work_order):
+        ref_dir = project / "design" / "reference"
+        anchors = getattr(work_order, "anchors", [])
+        if not anchors and not ref_dir.exists():
+            warnings.append("No reference anchors: This visual run has no reference anchors. "
+                          "The review will proceed under the charter floor alone.")
+
     def write_envelope(station_id, next_station, artifact, status, extra=None):
         envelope = {"schema": "anvil/envelope@1", "from_station": station_id, "to_station": next_station,
                     "work_order_id": work_order.id, "artifact_path": artifact,
@@ -459,8 +495,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         rendered_evidence_section = packet_rendered_evidence_section(project, work_order.id, station_id)
         # S3: Design knowledge section for design stations (computed once per run)
         knowledge_section = packet_knowledge_section(project, station_id, knowledge_pack)
+        # Quality charter and anchor sections for visual runs
+        quality_charter_section = packet_quality_charter_section(project, station_id, work_order)
+        anchor_section = packet_anchor_section(project, station_id, work_order)
         packet = run_dir / f"{station_id}.packet.md"
-        packet.write_text(_packet_text(station_id, prompt, work_order, steps, learnings_section, design_section, rendered_evidence_section, knowledge_section), encoding="utf-8")
+        packet.write_text(_packet_text(station_id, prompt, work_order, steps, learnings_section, design_section, rendered_evidence_section, knowledge_section, quality_charter_section, anchor_section), encoding="utf-8")
         return packet
 
     for idx, station_id in enumerate(order):

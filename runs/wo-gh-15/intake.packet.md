@@ -99,6 +99,21 @@ S7: a work order producing a set of related visual deliverables designates one c
 Tests covering S1 to S7 in the factory suite style, docs updated, CHANGELOG Unreleased updated. Keep the whole suite green and every pipeline valid.
 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/15
+
+GATE LOOPBACK (round 2). Round 1 verdict was changes_requested with 5 of 5 reviews counted after routing (reviewer-spec and reviewer-tests pass; reviewer-security, reviewer-architecture and reviewer-design changes_requested). Close exactly the counted findings:
+
+1. WIRE THE QUALITY MODULE INTO THE RUNNER (reviewer-architecture). anvil/quality.py defines packet_quality_charter_section() and packet_anchor_section() but anvil/runner.py never calls them; the module is orphaned. packet_step() must call both and pass their results to _packet_text(), which gains quality_charter_section and anchor_section parameters, following the established pattern of packet_design_section, packet_rendered_evidence_section and packet_knowledge_section. Wire the S2 warning the same way: on a visual run with no anchors, the run report carries the visible no-reference-anchors warning the quality module generates.
+
+2. STATION CONTRACTS (reviewer-architecture, spec S1 and S4). stations/reviewer-design/PROMPT.md must document the dual-section review structure the code validates ({compliance: {verdict, findings}, quality: {verdict, findings, anchor}} per validate_reviewer_quality_section), the anchor comparison duty as a separate named quality section, and the requirement to name gap categories by criterion (materials, light, scale, contact). The imagery generating station prompts (stations/builder/, stations/media-producer/, stations/brief-writer/) gain the S4 duty: verify each produced output against the run's anchors and charter criteria before the review step and record the comparison in the run evidence per output. reviewer-ux's prompt carries the same quality section duty for the experiential side, per S1.
+
+3. PATH AND INPUT VALIDATION (reviewer-security). WorkOrder.from_dict must validate the anchors, identity_reference and deliverable_set path fields: relative paths only, no parent traversal, no absolute paths, following the validate_path_component discipline already in the codebase; malformed values are rejected with a named error. quality.py is_visual_run and get_product_type must not assume attribute presence or types (defensive access or structural validation). Work order controlled strings interpolated into packet output are sanitized of control characters.
+
+4. RENDERED SURFACE (reviewer-design). In the surface rendered as this run's evidence: secondary text (the 'configured:' lines) must reach at least 4.5:1 contrast against the dark background at both breakpoints, and the station data table at 390x844 needs responsive treatment (no horizontal scrolling; touch targets at least 44x44px; card layout, scrollable region with clear affordance, or progressive disclosure). Capture rendered evidence at 390x844 and 1440x900 in this run showing both fixed.
+
+5. TESTS. Add regression tests in the factory suite style proving the wiring: a visual run's generating and reviewing packets contain the charter section and the anchor section; a visual run with no anchors produces the report warning; a non-visual run contains no charter text anywhere (S3); the reviewer-design dual-section output validates against the contract; traversal paths in the new WorkOrder fields are rejected.
+
+Guardrails: the charter document and quality.py's criteria content were not faulted; do not rewrite them beyond the wiring. No changes to the review parsing contract beyond the reviewer-design dual-section contract item 2 names (the parser and producer mechanisms themselves are frozen), the checks gate base ref behavior, or other items' modules. Keep the full suite green and every pipeline valid; docs and CHANGELOG Unreleased updated for the wiring. No em dash or en dash characters in any produced file.
+
 - risk_hints: 
 - status: new
 

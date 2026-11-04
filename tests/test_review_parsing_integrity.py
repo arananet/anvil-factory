@@ -659,6 +659,11 @@ class TestPacketAndPromptContract(unittest.TestCase):
                             f"{station_name}/PROMPT.md should reference its own station id in Output Format")
 
         # Loopback L1 enhancement: Verify sections are identical (modulo station id)
+        # Exception: reviewer-design and reviewer-ux have extended formats for visual quality judgments
+        # (dual-section structure per quality standard work order wo-gh-15)
+        visual_reviewers = {"reviewer-design", "reviewer-ux"}
+        standard_reviewers = [r for r in expected_reviewers if r not in visual_reviewers]
+
         # Normalize each section by replacing the station-specific name with a placeholder
         normalized_sections = {}
         for station_name, section_text in sections.items():
@@ -667,20 +672,33 @@ class TestPacketAndPromptContract(unittest.TestCase):
             normalized = normalized.replace(station_name, "STATION_ID")
             normalized_sections[station_name] = normalized
 
-        # All normalized sections should be identical
-        normalized_values = list(normalized_sections.values())
-        reference_section = normalized_values[0]
-        reference_station = expected_reviewers[0]
+        # All standard (non-visual) reviewer sections should be identical
+        if len(standard_reviewers) > 1:
+            reference_section = normalized_sections[standard_reviewers[0]]
+            reference_station = standard_reviewers[0]
 
-        for i, station_name in enumerate(expected_reviewers[1:], 1):
-            self.assertEqual(
-                normalized_values[i],
-                reference_section,
-                f"{station_name}/PROMPT.md Output Format section should be identical to "
-                f"{reference_station}/PROMPT.md (except for station id). "
-                f"Loopback L1 requires 'the same section text and structure, with only the "
-                f"station id changed where the section names it.'"
-            )
+            for station_name in standard_reviewers[1:]:
+                self.assertEqual(
+                    normalized_sections[station_name],
+                    reference_section,
+                    f"{station_name}/PROMPT.md Output Format section should be identical to "
+                    f"{reference_station}/PROMPT.md (except for station id). "
+                    f"Loopback L1 requires 'the same section text and structure, with only the "
+                    f"station id changed where the section names it.'"
+                )
+
+        # Visual reviewers (reviewer-design, reviewer-ux) have extended dual-section format
+        # Verify they have the required dual-section structure keywords
+        for station_name in visual_reviewers:
+            if station_name in sections:
+                section_text = sections[station_name]
+                # Should mention dual-section structure for visual runs
+                self.assertIn("visual run", section_text.lower(),
+                            f"{station_name} should document visual run handling")
+                self.assertIn("compliance", section_text.lower(),
+                            f"{station_name} should mention compliance section")
+                self.assertIn("quality", section_text.lower(),
+                            f"{station_name} should mention quality section")
 
     def test_wrapper_restatement_matches_or_defers_to_canonical_packet_loopback_l2(self):
         """Loopback L2 completion: Wrapper must repeat canonical wording word-for-word OR defer without restating"""

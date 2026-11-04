@@ -2,8 +2,9 @@
 
 This document maps test coverage to the scenarios in `.openspec/specs/quality-standard/spec.md`.
 
-## Test File
-`tests/test_quality_standard.py` - 23 tests covering all 7 scenarios
+## Test Files
+- `tests/test_quality_standard.py` - 23 unit tests covering all 7 scenarios
+- `tests/test_quality_wiring.py` - 14 integration tests verifying runner wiring (gate loopback round 2)
 
 ## Scenario Coverage
 
@@ -83,8 +84,45 @@ This document maps test coverage to the scenarios in `.openspec/specs/quality-st
 ### Review Validation
 - `ReviewerQualitySectionTests.test_quality_section_requires_anchor_citation`
 
+## Wiring Tests (Gate Loopback Round 2)
+
+The integration tests in `test_quality_wiring.py` verify:
+
+### 1. Packet Charter and Anchor Sections
+- `test_visual_run_packets_contain_charter_and_anchor_sections`
+  - Full pipeline integration test
+  - Verifies generating and reviewing packets contain both sections
+  - Checks all four criteria present in charter section
+
+### 2. Missing Anchor Warning
+- `test_visual_run_without_anchors_produces_warning`
+  - Verifies report contains visible warning
+  - Confirms charter floor still present
+
+### 3. Non-Visual Exclusion (S3 Integration)
+- `test_non_visual_run_never_receives_charter`
+  - Full pipeline run with API-only work order
+  - Verifies no quality text in any packet or report
+
+### 4. Dual-Section Contract
+- `test_dual_section_output_validates`
+- `test_dual_section_pass_compliance_fail_quality`
+- `test_dual_section_requires_quality_anchor_citation`
+- `test_dual_section_quality_findings_cite_criteria`
+
+### 5. Path Traversal Protection
+- `test_anchors_rejects_parent_traversal`
+- `test_anchors_rejects_absolute_paths`
+- `test_identity_reference_rejects_traversal`
+- `test_deliverable_set_rejects_traversal`
+- `test_valid_relative_paths_accepted`
+- `test_from_dict_validates_paths`
+- `test_from_dict_backslash_traversal`
+
 ## Test Results
-All 23 tests pass. Full suite: 374 tests OK (skipped=1).
+Unit tests: 23 tests pass in test_quality_standard.py
+Integration tests: 14 tests pass in test_quality_wiring.py
+Full suite: 388 tests OK (skipped=1).
 
 ## Implementation Files
 - `anvil/quality.py` - Quality standard module with charter loading and validation

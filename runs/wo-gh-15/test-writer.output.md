@@ -1,45 +1,35 @@
-## Summary
+Perfect! I've created comprehensive integration tests for the quality standard wiring. Here's a summary:
 
-I've completed the test-writer station work for wo-gh-15 (quality standard for visual deliverables). Here's what was delivered:
+## Tests Created
 
-### Tests Written (23 tests, all passing)
-- **tests/test_quality_standard.py** - Comprehensive test coverage for all 7 scenarios from the spec
-- **tests/test_quality_standard_coverage.md** - Documentation of test-to-scenario mapping
+**File:** `tests/test_quality_wiring.py` (14 tests)
 
-### Implementation Stubs
-- **anvil/quality.py** - Quality standard module with:
-  - Charter loading and validation functions
-  - Packet injection functions for charter and anchors
-  - Visual run detection and product type extraction
-  - Review validation functions
+### Coverage of Gate Loopback Round 2, Item 5:
 
-### Model Updates
-- **anvil/model.py** - WorkOrder extended with quality fields:
-  - `anchors`: list of reference anchor paths
-  - `identity_reference`: canonical reference for sets
-  - `identity_traits`: traits to check for set consistency
-  - `deliverable_set`: list of assets in a set
+1. **Packet Wiring** - Integration test runs full pipeline and verifies:
+   - Visual run packets contain Quality Charter section
+   - Visual run packets contain Reference Anchors section
+   - All four criteria present (materials, light, contact, scale)
+   
+2. **Missing Anchor Warning** - Verifies:
+   - Report contains visible warning when no anchors available
+   - Charter floor still present in packets
+   
+3. **Non-Visual Exclusion (S3)** - Full pipeline test:
+   - API-only work orders receive no charter in any packet
+   - No quality-related text in report
+   
+4. **Dual-Section Contract** - Four tests validating:
+   - Separate compliance and quality sections
+   - Quality can fail while compliance passes
+   - Anchor citation required
+   - Criteria categories must be named
+   
+5. **Path Traversal Protection** - Seven tests covering:
+   - Parent traversal rejection (..)
+   - Absolute path rejection (/)
+   - Backslash traversal rejection (\\)
+   - All three quality path fields validated
+   - WorkOrder.from_dict validation
 
-### Design System Updates
-- **anvil/design.py** - `scaffold_design_system()` now creates `design/reference/` directory with never-overwrite discipline
-
-### Documentation
-- **docs/QUALITY_CHARTER.md** - Factory-level charter document defining production quality criteria per product type
-- **CHANGELOG.md** - Unreleased section updated with quality standard changes
-
-### Test Coverage by Scenario
-- ✅ S1: Toy render fails quality against photoreal anchors
-- ✅ S2: Visual run without anchors warns and uses charter floor
-- ✅ S3: Non-visual run never receives charter
-- ✅ S4: Generating stations record anchor comparisons
-- ✅ S5: Anchors win over charter in composition order
-- ✅ S6: Game products use stated standards
-- ✅ S7: Set divergence fails quality even when individual assets pass
-
-### Validation
-- ✅ All 23 new tests pass
-- ✅ Full test suite passes (374 tests OK)
-- ✅ All pipelines remain valid
-- ✅ No existing tests broken
-
-The tests are written in the factory's style (Python unittest framework) and map directly to the spec scenarios. Implementation is stubbed but functional enough for the tests to pass, ready for the builder station to complete.
+The tests follow factory suite patterns and complement the existing unit tests in `test_quality_standard.py`. Updated coverage documentation in `tests/test_quality_standard_coverage.md`.
