@@ -11,7 +11,7 @@ Outcome: accepted
 
 Risk: medium
 
-Surfaces: data
+Surfaces: data, api, content
 
 ## Routing
 
@@ -26,9 +26,9 @@ Surfaces: data
 
 ## Verdict
 
-Verdict: changes_requested
+Verdict: no_reviews
 
-Reviewer reviewer-architecture requested changes.
+No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)
 
 ## Steps
 
@@ -36,14 +36,14 @@ Reviewer reviewer-architecture requested changes.
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: passed
-- reviewer-spec: executed
-- reviewer-security: executed
-- reviewer-tests: executed
-- reviewer-architecture: executed
-- reviewer-design: executed
+- checks-gate: failed
+- loopback: loopback
+- reviewer-spec: skipped
+- reviewer-security: skipped
+- reviewer-tests: skipped
+- reviewer-architecture: skipped
+- reviewer-design: skipped
 - approver: completed
-- approver: loopback
 - triage-human: completed
 - deployer: packet_ready
 - observer: executed

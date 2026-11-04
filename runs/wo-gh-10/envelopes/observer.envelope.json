@@ -5,7 +5,7 @@
   "work_order_id": "wo-gh-10",
   "artifact_path": "runs/wo-gh-10/observer.output.md",
   "status": "executed",
-  "created_at": "2026-11-04T02:58:18.466152+00:00",
+  "created_at": "2026-11-04T03:12:10.091864+00:00",
   "configured_model": "claude-sonnet-4-5",
   "executor": {
     "kind": "command",

@@ -3,24 +3,8 @@
   "from_station": "reviewer-architecture",
   "to_station": "reviewer-design",
   "work_order_id": "wo-gh-10",
-  "artifact_path": "runs/wo-gh-10/reviewer-architecture.output.md",
-  "status": "executed",
-  "created_at": "2026-11-04T02:55:36.830172+00:00",
-  "review": {
-    "station": "reviewer-architecture",
-    "verdict": "changes_requested",
-    "findings": [
-      "Builder violated work order constraint by creating test files (tests/test_cost_measurement.py, tests/test_cost_measurement_README.md). Work order explicitly states 'the builder must not modify tests/' and 'Test changes are written by the test-writer station'",
-      "Intake station changes (anvil/config.py DEFAULT_MODELS, stations/intake/station.json model field) are unrelated to cost measurement spec and should not be part of this work order. These changes modify the intake station's model configuration without connection to the cost measurement feature",
-      "Legacy cost override at runner.py:864-866 allows usage.cost to override calculated cost but this behavior is not documented in the spec. Either remove the legacy path or document it as intentional backwards compatibility",
-      "Cost calculation module anvil/cost.py properly separates concerns from model.py (architectural decision: model layer holds shapes and validation only)",
-      "Runner integration follows architectural pattern: cost measurement happens during step execution in runner layer, prices are configuration-driven, and cost does not affect verdicts (gates remain deterministic per decision 0001)"
-    ]
-  },
-  "configured_model": "review-balanced",
-  "executor": {
-    "kind": "command",
-    "detail": "python3"
-  },
-  "executed_model": null
+  "artifact_path": "runs/wo-gh-10/reviewer-architecture.packet.md",
+  "status": "skipped",
+  "created_at": "2026-11-04T03:11:16.874456+00:00",
+  "configured_model": "review-balanced"
 }

@@ -861,9 +861,6 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     "measured": cost_record["measured"],
                     "reason": cost_record["reason"]
                 }
-            # Legacy: if usage itself contains cost, use that instead
-            if isinstance(step_usage.get("cost"), (int, float)):
-                step["cost"] = step_usage["cost"]
         # Add extra fields from checks-gate to the step itself
         if station_id == "checks-gate" and extra_envelope:
             for key in ["phase", "commands", "exit_codes", "protected_paths",

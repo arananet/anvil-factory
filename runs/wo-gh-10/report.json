@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 48367.625,
+      "duration_ms": 21470.899,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/intake.output.md"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-10/spec-writer.output.md",
-      "duration_ms": 98860.917,
+      "duration_ms": 124324.968,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/spec-writer.output.md"
@@ -40,7 +40,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-10/test-writer.output.md",
-      "duration_ms": 290259.229,
+      "duration_ms": 236127.388,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/test-writer.output.md"
@@ -56,7 +56,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-10/builder.output.md",
-      "duration_ms": 355101.034,
+      "duration_ms": 307698.169,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/builder.output.md"
@@ -70,9 +70,9 @@
     },
     {
       "station": "checks-gate",
-      "status": "passed",
-      "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 29970.463,
+      "status": "failed",
+      "detail": "Gate failed: 1 checks, protected paths: fail",
+      "duration_ms": 27830.469,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/checks-gate.pre-review.output.md"
@@ -92,95 +92,98 @@
         "anvil.json",
         "pipelines/"
       ],
-      "protected_path_verdict": "pass",
-      "protected_path_findings": [],
-      "gate_verdict": "pass"
+      "protected_path_verdict": "fail",
+      "protected_path_findings": [
+        "Protected path violation: tests/test_cost_measurement.py (base ref file modified/deleted, matches tests/)",
+        "Protected path violation: tests/test_cost_measurement_README.md (base ref file modified/deleted, matches tests/)"
+      ],
+      "gate_verdict": "fail"
+    },
+    {
+      "station": "loopback",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Gate failure: Protected path violation: tests/test_cost_measurement.py (base ref file modified/deleted, matches tests/); Protected path violation: tests/test_cost_measurement_README.md (base ref file modified/deleted, matches tests/)",
+      "reason": "Gate failure: Protected path violation: tests/test_cost_measurement.py (base ref file modified/deleted, matches tests/); Protected path violation: tests/test_cost_measurement_README.md (base ref file modified/deleted, matches tests/)",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null,
+      "feedback": "",
+      "from_station": "checks-gate"
     },
     {
       "station": "reviewer-spec",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-10/reviewer-spec.output.md",
-      "duration_ms": 111534.93,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.353,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-10/reviewer-spec.output.md"
+        "runs/wo-gh-10/reviewer-spec.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-security",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-10/reviewer-security.output.md",
-      "duration_ms": 146840.555,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.281,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-10/reviewer-security.output.md"
+        "runs/wo-gh-10/reviewer-security.packet.md"
       ],
       "configured_model": "review-strong",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-tests",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-10/reviewer-tests.output.md",
-      "duration_ms": 64990.427,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.362,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-10/reviewer-tests.output.md"
+        "runs/wo-gh-10/reviewer-tests.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-architecture",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-10/reviewer-architecture.output.md",
-      "duration_ms": 96393.006,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.478,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-10/reviewer-architecture.output.md"
+        "runs/wo-gh-10/reviewer-architecture.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "reviewer-design",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-10/reviewer-design.output.md",
-      "duration_ms": 90928.711,
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.743,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-10/reviewer-design.output.md"
+        "runs/wo-gh-10/reviewer-design.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      }
+      "executor": null
     },
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: changes_requested",
-      "duration_ms": 0.047,
+      "detail": "Approver verdict: no_reviews",
+      "duration_ms": 0.026,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/report.json"
@@ -190,23 +193,10 @@
       "executor": null
     },
     {
-      "station": "approver",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: Builder violated work order constraint by creating test files (tests/test_cost_measurement.py, tests/test_cost_measurement_README.md). Work order explicitly states 'the builder must not modify tests/' and 'Test changes are written by the test-writer station'; Intake station changes (anvil/config.py DEFAULT_MODELS, stations/intake/station.json model field) are unrelated to cost measurement spec and should not be part of this work order. These changes modify the intake station's model configuration without connection to the cost measurement feature; Legacy cost override at runner.py:864-866 allows usage.cost to override calculated cost but this behavior is not documented in the spec. Either remove the legacy path or document it as intentional backwards compatibility; Cost calculation module anvil/cost.py properly separates concerns from model.py (architectural decision: model layer holds shapes and validation only); Runner integration follows architectural pattern: cost measurement happens during step execution in runner layer, prices are configuration-driven, and cost does not affect verdicts (gates remain deterministic per decision 0001)",
-      "reason": "Builder violated work order constraint by creating test files (tests/test_cost_measurement.py, tests/test_cost_measurement_README.md). Work order explicitly states 'the builder must not modify tests/' and 'Test changes are written by the test-writer station'; Intake station changes (anvil/config.py DEFAULT_MODELS, stations/intake/station.json model field) are unrelated to cost measurement spec and should not be part of this work order. These changes modify the intake station's model configuration without connection to the cost measurement feature; Legacy cost override at runner.py:864-866 allows usage.cost to override calculated cost but this behavior is not documented in the spec. Either remove the legacy path or document it as intentional backwards compatibility; Cost calculation module anvil/cost.py properly separates concerns from model.py (architectural decision: model layer holds shapes and validation only); Runner integration follows architectural pattern: cost measurement happens during step execution in runner layer, prices are configuration-driven, and cost does not affect verdicts (gates remain deterministic per decision 0001)",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null
-    },
-    {
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: required",
-      "duration_ms": 0.008,
+      "duration_ms": 0.011,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -217,7 +207,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-10/deployer.packet.md",
-      "duration_ms": 0.091,
+      "duration_ms": 0.343,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/deployer.packet.md"
@@ -230,7 +220,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-10/observer.output.md",
-      "duration_ms": 70706.452,
+      "duration_ms": 53214.593,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-10/observer.output.md"
@@ -243,7 +233,7 @@
       }
     }
   ],
-  "verdict": "changes_requested",
+  "verdict": "no_reviews",
   "human_required": true,
   "max_loopbacks": 2,
   "loopbacks": 1,
@@ -252,28 +242,7 @@
   "risk_hints": [],
   "decision": {
     "approver": {
-      "reviews_counted": [
-        {
-          "station": "reviewer-spec",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-security",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-tests",
-          "verdict": "pass"
-        },
-        {
-          "station": "reviewer-architecture",
-          "verdict": "changes_requested"
-        },
-        {
-          "station": "reviewer-design",
-          "verdict": "pass"
-        }
-      ],
+      "reviews_counted": [],
       "reviews_expected": [
         "reviewer-spec",
         "reviewer-security",
@@ -281,15 +250,20 @@
         "reviewer-architecture",
         "reviewer-design"
       ],
-      "rule": "Reviewer reviewer-architecture requested changes."
+      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)"
     },
     "human_gate": {
       "required": true,
-      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "rule": "Verdict is no_reviews, not approved, so a human is required.",
       "hints_matched": []
     }
   },
   "warnings": [],
-  "base_ref": "1287d0ca25d4550ebb07b784ef3e3f0a83347189",
-  "evidence": []
+  "base_ref": "b0bab9befb4411323551161217556ed89ca7c5d4",
+  "evidence": [],
+  "cost": {
+    "total": 0,
+    "measured_steps": 0,
+    "unmeasured_steps": 5
+  }
 }

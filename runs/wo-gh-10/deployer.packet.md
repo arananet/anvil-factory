@@ -46,6 +46,16 @@ Cost measurement changes no verdict: the approver, the gates and the human gate 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/10
 
 Operator standing note for every round of this order: the builder must not create or modify anything under .github/workflows/ (the Actions token cannot push workflow changes; a run that touches them loses its commit-back). Tooling the run needs is staged by the operator in the workflow before the line step. Test changes are written by the test-writer station; the builder must not modify tests/, anvil.json or pipelines/. Tests must be real: every test calls the implementation it names and asserts behavior, never the mere existence of data structures.
+
+GATE LOOPBACK 1 (after run 41761646614, verdict changes_requested, reviews counted 5 of 5; reviewer-architecture is the only requesting reviewer). Fix exactly these counted findings:
+
+1. Process violation: the builder created tests/test_cost_measurement.py and tests/test_cost_measurement_README.md, which the work order forbids. In this round the builder removes both files from its change and does not recreate them. The cost measurement tests are authored by the test-writer station in its own step; if the suite needs them, the test-writer writes them.
+
+2. Out of scope changes: the intake station changes (anvil/config.py DEFAULT_MODELS and the stations/intake/station.json model field) are unrelated to the cost measurement spec. The builder reverts them; this order changes nothing about the intake station's model configuration.
+
+3. Legacy cost override: anvil/runner.py (around lines 864-866) lets usage.cost override the calculated cost, and the spec does not document that behavior. Either remove the legacy path, or document it in the cost measurement spec and docs as intentional backwards compatibility. State which option was taken in the builder output. The suite stays green either way.
+
+Everything else from round 1 stands (reviewer-spec, reviewer-security, reviewer-tests and reviewer-design passed; the architecture review confirms anvil/cost.py separates concerns correctly and cost does not affect verdicts). Standing discipline unchanged: the builder must not modify tests/, anvil.json, pipelines/ or .github/workflows/. Keep the whole suite green and every pipeline valid. Update CHANGELOG Unreleased if the change set changes.
 - risk_hints: 
 - status: new
 
@@ -55,12 +65,12 @@ Operator standing note for every round of this order: the builder must not creat
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: passed
-- reviewer-spec: executed
-- reviewer-security: executed
-- reviewer-tests: executed
-- reviewer-architecture: executed
-- reviewer-design: executed
+- checks-gate: failed
+- loopback: loopback
+- reviewer-spec: skipped
+- reviewer-security: skipped
+- reviewer-tests: skipped
+- reviewer-architecture: skipped
+- reviewer-design: skipped
 - approver: completed
-- approver: loopback
 - triage-human: completed

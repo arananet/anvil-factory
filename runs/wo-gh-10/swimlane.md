@@ -2,27 +2,27 @@
 
 Routing: 5 reviewers (full panel)
 
-Cost is reported as null here. Model runtimes report cost when they run a station; ANVIL never invents a number.
+**Cost**: No measured steps (5 executed steps)
 
 | Station | Status | Duration ms | Artifacts | Cost |
 |---|---|---|---|---|
-| intake | executed | 48367.625 | runs/wo-gh-10/intake.output.md | null |
-| spec-writer | executed | 98860.917 | runs/wo-gh-10/spec-writer.output.md | null |
-| test-writer | executed | 290259.229 | runs/wo-gh-10/test-writer.output.md | null |
-| builder | executed | 355101.034 | runs/wo-gh-10/builder.output.md | null |
-| checks-gate | passed | 29970.463 | runs/wo-gh-10/checks-gate.pre-review.output.md | null |
-| reviewer-spec | executed | 111534.93 | runs/wo-gh-10/reviewer-spec.output.md | null |
-| reviewer-security | executed | 146840.555 | runs/wo-gh-10/reviewer-security.output.md | null |
-| reviewer-tests | executed | 64990.427 | runs/wo-gh-10/reviewer-tests.output.md | null |
-| reviewer-architecture | executed | 96393.006 | runs/wo-gh-10/reviewer-architecture.output.md | null |
-| reviewer-design | executed | 90928.711 | runs/wo-gh-10/reviewer-design.output.md | null |
-| approver | completed | 0.047 | runs/wo-gh-10/report.json | null |
-| approver | loopback | 0.0 | - | null |
-| triage-human | completed | 0.008 | - | null |
-| deployer | packet_ready | 0.091 | runs/wo-gh-10/deployer.packet.md | null |
-| observer | executed | 70706.452 | runs/wo-gh-10/observer.output.md | null |
+| intake | executed | 21470.899 | runs/wo-gh-10/intake.output.md | null |
+| spec-writer | executed | 124324.968 | runs/wo-gh-10/spec-writer.output.md | null |
+| test-writer | executed | 236127.388 | runs/wo-gh-10/test-writer.output.md | null |
+| builder | executed | 307698.169 | runs/wo-gh-10/builder.output.md | null |
+| checks-gate | failed | 27830.469 | runs/wo-gh-10/checks-gate.pre-review.output.md | null |
+| loopback | loopback | 0.0 | - | null |
+| reviewer-spec | skipped | 0.353 | runs/wo-gh-10/reviewer-spec.packet.md | null |
+| reviewer-security | skipped | 0.281 | runs/wo-gh-10/reviewer-security.packet.md | null |
+| reviewer-tests | skipped | 0.362 | runs/wo-gh-10/reviewer-tests.packet.md | null |
+| reviewer-architecture | skipped | 0.478 | runs/wo-gh-10/reviewer-architecture.packet.md | null |
+| reviewer-design | skipped | 0.743 | runs/wo-gh-10/reviewer-design.packet.md | null |
+| approver | completed | 0.026 | runs/wo-gh-10/report.json | null |
+| triage-human | completed | 0.011 | - | null |
+| deployer | packet_ready | 0.343 | runs/wo-gh-10/deployer.packet.md | null |
+| observer | executed | 53214.593 | runs/wo-gh-10/observer.output.md | null |
 
 ## Decision
 
-- Approver: Reviewer reviewer-architecture requested changes.
-- Human gate: Verdict is changes_requested, not approved, so a human is required.
+- Approver: No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)
+- Human gate: Verdict is no_reviews, not approved, so a human is required.
