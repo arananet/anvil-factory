@@ -1,0 +1,315 @@
+{
+  "work_order_id": "wo-gh-15",
+  "pipeline": "sdlc-default",
+  "title": "A standing quality standard for visual deliverables",
+  "kind": "feature",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "executed",
+      "detail": "Executed by command; outcome: accepted",
+      "duration_ms": 98961.18,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/intake.output.md"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/spec-writer.output.md",
+      "duration_ms": 112680.427,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/spec-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "test-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/test-writer.output.md",
+      "duration_ms": 246167.93,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/test-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/builder.output.md",
+      "duration_ms": 676512.262,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/builder.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "checks-gate",
+      "status": "passed",
+      "detail": "Gate passed: 1 checks, protected paths: pass",
+      "duration_ms": 32149.709,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/checks-gate.pre-review.output.md"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null,
+      "phase": "pre-review",
+      "commands": [
+        "python -m unittest discover -s tests -p 'test_*.py'"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "protected_paths": [
+        "tests/",
+        "anvil.json",
+        "pipelines/"
+      ],
+      "protected_path_verdict": "pass",
+      "protected_path_findings": [],
+      "gate_verdict": "pass"
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-spec.output.md",
+      "duration_ms": 79181.83,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/reviewer-spec.output.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-security",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-security.output.md",
+      "duration_ms": 109259.496,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/reviewer-security.output.md"
+      ],
+      "configured_model": "review-strong",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-tests.output.md",
+      "duration_ms": 147326.813,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/reviewer-tests.output.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-architecture.output.md",
+      "duration_ms": 48952.99,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/reviewer-architecture.output.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/reviewer-design.output.md",
+      "duration_ms": 97815.394,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/reviewer-design.output.md"
+      ],
+      "configured_model": "openai/gpt-6-astra",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-ux",
+      "status": "routed_out",
+      "detail": "Routed out: Routed out: no UI surface",
+      "duration_ms": 1.323,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/reviewer-ux.packet.md"
+      ],
+      "configured_model": "openai/gpt-6-astra",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.05,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: not_required",
+      "duration_ms": 0.016,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "detail": "Packet written to runs/wo-gh-15/deployer.packet.md",
+      "duration_ms": 0.417,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/deployer.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-15/observer.output.md",
+      "duration_ms": 42150.534,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-15/observer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    }
+  ],
+  "verdict": "approved",
+  "human_required": false,
+  "max_loopbacks": 2,
+  "loopbacks": 0,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [
+        {
+          "station": "reviewer-spec",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-security",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-architecture",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "pass"
+        }
+      ],
+      "reviews_expected": [
+        "reviewer-spec",
+        "reviewer-security",
+        "reviewer-tests",
+        "reviewer-architecture",
+        "reviewer-design"
+      ],
+      "rule": "All counted reviews passed. (Expected 5 reviews after routing.)"
+    },
+    "human_gate": {
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": [],
+  "base_ref": "74d8c9705018c03c6857e56aeebe5338bb0cef98",
+  "evidence": [
+    {
+      "type": "screenshot",
+      "breakpoint": "390x844",
+      "path": "runs/wo-gh-15/evidence/screenshot-390x844.png",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "type": "screenshot",
+      "breakpoint": "1440x900",
+      "path": "runs/wo-gh-15/evidence/screenshot-1440x900.png",
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "cost": {
+    "total": 0,
+    "measured_steps": 0,
+    "unmeasured_steps": 10
+  }
+}

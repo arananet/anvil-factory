@@ -1,0 +1,13 @@
+{
+  "station": "reviewer-design",
+  "verdict": "pass",
+  "compliance": {
+    "verdict": "pass",
+    "findings": []
+  },
+  "quality": {
+    "verdict": "pass",
+    "findings": [],
+    "anchor": "charter floor only"
+  }
+}
