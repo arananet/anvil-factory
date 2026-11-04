@@ -7,6 +7,7 @@ from .model import WorkOrder, Review
 from .config import default_model
 from .brain import packet_learnings_section
 from .design import packet_design_section, load_design_system
+from .capture import capture_breakpoints, packet_rendered_evidence_section
 from .gates import human_gate, checks_gate, resolve_base_ref_config, _run_shell
 from .approver import aggregate, needs_human, aggregate_explained, needs_human_explained, matched_risk_hints, RISK_SCAN_ORDER
 from .executor import ExecutorError
@@ -44,6 +45,7 @@ class RunReport:
     decision: dict = field(default_factory=dict)
     warnings: list = field(default_factory=list)
     base_ref: str = None
+    evidence: list = field(default_factory=list)
     def to_dict(self):
         return {"work_order_id": self.work_order_id, "pipeline": self.pipeline,
                 "title": self.title, "kind": self.kind,
@@ -51,7 +53,7 @@ class RunReport:
                 "max_loopbacks": self.max_loopbacks, "loopbacks": self.loopbacks,
                 "deployment_status": self.deployment_status, "verify_results": self.verify_results,
                 "risk_hints": self.risk_hints, "decision": self.decision, "warnings": self.warnings,
-                "base_ref": self.base_ref}
+                "base_ref": self.base_ref, "evidence": self.evidence}
 
 def parse_review(text, station_id):
     """Parse exactly one review JSON object from the authoritative channel.
@@ -300,7 +302,7 @@ def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None, b
     return set()
 
 
-def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section=""):
+def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section="", rendered_evidence_section=""):
     upstream = "\n".join(f"- {s['station']}: {s['status']}" for s in steps) or "- (none)"
     # Use rescoped description if intake rescoped the work
     description = work_order.description
@@ -315,6 +317,8 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
         text += f"\n{learnings_section}\n"
     if design_section:
         text += f"\n{design_section}\n"
+    if rendered_evidence_section:
+        text += f"\n{rendered_evidence_section}\n"
     # Reviewer stations have a specific output contract
     if station_id.startswith("reviewer"):
         text += (f"\n## Output contract\n\n"
@@ -357,6 +361,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
 
     # Routing record: will be populated after intake
     routing_record = None
+
+    # Evidence list: will be populated with screenshots from capture
+    evidence_list = []
 
     # Snapshot base ref configuration for checks gate (S4)
     # Configuration is resolved from the base ref through git where a repo is
@@ -409,8 +416,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     def packet_step(station, station_id):
         prompt = station.prompt if station and station.prompt else f"Station {station_id}: carry out your role for this work order."
         design_section = packet_design_section(project, station_id)
+        rendered_evidence_section = packet_rendered_evidence_section(project, work_order.id, station_id)
         packet = run_dir / f"{station_id}.packet.md"
-        packet.write_text(_packet_text(station_id, prompt, work_order, steps, learnings_section, design_section), encoding="utf-8")
+        packet.write_text(_packet_text(station_id, prompt, work_order, steps, learnings_section, design_section, rendered_evidence_section), encoding="utf-8")
         return packet
 
     for idx, station_id in enumerate(order):
@@ -837,6 +845,30 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             env_extra["executed_model"] = step_executed_model
         write_envelope(station_id, next_station, artifact or str(run_dir / "report.json"), status, env_extra)
 
+        # Capture screenshots after builder completes successfully (S1)
+        if station_id == "builder" and status == "executed" and execute_mode:
+            evidence_dir = run_dir / "evidence"
+            capture_result = capture_breakpoints(project, evidence_dir)
+
+            # Record capture result in the report
+            if capture_result["success"]:
+                # Store capture metadata for later use in report
+                for capture in capture_result["captures"]:
+                    # Add to evidence list with relative path
+                    rel_path = Path(capture["path"]).relative_to(project)
+                    evidence_list.append({
+                        "type": "screenshot",
+                        "breakpoint": capture["breakpoint"],
+                        "path": str(rel_path),
+                        "width": capture["width"],
+                        "height": capture["height"]
+                    })
+            else:
+                # Record failure reason for reviewer-design
+                # This will be picked up when building reviewer-design's packet
+                capture_failure_file = run_dir / "capture_failure.txt"
+                capture_failure_file.write_text(capture_result["error"], encoding="utf-8")
+
         # Stop pipeline if intake outcome is terminal (rejected or waiting_info)
         if station_id == "intake" and terminal_outcome:
             break
@@ -907,7 +939,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                        human_required=human_required, max_loopbacks=max_loopbacks, loopbacks=loopbacks,
                        deployment_status=deployment_status, verify_results=verify_results,
                        risk_hints=list(work_order.risk_hints or []), decision=decision, warnings=warnings,
-                       base_ref=base_ref)
+                       base_ref=base_ref, evidence=evidence_list)
     (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
     # Swimlane
     lines = ["# Swimlane", ""]

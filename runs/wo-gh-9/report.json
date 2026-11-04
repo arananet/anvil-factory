@@ -1,0 +1,294 @@
+{
+  "work_order_id": "wo-gh-9",
+  "pipeline": "sdlc-default",
+  "title": "Rendered design review: reviewer-design judges screenshots of the built page",
+  "kind": "feature",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "executed",
+      "detail": "Executed by command; outcome: accepted",
+      "duration_ms": 37712.6,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-9/intake.output.md"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-9/spec-writer.output.md",
+      "duration_ms": 98999.873,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-9/spec-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "test-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-9/test-writer.output.md",
+      "duration_ms": 182649.418,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-9/test-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-9/builder.output.md",
+      "duration_ms": 408912.672,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-9/builder.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "checks-gate",
+      "status": "passed",
+      "detail": "Gate passed: 1 checks, protected paths: pass",
+      "duration_ms": 15912.886,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-9/checks-gate.pre-review.output.md"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null,
+      "phase": "pre-review",
+      "commands": [
+        "python -m unittest discover -s tests -p 'test_*.py'"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "protected_paths": [
+        "tests/",
+        "anvil.json",
+        "pipelines/"
+      ],
+      "protected_path_verdict": "pass",
+      "protected_path_findings": [],
+      "gate_verdict": "pass"
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-9/reviewer-spec.output.md",
+      "duration_ms": 99743.941,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-9/reviewer-spec.output.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-security",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-9/reviewer-security.output.md",
+      "duration_ms": 100544.817,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-9/reviewer-security.output.md"
+      ],
+      "configured_model": "review-strong",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-9/reviewer-tests.output.md",
+      "duration_ms": 95398.898,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-9/reviewer-tests.output.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-9/reviewer-architecture.output.md",
+      "duration_ms": 94799.728,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-9/reviewer-architecture.output.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-9/reviewer-design.output.md",
+      "duration_ms": 99335.615,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-9/reviewer-design.output.md"
+      ],
+      "configured_model": "review-balanced",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: rejected",
+      "duration_ms": 0.04,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-9/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "approver",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Tests do not import anvil.capture module - the test file imports only anvil.scaffold.init_project and anvil.model.WorkOrder but nothing from the capture module being tested; Security validation tests are stubs that never call validation functions - test_serve_command_validation_prevents_shell_injection, test_static_root_prevents_path_traversal, test_page_path_prevents_url_injection, and test_breakpoint_dimensions_are_bounded only assert that test data lists exist (len > 0) without calling _validate_static_root, _validate_page_path, _validate_dimensions or capture_breakpoints; Packet section test does not test the function - test_s2_packet_section_with_captures creates mock screenshot files but never calls packet_rendered_evidence_section to verify the output markdown contains the required elements; Failure handling tests are placeholders - test_s3_server_never_answers_records_failure and test_s3_capture_tool_error_records_failure define expected messages but never call capture_breakpoints with configurations that would trigger these failures; Injectable seam tests don't verify injection works - test_capture_function_accepts_mock_implementation and test_server_startup_accepts_mock_implementation define mock functions but never pass them to capture_breakpoints or verify they're actually called; No integration testing - tests never call capture_breakpoints, packet_rendered_evidence_section, or any validation function with real or mock inputs to verify behavior; Tests pass without testing - all 23 tests pass because they only check that test data structures exist, not that the implementation works correctly, violating the spec requirement that tests must be real and mapped to scenarios",
+      "reason": "Tests do not import anvil.capture module - the test file imports only anvil.scaffold.init_project and anvil.model.WorkOrder but nothing from the capture module being tested; Security validation tests are stubs that never call validation functions - test_serve_command_validation_prevents_shell_injection, test_static_root_prevents_path_traversal, test_page_path_prevents_url_injection, and test_breakpoint_dimensions_are_bounded only assert that test data lists exist (len > 0) without calling _validate_static_root, _validate_page_path, _validate_dimensions or capture_breakpoints; Packet section test does not test the function - test_s2_packet_section_with_captures creates mock screenshot files but never calls packet_rendered_evidence_section to verify the output markdown contains the required elements; Failure handling tests are placeholders - test_s3_server_never_answers_records_failure and test_s3_capture_tool_error_records_failure define expected messages but never call capture_breakpoints with configurations that would trigger these failures; Injectable seam tests don't verify injection works - test_capture_function_accepts_mock_implementation and test_server_startup_accepts_mock_implementation define mock functions but never pass them to capture_breakpoints or verify they're actually called; No integration testing - tests never call capture_breakpoints, packet_rendered_evidence_section, or any validation function with real or mock inputs to verify behavior; Tests pass without testing - all 23 tests pass because they only check that test data structures exist, not that the implementation works correctly, violating the spec requirement that tests must be real and mapped to scenarios",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: required",
+      "duration_ms": 0.007,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "detail": "Packet written to runs/wo-gh-9/deployer.packet.md",
+      "duration_ms": 0.093,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-9/deployer.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-9/observer.output.md",
+      "duration_ms": 123537.874,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-9/observer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    }
+  ],
+  "verdict": "rejected",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 1,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [
+        {
+          "station": "reviewer-spec",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-security",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "fail"
+        },
+        {
+          "station": "reviewer-architecture",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "pass"
+        }
+      ],
+      "reviews_expected": [
+        "reviewer-spec",
+        "reviewer-security",
+        "reviewer-tests",
+        "reviewer-architecture",
+        "reviewer-design"
+      ],
+      "rule": "Reviewer reviewer-tests returned fail."
+    },
+    "human_gate": {
+      "required": true,
+      "rule": "Verdict is rejected, not approved, so a human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": [],
+  "base_ref": "d5fe89841d790b76d73116278f41f5b6e48a30a4"
+}
