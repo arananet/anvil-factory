@@ -7,7 +7,7 @@ packet, learns the station id from the packet's first line ("# Task packet:
 <station-id>", the marker the runner writes at the top of every packet),
 and runs Claude Code in print mode with the packet content as the prompt:
 
-    claude -p <packet> --model claude-sonnet-4-5 --output-format text
+    claude -p <packet> --model <configured-model> --output-format text
 
 Claude Code reaches the Cloudflare AI Gateway through the environment
 (ANTHROPIC_BASE_URL, ANTHROPIC_API_KEY, ANTHROPIC_CUSTOM_HEADERS), which
@@ -39,11 +39,11 @@ writes a partial or placeholder output and calls it success.
 """
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
 
-MODEL = "claude-sonnet-4-5"
 WRITE_STATIONS = {"builder", "test-writer"}
 NO_EDIT_TOOLS = "Edit,Write,NotebookEdit"
 TIMEOUT_SECONDS = 1500
@@ -170,6 +170,12 @@ def main():
     packet_path = Path(sys.argv[1])
     output_path = Path(sys.argv[2])
 
+    # Get configured model from environment (set by dispatcher)
+    model = os.environ.get("ANVIL_CONFIGURED_MODEL")
+    if not model:
+        print("claude_station: ANVIL_CONFIGURED_MODEL environment variable not set", file=sys.stderr)
+        return 7
+
     try:
         packet_text = packet_path.read_text(encoding="utf-8")
         station = station_of(packet_text)
@@ -204,7 +210,7 @@ def main():
 
         command = [
             "claude", "-p", prompt,
-            "--model", MODEL,
+            "--model", model,
             "--output-format", "text",
             "--dangerously-skip-permissions",
         ]

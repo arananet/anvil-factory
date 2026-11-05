@@ -1,1 +1,0 @@
-Tests complete for loopback round 2. I've strengthened the S1 test and added comprehensive S8 and S9 tests covering all four findings from the round 2 review. The tests fail as expected since the implementation hasn't been done yet - they're ready for the implementer station.

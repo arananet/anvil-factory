@@ -76,6 +76,18 @@ station output; if the command writes a non empty `{output}` file, that file
 wins. These two examples are shapes, not endorsements: wire the CLI you
 already operate, with the flags that CLI actually accepts.
 
+The factory itself wires `python3 tools/dispatch_station.py {packet} {output}`.
+The dispatcher reads the step's effective model from `ANVIL_CONFIGURED_MODEL`
+and runs Anthropic models through `tools/claude_station.py` (Claude Code
+print mode) and `openai/gpt-6.1-sol` through `tools/codex_station.py`, which
+runs the Codex CLI headlessly (`codex exec`) in the repo tree with the packet
+as the task, against the gateway OpenAI route with the bare id `gpt-6.1-sol`.
+The gateway credential reaches Codex only through its child environment.
+Builder and test-writer may write; other stations get no-edit instructions,
+and a reviewer that changes anything besides its own review file fails. Any
+other model, a missing `codex` CLI, or a missing gateway environment fails
+the step; there is no fallback runtime.
+
 ### http
 
 ```json

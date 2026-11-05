@@ -1,1 +1,0 @@
-Review complete. Both round 4 defects are resolved: the S7 same-subject test duty is now fully documented in the reviewer-design prompt itself (not just a generic reference), and all work order string interpolations in the quality packet sections apply control character sanitization.

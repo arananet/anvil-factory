@@ -14,9 +14,11 @@ touches:
    shrink below the pipeline it would replace.
 """
 
+import inspect
 import json
 from pathlib import Path
 
+from .config import default_model, resolve_model
 from .executor import ExecutorError
 from .pipeline import Pipeline, load_pipeline
 
@@ -232,8 +234,19 @@ def supervise(project, registry, executor=None):
     if output_path.exists():
         output_path.unlink()
     try:
-        executed = executor.execute(packet_text, "supervisor", packet_path=packet_path,
-                                    output_path=output_path, cwd=project)
+        # model-migration R10: the supervisor is a branch that executes, so it
+        # hands its runtime the same concrete model as every pipeline station.
+        label = station.model if station is not None and station.model else default_model("supervisor")
+        kwargs = {"packet_path": packet_path, "output_path": output_path, "cwd": project}
+        if getattr(executor, "kind", None) == "command":
+            try:
+                params = inspect.signature(executor.execute).parameters
+            except (TypeError, ValueError):
+                params = {}
+            if "configured_model" in params or any(
+                    p.kind is inspect.Parameter.VAR_KEYWORD for p in params.values()):
+                kwargs["configured_model"] = resolve_model(label)
+        executed = executor.execute(packet_text, "supervisor", **kwargs)
         output_text = executed.get("output", "") if isinstance(executed, dict) else str(executed)
     except ExecutorError as exc:
         result.update({"action": "execute_failed", "error": str(exc)})

@@ -1,1 +1,0 @@
-Review complete. The design review passes with no findings. The interface output (markdown reports) follows good information architecture practices, and the design system's visual quality bars don't apply to this textual output format.

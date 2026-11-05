@@ -1,10 +1,11 @@
+import inspect
 import json, os, shlex, struct, subprocess, time, zlib
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 from .model import WorkOrder, Review
-from .config import default_model, load_anvil_config, health_config, CHARS_PER_TOKEN, get_station_budget
+from .config import default_model, resolve_model, load_anvil_config, health_config, CHARS_PER_TOKEN, get_station_budget
 from .brain import packet_learnings_section
 from .design import packet_design_section, load_design_system
 from .capture import capture_breakpoints, packet_rendered_evidence_section
@@ -756,6 +757,33 @@ def _reported_model(text):
             return obj["model"]
     return None
 
+def _consumes_model_handoff(executor):
+    """True when the executor hands the assigned model to its runtime.
+
+    The command executor exports it as ANVIL_CONFIGURED_MODEL and the
+    dispatcher selects the runtime by it; the http executor always runs the
+    model named in its own config.
+    """
+    return getattr(executor, "kind", None) == "command"
+
+
+def _call_executor(executor, packet_text, station_id, configured_model=None, **kwargs):
+    """Call executor.execute, handing it the assigned model when it accepts one.
+
+    Executors written before the model hand-off (for example test doubles)
+    have no configured_model parameter; they are called without it.
+    """
+    try:
+        params = inspect.signature(executor.execute).parameters
+    except (TypeError, ValueError):
+        params = {}
+    accepts = "configured_model" in params or any(
+        p.kind is inspect.Parameter.VAR_KEYWORD for p in params.values())
+    if accepts:
+        kwargs["configured_model"] = configured_model
+    return executor.execute(packet_text, station_id, **kwargs)
+
+
 def _executor_provenance(executor, output_text=""):
     """Return (executor_object, executed_model) for an attempted execution.
 
@@ -1109,10 +1137,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                        "but the project has no design/DESIGN.md. Define the design system to enable "
                        "design review.")
 
-    # S5: Track Astra-bound stations' measured tokens for report total
-    # Astra route: openai/gpt-6-astra through Codex (UI and design stations)
-    astra_bound_stations = interface_stations  # Interface stations use Astra route
-    astra_measured_tokens_total = 0
+    # S5: Track interface stations' measured tokens for report total
+    # Interface stations (builder, writer, media-producer, brief-writer, reviewer-design)
+    # use the design model from routing policy (currently openai/gpt-6.1-sol)
+    astra_bound_stations = interface_stations  # Field name kept for continuity
+    astra_measured_tokens_total = 0  # Field name kept for continuity
     # S2: Add warning for visual runs with no reference anchors
     if is_visual_run(work_order):
         ref_dir = project / "design" / "reference"
@@ -1189,7 +1218,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         configured_model = station.model if station is not None and station.model else default_model(station_id)
         # Apply routing model overrides if routing selected a specific model for this station
         if routing_record and station_id in routing_record.selected_models:
-            configured_model = routing_record.selected_models[station_id]
+            # R10: routing speaks tier labels; resolve them at hand-off so the
+            # report's configured_model for a routed station is concrete.
+            configured_model = resolve_model(routing_record.selected_models[station_id])
         # Apply guided designation: guided design stations use the design model from routing policy
         # For the builder, only apply guided model when working on UI surface
         if station and station.guided:
@@ -1197,6 +1228,19 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 pass  # Builder not on UI surface, keep configured model
             else:
                 configured_model = get_design_model_from_routing()
+        # R10: the model handed to the runtime is always concrete. The report
+        # keeps the configured value (agent-execution S8 records the label for
+        # unrouted stations); the hand-off never carries an unresolved label.
+        handoff_model = resolve_model(configured_model)
+        # R10 (round 4): resolution happens here, once, after every override
+        # (registry, project config, routing, guided) has produced the final
+        # label. When the step runs on a runtime that consumes the hand-off,
+        # the recorded configured_model is that same concrete model, so the
+        # record and the hand-off always agree. Packet mode and the http
+        # executor (which runs its own endpoint model, ignoring the hand-off)
+        # keep recording the configured label (agent-execution S8).
+        if execute_mode and _consumes_model_handoff(executor):
+            configured_model = handoff_model
         step_executor = None
         step_executed_model = None
         status = "completed"
@@ -1283,12 +1327,17 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 packet_text = packet.read_text(encoding="utf-8")
                 output_file = run_dir / f"{station_id}.output.md"
                 try:
-                    result = executor.execute(packet_text, station_id, packet_path=packet,
-                                              output_path=output_file, cwd=project)
+                    result = _call_executor(executor, packet_text, station_id, packet_path=packet,
+                                              output_path=output_file, cwd=project,
+                                              configured_model=handoff_model)
                     output_text = result.get("output", "") if isinstance(result, dict) else str(result)
                     usage = result.get("usage") if isinstance(result, dict) else None
+                    executed_model_from_result = result.get("model") if isinstance(result, dict) else None
                     output_file.write_text(output_text, encoding="utf-8")
                     step_executor, step_executed_model = _executor_provenance(executor, output_text)
+                    # Use model from result if available (runtime evidence)
+                    if executed_model_from_result:
+                        step_executed_model = executed_model_from_result
                     if isinstance(usage, dict):
                         step_usage = usage
 
@@ -1614,15 +1663,20 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                         pass
 
                 try:
-                    result = executor.execute(packet_text, station_id, packet_path=packet,
-                                              output_path=output_file, cwd=project)
+                    result = _call_executor(executor, packet_text, station_id, packet_path=packet,
+                                              output_path=output_file, cwd=project,
+                                              configured_model=handoff_model)
                     output_text = result.get("output", "") if isinstance(result, dict) else str(result)
                     usage = result.get("usage") if isinstance(result, dict) else None
+                    executed_model_from_result = result.get("model") if isinstance(result, dict) else None
                     output_file.write_text(output_text, encoding="utf-8")
                     status = "executed"
                     detail = f"Executed by {executor.name}; output written to {output_file}"
                     artifact = str(output_file)
                     step_executor, step_executed_model = _executor_provenance(executor, output_text)
+                    # Use model from result if available (runtime evidence)
+                    if executed_model_from_result:
+                        step_executed_model = executed_model_from_result
                     extra_envelope = {}
                     if isinstance(usage, dict):
                         step_usage = usage
@@ -1720,7 +1774,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     step[key] = extra_envelope[key]
         steps.append(step)
 
-        # S5: Track Astra-bound stations' measured tokens for report total
+        # S5: Track interface stations' measured tokens for report total
         if station_id in astra_bound_stations and measured_tokens > 0:
             astra_measured_tokens_total += measured_tokens
 
