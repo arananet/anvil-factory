@@ -86,6 +86,12 @@ def deploy_config(config):
     deploy = config.get("deploy")
     return deploy if isinstance(deploy, dict) else None
 
+def health_config(config):
+    if not isinstance(config, dict):
+        return None
+    health = config.get("health")
+    return health if isinstance(health, dict) else None
+
 def build_default_config(station_ids):
     stations = {}
     for sid in station_ids:
