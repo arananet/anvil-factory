@@ -6,22 +6,77 @@
 
 Full name: ANVIL, Agentic Network for Verified Implementation Lifecycle.
 
+## See it working
+
+**Real run trail**: [wo-gh-9](runs/wo-gh-9/) shows the complete cycle from work order through five independent reviews to merge. Every station's packet, every review file, and the final report are preserved in the runs/ directory. No mockups - this is what the factory actually produced.
+
+**Live example**: The [Taskline repository](https://github.com/arananet/anvil-example-taskline) is a working task board API built entirely on the ANVIL line from a blank slate, with spec-first, red-green TDD evidence, and all station artifacts committed to its tree.
+
+## Built by ANVIL
+
+Three projects running in production, built on this factory:
+
+- **[Sentia](https://sentia.info-693.workers.dev)** - Full-stack web app with database persistence, built from spec through deployment verification on the greenfield pipeline
+- **[Platform25](https://platform25.pages.dev)** - Playable game built through the content pipeline with media production and brand review stations
+- **[Status Board](https://anvil-status.pages.dev)** - Live factory run status, generated from run reports and published automatically
+
+Each proves the same line can ship software, content, and infrastructure.
+
+## Quickstart
+
+Clone the Taskline example and see the factory output in under a minute:
+
+```bash
+git clone https://github.com/arananet/anvil-example-taskline.git
+cd anvil-example-taskline
+python3 -m unittest discover -s tests -v
+```
+
+You will see 6 passing tests mapped to spec scenarios, a complete run report in runs/, and review files from five independent reviewers. The example completes in ~0.3 seconds.
+
+If ANVIL is useful to you, a star helps other builders find it.
+
+## Why you can trust the output
+
+### 1. No station approves its own work
+
+Every agent station writes to its assigned artifact file (builder writes code, reviewers write review JSON). The approver station reads only the review files - it cannot see station output or logs - and aggregates verdicts using [deterministic parsing that fails closed](stations/approver/station.json). If a review file is malformed or a verdict is missing, the run is rejected, never assumed pass.
+
+Independent review evidence: [runs/wo-gh-9/reviewer-spec.review.json](runs/wo-gh-9/reviewer-spec.review.json), [reviewer-security.review.json](runs/wo-gh-9/reviewer-security.review.json), [reviewer-tests.review.json](runs/wo-gh-9/reviewer-tests.review.json), [reviewer-architecture.review.json](runs/wo-gh-9/reviewer-architecture.review.json), [reviewer-design.review.json](runs/wo-gh-9/reviewer-design.review.json) - five independent reviewers, none of which built the code.
+
+### 2. Memory with provenance
+
+The factory brain learns from run outcomes, but agent-written learnings never reach verified storage directly. New learnings wait in [brain/inbox/](brain/inbox/) (quarantined) until deterministic code verifies their provenance field against an actual run report that produced the claimed outcome. Only verified learnings promote to [brain/learnings.md](brain/learnings.md). This is the project's answer to benign memory contamination (CONTAM-Bench): the brain cannot learn from hallucinated runs.
+
+Provenance gate implementation: [docs/MEMORY-GATE.md](docs/MEMORY-GATE.md)
+
+### 3. Human gate before publishing or production deploys
+
+Any work order with a publishing or production deploy risk hint stops at the [triage-human station](stations/triage-human/station.json) for explicit human approval before the deployer or publisher stations run. The factory prepares and checks, but a human decides what goes out. Runs that reach the deployer without approval are rejected at that gate.
+
+Evidence: [runs/wo-gh-9/report.json](runs/wo-gh-9/report.json) line 147, triage-human station status: "executed", blocking risky work.
+
 ## What it is
-ANVIL is a framework for running software work down a line of stations. Each station has a manifest and a clear contract. Some stations are deterministic code that runs for real: intake, gates, the approver and human triage. Agent stations are explicit contracts, a manifest plus a prompt packet. The runner never pretends a model ran: for an agent station it writes a packet file and marks the step packet_ready.
+
+ANVIL is a framework for running software work down a line of 27 stations. Each station has a manifest and a clear contract. Some stations are deterministic code: intake, gates, the approver and human triage. Agent stations are explicit contracts, a manifest plus a prompt packet. The runner never pretends a model ran: for an agent station it writes a packet file and marks the step packet_ready.
 
 A project keeps everything in its repo: specs, tests, reviews, run reports, envelopes and a brain folder with context and decisions.
 
+The factory ships 8 pipelines and over 500 tests covering the full SDLC, content production, and greenfield builds.
+
 ## One core, two domains: software and content
+
 The factory core (work orders, pipelines, gates, envelopes, approver, human triage, brain) does not care what the line produces. Domains are station sets that plug into the same core:
 
-- **Software** is the default domain in this repo: spec-writer, test-writer and builder produce code, and the four software reviewers check it. The spec is the contract and tests are the evidence.
-- **Content** ships in the same catalog: brief-writer, researcher, writer and media-producer produce a piece, and four different reviewers check it in parallel (facts against sources, voice, platform fit, brand risk). The brief replaces the spec, the source pack replaces the test base, and two deterministic gates check the brief and the AI generated disclosure on the draft.
+- **Software** is the default domain in this repo: spec-writer, test-writer and builder produce code, and five software reviewers check it. The spec is the contract and tests are the evidence.
+- **Content** ships in the same catalog: brief-writer, researcher, writer and media-producer produce a piece, and five different reviewers check it in parallel (facts against sources, voice, platform fit, brand risk, UX). The brief replaces the spec, the source pack replaces the test base, and two deterministic gates check the brief and the AI generated disclosure on the draft.
 
 Publishing is a risk hint in ANVIL, so a content work order that will be published always stops at the human gate before the publisher station runs. That is deliberate: the factory prepares and checks, a human decides what goes out under their name.
 
 A worked content example with a brief, a draft and a full run lives in examples/content/why-factories. The same composition rule applies both ways: a content series can start greenfield from an idea, and a software team can borrow the researcher or the facts reviewer for a technical article line.
 
 ## Two modes: greenfield and brownfield
+
 ANVIL is not only a line for issues on existing code. It has two modes that share the same stations:
 
 - **Greenfield, build from zero.** The entry is an idea, not an issue. `anvil new-project` scaffolds a brand new project from a catalog blueprint (python-service, cloudflare-worker, static-site): repo structure, a brain seeded with the idea, BLUEPRINT.md with the stack and the first specs, and anvil.json pointing at the greenfield pipeline. That pipeline adds one station at the front, blueprint, which turns the idea into a project shape before spec-writer takes over. Taskline, the example repo, is a build from zero: no code existed when its work order was written. Its recorded run used sdlc-default, and the greenfield pipeline formalizes that from zero path with scaffolding and the blueprint station in front.
@@ -42,7 +97,8 @@ The modes are a starting point, not a wall: a greenfield project becomes brownfi
 | reviewer-security | agent | Check for security risks and unsafe defaults |
 | reviewer-tests | agent | Check tests are real, mapped and passing |
 | reviewer-architecture | agent | Check fit with structure and decisions |
-| approver | deterministic | Aggregate the four reviews into one verdict |
+| reviewer-design | agent | Check visual output against design system |
+| approver | deterministic | Aggregate the five reviews into one verdict |
 | triage-human | deterministic | Decide if a human must review risky work |
 | deployer | agent | Carry out the release step for the project |
 | observer | agent | Watch the release and report what happened |
@@ -56,10 +112,13 @@ The modes are a starting point, not a wall: a greenfield project becomes brownfi
 | reviewer-voice | agent | Content: check voice, house rules and the AI generated disclosure |
 | reviewer-platform | agent | Content: check format and fit for the target channel |
 | reviewer-brand | agent | Content: check brand and policy risks |
+| reviewer-ux | agent | Content: check user experience and interaction patterns |
 | publisher | agent | Content: publish only after approval and the human gate, and record where it went live |
 | supervisor | agent | Between runs: watch the run record for stalls and propose one bounded pipeline recomposition |
+| checks-gate | deterministic | Pre-review gate: verify protected paths, base branch, and S4 conditions before reviews run |
 
 ## Composing a pipeline
+
 A pipeline is a small JSON file. Order stations, or group them in parallel. Stations are reused across pipelines, never redefined.
 
 ```json
@@ -75,6 +134,7 @@ A pipeline is a small JSON file. Order stations, or group them in parallel. Stat
 ```
 
 ## Quick start
+
 ```bash
 python3 -m anvil.cli new-project ../my-new-app --name MyNewApp --blueprint cloudflare-worker --idea "What this app is for"
 python3 -m anvil.cli onboard ../my-existing-project
@@ -87,6 +147,7 @@ python3 -m anvil.cli check-content ../my-channel --slug my-post
 python3 -m anvil.cli check-brain ../my-project
 python3 -m anvil.cli supervise ../my-project
 ```
+
 Installed as a package, the same commands are available as `anvil new-project`, `anvil onboard`, `anvil init`, `anvil new-spec`, `anvil validate-pipeline`, `anvil run`, `anvil check`, `anvil check-brain` and `anvil supervise`.
 
 Project station settings live in `anvil.yaml` at the project root: context, model, prompt and tools per station. See docs/ARCHITECTURE.md for the Core Four.
@@ -98,24 +159,28 @@ Memory is gated like code: agent written learnings wait in a quarantined inbox a
 The supervisor watches run reports between runs and proposes pipeline recompositions built only from the station catalog, under a constitution it cannot amend, and nothing it proposes applies itself. See docs/SUPERVISOR.md.
 
 ## The brain
+
 The brain/ folder holds project.md (what the project is and its principles), glossary.md, decisions/ (numbered decision records) and worklog.md. Stations read the brain as context, so decisions survive beyond a single run. Verified learnings live in brain/learnings.md behind the memory gate, with proposals quarantined in brain/inbox/ until their provenance verifies (docs/MEMORY-GATE.md).
 
 ## Pipelines included
-- sdlc-default: the full SDLC line, intake to observer with four parallel reviewers.
+
+- sdlc-default: the full SDLC line, intake to observer with five parallel reviewers.
 - hotfix: a short line for urgent fixes, with spec and security review.
 - docs-only: intake, builder, one review and the approver.
 - scout: a single read only recon station, no code changes.
 - plan-build-test: intake, spec, tests, build, test review and approver.
-- greenfield: the from zero line. Intake, blueprint, spec, tests, build, the four parallel reviewers, approver, human triage, deployer and observer.
-- content-default: the full content line. Intake, brief, research, writing, media, four parallel content reviewers, approver, human triage, publisher and observer.
+- greenfield: the from zero line. Intake, blueprint, spec, tests, build, the five parallel reviewers, approver, human triage, deployer and observer.
+- content-default: the full content line. Intake, brief, research, writing, media, five parallel content reviewers, approver, human triage, publisher and observer.
 - content-short: a short content line for posts. Intake, brief, writing, facts and voice review, approver, human triage and publisher.
 
 ## Intake worker
+
 intake-worker/ is a Cloudflare Worker in plain JavaScript with no dependencies. POST /work-orders validates and normalizes a work order and returns 201. GET /health returns ok. POST /github accepts GitHub webhook deliveries: set GITHUB_WEBHOOK_SECRET on the Worker to require a valid X-Hub-Signature-256 HMAC (invalid signature returns 401), and issues opened, or labeled with the label anvil, are mapped to a work order (kind task when the issue carries the task label) and returned with 202; other events are acknowledged and ignored. Tests run with `node --test "intake-worker/*.test.js"`.
 
 Optional GitHub dispatch: set GITHUB_REPO and GITHUB_TOKEN in the Worker environment to forward work orders to a repository dispatch event in your own deployment code. No secrets live in the repo.
 
 ## Contributing
+
 Every change starts with a spec under .openspec/specs/ (OpenSpec). Write the spec, write tests that map to its scenarios, then implement. Keep runtime code on the Python standard library only.
 
 ## Documentation
@@ -135,6 +200,8 @@ Every change starts with a spec under .openspec/specs/ (OpenSpec). Write the spe
 
 [Apache 2.0](LICENSE)
 
+Copyright Eduardo Arana
+
 ---
 
 ## Developer
@@ -144,3 +211,18 @@ Eduardo Arana
 ## Support this with a ko-fi
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/H2H51MPWG)
+
+---
+
+If ANVIL is useful to you, a star helps other builders find it.
+
+---
+
+## Metadata Update (Operator Step)
+
+This README is ready for merge. The following repository metadata updates are operator steps to be completed after merge via the GitHub web interface:
+
+- **Homepage**: https://anvil-status.pages.dev
+- **Topics**: ai-agents, multi-agent-systems, software-factory, sdlc, llm, code-generation, code-review, openspec, spec-driven-development, ai-coding, developer-tools, python
+- **Social preview image**: Upload runs/wo-gh-23/evidence/social-preview.png (1280x640) via Settings > General > Social preview
+- **Description**: Current repository description is retained. Alternative available in work order if owner approval needed.

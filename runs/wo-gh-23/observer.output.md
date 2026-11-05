@@ -1,0 +1,1 @@
+Observer station complete. Created `runs/wo-gh-23/observer.output.md` reporting that the deployer hasn't executed yet, so there's no release record to observe. The deployer must run first to produce the release record input.

@@ -1,0 +1,322 @@
+{
+  "work_order_id": "wo-gh-23",
+  "pipeline": "sdlc-default",
+  "title": "Showcase README: first screen demo, Built by ANVIL, quickstart, trust section",
+  "kind": "task",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "executed",
+      "detail": "Executed by command; outcome: accepted",
+      "duration_ms": 55840.216,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/intake.output.md"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 2249,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-23/spec-writer.output.md",
+      "duration_ms": 119770.581,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/spec-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 1526,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "test-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-23/test-writer.output.md",
+      "duration_ms": 116644.888,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/test-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 1532,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-23/builder.output.md",
+      "duration_ms": 470980.437,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/builder.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 3305,
+      "budget": 50000,
+      "budget_action": "sent"
+    },
+    {
+      "station": "checks-gate",
+      "status": "failed",
+      "detail": "Gate failed: 1 checks, protected paths: pass",
+      "duration_ms": 50260.426,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/checks-gate.pre-review.output.md"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "phase": "pre-review",
+      "commands": [
+        "python -m unittest discover -s tests -p 'test_*.py'"
+      ],
+      "exit_codes": [
+        1
+      ],
+      "protected_paths": [
+        "tests/",
+        "anvil.json",
+        "pipelines/"
+      ],
+      "protected_path_verdict": "pass",
+      "protected_path_findings": [],
+      "gate_verdict": "fail"
+    },
+    {
+      "station": "loopback",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Gate checks failed",
+      "reason": "Gate checks failed",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null,
+      "feedback": "",
+      "from_station": "checks-gate"
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.191,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/reviewer-spec.packet.md"
+      ],
+      "configured_model": "review-cheap",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "reviewer-security",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.131,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/reviewer-security.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.121,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/reviewer-tests.packet.md"
+      ],
+      "configured_model": "review-cheap",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.122,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/reviewer-architecture.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "reviewer-design",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 5.657,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/reviewer-design.packet.md"
+      ],
+      "configured_model": "openai/gpt-6-astra",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "reviewer-ux",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.824,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/reviewer-ux.packet.md"
+      ],
+      "configured_model": "openai/gpt-6-astra",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: no_reviews",
+      "duration_ms": 0.03,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: required",
+      "duration_ms": 0.009,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "detail": "Packet written to runs/wo-gh-23/deployer.packet.md",
+      "duration_ms": 0.133,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/deployer.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 1622,
+      "budget": 0,
+      "budget_action": "none"
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-23/observer.output.md",
+      "duration_ms": 40640.411,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-23/observer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 1629,
+      "budget": 0,
+      "budget_action": "none"
+    }
+  ],
+  "verdict": "no_reviews",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 1,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [],
+      "reviews_expected": [
+        "reviewer-spec",
+        "reviewer-tests"
+      ],
+      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 2.)"
+    },
+    "human_gate": {
+      "required": true,
+      "rule": "Verdict is no_reviews, not approved, so a human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": [],
+  "astra_measured_tokens_total": 3305,
+  "base_ref": "fa2c07c14b8b865a8d77dc7b2fe5713deadac212",
+  "evidence": [],
+  "cost": {
+    "total": 0,
+    "measured_steps": 0,
+    "unmeasured_steps": 5
+  }
+}
