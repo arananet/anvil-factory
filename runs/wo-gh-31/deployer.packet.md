@@ -36,6 +36,10 @@ Prepare and carry out the release step described by the project.
 Guardrails: do not modify or delete any existing file under tests/ (new tests only in new files; the checks gate protects base ref test files). Routing's vocabulary and rules unchanged; the dispatcher keeps failing loudly on unmapped non-concrete values. Full suite green. No em dash or en dash characters in any produced file.
 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/31
+
+PURE VERIFICATION ROUND (round 2). Round 1 verdict: no_reviews, with the expected self-reference shape, disclosed in full: the builder implemented the fix (MODEL_TIER_MAP gained review-cheap -> claude-sonnet-5-5, plus the totality regression test enumerating the routing vocabulary), the checks gate PASSED on the new tree (the totality test runs in a fresh process and proves the map), but this order's own two selected reviewers (reviewer-spec and reviewer-tests, reduced panel at low risk) still failed at dispatch with the unresolved review-cheap label, because the runner process of round 1 loaded the pre-fix map at startup. A fix to the hand-off cannot prove itself inside the run that carries it; that is what this round is for.
+
+The standing tree at this round's start contains the complete fix with the gate green. THIS ROUND MAKES NO CHANGES: the builder is barred from modifying, adding or deleting any file; its task is verification and reporting only. The run starts on the fixed code, so routing's review-cheap assignments now resolve at hand-off. Reviewers: judge the standing tree against the spec (R1 the map entry, R2 the vocabulary-enumerating totality test, R3 nothing else changed, dispatcher still loud on unmapped values). If the tree is genuinely incomplete against the spec, name the specific gap for the record rather than requesting changes this round is barred from making.
 - risk_hints: 
 - status: new
 
@@ -46,9 +50,9 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/31
 - test-writer: executed
 - builder: executed
 - checks-gate: passed
-- reviewer-spec: failed
+- reviewer-spec: executed
 - reviewer-security: routed_out
-- reviewer-tests: failed
+- reviewer-tests: executed
 - reviewer-architecture: routed_out
 - reviewer-design: routed_out
 - reviewer-ux: routed_out

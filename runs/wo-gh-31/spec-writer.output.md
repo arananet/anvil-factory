@@ -1,11 +1,11 @@
-The spec already exists at `.openspec/specs/model-tier-map/spec.md`. It was staged in commit 9873716, and it matches the work order. I checked it against the code, and I made no changes.
+The spec at `.openspec/specs/model-tier-map/spec.md` already matches the work order, so I made no changes to it. This is a pure verification round.
 
-- **Problem statement:** `anvil/routing.py:30` lists `review-cheap` in `MODEL_HIERARCHY`. `anvil/routing.py:119` assigns it to the reduced panel. `MODEL_TIER_MAP` (`anvil/config.py:26`) has no entry for it, and `resolve_model` (`anvil/config.py:44`) passes unmapped labels through unchanged.
-- **R1 to R3:** These cover the work order's three items, which are the map entry, the totality test that reads its vocabulary from routing, and nothing else changing.
-- **Dashes:** The spec file has no em dash or en dash characters.
-- **Brain:** `brain/` has nothing that bears on this change.
+- **Problem statement:** it matches the standing tree. `review-cheap` is in `MODEL_HIERARCHY`, and `MODEL_TIER_MAP` now maps it to `claude-sonnet-5-5` (`anvil/config.py:27`).
+- **R1 to R3:** they cover the work order's items. R1 is the map entry, R2 is a totality test that reads its vocabulary from routing, and R3 says nothing else changes, with the dispatcher still failing loudly on unmapped values.
+- **Dashes:** the spec has no em dash or en dash characters.
+- **Not checked:** I did not look at the totality test or the CHANGELOG entry. The CHANGELOG entry is not part of this station's output.
 
 Nothing is missing, so the next station can take it.
 
-The CHANGELOG entry from the work order is not part of this station's output, so I left it for the implementation station.
+Git status showed `runs/wo-gh-31/spec-writer.output.md` as deleted. I recreated it with this report, since the station rules require the output to be a file. That is the only file I wrote.
 {"model": "claude-sonnet-5-5"}

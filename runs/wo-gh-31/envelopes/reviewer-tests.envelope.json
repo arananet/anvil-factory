@@ -3,14 +3,24 @@
   "from_station": "reviewer-tests",
   "to_station": "reviewer-architecture",
   "work_order_id": "wo-gh-31",
-  "artifact_path": "runs/wo-gh-31/reviewer-tests.packet.md",
-  "status": "failed",
-  "created_at": "2026-11-05T02:50:13.326260+00:00",
-  "error": "command executor exited 1: dispatch_station: unknown model 'review-cheap'. Known models: claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol",
-  "configured_model": "review-cheap",
+  "artifact_path": "runs/wo-gh-31/reviewer-tests.output.md",
+  "status": "executed",
+  "created_at": "2026-11-05T03:03:59.464761+00:00",
+  "correction_used": true,
+  "review": {
+    "station": "reviewer-tests",
+    "verdict": "pass",
+    "findings": [
+      "R1 met: MODEL_TIER_MAP in anvil/config.py maps review-cheap to claude-sonnet-5-5.",
+      "R2 met: tests/test_tier_map_totality.py is a new file. It builds the vocabulary from anvil.routing (MODEL_HIERARCHY, MODEL_POLICY values, and the model values from the default routing config load) with no hardcoded label list. It asserts each label resolves into CONCRETE_MODELS and that review-cheap is in the vocabulary. The 4 tests pass when run with unittest.",
+      "R3 met: the only existing-test-directory change is the new file, and routing labels are unchanged. The CHANGELOG Unreleased entry is present. The new files contain no em or en dashes. I did not re-verify dispatcher loudness beyond the changelog claim and the test asserting that an unknown tier is not in the map.",
+      "pytest is not installed in this environment, so I ran the new test with unittest only and did not run the full suite. The checks gate reported it green."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
   "executor": {
     "kind": "command",
     "detail": "python3"
   },
-  "executed_model": null
+  "executed_model": "claude-sonnet-5-5"
 }

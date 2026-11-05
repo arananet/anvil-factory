@@ -1,10 +1,14 @@
-I wrote the observation report to `runs/wo-gh-31/observer.output.md`. There is no release to observe. The deployer envelope status is `packet_ready`, and the release record, which is my only input, doesn't exist. I didn't guess at what happened after release.
+I wrote the observation report to `runs/wo-gh-31/observer.output.md`. It says there is nothing to observe yet. The deployer status is `packet_ready` and no release record exists. I didn't guess at post-release outcomes.
 
-- **Checks gate:** It passed. The pre-review run showed 586 tests OK with 6 skipped.
-- **Reviewers:** reviewer-spec and reviewer-tests both `failed`, and the other four were `routed_out`. No reviewer output files exist for this run, so I can't say why those two failed.
-- **Approval:** The approver and triage-human both show `completed` despite those two failures. I couldn't tell whether a human overrode them, so that needs a human look.
-- **Missing report:** `report.json` and `report.md`, which the approver and triage-human envelopes point to, don't exist.
-- **Not merged:** The change is still uncommitted edits on `anvil/run-tier-map`. Nothing is merged.
+- **Reviewers:** reviewer-spec and reviewer-tests both ran this round and passed. Both report R1 to R3 met, and reviewer-spec says `review-cheap` now resolves at hand-off, so the round 1 gap is closed.
+- **Fix in place:** `anvil/config.py` line 27 maps `review-cheap` to `claude-sonnet-5-5`. The checks gate passed.
+- **Stale reports:** `runs/wo-gh-31/report.md` and `report.json` still show round 1's `no_reviews` with both reviewers failed. They contradict the current envelopes and should be regenerated.
+- **Unchecked claims:**
+  - reviewer-spec had no `main` ref to diff against, so nobody confirmed that existing files under `tests/` are unmodified.
+  - reviewer-tests ran only the new tests (4 pass), not the full suite.
+  - Dispatcher loudness on unmapped values was checked by test and inspection, not by a live dispatch.
+  - I didn't re-run the suite. The 586 tests OK (6 skipped) figure comes from reviewer-spec.
+- **Not merged:** the change is still uncommitted edits on `anvil/run-tier-map`.
 
-I didn't re-run the suite or check the spec scenarios against the diff, since both are outside my inputs. The report contains no em or en dashes.
+The report contains no em or en dashes.
 {"model": "claude-sonnet-5-5"}

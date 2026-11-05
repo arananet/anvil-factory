@@ -11,7 +11,7 @@ Outcome: accepted
 
 Risk: low
 
-Surfaces: data, content
+Surfaces: content
 
 ## Routing
 
@@ -22,16 +22,16 @@ Surfaces: data, content
 - reviewer-tests (model: review-cheap)
 
 **Routed out** (4):
-- reviewer-security: Routed out by low risk rule (not in reduced panel)
 - reviewer-ux: Routed out by low risk rule (not in reduced panel)
 - reviewer-design: Routed out by low risk rule (not in reduced panel)
+- reviewer-security: Routed out by low risk rule (not in reduced panel)
 - reviewer-architecture: Routed out by low risk rule (not in reduced panel)
 
 ## Verdict
 
-Verdict: no_reviews
+Verdict: approved
 
-No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 2.)
+All counted reviews passed. (Expected 2 reviews after routing.)
 
 ## Steps
 
@@ -40,9 +40,9 @@ No reviews were produced in this run, so the verdict is no_reviews; standing pro
 - test-writer: executed
 - builder: executed
 - checks-gate: passed
-- reviewer-spec: failed
+- reviewer-spec: executed
 - reviewer-security: routed_out
-- reviewer-tests: failed
+- reviewer-tests: executed
 - reviewer-architecture: routed_out
 - reviewer-design: routed_out
 - reviewer-ux: routed_out
