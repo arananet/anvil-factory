@@ -8,18 +8,18 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 38752.224,
+      "duration_ms": 5179.985,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/intake.output.md"
       ],
-      "configured_model": "default",
-      "executed_model": null,
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
       "executor": {
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2403,
+      "measured_tokens": 3260,
       "budget": 0,
       "budget_action": "none"
     },
@@ -27,18 +27,18 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-29/spec-writer.output.md",
-      "duration_ms": 25821.21,
+      "duration_ms": 90722.609,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/spec-writer.output.md"
       ],
-      "configured_model": "claude-sonnet-4-5",
-      "executed_model": null,
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
       "executor": {
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 1680,
+      "measured_tokens": 2537,
       "budget": 0,
       "budget_action": "none"
     },
@@ -46,18 +46,18 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-29/test-writer.output.md",
-      "duration_ms": 360272.001,
+      "duration_ms": 84982.92,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/test-writer.output.md"
       ],
-      "configured_model": "claude-sonnet-4-5",
-      "executed_model": null,
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
       "executor": {
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 1686,
+      "measured_tokens": 2543,
       "budget": 0,
       "budget_action": "none"
     },
@@ -65,26 +65,26 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-29/builder.output.md",
-      "duration_ms": 407793.019,
+      "duration_ms": 68885.23,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/builder.output.md"
       ],
-      "configured_model": "claude-sonnet-4-5",
-      "executed_model": null,
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
       "executor": {
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 3305,
+      "measured_tokens": 4316,
       "budget": 50000,
       "budget_action": "sent"
     },
     {
       "station": "checks-gate",
-      "status": "failed",
-      "detail": "Gate failed: 1 checks, protected paths: pass",
-      "duration_ms": 48667.945,
+      "status": "passed",
+      "detail": "Gate passed: 1 checks, protected paths: pass",
+      "duration_ms": 34087.585,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/checks-gate.pre-review.output.md"
@@ -100,7 +100,7 @@
         "python -m unittest discover -s tests -p 'test_*.py'"
       ],
       "exit_codes": [
-        1
+        0
       ],
       "protected_paths": [
         "tests/",
@@ -109,113 +109,113 @@
       ],
       "protected_path_verdict": "pass",
       "protected_path_findings": [],
-      "gate_verdict": "fail"
-    },
-    {
-      "station": "loopback",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: Gate checks failed",
-      "reason": "Gate checks failed",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null,
-      "feedback": "",
-      "from_station": "checks-gate"
+      "gate_verdict": "pass"
     },
     {
       "station": "reviewer-spec",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.111,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 1: dispatch_station: unknown model 'review-balanced'. Known models: claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol",
+      "duration_ms": 27.442,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/reviewer-spec.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 2747,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-security",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.066,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 1: dispatch_station: unknown model 'review-strong'. Known models: claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol",
+      "duration_ms": 26.728,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/reviewer-security.packet.md"
       ],
       "configured_model": "review-strong",
       "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 2757,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-tests",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.061,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 1: dispatch_station: unknown model 'review-balanced'. Known models: claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol",
+      "duration_ms": 26.029,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/reviewer-tests.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 2759,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-architecture",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.052,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 1: dispatch_station: unknown model 'review-balanced'. Known models: claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol",
+      "duration_ms": 26.131,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/reviewer-architecture.packet.md"
       ],
       "configured_model": "review-balanced",
       "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 2782,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-design",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 27.903,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: codex_station: Missing OPENAI_BASE_URL or OPENAI_API_KEY environment variables",
+      "duration_ms": 82.006,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/reviewer-design.packet.md"
       ],
-      "configured_model": "openai/gpt-6-astra",
+      "configured_model": "openai/gpt-6.1-sol",
       "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
-      "budget": 0,
-      "budget_action": "none"
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 8462,
+      "budget": 50000,
+      "budget_action": "sent"
     },
     {
       "station": "reviewer-ux",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.511,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out: no UI surface",
+      "duration_ms": 0.974,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/reviewer-ux.packet.md"
       ],
-      "configured_model": "openai/gpt-6-astra",
+      "configured_model": "openai/gpt-6.1-sol",
       "executed_model": null,
       "executor": null,
       "measured_tokens": 0,
@@ -226,7 +226,7 @@
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.014,
+      "duration_ms": 0.021,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/report.json"
@@ -242,7 +242,7 @@
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: required",
-      "duration_ms": 0.005,
+      "duration_ms": 0.007,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -256,34 +256,34 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-29/deployer.packet.md",
-      "duration_ms": 0.06,
+      "duration_ms": 0.218,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/deployer.packet.md"
       ],
-      "configured_model": "claude-sonnet-4-5",
+      "configured_model": "claude-sonnet-5-5",
       "executed_model": null,
       "executor": null,
-      "measured_tokens": 1776,
+      "measured_tokens": 2626,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "observer",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 7: claude_station: ANVIL_CONFIGURED_MODEL environment variable not set",
-      "duration_ms": 23.665,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-29/observer.output.md",
+      "duration_ms": 22604.164,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-29/observer.packet.md"
+        "runs/wo-gh-29/observer.output.md"
       ],
-      "configured_model": "claude-sonnet-4-5",
-      "executed_model": null,
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
       "executor": {
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 1783,
+      "measured_tokens": 2633,
       "budget": 0,
       "budget_action": "none"
     }
@@ -291,7 +291,7 @@
   "verdict": "no_reviews",
   "human_required": true,
   "max_loopbacks": 2,
-  "loopbacks": 1,
+  "loopbacks": 0,
   "deployment_status": null,
   "verify_results": [],
   "risk_hints": [],
@@ -316,8 +316,8 @@
   "warnings": [
     "No reference anchors: This visual run has no reference anchors. The review will proceed under the charter floor alone."
   ],
-  "astra_measured_tokens_total": 3305,
-  "base_ref": "9008ccc41ba913ddaff06375bab6588a26b60b84",
+  "astra_measured_tokens_total": 12778,
+  "base_ref": "2e2ebf27325e06aa5d2258ff1a451951a21c36b3",
   "evidence": [
     {
       "type": "screenshot",
@@ -337,6 +337,6 @@
   "cost": {
     "total": 0,
     "measured_steps": 0,
-    "unmeasured_steps": 4
+    "unmeasured_steps": 5
   }
 }

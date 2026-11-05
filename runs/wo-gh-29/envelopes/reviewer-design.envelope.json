@@ -4,7 +4,13 @@
   "to_station": "reviewer-ux",
   "work_order_id": "wo-gh-29",
   "artifact_path": "runs/wo-gh-29/reviewer-design.packet.md",
-  "status": "skipped",
-  "created_at": "2026-11-05T01:06:33.090785+00:00",
-  "configured_model": "openai/gpt-6-astra"
+  "status": "failed",
+  "created_at": "2026-11-05T01:17:50.817806+00:00",
+  "error": "command executor exited 2: codex_station: Missing OPENAI_BASE_URL or OPENAI_API_KEY environment variables",
+  "configured_model": "openai/gpt-6.1-sol",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
 }

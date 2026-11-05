@@ -154,25 +154,5 @@
       "prompt": "stations/supervisor/PROMPT.md",
       "tools": []
     }
-  },
-  "prices": {
-    "claude-opus-5-5": {
-      "input_per_million": 3.0,
-      "output_per_million": 15.0,
-      "source": "anthropic-pricing-2024-12",
-      "date_recorded": "2024-12-15"
-    },
-    "claude-sonnet-5-5": {
-      "input_per_million": 0.6,
-      "output_per_million": 3.0,
-      "source": "anthropic-pricing-2024-12",
-      "date_recorded": "2024-12-15"
-    },
-    "openai/gpt-6.1-sol": {
-      "input_per_million": 0.8,
-      "output_per_million": 2.4,
-      "source": "openai-pricing-2024-11",
-      "date_recorded": "2024-11-20"
-    }
   }
 }

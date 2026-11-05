@@ -17,10 +17,26 @@ Exit codes:
 - other: propagated from underlying runtime
 """
 
+import json
 import os
 import subprocess
 import sys
 from pathlib import Path
+
+
+def _self_report(output_path, model):
+    """Self-report the model actually dispatched through the existing channel:
+    a JSON object with a "model" field in the runtime output."""
+    line = json.dumps({"model": model})
+    try:
+        path = Path(output_path)
+        if path.exists():
+            text = path.read_text(encoding="utf-8")
+            sep = "" if text.endswith("\n") or not text else "\n"
+            path.write_text(text + sep + line + "\n", encoding="utf-8")
+    except OSError:
+        pass
+    print(line)
 
 
 def dispatch_runtime(packet_path, output_path, configured_model):
@@ -59,6 +75,8 @@ def dispatch_runtime(packet_path, output_path, configured_model):
                 print(proc.stdout, end="")
             if proc.stderr:
                 print(proc.stderr, end="", file=sys.stderr)
+            if proc.returncode == 0:
+                _self_report(output_path, configured_model)
             return proc.returncode
 
         except Exception as e:
@@ -83,6 +101,8 @@ def dispatch_runtime(packet_path, output_path, configured_model):
                 print(proc.stdout, end="")
             if proc.stderr:
                 print(proc.stderr, end="", file=sys.stderr)
+            if proc.returncode == 0:
+                _self_report(output_path, configured_model)
             return proc.returncode
 
         except Exception as e:

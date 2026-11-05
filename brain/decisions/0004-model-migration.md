@@ -36,7 +36,7 @@ claude-sonnet-4-5 retires 2026-11-30 per Anthropic's published model lifecycle.
 
 **Review channel unchanged**: Review file validation, the one in-session correction, parser contract and producer mechanism stay identical for Claude and Codex executed reviewers. Wrapper validates review files the same way under both runtimes.
 
-**Cost measurement**: Price table gains entries for claude-opus-5-5, claude-sonnet-5-5 and openai/gpt-6.1-sol with source and date recorded. Models without verifiable prices stay unmeasured and record the reason.
+**Cost measurement**: claude-opus-5-5, claude-sonnet-5-5 and openai/gpt-6.1-sol carry no price table entries. No verifiable source was recorded, so no price is invented; their steps record cost measured false with the reason. An entry may be added only with a source a reviewer can check, labelled with that source and a current date.
 
 **Design station model**: The UX module's guided design stations (reviewer-design, reviewer-ux, builder on UI surfaces) execute on openai/gpt-6.1-sol as the routing policy specifies. The model is visible per step in run reports.
 

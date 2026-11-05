@@ -11,11 +11,11 @@ Outcome: accepted
 
 Risk: high
 
-Surfaces: deploy
+Surfaces: api, security, data, content, deploy
 
 ## Routing
 
-**Decision**: High risk: full panel at policy models, no reduction applied
+**Decision**: High risk: full panel at policy models, no reduction applied; Security surface: reviewer-security at strong model
 
 **Selected reviewers** (5):
 - reviewer-spec (model: review-balanced)
@@ -39,16 +39,15 @@ No reviews were produced in this run, so the verdict is no_reviews; standing pro
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
-- reviewer-spec: skipped
-- reviewer-security: skipped
-- reviewer-tests: skipped
-- reviewer-architecture: skipped
-- reviewer-design: skipped
-- reviewer-ux: skipped
+- checks-gate: passed
+- reviewer-spec: failed
+- reviewer-security: failed
+- reviewer-tests: failed
+- reviewer-architecture: failed
+- reviewer-design: failed
+- reviewer-ux: routed_out
 - approver: completed
 - triage-human: completed
 - deployer: packet_ready
-- observer: failed
+- observer: executed
 

@@ -1,3 +1,4 @@
+import inspect
 import json, os, shlex, struct, subprocess, time, zlib
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -756,6 +757,23 @@ def _reported_model(text):
             return obj["model"]
     return None
 
+def _call_executor(executor, packet_text, station_id, configured_model=None, **kwargs):
+    """Call executor.execute, handing it the assigned model when it accepts one.
+
+    Executors written before the model hand-off (for example test doubles)
+    have no configured_model parameter; they are called without it.
+    """
+    try:
+        params = inspect.signature(executor.execute).parameters
+    except (TypeError, ValueError):
+        params = {}
+    accepts = "configured_model" in params or any(
+        p.kind is inspect.Parameter.VAR_KEYWORD for p in params.values())
+    if accepts:
+        kwargs["configured_model"] = configured_model
+    return executor.execute(packet_text, station_id, **kwargs)
+
+
 def _executor_provenance(executor, output_text=""):
     """Return (executor_object, executed_model) for an attempted execution.
 
@@ -1284,7 +1302,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 packet_text = packet.read_text(encoding="utf-8")
                 output_file = run_dir / f"{station_id}.output.md"
                 try:
-                    result = executor.execute(packet_text, station_id, packet_path=packet,
+                    result = _call_executor(executor, packet_text, station_id, packet_path=packet,
                                               output_path=output_file, cwd=project,
                                               configured_model=configured_model)
                     output_text = result.get("output", "") if isinstance(result, dict) else str(result)
@@ -1620,7 +1638,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                         pass
 
                 try:
-                    result = executor.execute(packet_text, station_id, packet_path=packet,
+                    result = _call_executor(executor, packet_text, station_id, packet_path=packet,
                                               output_path=output_file, cwd=project,
                                               configured_model=configured_model)
                     output_text = result.get("output", "") if isinstance(result, dict) else str(result)

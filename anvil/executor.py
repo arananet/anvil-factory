@@ -67,12 +67,10 @@ class CommandExecutor:
             except (OSError, UnicodeDecodeError):
                 pass
 
-        # Extract executed model from output if runtime reported it
-        # The runtime dispatcher or specific runtime (claude_station/codex_station)
-        # should report the model it actually executed
-        executed_model = configured_model  # Default: executed = configured
-
-        return {"output": output, "usage": None, "model": executed_model}
+        # The executed model is recorded only from runtime self-report evidence
+        # found in the output (see runner._reported_model). configured_model is
+        # a hand-off to the runtime, never a record of what ran.
+        return {"output": output, "usage": None}
 
 
 class HttpExecutor:
@@ -85,7 +83,7 @@ class HttpExecutor:
         self.timeout = int(config.get("timeout_seconds", 300))
         self.name = f"http:{self.model}" if self.model else "http"
 
-    def execute(self, packet_text, station_id, packet_path=None, output_path=None, cwd=None):
+    def execute(self, packet_text, station_id, packet_path=None, output_path=None, cwd=None, configured_model=None):
         if not self.endpoint:
             raise ExecutorError("http executor has no endpoint configured")
         payload = {"model": self.model, "station": station_id,
@@ -125,7 +123,7 @@ class FailingExecutor:
         self.kind = str(kind)
         self.name = f"unknown:{self.kind}"
 
-    def execute(self, packet_text, station_id, packet_path=None, output_path=None, cwd=None):
+    def execute(self, packet_text, station_id, packet_path=None, output_path=None, cwd=None, configured_model=None):
         raise ExecutorError(f"unknown executor kind: {self.kind}")
 
 

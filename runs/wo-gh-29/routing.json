@@ -13,11 +13,11 @@
     }
   ],
   "selected_models": {
-    "reviewer-tests": "review-balanced",
     "reviewer-architecture": "review-balanced",
     "reviewer-spec": "review-balanced",
-    "reviewer-security": "review-strong",
-    "reviewer-design": "review-balanced"
+    "reviewer-tests": "review-balanced",
+    "reviewer-design": "review-balanced",
+    "reviewer-security": "review-strong"
   },
-  "reason": "High risk: full panel at policy models, no reduction applied"
+  "reason": "High risk: full panel at policy models, no reduction applied; Security surface: reviewer-security at strong model"
 }

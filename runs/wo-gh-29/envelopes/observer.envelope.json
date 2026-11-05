@@ -3,14 +3,13 @@
   "from_station": "observer",
   "to_station": null,
   "work_order_id": "wo-gh-29",
-  "artifact_path": "runs/wo-gh-29/observer.packet.md",
-  "status": "failed",
-  "created_at": "2026-11-05T01:06:33.115505+00:00",
-  "error": "command executor exited 7: claude_station: ANVIL_CONFIGURED_MODEL environment variable not set",
-  "configured_model": "claude-sonnet-4-5",
+  "artifact_path": "runs/wo-gh-29/observer.output.md",
+  "status": "executed",
+  "created_at": "2026-11-05T01:18:13.424507+00:00",
+  "configured_model": "claude-sonnet-5-5",
   "executor": {
     "kind": "command",
     "detail": "python3"
   },
-  "executed_model": null
+  "executed_model": "claude-sonnet-5-5"
 }
