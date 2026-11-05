@@ -1,0 +1,41 @@
+Quickstart Execution Evidence
+=============================
+
+Repository: arananet/anvil-example-taskline
+Executed: 2026-11-05
+Total duration: ~0.322 seconds (well under 5 minute budget)
+
+Commands executed:
+------------------
+
+1. Clone repository:
+   $ git clone https://github.com/arananet/anvil-example-taskline.git
+   Duration: 0.212s
+
+2. Run tests:
+   $ cd anvil-example-taskline
+   $ python3 -m unittest discover -s tests -v
+
+Output:
+-------
+test_s1_create_returns_201_with_id_and_open (test_taskline.TasklineTest.test_s1_create_returns_201_with_id_and_open)
+S1 create task returns 201 with id and status open ... ok
+test_s2_list_returns_all_created (test_taskline.TasklineTest.test_s2_list_returns_all_created)
+S2 list tasks returns all created tasks ... ok
+test_s3_complete_marks_done (test_taskline.TasklineTest.test_s3_complete_marks_done)
+S3 complete task marks it done ... ok
+test_s4_complete_missing_returns_404 (test_taskline.TasklineTest.test_s4_complete_missing_returns_404)
+S4 completing a missing task returns 404 ... ok
+test_s5_create_without_title_returns_400 (test_taskline.TasklineTest.test_s5_create_without_title_returns_400)
+S5 creating a task without a title returns 400 ... ok
+test_s6_persistence_survives_reload (test_taskline.TasklineTest.test_s6_persistence_survives_reload)
+S6 tasks persist to a JSON file and survive a reload ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.003s
+
+OK
+
+Duration: 0.110s
+
+Result: Success - all 6 tests passing, demonstrating the complete factory output from wo-taskline-001

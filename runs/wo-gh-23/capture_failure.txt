@@ -1,0 +1,1 @@
+capture failed for 390x844: Playwright not installed. Install with: pip install playwright && playwright install chromium
