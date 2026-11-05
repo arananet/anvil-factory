@@ -113,12 +113,12 @@ jobs:
             exit 0
           fi
           VERDICT=$(python3 -c "import json; print(json.load(open('runs/wo-gh-32/report.json'))['verdict'])" 2>/dev/null || echo "no-report")
-          git commit -m "ANVIL execute run wo-gh-32 (issue 31): verdict ${VERDICT}" -m "Stations executed on the standing per-station wiring through the Cloudflare AI Gateway. Builder change and run evidence included; see runs/wo-gh-32/."
+          git commit -m "ANVIL execute run wo-gh-32 (issue 32): verdict ${VERDICT}" -m "Stations executed on the standing per-station wiring through the Cloudflare AI Gateway. Builder change and run evidence included; see runs/wo-gh-32/."
           git fetch origin "${GITHUB_REF_NAME}"
           git rebase "origin/${GITHUB_REF_NAME}" || { git rebase --abort; echo "Rebase onto the branch tip failed; pushing as is not attempted."; exit 1; }
           git push origin "HEAD:${GITHUB_REF_NAME}"
 
-      - name: Comment the run report on issue 31
+      - name: Comment the run report on issue 32
         if: always() && steps.smoke.outcome == 'success'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
