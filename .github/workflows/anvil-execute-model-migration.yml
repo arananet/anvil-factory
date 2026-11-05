@@ -48,6 +48,11 @@ jobs:
           npm install -g @anthropic-ai/claude-code
           claude --version
 
+      - name: Install Codex (operator staged, for the OpenAI runtime)
+        run: |
+          npm install -g @openai/codex
+          codex --version
+
       - name: Gateway smoke test (all migrated routes)
         id: smoke
         env:
