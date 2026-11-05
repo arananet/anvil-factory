@@ -373,37 +373,88 @@ it reports one, under every executor class.
 S11. The price table contains no entry without a verifiable source and date;
 the three new models are unpriced unless such a source is provided.
 
+R12. The OpenAI runtime is agentic. Station execution for openai/* models
+runs the Codex CLI headlessly, in the repo working tree, with the packet as
+the task. It is not a plain chat completion: a station on this runtime can
+read the tree and run shell commands, so reviewers can write their review file
+and the builder can edit. Contract, mirroring the Claude wrapper:
+- configuration: Codex is configured against the gateway OpenAI provider route
+  (endpoint and credential per R11), with the bare model id gpt-6.1-sol. The
+  credential is handed to Codex through its environment key mechanism and is
+  never printed, logged, or written to a tracked file.
+- permissions: builder and test-writer may write. Every other station,
+  reviewers included, runs without edit tools on the code under judgment but
+  can write its own review file through the shell channel, as the producer
+  contract requires.
+- review validation and the one in-session correction behave exactly as in the
+  Claude wrapper.
+- provenance: the runtime self-reports the model it ran (openai/gpt-6.1-sol)
+  through the existing self-report channel, so executed_model is runtime
+  evidence, not a label copy (R3).
+- failure: if the Codex CLI is absent or cannot be configured, the station
+  fails loudly. There is no fallback to a bare completion for station
+  execution. A plain completion call may exist only inside
+  tools/model_route_smoke.py, which is a probe and not a runtime.
+
+R13. Test correction ruling (operator, round 5). Two assertions in
+migration tests encode superseded contracts and are corrected by the
+test-writer, and only these:
+- tests/test_model_migration_loopback.py: the builder step's configured_model
+  is the resolved concrete model claude-opus-5-5, not the tier label
+  fast-builder (R10).
+- tests/test_model_migration_tiers.py (S9): the OpenAI runtime's missing
+  environment error names the credential sources actually checked
+  (CF_AIG_TOKEN and the ANTHROPIC_CUSTOM_HEADERS cf-aig-authorization header),
+  and the no-raise case is the one where a credential source is present (R11).
+No other existing assertion in any test changes. The builder changes no test
+file.
+
+S12. Unit tests prove the Codex wrapper builds a headless Codex invocation for
+gpt-6.1-sol against the gateway OpenAI route with the credential only in the
+child environment; builder and test-writer get write permission and every
+other station does not; a reviewer's review file is validated with the one
+in-session correction as under Claude; the wrapper self-reports
+openai/gpt-6.1-sol; an absent Codex CLI fails loudly with no completion
+fallback. Fake runtimes stand in for the CLI in tests.
+S13. The corrected assertions of R13 pass and the full suite is green.
+Acceptance evidence is the run itself: reviewer-design executes on the Codex
+runtime, writes a valid review file the runner counts, and its step records
+executed_model openai/gpt-6.1-sol from the runtime's self-report.
+
 
 ## Diff summary
 
-- .openspec/specs/model-migration/spec.md: +25, -13
-- anvil/runner.py: +19, -0
-- anvil/supervisor.py: +15, -2
-- runs/wo-gh-29/builder.output.md: +15, -17
-- runs/wo-gh-29/builder.packet.md: +8, -0
-- runs/wo-gh-29/checks-gate.pre-review.output.md: +62, -59
+- .openspec/specs/model-migration/spec.md: +48, -0
+- CHANGELOG.md: +1, -0
+- docs/EXECUTION.md: +12, -0
+- runs/wo-gh-29/builder.output.md: +21, -15
+- runs/wo-gh-29/builder.packet.md: +17, -0
+- runs/wo-gh-29/checks-gate.pre-review.output.md: +32, -71
 - runs/wo-gh-29/envelopes/builder.envelope.json: +1, -1
-- runs/wo-gh-29/envelopes/checks-gate.envelope.json: +36, -33
+- runs/wo-gh-29/envelopes/checks-gate.envelope.json: +7, -45
 - runs/wo-gh-29/envelopes/intake.envelope.json: +1, -1
-- runs/wo-gh-29/envelopes/reviewer-architecture.envelope.json: +3, -9
-- runs/wo-gh-29/envelopes/reviewer-security.envelope.json: +3, -9
-- runs/wo-gh-29/envelopes/reviewer-spec.envelope.json: +3, -9
-- runs/wo-gh-29/envelopes/reviewer-tests.envelope.json: +3, -9
+- runs/wo-gh-29/envelopes/reviewer-architecture.envelope.json: +23, -4
+- runs/wo-gh-29/envelopes/reviewer-security.envelope.json: +20, -4
+- runs/wo-gh-29/envelopes/reviewer-spec.envelope.json: +20, -4
+- runs/wo-gh-29/envelopes/reviewer-tests.envelope.json: +20, -4
 - runs/wo-gh-29/envelopes/spec-writer.envelope.json: +1, -1
-- runs/wo-gh-29/envelopes/test-writer.envelope.json: +1, -1
+- runs/wo-gh-29/envelopes/test-writer.envelope.json: +2, -2
 - runs/wo-gh-29/intake.output.md: +1, -1
-- runs/wo-gh-29/intake.packet.md: +8, -0
-- runs/wo-gh-29/reviewer-architecture.packet.md: +13, -4
-- runs/wo-gh-29/reviewer-security.packet.md: +11, -2
-- runs/wo-gh-29/reviewer-spec.packet.md: +10, -1
-- runs/wo-gh-29/reviewer-tests.packet.md: +12, -3
-- runs/wo-gh-29/routing.json: +3, -3
-- runs/wo-gh-29/spec-writer.output.md: +5, -14
-- runs/wo-gh-29/spec-writer.packet.md: +8, -0
-- runs/wo-gh-29/test-writer.output.md: +19, -14
-- runs/wo-gh-29/test-writer.packet.md: +8, -0
-- tools/codex_station.py: +25, -3
-- work_orders/wo-gh-29.json: +4, -3
+- runs/wo-gh-29/intake.packet.md: +17, -0
+- runs/wo-gh-29/reviewer-architecture.packet.md: +21, -5
+- runs/wo-gh-29/reviewer-security.packet.md: +19, -3
+- runs/wo-gh-29/reviewer-spec.packet.md: +18, -2
+- runs/wo-gh-29/reviewer-tests.packet.md: +20, -4
+- runs/wo-gh-29/routing.json: +2, -2
+- runs/wo-gh-29/spec-writer.output.md: +14, -5
+- runs/wo-gh-29/spec-writer.packet.md: +17, -0
+- runs/wo-gh-29/test-writer.output.md: +19, -20
+- runs/wo-gh-29/test-writer.packet.md: +17, -0
+- tests/test_model_migration_loopback.py: +1, -1
+- tests/test_model_migration_tiers.py: +19, -2
+- tools/codex_station.py: +189, -44
+- tools/model_route_smoke.py: +40, -0
+- work_orders/wo-gh-29.json: +4, -4
 
 ## File access allowlist
 
@@ -412,8 +463,8 @@ This packet may only embed content from:
 - design/tokens.json
 - .openspec/specs/model-migration/spec.md
 - .openspec/specs/model-migration/spec.md
-- anvil/runner.py
-- anvil/supervisor.py
+- CHANGELOG.md
+- docs/EXECUTION.md
 - runs/wo-gh-29/builder.output.md
 - runs/wo-gh-29/builder.packet.md
 - runs/wo-gh-29/checks-gate.pre-review.output.md
@@ -437,7 +488,10 @@ This packet may only embed content from:
 - runs/wo-gh-29/spec-writer.packet.md
 - runs/wo-gh-29/test-writer.output.md
 - runs/wo-gh-29/test-writer.packet.md
+- tests/test_model_migration_loopback.py
+- tests/test_model_migration_tiers.py
 - tools/codex_station.py
+- tools/model_route_smoke.py
 - work_orders/wo-gh-29.json
 
 ## Work order
@@ -503,6 +557,23 @@ GATE LOOPBACK (round 4, final). Round 3 verdict: no_reviews again; gate passed; 
 2. CODEX CREDENTIAL SOURCE. reviewer-design envelope: "codex_station: gateway environment absent, missing: CF_AIG_TOKEN". The standing workflows never export CF_AIG_TOKEN as its own variable; the gateway credential travels inside ANTHROPIC_CUSTOM_HEADERS as the header 'cf-aig-authorization: Bearer <token>', which IS present in the runtime's environment (the Claude wrapper inherits the same environment). The OpenAI runtime must take the credential from that header when CF_AIG_TOKEN is not set: parse the cf-aig-authorization value out of ANTHROPIC_CUSTOM_HEADERS, use CF_AIG_TOKEN directly when it is set, and fail loudly only when neither is present. The credential value is never printed, logged or written to any file. Unit test with a headers fixture string proving the parse, plus the direct variable path.
 
 This is the final loopback for this order. Scope is exactly these two mechanisms on the standing tree; nothing else changes. HARD CONSTRAINTS unchanged: full suite green with existing tests unmodified; new tests only in new files; review parsing contract, producer mechanism, routing tier vocabulary and checks gate base ref behavior frozen; no em dash or en dash characters in any produced file.
+
+GATE LOOPBACK (round 5, final). Round 4 verdict: no_reviews; the in-run gate loopback was spent and the gate failed again, this time on three failures inside the line's own migration tests. Round 4's two mechanisms themselves LANDED: the run's steps record concrete configured models for every station (reviewers included), which is visible in the round 4 report. What remains is one operator ruling and one runtime substitution.
+
+PART A: OPERATOR RULING ON TWO STALE TESTS (test correction round, the wo-gh-10 pattern). The following assertions encode superseded rounds' contracts and contradict the round 4 requirements of record, which stand:
+1. tests/test_model_migration_loopback.py asserts the builder step's configured_model equals the tier label 'fast-builder'. Round 4 requires configured_model to be the resolved concrete model ('claude-opus-5-5'). The assertion is corrected to the concrete model.
+2. tests/test_model_migration_tiers.py (S9) asserts the OpenAI runtime's missing environment error names 'CF_AIG_TOKEN' and that the runtime raises when only ANTHROPIC_BASE_URL is present. Round 4 replaced the credential source: the token is taken from ANTHROPIC_CUSTOM_HEADERS' cf-aig-authorization header when CF_AIG_TOKEN is unset, and the runtime fails only when neither source exists. The test is corrected to that contract: error naming follows the sources actually checked, and the no-raise case is the one where a credential source IS present.
+The TEST-WRITER corrects exactly these assertions; the builder changes no test file, and no other assertion in any test changes. Implementation behavior per the round 4 brief is not reopened by this part.
+
+PART B: THE OPENAI RUNTIME MUST BE AGENTIC (spec R3, unmet). Audit of the standing tools/codex_station.py: its call_openai_api is a plain chat completion (one prompt, one text reply, no tools). A reviewer executed through it cannot write its review file, cannot read the tree it judges, and its wrapper's review validation can never pass; a builder executed through it cannot edit anything. That is a stand-in, not the agentic runtime R3 requires, and it may not be presented as one. Replace the station execution for openai/* models with a real agentic Codex runtime, mirroring the Claude wrapper's contract exactly:
+- The operator has staged the Codex CLI in this order's execute workflow (npm @openai/codex). The wrapper invokes it headlessly with the packet as the task, in the repo working tree.
+- The wrapper configures Codex against the gateway OpenAI provider route (coordinates derived as in round 4, credential from CF_AIG_TOKEN or the cf-aig-authorization header in ANTHROPIC_CUSTOM_HEADERS, handed to Codex through its environment key mechanism, never printed or written to a tracked file), with the bare model id gpt-6.1-sol.
+- Permissions mirror the Claude wrapper: builder and test-writer may write; every other station, reviewers included, runs without edit tools on the code under judgment but CAN write its own review file through the shell channel, exactly as the producer contract requires. Review validation and the one in-session correction behave as in the Claude wrapper.
+- The runtime self-reports the model it ran (openai/gpt-6.1-sol) through the existing self-report channel, so executed_model is evidence, not a label copy.
+- If the Codex CLI is absent or cannot be configured, the station fails loudly. There is no fallback to a bare completion for station execution. The plain completion call may survive only inside tools/model_route_smoke.py, which is a probe, not a runtime.
+Acceptance evidence is this run itself: reviewer-design executes on the Codex runtime, writes a valid review file that the runner counts, and its step records executed_model openai/gpt-6.1-sol from the runtime's self-report.
+
+This is the final loopback. HARD CONSTRAINTS unchanged: full suite green; existing tests change only through Part A's two named corrections, made by the test-writer; review parsing contract, producer mechanism, routing tier vocabulary and checks gate base ref behavior frozen; no em dash or en dash characters in any produced file.
 - risk_hints: 
 - status: new
 

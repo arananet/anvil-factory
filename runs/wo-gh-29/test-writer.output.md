@@ -1,25 +1,24 @@
-I added `tests/test_model_migration_round4.py` with 14 tests. 7 of them fail against the current tree, so they are red ahead of the builder's fix. No existing test file was touched, and the new file has no em or en dashes.
+Both parts are written, but the full suite is red on purpose: 557 tests run and the 10 failures are all in the new Codex file. Part A is fixed and passing. The Part B tests are written ahead of the builder's work, and today's `tools/codex_station.py` still makes a plain chat completion, so they fail against it.
 
-**What the tests cover**
+**Part A: the two stale tests corrected**
+- **`tests/test_model_migration_loopback.py`:** the builder step's `configured_model` is now asserted as `claude-opus-5-5` instead of `fast-builder`.
+- **`tests/test_model_migration_tiers.py` (S9):** I replaced the missing-environment test.
+  - The error is now expected to name `CF_AIG_TOKEN` and `ANTHROPIC_CUSTOM_HEADERS` / `cf-aig-authorization`, plus `ANTHROPIC_BASE_URL` when only the token is set.
+  - The runtime must not raise when a credential source is present.
+  - Two new cases cover the header-parse path and the direct token taking priority over the header.
+- **One change beyond the two named assertions:** the shared test helper now also clears `ANTHROPIC_CUSTOM_HEADERS`, so the tests don't pick up a real credential from the host.
+- Both modules pass: 23 tests OK.
 
-- **Tier resolution through `run_pipeline` (R10, S8, S10):**
-  - The tests drive `sdlc-default` with a fake command runtime. `anvil.runner.route_reviewers` is patched to return a `RoutingRecord` whose `selected_models` are tier labels (`review-balanced`, `review-strong`).
-  - They assert the runtime received the concrete model for the routed reviewers and that the recorded `configured_model` is concrete and equals what was handed over.
-  - They assert every executing step, intake included, hands off a concrete model, and that a tier label set on the intake station itself is resolved.
-  - A concrete routed model must pass through unchanged, and `executed_model` must stay null without a self-report.
-- **Codex credential source (R11, S9):**
-  - These use a headers fixture string.
-  - They cover parsing `cf-aig-authorization` out of `ANTHROPIC_CUSTOM_HEADERS` when `CF_AIG_TOKEN` is unset, and a request authorised from that value.
-  - They cover the `CF_AIG_TOKEN` variable path and that it wins over the header, case-insensitive and CRLF-tolerant matching, and `ANVIL_GATEWAY_OPENAI_URL` still being honoured.
-  - They cover a loud failure naming `CF_AIG_TOKEN` when neither source is present, with the credential never in stdout, stderr or the error text.
+**Part B: `tests/test_codex_agentic.py` (new, 13 tests, covering S12)**
+- A fake `codex` executable on `PATH` stands in for the CLI and records its arguments, working directory and environment.
+- **Invocation:** the tests expect a headless `exec` run in the repo tree, with the packet as the task and the bare model id `gpt-6.1-sol`.
+- **Endpoint and credential:** the gateway route must end in `/openai`. The credential (from `CF_AIG_TOKEN` or the header) must appear only in the child's environment, never in arguments, stdout, stderr or the output file.
+- **Permissions:** builder and test-writer must get the same arguments as each other, and different ones from the other stations.
+- **Review file:** reviewers' files are validated, with one in-session correction and no second one.
+- **Failure cases:** a missing CLI or a missing gateway environment must fail loudly. `codex_station.py` must contain no `chat/completions` or `urlopen`.
+- **Self-report:** the dispatcher must emit `{"model": "openai/gpt-6.1-sol"}` on success, and not when the CLI is absent.
 
-**Current failures**
+The runtime-shape assertions follow the spec's R12 wording and my guess at the fake-CLI interface. If the builder uses a different Codex argument layout, those tests may need adjusting to the real contract.
 
-- **5 errors, all in the credential group:** `codex_station.gateway_openai_config` still raises "missing: CF_AIG_TOKEN" because it doesn't read the header.
-- **2 failures, routed path:**
-  - A step still records the unresolved label as `configured_model` (intake shows `default`).
-  - A registry-level tier label (`reasoning-strong`) is likewise recorded unresolved.
-- **Already passing:** The routed-reviewer hand-off assertions, for `reviewer-spec` and `reviewer-security`, already pass. The runner passes `handoff_model` to the runtime but records `configured_model` unresolved. The fix is to resolve the label once, after all overrides, and use it for both.
-
-I didn't run the full suite, only the new file.
+I haven't touched any file outside `tests/`, and the new files contain no em or en dashes.
 {"model": "claude-sonnet-5-5"}

@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 2268.358,
+      "duration_ms": 3122.593,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/intake.output.md"
@@ -19,7 +19,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 5109,
+      "measured_tokens": 6290,
       "budget": 0,
       "budget_action": "none"
     },
@@ -27,7 +27,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-29/spec-writer.output.md",
-      "duration_ms": 19447.902,
+      "duration_ms": 17703.026,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/spec-writer.output.md"
@@ -38,7 +38,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 4386,
+      "measured_tokens": 5567,
       "budget": 0,
       "budget_action": "none"
     },
@@ -46,18 +46,18 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-29/test-writer.output.md",
-      "duration_ms": 54921.638,
+      "duration_ms": 129409.088,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/test-writer.output.md"
       ],
       "configured_model": "claude-sonnet-5-5",
-      "executed_model": "claude-sonnet-5-5",
+      "executed_model": "openai/gpt-6.1-sol",
       "executor": {
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 4392,
+      "measured_tokens": 5573,
       "budget": 0,
       "budget_action": "none"
     },
@@ -65,7 +65,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-29/builder.output.md",
-      "duration_ms": 426762.438,
+      "duration_ms": 843271.216,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/builder.output.md"
@@ -76,20 +76,20 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 6165,
+      "measured_tokens": 7346,
       "budget": 50000,
       "budget_action": "sent"
     },
     {
       "station": "checks-gate",
-      "status": "failed",
-      "detail": "Gate failed: 1 checks, protected paths: pass",
-      "duration_ms": 55711.712,
+      "status": "passed",
+      "detail": "Gate passed: 1 checks, protected paths: pass",
+      "duration_ms": 62191.531,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/checks-gate.pre-review.output.md"
       ],
-      "configured_model": "default",
+      "configured_model": "claude-sonnet-5-5",
       "executed_model": null,
       "executor": null,
       "measured_tokens": 0,
@@ -100,7 +100,7 @@
         "python -m unittest discover -s tests -p 'test_*.py'"
       ],
       "exit_codes": [
-        1
+        0
       ],
       "protected_paths": [
         "tests/",
@@ -109,108 +109,108 @@
       ],
       "protected_path_verdict": "pass",
       "protected_path_findings": [],
-      "gate_verdict": "fail"
-    },
-    {
-      "station": "loopback",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: Gate checks failed",
-      "reason": "Gate checks failed",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null,
-      "feedback": "",
-      "from_station": "checks-gate"
+      "gate_verdict": "pass"
     },
     {
       "station": "reviewer-spec",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.437,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-29/reviewer-spec.output.md",
+      "duration_ms": 83250.906,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-29/reviewer-spec.packet.md"
+        "runs/wo-gh-29/reviewer-spec.output.md"
       ],
       "configured_model": "claude-sonnet-5-5",
-      "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 5777,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-security",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.376,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-29/reviewer-security.output.md",
+      "duration_ms": 19581.018,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-29/reviewer-security.packet.md"
+        "runs/wo-gh-29/reviewer-security.output.md"
       ],
       "configured_model": "claude-sonnet-5-5",
-      "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 5788,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-tests",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.39,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-29/reviewer-tests.output.md",
+      "duration_ms": 73488.215,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-29/reviewer-tests.packet.md"
+        "runs/wo-gh-29/reviewer-tests.output.md"
       ],
       "configured_model": "claude-sonnet-5-5",
-      "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 5790,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-architecture",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.353,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-29/reviewer-architecture.output.md",
+      "duration_ms": 18120.293,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-29/reviewer-architecture.packet.md"
+        "runs/wo-gh-29/reviewer-architecture.output.md"
       ],
       "configured_model": "claude-sonnet-5-5",
-      "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 5814,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-design",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 17.939,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-29/reviewer-design.output.md",
+      "duration_ms": 14611.782,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-29/reviewer-design.packet.md"
+        "runs/wo-gh-29/reviewer-design.output.md"
       ],
       "configured_model": "openai/gpt-6.1-sol",
-      "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
-      "budget": 0,
-      "budget_action": "none"
+      "executed_model": "openai/gpt-6.1-sol",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 13421,
+      "budget": 50000,
+      "budget_action": "sent"
     },
     {
       "station": "reviewer-ux",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 1.465,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out: no UI surface",
+      "duration_ms": 1.366,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/reviewer-ux.packet.md"
@@ -225,13 +225,13 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.042,
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.064,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/report.json"
       ],
-      "configured_model": "default",
+      "configured_model": "claude-sonnet-5-5",
       "executed_model": null,
       "executor": null,
       "measured_tokens": 0,
@@ -241,11 +241,11 @@
     {
       "station": "triage-human",
       "status": "completed",
-      "detail": "Human review: required",
+      "detail": "Human review: not_required",
       "duration_ms": 0.017,
       "cost": null,
       "artifacts": [],
-      "configured_model": "default",
+      "configured_model": "claude-sonnet-5-5",
       "executed_model": null,
       "executor": null,
       "measured_tokens": 0,
@@ -256,7 +256,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-29/deployer.packet.md",
-      "duration_ms": 0.577,
+      "duration_ms": 0.329,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/deployer.packet.md"
@@ -264,7 +264,7 @@
       "configured_model": "claude-sonnet-5-5",
       "executed_model": null,
       "executor": null,
-      "measured_tokens": 4482,
+      "measured_tokens": 5659,
       "budget": 0,
       "budget_action": "none"
     },
@@ -272,7 +272,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-29/observer.output.md",
-      "duration_ms": 19658.966,
+      "duration_ms": 23256.736,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/observer.output.md"
@@ -283,21 +283,42 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 4489,
+      "measured_tokens": 5666,
       "budget": 0,
       "budget_action": "none"
     }
   ],
-  "verdict": "no_reviews",
-  "human_required": true,
+  "verdict": "approved",
+  "human_required": false,
   "max_loopbacks": 2,
-  "loopbacks": 1,
+  "loopbacks": 0,
   "deployment_status": null,
   "verify_results": [],
   "risk_hints": [],
   "decision": {
     "approver": {
-      "reviews_counted": [],
+      "reviews_counted": [
+        {
+          "station": "reviewer-spec",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-security",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-architecture",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "pass"
+        }
+      ],
       "reviews_expected": [
         "reviewer-spec",
         "reviewer-security",
@@ -305,19 +326,19 @@
         "reviewer-architecture",
         "reviewer-design"
       ],
-      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)"
+      "rule": "All counted reviews passed. (Expected 5 reviews after routing.)"
     },
     "human_gate": {
-      "required": true,
-      "rule": "Verdict is no_reviews, not approved, so a human is required.",
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
       "hints_matched": []
     }
   },
   "warnings": [
     "No reference anchors: This visual run has no reference anchors. The review will proceed under the charter floor alone."
   ],
-  "astra_measured_tokens_total": 6165,
-  "base_ref": "732d67bb4ee3def41ddd756278b103b6a4c2ff60",
+  "astra_measured_tokens_total": 20767,
+  "base_ref": "81808dc601005bf9db3a28c976bd0175b854ebbc",
   "evidence": [
     {
       "type": "screenshot",
@@ -337,6 +358,6 @@
   "cost": {
     "total": 0,
     "measured_steps": 0,
-    "unmeasured_steps": 5
+    "unmeasured_steps": 10
   }
 }

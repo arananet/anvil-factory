@@ -5,11 +5,11 @@
   "work_order_id": "wo-gh-29",
   "artifact_path": "runs/wo-gh-29/test-writer.output.md",
   "status": "executed",
-  "created_at": "2026-11-05T01:36:55.398423+00:00",
+  "created_at": "2026-11-05T01:50:33.830271+00:00",
   "configured_model": "claude-sonnet-5-5",
   "executor": {
     "kind": "command",
     "detail": "python3"
   },
-  "executed_model": "claude-sonnet-5-5"
+  "executed_model": "openai/gpt-6.1-sol"
 }

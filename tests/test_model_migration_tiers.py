@@ -159,7 +159,8 @@ class TestOpenAIRuntimeGatewayEnv(unittest.TestCase):
 
         clean = {k: v for k, v in os.environ.items()
                  if not k.startswith("OPENAI_") and k not in
-                 ("CF_AIG_TOKEN", "ANTHROPIC_BASE_URL", "ANVIL_GATEWAY_OPENAI_URL")}
+                 ("CF_AIG_TOKEN", "ANTHROPIC_BASE_URL", "ANVIL_GATEWAY_OPENAI_URL",
+                                  "ANTHROPIC_CUSTOM_HEADERS")}
         clean.update(env)
         with mock.patch.dict(os.environ, clean, clear=True), \
              mock.patch("urllib.request.urlopen", fake_urlopen):
@@ -183,16 +184,32 @@ class TestOpenAIRuntimeGatewayEnv(unittest.TestCase):
         self.assertNotIn("gateway.example.test", cap["url"])
 
     def test_missing_gateway_env_fails_loudly_without_values_s9(self):
+        # Error naming follows the credential sources actually checked (R11, R13).
         for env, missing in (({}, "CF_AIG_TOKEN"),
+                             ({}, "ANTHROPIC_CUSTOM_HEADERS"),
                              ({"ANTHROPIC_BASE_URL": GATEWAY}, "CF_AIG_TOKEN"),
+                             ({"ANTHROPIC_BASE_URL": GATEWAY}, "cf-aig-authorization"),
                              ({"CF_AIG_TOKEN": TOKEN}, "ANTHROPIC_BASE_URL")):
-            with self.subTest(env=sorted(env)):
+            with self.subTest(env=sorted(env), missing=missing):
                 with self.assertRaises(RuntimeError) as ctx:
                     self._call(env)
                 msg = str(ctx.exception)
                 self.assertIn(missing, msg)
                 self.assertNotIn(TOKEN, msg)
                 self.assertNotIn("OPENAI_API_KEY", msg)
+
+    def test_credential_from_custom_headers_when_token_unset_s9(self):
+        headers = "x-other: 1\ncf-aig-authorization: Bearer " + TOKEN + "\n"
+        out, cap = self._call({"ANTHROPIC_BASE_URL": GATEWAY, "ANTHROPIC_CUSTOM_HEADERS": headers})
+        self.assertEqual(out, "hello")
+        self.assertIn(TOKEN, cap["auth"])
+
+    def test_direct_token_wins_over_headers_s9(self):
+        headers = "cf-aig-authorization: Bearer header-token-abc"
+        _, cap = self._call({"CF_AIG_TOKEN": TOKEN, "ANTHROPIC_BASE_URL": GATEWAY,
+                             "ANTHROPIC_CUSTOM_HEADERS": headers})
+        self.assertIn(TOKEN, cap["auth"])
+        self.assertNotIn("header-token-abc", cap["auth"])
 
     def test_openai_env_variables_are_not_required_s9(self):
         with mock.patch.dict(os.environ, {}, clear=False):

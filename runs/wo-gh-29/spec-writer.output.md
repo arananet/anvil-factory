@@ -1,7 +1,16 @@
-I revised `.openspec/specs/model-migration/spec.md` for the round 4 loopback. I did not run the test suite, since this station only writes the spec. The file has no em or en dashes.
+I added the round 5 requirements to `.openspec/specs/model-migration/spec.md`, appended after S11. I didn't run any tests. The only check was that the file has no em or en dashes.
 
-- **R10, tier resolution:** resolution now happens at the hand-off itself, after all overrides (registry, project config, routing, guided). It runs before the runner records `configured_model` and before it passes the model to the runtime. The spec says this covers every station and every executing branch, intake included. It also names the routed path, where the routing record's `selected_models` replace the first computed model inside `run_pipeline`. The tier map is unchanged.
-- **R11, Codex credential:** the credential is `CF_AIG_TOKEN` when set. Otherwise it is the `cf-aig-authorization` bearer value parsed out of `ANTHROPIC_CUSTOM_HEADERS`. It fails loudly only when neither source is present or the gateway coordinates are missing. The spec says the credential value is never printed, logged or written to a file.
-- **S8:** now requires an integration test that drives `run_pipeline`. The test uses a routing record with tier `selected_models` and a fake command runtime. It must assert that the runtime received the concrete model and that the recorded `configured_model` is concrete. A test of the map function alone does not satisfy S8.
-- **S9:** now requires a headers fixture string proving the parse, the direct `CF_AIG_TOKEN` path, the `ANVIL_GATEWAY_OPENAI_URL` override, the loud failure, and no credential in the output.
+- **R12, agentic OpenAI runtime:**
+  - **Invocation:** Codex CLI runs headlessly in the repo tree with the packet as the task. It uses the gateway OpenAI route from R11 with the bare id `gpt-6.1-sol`. The credential reaches it only through the environment.
+  - **Permissions:** builder and test-writer may write. Every other station, reviewers included, writes only its own review file through the shell.
+  - **Review and provenance:** review validation and the one in-session correction match the Claude wrapper. The wrapper self-reports `openai/gpt-6.1-sol`.
+  - **Failure:** if the CLI is absent or can't be configured, the step fails loudly. A plain completion call is allowed only inside `tools/model_route_smoke.py`.
+- **R13, test correction ruling:** the test-writer corrects exactly two assertions and the builder touches no test file.
+  - `tests/test_model_migration_loopback.py` now expects builder `configured_model` to be `claude-opus-5-5`, not `fast-builder`.
+  - `tests/test_model_migration_tiers.py` (S9) now expects the missing-credential error to name the sources actually checked. Its no-raise case is the one where a credential source is present.
+- **S12 and S13:**
+  - S12 covers the Codex wrapper unit tests, using fake runtimes in place of the CLI.
+  - S13 requires the corrected assertions and the full suite to pass. It also names this run as the acceptance evidence: reviewer-design on Codex, a valid review file the runner counts, and `executed_model` `openai/gpt-6.1-sol` from self-report.
+
+The existing R1 to R11 and S1 to S11 are unchanged.
 {"model": "claude-sonnet-5-5"}

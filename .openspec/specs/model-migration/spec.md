@@ -185,3 +185,51 @@ is null when the runtime reports none and equals the self-reported value when
 it reports one, under every executor class.
 S11. The price table contains no entry without a verifiable source and date;
 the three new models are unpriced unless such a source is provided.
+
+R12. The OpenAI runtime is agentic. Station execution for openai/* models
+runs the Codex CLI headlessly, in the repo working tree, with the packet as
+the task. It is not a plain chat completion: a station on this runtime can
+read the tree and run shell commands, so reviewers can write their review file
+and the builder can edit. Contract, mirroring the Claude wrapper:
+- configuration: Codex is configured against the gateway OpenAI provider route
+  (endpoint and credential per R11), with the bare model id gpt-6.1-sol. The
+  credential is handed to Codex through its environment key mechanism and is
+  never printed, logged, or written to a tracked file.
+- permissions: builder and test-writer may write. Every other station,
+  reviewers included, runs without edit tools on the code under judgment but
+  can write its own review file through the shell channel, as the producer
+  contract requires.
+- review validation and the one in-session correction behave exactly as in the
+  Claude wrapper.
+- provenance: the runtime self-reports the model it ran (openai/gpt-6.1-sol)
+  through the existing self-report channel, so executed_model is runtime
+  evidence, not a label copy (R3).
+- failure: if the Codex CLI is absent or cannot be configured, the station
+  fails loudly. There is no fallback to a bare completion for station
+  execution. A plain completion call may exist only inside
+  tools/model_route_smoke.py, which is a probe and not a runtime.
+
+R13. Test correction ruling (operator, round 5). Two assertions in
+migration tests encode superseded contracts and are corrected by the
+test-writer, and only these:
+- tests/test_model_migration_loopback.py: the builder step's configured_model
+  is the resolved concrete model claude-opus-5-5, not the tier label
+  fast-builder (R10).
+- tests/test_model_migration_tiers.py (S9): the OpenAI runtime's missing
+  environment error names the credential sources actually checked
+  (CF_AIG_TOKEN and the ANTHROPIC_CUSTOM_HEADERS cf-aig-authorization header),
+  and the no-raise case is the one where a credential source is present (R11).
+No other existing assertion in any test changes. The builder changes no test
+file.
+
+S12. Unit tests prove the Codex wrapper builds a headless Codex invocation for
+gpt-6.1-sol against the gateway OpenAI route with the credential only in the
+child environment; builder and test-writer get write permission and every
+other station does not; a reviewer's review file is validated with the one
+in-session correction as under Claude; the wrapper self-reports
+openai/gpt-6.1-sol; an absent Codex CLI fails loudly with no completion
+fallback. Fake runtimes stand in for the CLI in tests.
+S13. The corrected assertions of R13 pass and the full suite is green.
+Acceptance evidence is the run itself: reviewer-design executes on the Codex
+runtime, writes a valid review file the runner counts, and its step records
+executed_model openai/gpt-6.1-sol from the runtime's self-report.

@@ -3,8 +3,27 @@
   "from_station": "reviewer-architecture",
   "to_station": "reviewer-design",
   "work_order_id": "wo-gh-29",
-  "artifact_path": "runs/wo-gh-29/reviewer-architecture.packet.md",
-  "status": "skipped",
-  "created_at": "2026-11-05T01:45:00.719932+00:00",
-  "configured_model": "claude-sonnet-5-5"
+  "artifact_path": "runs/wo-gh-29/reviewer-architecture.output.md",
+  "status": "executed",
+  "created_at": "2026-11-05T02:08:56.494015+00:00",
+  "review": {
+    "station": "reviewer-architecture",
+    "verdict": "pass",
+    "findings": [
+      "Dispatch layering is sound: tools/dispatch_station.py selects the runtime by concrete model family (Anthropic to claude_station.py, openai/gpt-6.1-sol to codex_station.py) and fails loudly on anything else, with no default and no fallback, matching R3 and decision 0004.",
+      "tools/codex_station.py is now an agentic runtime: it runs 'codex exec' headlessly in the repo tree against the gateway OpenAI provider route. It uses the bare model id, passes the credential only through the child environment (env_key and env_http_headers), and refuses to run if the CLI is absent. The plain completion call is no longer the station path, as Part B requires.",
+      "The permission model mirrors the Claude wrapper. WRITE_STATIONS keep write access. Other stations get a no-edit developer instruction plus a post-run tree-diff check (reviewer_tree_violations) that fails the step if a reviewer touched anything besides its own review file. This is a compensating control, not a hard denylist, because Codex has no setting that drops apply_patch. The code comments say so, and I accept it as a runtime-equivalent trade-off.",
+      "Review validation and the single in-session correction are kept in the Codex wrapper with the same file path contract (runs/<wo>/<station>.review.json) and correction metadata. The review parsing contract and producer mechanism are unchanged.",
+      "Provenance fits the architecture: the dispatcher self-reports the dispatched model through the existing self-report channel, so executed_model is recorded from runtime evidence and not copied from the configured label.",
+      "Tier resolution is applied at the runner hand-off so the concrete model is recorded and passed on. Routing's tier vocabulary is untouched. The dispatcher still rejects non-concrete labels, which keeps the boundary between routing and runtime clean.",
+      "No residual claude-sonnet-4-5 or gpt-6-astra remains in anvil.yaml, anvil/*.py, docs/UX-MODULE.md or tools/*.py. brain/decisions/0004-model-migration.md exists in the decision-record location. No em or en dashes were found in the checked tools files or the decision record.",
+      "Minor note, not blocking: the codex_station.py module docstring and the ANVIL_CODEX_WIRE_API override add an undocumented tuning knob. Mention it in docs/EXECUTION.md if that is not already done."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
 }

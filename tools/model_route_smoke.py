@@ -19,6 +19,7 @@ import base64
 import json
 import os
 import sys
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -62,6 +63,45 @@ def probe_anthropic(model, description):
 
     except Exception as e:
         return False, f"{description}: {str(e)[:200]}"
+
+
+def route_completion(prompt, model, max_tokens=4000, timeout=30):
+    """Plain completion against the gateway OpenAI route: a probe, not a runtime.
+
+    This is the only place a bare completion lives (model-migration R12).
+    Station execution for openai/* models runs the agentic Codex CLI in
+    tools/codex_station.py and never calls this. Returns the reply text;
+    raises RuntimeError without ever including the credential.
+    """
+    base_url, token = gateway_openai_config()
+    bare_model = model.split("/")[-1] if "/" in model else model
+    payload = {
+        "model": bare_model,
+        "max_tokens": max_tokens,
+        "messages": [{"role": "user", "content": prompt}]
+    }
+    try:
+        req = urllib.request.Request(
+            f"{base_url}/chat/completions",
+            data=json.dumps(payload).encode("utf-8"),
+            method="POST"
+        )
+        req.add_header("Content-Type", "application/json")
+        req.add_header("Authorization", f"Bearer {token}")
+        req.add_header("cf-aig-authorization", f"Bearer {token}")
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode("utf-8", errors="replace")[:500].replace(token, "[redacted]")
+        raise RuntimeError(f"OpenAI route HTTP error {e.code}: {detail}")
+    except Exception as e:
+        raise RuntimeError(f"OpenAI route call failed: {str(e)[:500].replace(token, '[redacted]')}")
+    if not body.get("choices"):
+        raise RuntimeError("OpenAI route returned unexpected response structure")
+    output = body["choices"][0].get("message", {}).get("content", "")
+    if not output.strip():
+        raise RuntimeError("OpenAI route returned empty response")
+    return output
 
 
 def probe_openai_text(model, description):

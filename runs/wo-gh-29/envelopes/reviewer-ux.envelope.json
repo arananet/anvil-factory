@@ -4,7 +4,7 @@
   "to_station": "approver",
   "work_order_id": "wo-gh-29",
   "artifact_path": "runs/wo-gh-29/reviewer-ux.packet.md",
-  "status": "skipped",
-  "created_at": "2026-11-05T01:45:00.739900+00:00",
+  "status": "routed_out",
+  "created_at": "2026-11-05T02:09:11.107640+00:00",
   "configured_model": "openai/gpt-6.1-sol"
 }

@@ -58,7 +58,7 @@ class TestProvenanceNotConflatedWithHandoff(unittest.TestCase):
             report, record = run_with(tmp, RECORDER, "wo-loop-001")
             builder = [s for s in report.steps if s["station"] == "builder"][0]
             self.assertIsNone(builder["executed_model"])
-            self.assertEqual(builder["configured_model"], "fast-builder")
+            self.assertEqual(builder["configured_model"], "claude-opus-5-5")
             self.assertIn("claude-opus-5-5", record.read_text().split())
 
     def test_self_reported_model_wins_over_configured_label(self):
