@@ -1,0 +1,10 @@
+{
+  "station": "reviewer-tests",
+  "verdict": "pass",
+  "findings": [
+    "R1 met: MODEL_TIER_MAP in anvil/config.py maps review-cheap to claude-sonnet-5-5.",
+    "R2 met: tests/test_tier_map_totality.py is a new file. It builds the vocabulary from anvil.routing (MODEL_HIERARCHY, MODEL_POLICY values, and the model values from the default routing config load) with no hardcoded label list. It asserts each label resolves into CONCRETE_MODELS and that review-cheap is in the vocabulary. The 4 tests pass when run with unittest.",
+    "R3 met: the only existing-test-directory change is the new file, and routing labels are unchanged. The CHANGELOG Unreleased entry is present. The new files contain no em or en dashes. I did not re-verify dispatcher loudness beyond the changelog claim and the test asserting that an unknown tier is not in the map.",
+    "pytest is not installed in this environment, so I ran the new test with unittest only and did not run the full suite. The checks gate reported it green."
+  ]
+}

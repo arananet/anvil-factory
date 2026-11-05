@@ -24,6 +24,7 @@ DEFAULT_MODELS = {
 # produce. A value that is already concrete passes through unchanged; any
 # other value also passes through so the dispatcher fails on it loudly.
 MODEL_TIER_MAP = {
+    "review-cheap": "claude-sonnet-5-5",
     "review-balanced": "claude-sonnet-5-5",
     "review-strong": "claude-sonnet-5-5",
     "fast-builder": "claude-opus-5-5",

@@ -1,0 +1,10 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "pass",
+  "findings": [
+    "R1 met: anvil/config.py MODEL_TIER_MAP contains review-cheap -> claude-sonnet-5-5, same as review-balanced and review-strong.",
+    "R2 met: tests/test_tier_map_totality.py builds the vocabulary from anvil.routing (MODEL_HIERARCHY, MODEL_POLICY values, default routing table models and policy ceilings via load_routing_config), includes review-cheap, and asserts resolve_model maps each label into CONCRETE_MODELS. No hardcoded label list, so a future unmapped label fails the suite.",
+    "R3 met: resolve_model still passes unmapped values through unchanged (covered by test_unmapped_value_still_passes_through), so the dispatcher still fails loudly. Routing vocabulary and rules show review-cheap only in their existing places. The totality test is a new file and the existing test_model_migration_tiers.py is present. Caveat: git has no main ref in this checkout, so I could not diff against the base ref. I did not check whether other files under tests/ were left unmodified.",
+    "Verification: the new tests pass (4 of 4) and the full unittest suite passes (586 tests, 6 skipped). The CHANGELOG has an Unreleased-style entry for the fix. No em or en dashes were found in config.py, the new test file or CHANGELOG.md. The reviewer step resolved review-cheap at hand-off in this round, so the round 1 self-reference gap is closed."
+  ]
+}
