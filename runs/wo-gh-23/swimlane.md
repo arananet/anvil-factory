@@ -1,29 +1,28 @@
 # Swimlane
 
-Routing: 5 reviewers (reduced panel, 1 routed out)
+Routing: 2 reviewers (reduced panel, 4 routed out)
 
-**Cost**: No measured steps (5 executed steps)
+**Cost**: No measured steps (7 executed steps)
 
 | Station | Status | Duration ms | Artifacts | Cost |
 |---|---|---|---|---|
-| intake | executed | 42197.382 | runs/wo-gh-23/intake.output.md | null |
-| spec-writer | executed | 160353.279 | runs/wo-gh-23/spec-writer.output.md | null |
-| test-writer | executed | 327785.066 | runs/wo-gh-23/test-writer.output.md | null |
-| builder | executed | 321711.977 | runs/wo-gh-23/builder.output.md | null |
-| checks-gate | failed | 122308.875 | runs/wo-gh-23/checks-gate.pre-review.output.md | null |
-| loopback | loopback | 0.0 | - | null |
-| reviewer-spec | skipped | 0.39 | runs/wo-gh-23/reviewer-spec.packet.md | null |
-| reviewer-security | skipped | 0.351 | runs/wo-gh-23/reviewer-security.packet.md | null |
-| reviewer-tests | skipped | 0.358 | runs/wo-gh-23/reviewer-tests.packet.md | null |
-| reviewer-architecture | skipped | 0.327 | runs/wo-gh-23/reviewer-architecture.packet.md | null |
-| reviewer-design | skipped | 22.309 | runs/wo-gh-23/reviewer-design.packet.md | null |
-| reviewer-ux | skipped | 2.592 | runs/wo-gh-23/reviewer-ux.packet.md | null |
-| approver | completed | 0.045 | runs/wo-gh-23/report.json | null |
-| triage-human | completed | 0.009 | - | null |
-| deployer | packet_ready | 0.34 | runs/wo-gh-23/deployer.packet.md | null |
-| observer | executed | 74742.166 | runs/wo-gh-23/observer.output.md | null |
+| intake | executed | 100866.516 | runs/wo-gh-23/intake.output.md | null |
+| spec-writer | executed | 132140.381 | runs/wo-gh-23/spec-writer.output.md | null |
+| test-writer | executed | 58051.741 | runs/wo-gh-23/test-writer.output.md | null |
+| builder | executed | 215198.096 | runs/wo-gh-23/builder.output.md | null |
+| checks-gate | passed | 114292.64 | runs/wo-gh-23/checks-gate.pre-review.output.md | null |
+| reviewer-spec | executed | 99790.141 | runs/wo-gh-23/reviewer-spec.output.md | null |
+| reviewer-security | routed_out | 0.368 | runs/wo-gh-23/reviewer-security.packet.md | null |
+| reviewer-tests | executed | 86190.59 | runs/wo-gh-23/reviewer-tests.output.md | null |
+| reviewer-architecture | routed_out | 0.415 | runs/wo-gh-23/reviewer-architecture.packet.md | null |
+| reviewer-design | routed_out | 165.164 | runs/wo-gh-23/reviewer-design.packet.md | null |
+| reviewer-ux | routed_out | 1.469 | runs/wo-gh-23/reviewer-ux.packet.md | null |
+| approver | completed | 0.058 | runs/wo-gh-23/report.json | null |
+| triage-human | completed | 0.021 | - | null |
+| deployer | packet_ready | 0.329 | runs/wo-gh-23/deployer.packet.md | null |
+| observer | executed | 71890.28 | runs/wo-gh-23/observer.output.md | null |
 
 ## Decision
 
-- Approver: No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)
-- Human gate: Verdict is no_reviews, not approved, so a human is required.
+- Approver: All counted reviews passed. (Expected 2 reviews after routing.)
+- Human gate: Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.

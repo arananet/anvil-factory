@@ -7,8 +7,8 @@
     {
       "station": "intake",
       "status": "executed",
-      "detail": "Executed by command; outcome: unknown",
-      "duration_ms": 42197.382,
+      "detail": "Executed by command; outcome: accepted",
+      "duration_ms": 100866.516,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/intake.output.md"
@@ -19,7 +19,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 3032,
+      "measured_tokens": 3612,
       "budget": 0,
       "budget_action": "none"
     },
@@ -27,7 +27,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-23/spec-writer.output.md",
-      "duration_ms": 160353.279,
+      "duration_ms": 132140.381,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/spec-writer.output.md"
@@ -38,7 +38,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2309,
+      "measured_tokens": 2890,
       "budget": 0,
       "budget_action": "none"
     },
@@ -46,7 +46,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-23/test-writer.output.md",
-      "duration_ms": 327785.066,
+      "duration_ms": 58051.741,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/test-writer.output.md"
@@ -57,7 +57,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2315,
+      "measured_tokens": 2896,
       "budget": 0,
       "budget_action": "none"
     },
@@ -65,7 +65,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-23/builder.output.md",
-      "duration_ms": 321711.977,
+      "duration_ms": 215198.096,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/builder.output.md"
@@ -76,15 +76,15 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 3934,
+      "measured_tokens": 4668,
       "budget": 50000,
       "budget_action": "sent"
     },
     {
       "station": "checks-gate",
-      "status": "failed",
-      "detail": "Gate failed: 1 checks, protected paths: fail",
-      "duration_ms": 122308.875,
+      "status": "passed",
+      "detail": "Gate passed: 1 checks, protected paths: pass",
+      "duration_ms": 114292.64,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/checks-gate.pre-review.output.md"
@@ -107,53 +107,39 @@
         "anvil.json",
         "pipelines/"
       ],
-      "protected_path_verdict": "fail",
-      "protected_path_findings": [
-        "Protected path violation: tests/test_readme_showcase.py (base ref file modified/deleted, matches tests/)"
-      ],
-      "gate_verdict": "fail"
-    },
-    {
-      "station": "loopback",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: Gate failure: Protected path violation: tests/test_readme_showcase.py (base ref file modified/deleted, matches tests/)",
-      "reason": "Gate failure: Protected path violation: tests/test_readme_showcase.py (base ref file modified/deleted, matches tests/)",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null,
-      "feedback": "",
-      "from_station": "checks-gate"
+      "protected_path_verdict": "pass",
+      "protected_path_findings": [],
+      "gate_verdict": "pass"
     },
     {
       "station": "reviewer-spec",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.39,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-23/reviewer-spec.output.md",
+      "duration_ms": 99790.141,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-23/reviewer-spec.packet.md"
+        "runs/wo-gh-23/reviewer-spec.output.md"
       ],
-      "configured_model": "review-balanced",
+      "configured_model": "review-cheap",
       "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 3099,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-security",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.351,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out by low risk rule (not in reduced panel)",
+      "duration_ms": 0.368,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/reviewer-security.packet.md"
       ],
-      "configured_model": "review-strong",
+      "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
       "executor": null,
       "measured_tokens": 0,
@@ -162,30 +148,33 @@
     },
     {
       "station": "reviewer-tests",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.358,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-23/reviewer-tests.output.md",
+      "duration_ms": 86190.59,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-23/reviewer-tests.packet.md"
+        "runs/wo-gh-23/reviewer-tests.output.md"
       ],
-      "configured_model": "review-balanced",
+      "configured_model": "review-cheap",
       "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 3113,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-architecture",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 0.327,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out by low risk rule (not in reduced panel)",
+      "duration_ms": 0.415,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/reviewer-architecture.packet.md"
       ],
-      "configured_model": "review-balanced",
+      "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
       "executor": null,
       "measured_tokens": 0,
@@ -194,9 +183,9 @@
     },
     {
       "station": "reviewer-design",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 22.309,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out by low risk rule (not in reduced panel)",
+      "duration_ms": 165.164,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/reviewer-design.packet.md"
@@ -210,9 +199,9 @@
     },
     {
       "station": "reviewer-ux",
-      "status": "skipped",
-      "detail": "Skipped due to gate failure",
-      "duration_ms": 2.592,
+      "status": "routed_out",
+      "detail": "Routed out: Routed out by low risk rule (not in reduced panel)",
+      "duration_ms": 1.469,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/reviewer-ux.packet.md"
@@ -227,8 +216,8 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.045,
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.058,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/report.json"
@@ -243,8 +232,8 @@
     {
       "station": "triage-human",
       "status": "completed",
-      "detail": "Human review: required",
-      "duration_ms": 0.009,
+      "detail": "Human review: not_required",
+      "duration_ms": 0.021,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -258,7 +247,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-23/deployer.packet.md",
-      "duration_ms": 0.34,
+      "duration_ms": 0.329,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/deployer.packet.md"
@@ -266,7 +255,7 @@
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
       "executor": null,
-      "measured_tokens": 2405,
+      "measured_tokens": 2984,
       "budget": 0,
       "budget_action": "none"
     },
@@ -274,7 +263,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-23/observer.output.md",
-      "duration_ms": 74742.166,
+      "duration_ms": 71890.28,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/observer.output.md"
@@ -285,39 +274,45 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2412,
+      "measured_tokens": 2990,
       "budget": 0,
       "budget_action": "none"
     }
   ],
-  "verdict": "no_reviews",
-  "human_required": true,
+  "verdict": "approved",
+  "human_required": false,
   "max_loopbacks": 2,
-  "loopbacks": 1,
+  "loopbacks": 0,
   "deployment_status": null,
   "verify_results": [],
   "risk_hints": [],
   "decision": {
     "approver": {
-      "reviews_counted": [],
+      "reviews_counted": [
+        {
+          "station": "reviewer-spec",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        }
+      ],
       "reviews_expected": [
         "reviewer-spec",
-        "reviewer-security",
-        "reviewer-tests",
-        "reviewer-architecture",
-        "reviewer-design"
+        "reviewer-tests"
       ],
-      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)"
+      "rule": "All counted reviews passed. (Expected 2 reviews after routing.)"
     },
     "human_gate": {
-      "required": true,
-      "rule": "Verdict is no_reviews, not approved, so a human is required.",
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
       "hints_matched": []
     }
   },
   "warnings": [],
-  "astra_measured_tokens_total": 3934,
-  "base_ref": "9582290dbeed26f602aaa66d7a27655c840a4831",
+  "astra_measured_tokens_total": 4668,
+  "base_ref": "14978998eb38b4c7f8f79fb44787c173eac5f4ca",
   "evidence": [
     {
       "type": "screenshot",
@@ -337,6 +332,6 @@
   "cost": {
     "total": 0,
     "measured_steps": 0,
-    "unmeasured_steps": 5
+    "unmeasured_steps": 7
   }
 }

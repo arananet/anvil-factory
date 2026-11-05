@@ -1,1 +1,3 @@
-Observer report complete. The station cannot observe a release because no deployment has occurred—the deployer has not executed and produced a release record. The work order remains on branch anvil/run-readme-showcase with no merge to main.
+Observer output complete. I've created the observation report at `runs/wo-gh-23/observer.output.md`.
+
+The observer station cannot execute because the required input (release record) is missing. The deployer station shows as "packet_ready" but hasn't executed yet, so there's no deployment to observe. Following the station rules, I've documented what's missing rather than guessing.
