@@ -67,7 +67,16 @@ jobs:
           TEXT_RESP=$(curl -s -X POST "${GW}" -H "Authorization: Bearer ${CF_AIG_TOKEN}" -H "Content-Type: application/json" -d "${TEXT_BODY}")
           echo "${TEXT_RESP}" | grep -q "GATEWAY_OK" || { echo "Smoke failed for gpt-6.1-sol text route: ${TEXT_RESP}"; exit 1; }
           echo "Smoke passed: OpenAI route, gpt-6.1-sol, text"
-          VISION_BODY='{"model":"gpt-6.1-sol","messages":[{"role":"user","content":[{"type":"text","text":"You were given an image. Reply with exactly: IMAGE_OK"},{"type":"image_url","image_url":{"url":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAwMCAO+ip1sAAAAASUVORK5CYII="}}]}]}'
+          PNG_B64=$(python3 -c "
+          import zlib, struct, base64
+          def chunk(t, d):
+              c = t + d
+              return struct.pack('>I', len(d)) + c + struct.pack('>I', zlib.crc32(c) & 0xffffffff)
+          raw = b'\x00\xff\x00\x00\x00\xff\x00\x00'
+          png = b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', 2, 1, 8, 2, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(raw)) + chunk(b'IEND', b'')
+          print(base64.b64encode(png).decode())
+          ")
+          VISION_BODY="{\"model\":\"gpt-6.1-sol\",\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"You were given an image. Reply with exactly: IMAGE_OK\"},{\"type\":\"image_url\",\"image_url\":{\"url\":\"data:image/png;base64,${PNG_B64}\"}}]}]}"
           VISION_RESP=$(curl -s -X POST "${GW}" -H "Authorization: Bearer ${CF_AIG_TOKEN}" -H "Content-Type: application/json" -d "${VISION_BODY}")
           echo "${VISION_RESP}" | grep -q "IMAGE_OK" || { echo "Smoke failed for gpt-6.1-sol vision route: ${VISION_RESP}"; exit 1; }
           echo "Smoke passed: OpenAI route, gpt-6.1-sol, vision"
