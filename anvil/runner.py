@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 from .model import WorkOrder, Review
-from .config import default_model, load_anvil_config, health_config, CHARS_PER_TOKEN
+from .config import default_model, load_anvil_config, health_config, CHARS_PER_TOKEN, get_station_budget
 from .brain import packet_learnings_section
 from .design import packet_design_section, load_design_system
 from .capture import capture_breakpoints, packet_rendered_evidence_section
@@ -562,7 +562,9 @@ def prepare_reviewer_design_step(project, work_order, files_changed, captures, r
     return packet, contact_sheet_path
 
 def prepare_packet(project, station_id, prompt, work_order, steps,
-                   learnings_section="", design_section=""):
+                   learnings_section="", design_section="",
+                   rendered_evidence_section="", knowledge_section="",
+                   quality_charter_section="", anchor_section=""):
     """S1: Prepare packet with budget measurement and trimming.
 
     Returns (packet_text, action, measured_tokens, budget) where:
@@ -580,7 +582,9 @@ def prepare_packet(project, station_id, prompt, work_order, steps,
 
     # Build initial packet
     packet = _packet_text(station_id, prompt, work_order, steps,
-                         learnings_section, design_section)
+                         learnings_section, design_section,
+                         rendered_evidence_section, knowledge_section,
+                         quality_charter_section, anchor_section)
 
     measured = estimate_tokens(packet)
 
@@ -595,7 +599,9 @@ def prepare_packet(project, station_id, prompt, work_order, steps,
     from .design import packet_design_section_compact
     design_compact = packet_design_section_compact(project, station_id)
     packet_trimmed = _packet_text(station_id, prompt, work_order, steps,
-                                   learnings_section, design_compact)
+                                   learnings_section, design_compact,
+                         rendered_evidence_section, knowledge_section,
+                         quality_charter_section, anchor_section)
     measured = estimate_tokens(packet_trimmed)
 
     if measured <= budget:
@@ -605,7 +611,9 @@ def prepare_packet(project, station_id, prompt, work_order, steps,
     from .design import packet_design_section_reduced
     design_reduced = packet_design_section_reduced(project, station_id)
     packet_trimmed = _packet_text(station_id, prompt, work_order, steps,
-                                   learnings_section, design_reduced)
+                                   learnings_section, design_reduced,
+                         rendered_evidence_section, knowledge_section,
+                         quality_charter_section, anchor_section)
     measured = estimate_tokens(packet_trimmed)
 
     if measured <= budget:
@@ -615,7 +623,9 @@ def prepare_packet(project, station_id, prompt, work_order, steps,
     from .brain import packet_learnings_section_limited
     learnings_limited = packet_learnings_section_limited(project, budget // 10)
     packet_trimmed = _packet_text(station_id, prompt, work_order, steps,
-                                   learnings_limited, design_reduced)
+                                   learnings_limited, design_reduced,
+                         rendered_evidence_section, knowledge_section,
+                         quality_charter_section, anchor_section)
     measured = estimate_tokens(packet_trimmed)
 
     if measured <= budget:
@@ -1132,22 +1142,27 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         packet = run_dir / f"{station_id}.packet.md"
         design_section = packet_design_section(project, station_id)
 
-        # S1: Apply budget for interface stations
-        if station_id in budgeted_stations:
-            packet_text, action, measured, budget = prepare_packet(
-                project, station_id, prompt, work_order, steps,
-                learnings_section, design_section
-            )
-            packet.write_text(packet_text, encoding="utf-8")
-            return packet, measured, budget, action
-
-        # Non-budgeted stations: full packet with every applicable section
+        # Sections every station packet can carry (each builder self-gates
+        # to an empty string when the section does not apply)
         rendered_evidence_section = packet_rendered_evidence_section(project, work_order.id, station_id)
         # S3: Design knowledge section for design stations (computed once per run)
         knowledge_section = packet_knowledge_section(project, station_id, knowledge_pack)
         # Quality charter and anchor sections for visual runs
         quality_charter_section = packet_quality_charter_section(project, station_id, work_order)
         anchor_section = packet_anchor_section(project, station_id, work_order)
+
+        # S1: Apply budget for interface stations
+        if station_id in budgeted_stations:
+            packet_text, action, measured, budget = prepare_packet(
+                project, station_id, prompt, work_order, steps,
+                learnings_section, design_section,
+                rendered_evidence_section, knowledge_section,
+                quality_charter_section, anchor_section
+            )
+            packet.write_text(packet_text, encoding="utf-8")
+            return packet, measured, budget, action
+
+        # Non-budgeted stations: full packet with every applicable section
         packet_text = _packet_text(station_id, prompt, work_order, steps, learnings_section, design_section, rendered_evidence_section, knowledge_section, quality_charter_section, anchor_section)
         packet.write_text(packet_text, encoding="utf-8")
         measured = estimate_tokens(packet_text)
@@ -1199,10 +1214,72 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         budget = 0
         budget_action = "none"
         terminal_outcome = False  # Track if intake outcome is terminal
+        # reviewer-design pre-step: build the scoped packet (wo-gh-21 S3,
+        # contact sheet and provenance allowlist) plus the standard work
+        # order block and the capability sections, then let the generic
+        # paths below handle it. Execution follows the producer channel
+        # rules (wo-gh-24) exactly like every other reviewer: the runner
+        # never transcribes executor output into the review file.
+        prebuilt_packet = None
+        if station_id == "reviewer-design":
+            rd_captures = []
+            if run_dir.exists():
+                rd_captures = list(run_dir.glob("capture-*.png"))
+            rd_files_changed = []
+            try:
+                import subprocess
+                rd_result = subprocess.run(
+                    ["git", "diff", "--numstat", "HEAD"],
+                    cwd=project, capture_output=True, text=True, timeout=5
+                )
+                if rd_result.returncode == 0:
+                    for rd_line in rd_result.stdout.strip().split('\n'):
+                        if rd_line:
+                            rd_parts = rd_line.split('\t')
+                            if len(rd_parts) >= 3:
+                                rd_added = int(rd_parts[0]) if rd_parts[0] != '-' else 0
+                                rd_removed = int(rd_parts[1]) if rd_parts[1] != '-' else 0
+                                rd_files_changed.append({
+                                    "file": rd_parts[2],
+                                    "added": rd_added,
+                                    "removed": rd_removed
+                                })
+            except Exception:
+                pass  # Use empty files_changed if git fails
+            scoped_text, contact_sheet_path = prepare_reviewer_design_step(
+                project, work_order, rd_files_changed, rd_captures, registry=registry
+            )
+            wo_description = work_order.description
+            if work_order.intake_outcome and work_order.intake_outcome.get("outcome") == "rescoped":
+                wo_description = work_order.intake_outcome.get("rescoped_description", wo_description)
+            scoped_text += (
+                "\n## Work order\n\n"
+                f"- id: {_sanitize_control_chars(work_order.id)}\n"
+                f"- kind: {_sanitize_control_chars(work_order.kind)}\n"
+                f"- title: {_sanitize_control_chars(work_order.title)}\n"
+                f"- source: {_sanitize_control_chars(work_order.source)}\n"
+                f"- description: {_sanitize_control_chars(wo_description)}\n"
+                f"- risk_hints: {_sanitize_control_chars(', '.join(work_order.risk_hints))}\n"
+                f"- status: {_sanitize_control_chars(work_order.status)}\n"
+            )
+            for extra_section in (
+                packet_rendered_evidence_section(project, work_order.id, station_id),
+                packet_knowledge_section(project, station_id, knowledge_pack),
+                packet_quality_charter_section(project, station_id, work_order),
+                packet_anchor_section(project, station_id, work_order),
+            ):
+                if extra_section:
+                    scoped_text += "\n" + extra_section + "\n"
+            prebuilt_path = run_dir / f"{station_id}.packet.md"
+            prebuilt_path.write_text(scoped_text, encoding="utf-8")
+            prebuilt_measured = estimate_tokens(scoped_text)
+            prebuilt_budget = get_station_budget(load_anvil_config(project / "anvil.yaml"), station_id)
+            prebuilt_action = "sent" if prebuilt_measured <= prebuilt_budget else "trimmed"
+            prebuilt_packet = (prebuilt_path, prebuilt_measured, prebuilt_budget, prebuilt_action)
         if station_id == "intake":
             # In execute mode, parse intake output for outcomes
             if execute_mode:
-                packet, measured_tokens, budget, budget_action = packet_step(station, station_id)
+                packet, measured_tokens, budget, budget_action = prebuilt_packet if prebuilt_packet is not None else packet_step(station, station_id)
                 packet_text = packet.read_text(encoding="utf-8")
                 output_file = run_dir / f"{station_id}.output.md"
                 try:
@@ -1491,7 +1568,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     detail = f"Deploy command failed with exit code {code}"
                     deployment_status = "deploy_failed"
             else:
-                packet, measured_tokens, budget, budget_action = packet_step(station, station_id)
+                packet, measured_tokens, budget, budget_action = prebuilt_packet if prebuilt_packet is not None else packet_step(station, station_id)
                 status = "packet_ready"
                 detail = f"Deploy skipped (verdict: {verdict or 'pending'}, human gate {'blocks' if blocked else 'open'}); packet written to {packet}"
                 artifact = str(packet)
@@ -1500,123 +1577,23 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         elif station_id == "deployer":
             # The deployer never runs through a generic executor: without a
             # deploy config and an approved, unblocked run it stays a packet.
-            packet, measured_tokens, budget, budget_action = packet_step(station, station_id)
+            packet, measured_tokens, budget, budget_action = prebuilt_packet if prebuilt_packet is not None else packet_step(station, station_id)
             status = "packet_ready"
             detail = f"Packet written to {packet}"
             artifact = str(packet)
-        elif station_id == "reviewer-design":
-            # Loopback item 1: S3 integration - reviewer-design uses scoped packet builder
-            # Collect captures from run directory
-            captures = []
-            if run_dir.exists():
-                captures = list(run_dir.glob("capture-*.png"))
-
-            # Get files changed from git or use empty list
-            files_changed = []
-            try:
-                # Try to get diff from git (simple implementation for now)
-                import subprocess
-                result = subprocess.run(
-                    ["git", "diff", "--numstat", "HEAD"],
-                    cwd=project, capture_output=True, text=True, timeout=5
-                )
-                if result.returncode == 0:
-                    for line in result.stdout.strip().split('\n'):
-                        if line:
-                            parts = line.split('\t')
-                            if len(parts) >= 3:
-                                added = int(parts[0]) if parts[0] != '-' else 0
-                                removed = int(parts[1]) if parts[1] != '-' else 0
-                                files_changed.append({
-                                    "file": parts[2],
-                                    "added": added,
-                                    "removed": removed
-                                })
-            except Exception:
-                pass  # Use empty files_changed if git fails
-
-            # Use scoped packet builder
-            # Loopback gate round 3, finding 2: Pass registry so prompt can be resolved
-            packet_text, contact_sheet_path = prepare_reviewer_design_step(
-                project, work_order, files_changed, captures, registry=registry
-            )
-            packet = run_dir / f"{station_id}.packet.md"
-            packet.write_text(packet_text, encoding="utf-8")
-
-            # Measure tokens for budget tracking
-            from .config import get_station_budget, load_anvil_config
-            config = load_anvil_config(project / "anvil.yaml")
-            budget = get_station_budget(config, station_id)
-            measured_tokens = estimate_tokens(packet_text)
-            budget_action = "sent" if measured_tokens <= budget else "trimmed"
-
-            if execute_mode:
-                # Execute reviewer-design
-                output_file = run_dir / f"{station_id}.output.md"
-                try:
-                    result = executor.execute(packet_text, station_id, packet_path=packet,
-                                              output_path=output_file, cwd=project)
-                    output_text = result.get("output", "") if isinstance(result, dict) else str(result)
-                    usage = result.get("usage") if isinstance(result, dict) else None
-                    output_file.write_text(output_text, encoding="utf-8")
-                    status = "executed"
-                    detail = f"Executed by {executor.name}; output written to {output_file}"
-                    artifact = str(output_file)
-                    step_executor, step_executed_model = _executor_provenance(executor, output_text)
-                    extra_envelope = {}
-                    if isinstance(usage, dict):
-                        step_usage = usage
-                        extra_envelope["usage"] = usage
-                        tokens = {k: usage[k] for k in usage if "token" in k}
-                        if tokens:
-                            extra_envelope["tokens"] = tokens
-
-                    # Write the executor output to the authoritative review channel
-                    review_file = run_dir / f"{station_id}.review.json"
-                    review_file.write_text(output_text, encoding="utf-8")
-
-                    # Parse review only from the authoritative channel
-                    review = parse_review(output_text, station_id)
-                    # Special handling for reviewer-design when no design system exists
-                    if not has_design_system:
-                        # Force a changes_requested verdict with a finding about missing design system
-                        review = Review(
-                            station="reviewer-design",
-                            verdict="changes_requested",
-                            findings=["No design system exists for this project. The project must define "
-                                     "design/DESIGN.md and design/tokens.json before interface output can be "
-                                     "reviewed against design standards."]
-                        )
-                    if review is not None:
-                        run_reviews.append(review)
-                        run_findings.extend(review.findings)
-                        extra_envelope["review"] = review.to_dict()
-                    else:
-                        extra_envelope["review_parse_failed"] = True
-                        detail += "; review output did not parse as a review JSON"
-                except ExecutorError as exc:
-                    status = "failed"
-                    detail = f"Executor failed: {exc}"
-                    artifact = str(packet)
-                    step_executor, step_executed_model = _executor_provenance(executor)
-                    extra_envelope = {"error": str(exc)}
-            else:
-                status = "packet_ready"
-                detail = f"Packet written to {packet}"
-                artifact = str(packet)
         elif execute_mode:
             # Skip reviewers if gate failed (S2)
             if gate_failed and station_id.startswith("reviewer"):
                 status = "skipped"
                 detail = "Skipped due to gate failure"
-                packet = packet_step(station, station_id)[0]
+                packet = prebuilt_packet[0] if prebuilt_packet is not None else packet_step(station, station_id)[0]
                 artifact = str(packet)
             # Skip reviewers that were routed out
             elif station_id.startswith("reviewer") and routing_record and station_id not in routing_record.selected_reviewers:
                 status = "routed_out"
                 routed_reason = next((r["reason"] for r in routing_record.routed_out if r["reviewer"] == station_id), "Not in selected panel")
                 detail = f"Routed out: {routed_reason}"
-                packet = packet_step(station, station_id)[0]
+                packet = prebuilt_packet[0] if prebuilt_packet is not None else packet_step(station, station_id)[0]
                 artifact = str(packet)
             else:
                 # Capture builder delta (Loopback round 2)
@@ -1624,7 +1601,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     builder_attempt += 1
                     builder_snapshot_before = _snapshot_working_tree(project)
 
-                packet, measured_tokens, budget, budget_action = packet_step(station, station_id)
+                packet, measured_tokens, budget, budget_action = prebuilt_packet if prebuilt_packet is not None else packet_step(station, station_id)
                 packet_text = packet.read_text(encoding="utf-8")
                 output_file = run_dir / f"{station_id}.output.md"
 
@@ -1711,7 +1688,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     step_executor, step_executed_model = _executor_provenance(executor)
                     extra_envelope = {"error": str(exc)}
         else:
-            packet, measured_tokens, budget, budget_action = packet_step(station, station_id)
+            packet, measured_tokens, budget, budget_action = prebuilt_packet if prebuilt_packet is not None else packet_step(station, station_id)
             status = "packet_ready"
             detail = f"Packet written to {packet}"
             artifact = str(packet)
