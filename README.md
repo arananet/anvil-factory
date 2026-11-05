@@ -193,6 +193,7 @@ Every change starts with a spec under .openspec/specs/ (OpenSpec). Write the spe
 | [docs/STATUS-PAGE.md](docs/STATUS-PAGE.md) | The run status page: generation, publishing to Cloudflare Pages or GitHub Pages, and the snapshot note |
 | [docs/MEMORY-GATE.md](docs/MEMORY-GATE.md) | Verified learnings: the inbox flow, the provenance format, and why memory writes are gated |
 | [docs/SUPERVISOR.md](docs/SUPERVISOR.md) | The bounded supervisor: stall signals, the constitution, the proposal lifecycle, and what it can never do |
+| [docs/OPERATOR-REQUIREMENTS.md](docs/OPERATOR-REQUIREMENTS.md) | Operator credentials and permissions: the GitHub PAT, the Cloudflare token and AI Gateway shape, and where each lives in the Secure Vault |
 | [brain/project.md](brain/project.md) | Principles and project context |
 | [templates/spec.md](templates/spec.md) | The spec template every spec starts from |
 

@@ -1,0 +1,28 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-tests",
+  "to_station": "reviewer-architecture",
+  "work_order_id": "wo-gh-32",
+  "artifact_path": "runs/wo-gh-32/reviewer-tests.output.md",
+  "status": "executed",
+  "created_at": "2026-11-05T04:48:20.932935+00:00",
+  "review": {
+    "station": "reviewer-tests",
+    "verdict": "pass",
+    "findings": [
+      "No tests/ file was created or modified (git status shows none); scenario checks live in .openspec/specs/operator-requirements/scenario-checks.md, which is consistent with the guardrail.",
+      "Ran every scenario check S1, S2, S3, R5 and S4 from scenario-checks.md against docs/OPERATOR-REQUIREMENTS.md: no MISSING terms, all required headings present, and Placement and care is the last H2 section.",
+      "S4 credential scan (token-shaped strings, 32-char hex ids) over the doc, README.md and CHANGELOG.md found nothing. The dash check found no em or en dashes in the doc, README, CHANGELOG or the scenario-checks file.",
+      "Each GitHub permission row states the operation and the observed failure. Contents and Secrets rows state honestly that no isolated failure is on record, which fits the 'verified only' rule.",
+      "README Documentation table row matches the neighbouring rows' style. The CHANGELOG Unreleased entry is present and names the operator requirements.",
+      "Full suite is green: 580 passed, 6 skipped, 82 subtests passed.",
+      "Not checked: the scope diff against main (the 'main...' ref does not exist in this checkout). git status shows only CHANGELOG.md, README.md, the new doc, the scenario-checks file and the work order."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}
