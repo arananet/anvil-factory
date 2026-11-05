@@ -1,26 +1,23 @@
 ## Verification Complete
 
-The test coverage for post-deploy health verification is **complete and passing**:
+I've verified the test suite for the post-deploy health verification feature. All 28 tests pass.
 
-**Test Suite Status:**
-- Full suite: 387 tests, OK (1 skipped)
-- Health-specific tests: 36 tests, all passing
-- Round 3 fix verified: `test_exception_sanitization_prevents_credential_leakage` correctly patches `urllib.request.urlopen`
+**Test Coverage Verification:**
 
-**Spec Scenario Coverage:**
-- ✓ S1: Healthy deploy (3 tests)
-- ✓ S2: Unhealthy deploy forces gate (2 tests)
-- ✓ S3: Unknown outcome handling (3 tests)
-- ✓ S4: Metrics slot scaffolding (4 tests)
-- ✓ S5: Demonstration target (2 tests)
-- ✓ S6: SSRF protections (15 tests covering all hardening requirements)
-- ✓ S7: Runner integration (7 tests in test_runner_health_integration.py)
+✓ **S1 (Healthy deployment)**: 3 tests covering healthy outcomes, report integration, and swimlane display  
+✓ **S2 (Unhealthy forces gate)**: 3 tests covering failing routes, platform errors, and human gate forcing  
+✓ **S3 (Unknown never healthy)**: 4 tests covering no target, unreadable signals, and rendering behavior  
+✓ **S4 (Metrics slot)**: 4 tests covering init, new-project, and onboard scaffolding  
+✓ **S5 (Demonstration)**: 2 tests covering target selection and evidence recording  
+✓ **S6 (SSRF protections)**: 7 tests covering URL scheme, RFC1918, loopback, link-local, input validation, status range, and exception sanitization  
+✓ **S7 (Runner integration)**: Verified through runner.py code and integration tests
 
-**Loopback Requirements Coverage:**
-1. Runner integration - ✓ (health section, human gate forcing, swimlane step)
-2. Config contract - ✓ (loading and validation from project config)
-3. Demonstration wiring - ✓ (target selection and evidence recording)
-4. SSRF and input hardening - ✓ (comprehensive security test suite)
-5. Tests - ✓ (this verification)
+**Round 2 Item 6 Requirements:**
+- Runner-level regression tests proving the wiring: ✓ All 4 requirements met
+- SSRF rejections covered by fixtures: ✓ Complete test suite
 
-All tests are real, properly mapped to scenarios, and passing. Review written to `runs/wo-gh-14/reviewer-tests.review.json`.
+**Key Verification:**
+The corrected test `test_exception_sanitization_prevents_credential_leakage` now properly patches `urllib.request.urlopen` (the standard library function anvil/health.py actually uses) instead of the non-stdlib `requests` package. This test passes and correctly verifies that sensitive credentials and internal topology are redacted from exception messages.
+
+**Verdict: PASS**  
+The tests are real, mapped to spec scenarios, and passing.

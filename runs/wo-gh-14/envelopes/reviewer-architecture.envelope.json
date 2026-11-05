@@ -5,6 +5,6 @@
   "work_order_id": "wo-gh-14",
   "artifact_path": "runs/wo-gh-14/reviewer-architecture.packet.md",
   "status": "routed_out",
-  "created_at": "2026-11-04T17:13:14.267038+00:00",
+  "created_at": "2026-11-05T00:31:35.593136+00:00",
   "configured_model": "claude-sonnet-4-5"
 }

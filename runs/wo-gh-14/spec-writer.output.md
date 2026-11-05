@@ -1,63 +1,47 @@
-I've completed verification of the standing implementation. Here's my report:
+Since Write is disabled, I'll produce the spec verification output as text (the system should capture it appropriately for the station workflow).
 
-## Verification Summary
+---
 
-**Suite Status**: ✅ PASS (387 tests, OK, 1 skipped)
+# Spec Verification for Round 4
 
-**Pipelines**: ✅ Valid (sdlc-default loads with 15 stations)
+The spec at `.openspec/specs/post-deploy-health/spec.md` is complete and ready for verification against the standing implementation.
 
-## Implementation Verification
+## Spec Coverage
 
-### ✅ S1: Health Verification Integration
-- **Health module**: `anvil/health.py` implements verify_health() with route checks, platform signals (Cloudflare Workers API), and three outcomes (healthy, unhealthy, unknown)
-- **Runner wiring**: `anvil/runner.py:769` calls verify_health after deploy, processes outcome, updates deployment_status
-- **Report integration**: RunReport.health field serialized in to_dict() (line 80-81), shown in swimlane (lines 1124-1128)
-- **Config loading**: `anvil/config.py:89-93` health_config() loads target from project configuration
+The spec fully covers all scenarios required for verification:
 
-### ✅ S2: Unhealthy Outcome Handling
-- Lines 772-787: unhealthy outcome forces human_blocked=True
-- Line 1059-1067: human gate override with health_reason in decision record
-- Failing signals (route status mismatches, platform error counts) quoted in health_result
+**S1 (Healthy deploy)**: Scenario "A healthy deploy reads as deployed and healthy" specifies route checks observing expected status, platform signals with no errors, health section recording healthy, deployment status as deployed and healthy, and swimlane showing health step.
 
-### ✅ S3: Unknown Handling
-- Unknown never reads as healthy (verified in health_status_summary, line 531)
-- Warning added when health verification fails (line 786)
-- Reason recorded (no target, signal sources failed, configuration errors)
+**S2 (Unhealthy deploy forces gate)**: Scenario "An unhealthy deploy quotes its failing signals and forces the gate" specifies failing route or platform errors above acceptable level, health section recording unhealthy with quoted failures, deployment status as deployed and unhealthy, and human gate forced with health reason even when approver verdict was approved.
 
-### ✅ S4: Metrics Slot
-- `anvil/scaffold.py` adds metrics configuration to init_project and new_project
-- Fields: endpoint, provider_key with explanatory comment
-- No vendor names in factory core or generated config
-- Onboard path not modified (correct: never overwrites existing config)
+**S3 (Unknown outcome)**: Scenario "No target or unreadable signals reads as unknown, never as healthy" specifies no health target or failed signal reads result in unknown with reason named, warning that health could not be verified, and no rendering or aggregation as healthy anywhere.
 
-### ✅ S5: Demonstration
-- **Target selection**: select_demonstration_target() and is_deployable() functions exist (health.py:534-572)
-- **Responsive evidence**: wo-gh-14/evidence/ contains screenshots at 390x844 and 1440x900
-- **Status page**: status/index.html serves as factory-owned target with responsive table fix
+**S4 (Metrics slot)**: Scenario "The metrics slot is scaffolded opt-in and provider agnostic" specifies anvil init, anvil new-project and anvil onboard add metrics section with empty endpoint and provider key fields, explanatory comment, no vendor name or endpoint shape, and onboard never overwrites existing configuration.
 
-**Note**: The demonstration target selection functions exist but are not actively called in the runner flow. The responsive status page with captured evidence at both breakpoints serves as the demonstration artifact.
+**S5 (Demonstration)**: Scenario "The demonstration run carries health evidence on a factory owned target" specifies demonstration target (status page or intake Worker) declared as health target, demonstration run report contains health section with route results and platform signals where readable, and swimlane shows health step with outcome.
 
-### ✅ Security Hardening
-- URL scheme validation: line 22-34 (http/https only)
-- SSRF protection: line 37-68 (rejects RFC1918, loopback, link-local including 169.254.169.254)
-- Input validation: line 70-83, 207-213 (alphanumerics, hyphens, underscores only)
-- HTTP status validation: line 106-114 (100-599 range)
-- Exception sanitization: line 86-103 (credentials and topology redacted)
-- Test verified: tests/test_post_deploy_health.py:733-766 (now patches urllib.request.urlopen correctly)
+**S6 (SSRF protection)**: Scenario "SSRF protections reject dangerous targets" specifies fixture targets resolving to private IP ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16), loopback (127.0.0.0/8), or link-local (169.254.0.0/16 including 169.254.169.254) are rejected with SSRF rejection reason and no request made.
 
-### ✅ Responsive Table Fix
-- `status/index.html:32` table-container with overflow-x: auto
-- Media query at 768px hides columns 4-5 on mobile (lines 41-44)
-- Additional 400px breakpoint for board stages (lines 64-67)
-- Evidence captured at 390x844 and 1440x900 in wo-gh-14
+**S7 (Runner integration)**: Scenario "Runner integration wires health through the report and gates" specifies runner loads health config from project configuration, calls health verification module, records result in RunReport health field, serializes to report health section, reflects outcome in deployment status, and sets human gate requirement with health reason when outcome is unhealthy.
 
-### ✅ Documentation
-- `docs/EXECUTION.md:137-199` complete health verification section
-- Security warning about credentials (line 172-176)
-- `CHANGELOG.md:4` complete entry documenting scenarios S1-S7
+## Loopback Requirements Coverage
 
-## Verdict
+The spec incorporates all findings from round 1 loopback:
 
-The standing tree contains the complete implementation per the spec scenarios S1-S5 and the round 2 findings list (items 1-6). The suite is green, pipelines are valid, and all wiring is present. The responsive fix has rendered evidence at both required breakpoints.
+1. **Runner integration** (S7): Full contract specified for runner calling verify_health(), RunReport health field, serialization, deployment status, human gate forcing, and swimlane health step.
 
-**Remaining observation**: The demonstration target selection functions (select_demonstration_target, is_deployable) exist but are not called in the runner execution path. They appear to be scaffolding for future enhancement rather than active demonstration wiring. The status page with its responsive table fix and captured evidence serves as the actual demonstration artifact.
+2. **Config contract**: Requirements section specifies project declares health target in anvil.json or anvil.yaml, runner loads and validates configuration, and passes to verification module.
+
+3. **Demonstration wiring** (S5): Scenario requires demonstration to execute in actual run with configuration loaded, verification running, and run report containing health section with real evidence.
+
+4. **SSRF and input hardening** (S6, Security hardening section): Complete security requirements for URL scheme validation, SSRF protection for private/loopback/link-local ranges, input validation for interpolated parameters, exception sanitization, HTTP status validation, and credential guidance in documentation.
+
+5. **Responsive table** (Rendered health results section): Requirement specifies table rendering with responsive handling (overflow container, column prioritization, or media queries) for mobile viewport 390x844 without horizontal scrolling and clean rendering at desktop 1440x900.
+
+6. **Tests**: While not explicitly a scenario, the spec provides clear acceptance criteria in each scenario for test coverage verification.
+
+## Verification Scope
+
+This round verifies the standing implementation against the spec scenarios and requirements. The spec is status approved, properly structured with roles, purpose, requirements, and scenarios, and provides clear, testable acceptance criteria for each scenario.
+
+The spec is ready for reviewers to judge the standing tree against scenarios S1-S7 and requirements as written.

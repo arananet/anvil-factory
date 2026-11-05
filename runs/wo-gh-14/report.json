@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 26643.272,
+      "duration_ms": 32618.242,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/intake.output.md"
@@ -24,7 +24,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-14/spec-writer.output.md",
-      "duration_ms": 169079.292,
+      "duration_ms": 105066.699,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/spec-writer.output.md"
@@ -40,7 +40,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-14/test-writer.output.md",
-      "duration_ms": 209626.026,
+      "duration_ms": 121717.484,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/test-writer.output.md"
@@ -56,7 +56,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-14/builder.output.md",
-      "duration_ms": 197477.031,
+      "duration_ms": 186377.969,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/builder.output.md"
@@ -72,7 +72,7 @@
       "station": "checks-gate",
       "status": "passed",
       "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 30764.815,
+      "duration_ms": 33273.399,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/checks-gate.pre-review.output.md"
@@ -100,7 +100,7 @@
       "station": "reviewer-spec",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-14/reviewer-spec.output.md",
-      "duration_ms": 221666.534,
+      "duration_ms": 229082.949,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/reviewer-spec.output.md"
@@ -116,7 +116,7 @@
       "station": "reviewer-security",
       "status": "routed_out",
       "detail": "Routed out: Routed out by low risk rule (not in reduced panel)",
-      "duration_ms": 0.3,
+      "duration_ms": 0.286,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/reviewer-security.packet.md"
@@ -129,7 +129,7 @@
       "station": "reviewer-tests",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-14/reviewer-tests.output.md",
-      "duration_ms": 100739.783,
+      "duration_ms": 168186.507,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/reviewer-tests.output.md"
@@ -145,7 +145,7 @@
       "station": "reviewer-architecture",
       "status": "routed_out",
       "detail": "Routed out: Routed out by low risk rule (not in reduced panel)",
-      "duration_ms": 0.256,
+      "duration_ms": 0.287,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/reviewer-architecture.packet.md"
@@ -158,7 +158,7 @@
       "station": "reviewer-design",
       "status": "routed_out",
       "detail": "Routed out: Routed out by low risk rule (not in reduced panel)",
-      "duration_ms": 1.221,
+      "duration_ms": 1.384,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/reviewer-design.packet.md"
@@ -171,7 +171,7 @@
       "station": "reviewer-ux",
       "status": "routed_out",
       "detail": "Routed out: Routed out by low risk rule (not in reduced panel)",
-      "duration_ms": 0.861,
+      "duration_ms": 0.976,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/reviewer-ux.packet.md"
@@ -184,7 +184,7 @@
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: approved",
-      "duration_ms": 0.037,
+      "duration_ms": 0.06,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/report.json"
@@ -197,7 +197,7 @@
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: required",
-      "duration_ms": 0.018,
+      "duration_ms": 0.02,
       "cost": null,
       "artifacts": [],
       "configured_model": "default",
@@ -208,7 +208,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-14/deployer.packet.md",
-      "duration_ms": 0.208,
+      "duration_ms": 0.246,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/deployer.packet.md"
@@ -221,7 +221,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-14/observer.output.md",
-      "duration_ms": 121374.065,
+      "duration_ms": 145841.872,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-14/observer.output.md"
@@ -270,7 +270,7 @@
     }
   },
   "warnings": [],
-  "base_ref": "422127893b2c33c479174e3b0a5ac0165ee9e507",
+  "base_ref": "fba69254c58a45b0f357972059b23eaf0fbf7d2a",
   "evidence": [
     {
       "type": "screenshot",

@@ -5,11 +5,7 @@
   ],
   "routed_out": [
     {
-      "reviewer": "reviewer-design",
-      "reason": "Routed out by low risk rule (not in reduced panel)"
-    },
-    {
-      "reviewer": "reviewer-architecture",
+      "reviewer": "reviewer-ux",
       "reason": "Routed out by low risk rule (not in reduced panel)"
     },
     {
@@ -17,7 +13,11 @@
       "reason": "Routed out by low risk rule (not in reduced panel)"
     },
     {
-      "reviewer": "reviewer-ux",
+      "reviewer": "reviewer-architecture",
+      "reason": "Routed out by low risk rule (not in reduced panel)"
+    },
+    {
+      "reviewer": "reviewer-design",
       "reason": "Routed out by low risk rule (not in reduced panel)"
     }
   ],

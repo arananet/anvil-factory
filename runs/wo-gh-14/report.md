@@ -22,10 +22,10 @@ Surfaces: deploy, content
 - reviewer-tests (model: review-cheap)
 
 **Routed out** (4):
-- reviewer-design: Routed out by low risk rule (not in reduced panel)
-- reviewer-architecture: Routed out by low risk rule (not in reduced panel)
-- reviewer-security: Routed out by low risk rule (not in reduced panel)
 - reviewer-ux: Routed out by low risk rule (not in reduced panel)
+- reviewer-security: Routed out by low risk rule (not in reduced panel)
+- reviewer-architecture: Routed out by low risk rule (not in reduced panel)
+- reviewer-design: Routed out by low risk rule (not in reduced panel)
 
 ## Verdict
 
