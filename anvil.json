@@ -1,4 +1,12 @@
 {
   "pipeline": "sdlc-default",
-  "project": "anvil-factory"
+  "project": "anvil-factory",
+  "checks": [
+    "python -m unittest discover -s tests -p 'test_*.py'"
+  ],
+  "protected_paths": [
+    "tests/",
+    "anvil.json",
+    "pipelines/"
+  ]
 }

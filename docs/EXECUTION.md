@@ -26,25 +26,32 @@ configured runtime, each agent station packet is rendered as today (station
 prompt, work order, upstream step summary) and sent to the executor:
 
 - The executor output is written to `runs/<id>/<station>.output.md`.
-- For reviewer stations, the executor output is additionally written to
+- For reviewer stations, the reviewer itself writes its review to
   `runs/<id>/<station>.review.json`, which is the authoritative review channel.
+  The runner removes any pre-existing review file before the reviewer executes,
+  so the file's presence at step exit means it was produced during this run.
   The runner parses reviews only from this file, never from the free output
-  transcript (which stays as provenance).
+  transcript (which stays as provenance only).
 - The step status becomes `executed`, and the envelope records status
   `executed` plus the executor object `{kind, detail}` (see Model
   provenance below).
 - If the executor fails or the kind is unknown, the step status is `failed`
   with the error recorded in the step and the envelope. A failed step is never
   quietly reported as `packet_ready`.
-- Reviewer stations are expected to answer with exactly one review JSON object:
-  `{"station": "<station-id>", "verdict": "pass | fail | changes_requested",
-  "findings": ["..."]}`. The review file must parse as exactly one JSON object
-  (surrounding whitespace and one surrounding markdown code fence allowed) with
-  the station field equal to the step station id, verdict one of pass, fail, or
-  changes_requested, and findings a list of strings. A parsed review feeds the
-  approver of that same run. If the review file is missing, empty, malformed,
-  or does not match the expected shape, the envelope records
-  `review_parse_failed` and the station contributes no review.
+- Reviewer stations are expected to write exactly one review JSON object to
+  their review file: `{"station": "<station-id>", "verdict": "pass | fail |
+  changes_requested", "findings": ["..."]}`. The review file must parse as
+  exactly one JSON object (surrounding whitespace and one surrounding markdown
+  code fence allowed) with the station field equal to the step station id,
+  verdict one of pass, fail, or changes_requested, and findings a list of
+  strings. A parsed review feeds the approver of that same run. If the review
+  file is missing when the station exits, the envelope records
+  `review_file_missing` and the station contributes no review. If the file
+  exists but is empty, malformed, or does not match the expected shape, the
+  envelope records `review_parse_failed` and the station contributes no review.
+  The wrapper validates the review file at station exit and allows one
+  in-session correction attempt when the file is missing or malformed; a second
+  failure stands as recorded.
 - Cost stays null unless the executor reports usage. When usage is reported,
   token counts are recorded on the step and the envelope; a numeric cost in
   the usage object is the only way a step cost becomes non null.
@@ -126,6 +133,88 @@ in the Taskline demonstration, `wrangler deploy` or a release script in real
 use. ANVIL runs the command and the verification; it does not invent a
 hosting target, and it does not hold credentials. Secrets for deploy and
 verify commands stay in the operator environment, never in the config file.
+
+## Health verification
+
+After the deploy step completes, the factory can verify the deployed
+application's health from live signals. Health verification is configured in
+the project `anvil.json`:
+
+```json
+{
+  "health": {
+    "base_url": "https://your-deployed-app.example",
+    "routes": [
+      {"path": "/", "expected_status": 200},
+      {"path": "/health", "expected_status": 200},
+      {"path": "/api/status", "expected_status": 200}
+    ],
+    "platform": {
+      "source": "cloudflare_workers",
+      "account_id": "your-account-id",
+      "worker_name": "your-worker",
+      "acceptable_error_rate": 0.01
+    }
+  }
+}
+```
+
+Health verification runs only when a health target is declared. It performs:
+
+- **Route checks**: HTTP requests to each declared route, recording expected
+  status, observed status (or transport error), and latency.
+- **Platform signals** (optional): For Cloudflare Workers, reads request and
+  error counts from the analytics API for the window since deploy. Requires
+  `CLOUDFLARE_API_TOKEN` in the environment. Other platforms can be added as
+  sources later.
+
+**Security Warning**: Never put provider credentials (API tokens, secrets, or
+keys) directly in configuration files (anvil.json or anvil.yaml). Instead, use
+environment variables (like `CLOUDFLARE_API_TOKEN`) or a secrets management
+system. Configuration files are often committed to version control and may be
+shared, exposing credentials. Health verification is designed to read
+credentials from the environment, not from project configuration files.
+
+The outcome is one of three values, recorded in the run report's health
+section:
+
+- **healthy**: All route checks observed their expected status and platform
+  error signals (if present) show no errors above the acceptable level.
+- **unhealthy**: At least one route check failed or platform signals show
+  errors above acceptable. The failing signals are quoted in the record with
+  specific routes and observed statuses or error counts. An unhealthy outcome
+  forces the human gate even when the approver verdict was approved, with the
+  health reason recorded in the decision.
+- **unknown**: No health target configured, or all signal sources failed to
+  read (network failure, missing credential, API error). Unknown states the
+  reason and warns that health could not be verified. Unknown is never
+  rendered or aggregated as healthy anywhere.
+
+The deployment status in the run report reflects health: deployed and healthy,
+deployed and unhealthy, or deployed with health unknown. The swimlane shows
+health verification as a step after deploy with its outcome.
+
+Health verification never blocks a run with no health target configured. The
+unknown outcome is recorded with the reason, and the run proceeds.
+
+### Application metrics slot
+
+Projects can optionally declare an application metrics endpoint in `anvil.json`:
+
+```json
+{
+  "metrics": {
+    "endpoint": "",
+    "provider_key": ""
+  }
+}
+```
+
+This slot is provider-agnostic: no vendor name or endpoint shape is written
+into the factory core or generated configurations. Projects fill the endpoint
+and provider_key fields to connect their own metrics provider. The factory
+scaffolds this slot in all new projects (`anvil init`, `anvil new-project`,
+`anvil onboard`) but never overwrites an existing configuration.
 
 ## Model provenance
 

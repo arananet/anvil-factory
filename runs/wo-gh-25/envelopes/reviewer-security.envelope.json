@@ -1,0 +1,20 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-security",
+  "to_station": "reviewer-tests",
+  "work_order_id": "wo-gh-25",
+  "artifact_path": "runs/wo-gh-25/reviewer-security.output.md",
+  "status": "executed",
+  "created_at": "2026-11-03T09:13:40.482433+00:00",
+  "review": {
+    "station": "reviewer-security",
+    "verdict": "pass",
+    "findings": []
+  },
+  "configured_model": "claude-sonnet-4-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
+}

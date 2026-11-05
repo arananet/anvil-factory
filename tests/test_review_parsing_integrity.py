@@ -87,17 +87,24 @@ class TestOneAuthoritativeChannel(unittest.TestCase):
     """S1: One authoritative channel - runner writes to .review.json and counts only from that file"""
 
     def test_review_written_to_authoritative_channel_s1(self):
-        """S1: Runner writes executor output to runs/<work-order-id>/<station-id>.review.json"""
+        """S1: Reviewer writes review to runs/<work-order-id>/<station-id>.review.json"""
         EXECUTOR_SCRIPT = '''
 import json, sys
+from pathlib import Path
 packet_path = sys.argv[1]
 station = ""
+work_order_id = ""
 for line in open(packet_path, encoding="utf-8"):
     if line.startswith("# Task packet:"):
         station = line.split(":", 1)[1].strip()
-        break
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
 if station.startswith("reviewer"):
-    print(json.dumps({"station": station, "verdict": "pass", "findings": ["review done"]}))
+    review_obj = {"station": station, "verdict": "pass", "findings": ["review done"]}
+    review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+    review_path.parent.mkdir(parents=True, exist_ok=True)
+    review_path.write_text(json.dumps(review_obj))
+    print(json.dumps(review_obj))
 else:
     print("Executed " + station)
 '''
@@ -127,13 +134,16 @@ else:
         """S1: Free output transcript stays as provenance and is never parsed for a review"""
         EXECUTOR_WITH_OUTPUT = '''
 import json, sys
+from pathlib import Path
 packet_path = sys.argv[1]
 station = ""
+work_order_id = ""
 for line in open(packet_path, encoding="utf-8"):
     if line.startswith("# Task packet:"):
         station = line.split(":", 1)[1].strip()
-        break
-# Write to .output.md (simulated by executor)
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
+# Reviewer does NOT write review file, only prints prose
 print("Here's some free-form output that shouldn't be parsed")
 print("It might mention pass or fail but that's just prose")
 '''
@@ -152,10 +162,10 @@ print("It might mention pass or fail but that's just prose")
             output_file = proj / "runs" / "wo-auth-002" / "reviewer-spec.output.md"
             self.assertTrue(output_file.exists())
 
-            # No review was parsed since .review.json doesn't exist or is malformed
+            # No review was counted since reviewer didn't write review file
             self.assertEqual(report.verdict, "no_reviews")
             env = json.loads((proj / "runs" / "wo-auth-002" / "envelopes" / "reviewer-spec.envelope.json").read_text())
-            self.assertTrue(env.get("review_parse_failed"))
+            self.assertTrue(env.get("review_file_missing"), "Should record review_file_missing when no file written")
 
 
 class TestWholeDocumentParse(unittest.TestCase):
@@ -165,14 +175,21 @@ class TestWholeDocumentParse(unittest.TestCase):
         """S2: Review file with exactly one JSON object (with surrounding whitespace) parses correctly"""
         EXECUTOR_CLEAN_JSON = '''
 import json, sys
+from pathlib import Path
 packet_path = sys.argv[1]
 station = ""
+work_order_id = ""
 for line in open(packet_path, encoding="utf-8"):
     if line.startswith("# Task packet:"):
         station = line.split(":", 1)[1].strip()
-        break
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
 if station.startswith("reviewer"):
-    print(json.dumps({"station": station, "verdict": "pass", "findings": []}))
+    review_obj = {"station": station, "verdict": "pass", "findings": []}
+    review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+    review_path.parent.mkdir(parents=True, exist_ok=True)
+    review_path.write_text(json.dumps(review_obj))
+    print(json.dumps(review_obj))
 else:
     print("Executed " + station)
 '''
@@ -195,16 +212,22 @@ else:
         """S2: Review file with markdown code fence around JSON object parses correctly"""
         EXECUTOR_FENCED_JSON = '''
 import json, sys
+from pathlib import Path
 packet_path = sys.argv[1]
 station = ""
+work_order_id = ""
 for line in open(packet_path, encoding="utf-8"):
     if line.startswith("# Task packet:"):
         station = line.split(":", 1)[1].strip()
-        break
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
 if station.startswith("reviewer"):
-    print("```json")
-    print(json.dumps({"station": station, "verdict": "pass", "findings": []}))
-    print("```")
+    review_obj = {"station": station, "verdict": "pass", "findings": []}
+    review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+    review_path.parent.mkdir(parents=True, exist_ok=True)
+    fenced_content = "```json\\n" + json.dumps(review_obj) + "\\n```"
+    review_path.write_text(fenced_content)
+    print(fenced_content)
 else:
     print("Executed " + station)
 '''
@@ -224,20 +247,28 @@ else:
     def test_no_scanning_for_first_match_s2(self):
         """S2: No code path counts a review from scanned text - scanning is removed"""
         # This test verifies that the old scanning behavior is gone
-        # If an executor produces output with multiple JSON objects, only the
+        # If an executor writes a file with multiple JSON objects, only the
         # whole document parse matters, not the first JSON object found
         EXECUTOR_MULTIPLE_OBJECTS = '''
 import json, sys
+from pathlib import Path
 packet_path = sys.argv[1]
 station = ""
+work_order_id = ""
 for line in open(packet_path, encoding="utf-8"):
     if line.startswith("# Task packet:"):
         station = line.split(":", 1)[1].strip()
-        break
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
 if station.startswith("reviewer"):
-    # This should NOT parse because there are multiple JSON objects
-    print(json.dumps({"station": station, "verdict": "fail", "findings": ["first object"]}))
-    print(json.dumps({"station": station, "verdict": "pass", "findings": ["second object"]}))
+    # Write multiple JSON objects to file - should NOT parse
+    review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+    review_path.parent.mkdir(parents=True, exist_ok=True)
+    obj1 = json.dumps({"station": station, "verdict": "fail", "findings": ["first object"]})
+    obj2 = json.dumps({"station": station, "verdict": "pass", "findings": ["second object"]})
+    review_path.write_text(obj1 + "\\n" + obj2)
+    print(obj1)
+    print(obj2)
 else:
     print("Executed " + station)
 '''
@@ -262,11 +293,12 @@ class TestFailClosed(unittest.TestCase):
     """S3: Fail closed - malformed/missing reviews record review_parse_failed"""
 
     def test_missing_review_file_fails_closed_s3(self):
-        """S3: Missing review file records review_parse_failed and contributes zero reviews"""
+        """S3: Missing review file records review_file_missing and contributes zero reviews"""
         EXECUTOR_NO_OUTPUT = '''
 import sys
 packet_path = sys.argv[1]
-# Executor produces no output at all
+# Executor produces stdout but no review file
+print("Station executed but did not write review file")
 '''
         with tempfile.TemporaryDirectory() as tmp:
             proj = make_project(tmp)
@@ -281,13 +313,26 @@ packet_path = sys.argv[1]
 
             self.assertEqual(report.verdict, "no_reviews")
             env = json.loads((proj / "runs" / "wo-fail-001" / "envelopes" / "reviewer-spec.envelope.json").read_text())
-            self.assertTrue(env.get("review_parse_failed"))
+            self.assertTrue(env.get("review_file_missing"), "Should record review_file_missing when no file exists")
 
     def test_empty_review_file_fails_closed_s3(self):
         """S3: Empty review file records review_parse_failed and contributes zero reviews"""
         EXECUTOR_EMPTY = '''
 import sys
+from pathlib import Path
 packet_path = sys.argv[1]
+station = ""
+work_order_id = ""
+for line in open(packet_path, encoding="utf-8"):
+    if line.startswith("# Task packet:"):
+        station = line.split(":", 1)[1].strip()
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
+if station.startswith("reviewer"):
+    # Write empty file
+    review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+    review_path.parent.mkdir(parents=True, exist_ok=True)
+    review_path.write_text("")
 print("")
 '''
         with tempfile.TemporaryDirectory() as tmp:
@@ -309,7 +354,20 @@ print("")
         """S3: Malformed JSON records review_parse_failed and contributes zero reviews"""
         EXECUTOR_MALFORMED = '''
 import sys
+from pathlib import Path
 packet_path = sys.argv[1]
+station = ""
+work_order_id = ""
+for line in open(packet_path, encoding="utf-8"):
+    if line.startswith("# Task packet:"):
+        station = line.split(":", 1)[1].strip()
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
+if station.startswith("reviewer"):
+    # Write malformed JSON to file
+    review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+    review_path.parent.mkdir(parents=True, exist_ok=True)
+    review_path.write_text("{not valid json at all")
 print("{not valid json at all")
 '''
         with tempfile.TemporaryDirectory() as tmp:
@@ -328,7 +386,7 @@ print("{not valid json at all")
             self.assertTrue(env.get("review_parse_failed"))
 
     def test_prose_only_output_fails_closed_and_reports_shrinkage_s3(self):
-        """S3: Prose only output counts zero with review_parse_failed and decision states counted vs expected"""
+        """S3: Prose only output counts zero with review_file_missing and decision states counted vs expected"""
         EXECUTOR_PROSE = '''
 import sys
 packet_path = sys.argv[1]
@@ -337,6 +395,7 @@ for line in open(packet_path, encoding="utf-8"):
     if line.startswith("# Task packet:"):
         station = line.split(":", 1)[1].strip()
         break
+# Reviewer writes prose to stdout but no review file
 print("This is just prose. The spec looks good and passes all criteria.")
 print("No JSON review here, just natural language.")
 '''
@@ -353,7 +412,7 @@ print("No JSON review here, just natural language.")
 
             self.assertEqual(report.verdict, "no_reviews")
             env = json.loads((proj / "runs" / "wo-fail-004" / "envelopes" / "reviewer-spec.envelope.json").read_text())
-            self.assertTrue(env.get("review_parse_failed"))
+            self.assertTrue(env.get("review_file_missing"), "Prose-only output without file should be review_file_missing")
 
             # Verify decision rule states both counted and expected numbers
             decision = report.decision
@@ -373,31 +432,27 @@ class TestPlatform25Evidence(unittest.TestCase):
     """S4: Platform25 round 2 evidence shape counts as pass"""
 
     def test_example_object_before_real_review_counts_real_verdict_s4(self):
-        """S4: Output with example object plus real pass review counts as pass"""
+        """S4: Review file with multiple JSON objects fails to parse"""
         EXECUTOR_EXAMPLE_PLUS_REVIEW = '''
 import json, sys
+from pathlib import Path
 packet_path = sys.argv[1]
 station = ""
+work_order_id = ""
 for line in open(packet_path, encoding="utf-8"):
     if line.startswith("# Task packet:"):
         station = line.split(":", 1)[1].strip()
-        break
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
 if station.startswith("reviewer"):
-    # Simulate the platform25 evidence shape:
-    # An example object (like from a prompt) followed by the real review
-    print("Here's an example of what not to do:")
-    print(json.dumps({
-        "station": station,
-        "verdict": "changes_requested",
-        "findings": ["Example: Missing design system"]
-    }))
-    print("")
-    print("And here's the actual review:")
-    print(json.dumps({
-        "station": station,
-        "verdict": "pass",
-        "findings": []
-    }))
+    # Write file with multiple JSON objects - should NOT parse
+    review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+    review_path.parent.mkdir(parents=True, exist_ok=True)
+    example = json.dumps({"station": station, "verdict": "changes_requested", "findings": ["Example"]})
+    real = json.dumps({"station": station, "verdict": "pass", "findings": []})
+    review_path.write_text(example + "\\n\\n" + real)
+    print(example)
+    print(real)
 else:
     print("Executed " + station)
 '''
@@ -427,18 +482,21 @@ else:
         # examples in prompts don't matter.
         EXECUTOR_CLEAN_PASS = '''
 import json, sys
+from pathlib import Path
 packet_path = sys.argv[1]
 station = ""
+work_order_id = ""
 for line in open(packet_path, encoding="utf-8"):
     if line.startswith("# Task packet:"):
         station = line.split(":", 1)[1].strip()
-        break
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
 if station.startswith("reviewer"):
-    print(json.dumps({
-        "station": station,
-        "verdict": "pass",
-        "findings": []
-    }))
+    review_obj = {"station": station, "verdict": "pass", "findings": []}
+    review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+    review_path.parent.mkdir(parents=True, exist_ok=True)
+    review_path.write_text(json.dumps(review_obj))
+    print(json.dumps(review_obj))
 else:
     print("Executed " + station)
 '''
@@ -601,6 +659,11 @@ class TestPacketAndPromptContract(unittest.TestCase):
                             f"{station_name}/PROMPT.md should reference its own station id in Output Format")
 
         # Loopback L1 enhancement: Verify sections are identical (modulo station id)
+        # Exception: reviewer-design and reviewer-ux have extended formats for visual quality judgments
+        # (dual-section structure per quality standard work order wo-gh-15)
+        visual_reviewers = {"reviewer-design", "reviewer-ux"}
+        standard_reviewers = [r for r in expected_reviewers if r not in visual_reviewers]
+
         # Normalize each section by replacing the station-specific name with a placeholder
         normalized_sections = {}
         for station_name, section_text in sections.items():
@@ -609,20 +672,33 @@ class TestPacketAndPromptContract(unittest.TestCase):
             normalized = normalized.replace(station_name, "STATION_ID")
             normalized_sections[station_name] = normalized
 
-        # All normalized sections should be identical
-        normalized_values = list(normalized_sections.values())
-        reference_section = normalized_values[0]
-        reference_station = expected_reviewers[0]
+        # All standard (non-visual) reviewer sections should be identical
+        if len(standard_reviewers) > 1:
+            reference_section = normalized_sections[standard_reviewers[0]]
+            reference_station = standard_reviewers[0]
 
-        for i, station_name in enumerate(expected_reviewers[1:], 1):
-            self.assertEqual(
-                normalized_values[i],
-                reference_section,
-                f"{station_name}/PROMPT.md Output Format section should be identical to "
-                f"{reference_station}/PROMPT.md (except for station id). "
-                f"Loopback L1 requires 'the same section text and structure, with only the "
-                f"station id changed where the section names it.'"
-            )
+            for station_name in standard_reviewers[1:]:
+                self.assertEqual(
+                    normalized_sections[station_name],
+                    reference_section,
+                    f"{station_name}/PROMPT.md Output Format section should be identical to "
+                    f"{reference_station}/PROMPT.md (except for station id). "
+                    f"Loopback L1 requires 'the same section text and structure, with only the "
+                    f"station id changed where the section names it.'"
+                )
+
+        # Visual reviewers (reviewer-design, reviewer-ux) have extended dual-section format
+        # Verify they have the required dual-section structure keywords
+        for station_name in visual_reviewers:
+            if station_name in sections:
+                section_text = sections[station_name]
+                # Should mention dual-section structure for visual runs
+                self.assertIn("visual run", section_text.lower(),
+                            f"{station_name} should document visual run handling")
+                self.assertIn("compliance", section_text.lower(),
+                            f"{station_name} should mention compliance section")
+                self.assertIn("quality", section_text.lower(),
+                            f"{station_name} should mention quality section")
 
     def test_wrapper_restatement_matches_or_defers_to_canonical_packet_loopback_l2(self):
         """Loopback L2 completion: Wrapper must repeat canonical wording word-for-word OR defer without restating"""
@@ -753,17 +829,23 @@ class TestLoopbackRound2Compliance(unittest.TestCase):
 
         EXECUTOR_COMPLIANT_REVIEWERS = '''
 import json, sys
+from pathlib import Path
 packet_path = sys.argv[1]
 station = ""
+work_order_id = ""
 for line in open(packet_path, encoding="utf-8"):
     if line.startswith("# Task packet:"):
         station = line.split(":", 1)[1].strip()
-        break
+    if line.strip().startswith("- id:"):
+        work_order_id = line.split(":", 1)[1].strip()
 if station.startswith("reviewer"):
     # Compliant output: exactly one JSON object (with markdown fence allowed)
-    print("```json")
-    print(json.dumps({"station": station, "verdict": "pass", "findings": []}))
-    print("```")
+    review_obj = {"station": station, "verdict": "pass", "findings": []}
+    review_path = Path.cwd() / "runs" / work_order_id / f"{station}.review.json"
+    review_path.parent.mkdir(parents=True, exist_ok=True)
+    fenced_content = "```json\\n" + json.dumps(review_obj) + "\\n```"
+    review_path.write_text(fenced_content)
+    print(fenced_content)
 else:
     print("Executed " + station)
 '''
@@ -838,15 +920,15 @@ else:
             wo = WorkOrder(id="wo-l2-prose-001", kind="bug", title="Test prose fails closed")
             report = run_pipeline(proj, hotfix_pipe(reg), wo, registry=reg, executor=executor)
 
-            # Parser should fail closed on prose
+            # Parser should fail closed on prose (no file written = review_file_missing)
             self.assertEqual(report.verdict, "no_reviews")
 
-            # Check envelopes have review_parse_failed
+            # Check envelopes have review_file_missing (prose in stdout, no file written)
             for reviewer in ["reviewer-spec", "reviewer-security"]:
                 env_file = proj / "runs" / "wo-l2-prose-001" / "envelopes" / f"{reviewer}.envelope.json"
                 env = json.loads(env_file.read_text())
-                self.assertTrue(env.get("review_parse_failed"),
-                              f"{reviewer} should have review_parse_failed for prose output")
+                self.assertTrue(env.get("review_file_missing"),
+                              f"{reviewer} should have review_file_missing for prose stdout with no file")
 
 
 class TestRegressionSuite(unittest.TestCase):

@@ -295,3 +295,37 @@ def packet_learnings_section(project):
         lines.append(f"- {e['id']}: {e['claim']} "
                      f"(provenance: run {e['run']}, artifact {e['artifact']}, evidence {e['evidence']})")
     return "\n".join(lines)
+
+def packet_learnings_section_limited(project, max_chars):
+    """S1 trim rule 3: Render learnings section limited to most recent entries that fit.
+
+    Limits to the most recent learnings entries that fit within max_chars budget.
+    Returns "" when empty or when even one entry exceeds the budget.
+    """
+    entries = verified_learnings(project)
+    if not entries:
+        return ""
+
+    lines = ["## Verified learnings", ""]
+    base_size = len("\n".join(lines))
+
+    # Add entries in reverse order (most recent first) until budget is hit
+    included = []
+    current_size = base_size
+
+    for e in reversed(entries):
+        entry_line = (f"- {e['id']}: {e['claim']} "
+                     f"(provenance: run {e['run']}, artifact {e['artifact']}, evidence {e['evidence']})")
+        entry_size = len(entry_line) + 1  # +1 for newline
+
+        if current_size + entry_size <= max_chars:
+            included.insert(0, entry_line)  # Keep original order
+            current_size += entry_size
+        else:
+            break
+
+    if not included:
+        return ""
+
+    lines.extend(included)
+    return "\n".join(lines)

@@ -42,7 +42,18 @@ def init_project(path, name, description=None, contact=None):
     scaffold_design_system(root)
     (root / "tests").mkdir(exist_ok=True)
     (root / "reviews").mkdir(exist_ok=True)
-    (root / "anvil.json").write_text(json.dumps({"pipeline": "sdlc-default", "project": name}, indent=2) + "\n", encoding="utf-8")
+
+    # Create project configuration with metrics slot
+    config = {
+        "pipeline": "sdlc-default",
+        "project": name,
+        "metrics": {
+            "_comment": "Optional: Configure your application metrics endpoint and provider credentials here to connect your own metrics provider",
+            "endpoint": "",
+            "provider_key": ""
+        }
+    }
+    (root / "anvil.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
     (root / "anvil.yaml").write_text(render_anvil_yaml(STATION_IDS), encoding="utf-8")
     (root / "README.md").write_text(f"# {name}\n\nProject created with ANVIL. Pipeline: sdlc-default (see anvil.json). Station settings: see anvil.yaml. Specs live under .openspec/specs/.\n", encoding="utf-8")
     note = root / "PIPELINES.md"
@@ -94,7 +105,19 @@ def new_project(path, name, blueprint, idea="", description=None, contact=None):
     if idea:
         brain = root / "brain" / "project.md"
         brain.write_text(brain.read_text(encoding="utf-8") + f"\n## Idea\n{idea}\n", encoding="utf-8")
-    (root / "anvil.json").write_text(json.dumps({"pipeline": "greenfield", "project": name, "blueprint": blueprint["id"]}, indent=2) + "\n", encoding="utf-8")
+
+    # Create project configuration with metrics slot
+    config = {
+        "pipeline": "greenfield",
+        "project": name,
+        "blueprint": blueprint["id"],
+        "metrics": {
+            "_comment": "Optional: Configure your application metrics endpoint and provider credentials here to connect your own metrics provider",
+            "endpoint": "",
+            "provider_key": ""
+        }
+    }
+    (root / "anvil.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
     scaffold_design_system(root)
     for slug in blueprint["first_specs"]:
         scaffold_spec(root, slug, slug.replace("-", " ").title())

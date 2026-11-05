@@ -1,4 +1,4 @@
-import json, re
+import json, os, re, subprocess
 from pathlib import Path
 
 REVIEWER_STATIONS = ["reviewer-spec", "reviewer-security", "reviewer-tests", "reviewer-architecture"]
@@ -81,3 +81,363 @@ def disclosure_gate(project_dir, slug):
     if "ai generated" not in text and "ai-generated" not in text:
         return (False, "Draft has no AI generated disclosure")
     return (True, "Draft carries an AI generated disclosure")
+
+
+def _run_shell(command, cwd, work_order_id, timeout):
+    """Execute a shell command with timeout."""
+    env = dict(os.environ)
+    env["ANVIL_WORK_ORDER_ID"] = work_order_id
+    try:
+        proc = subprocess.run(command, shell=True, cwd=str(cwd), env=env,
+                              capture_output=True, text=True, timeout=timeout)
+        return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
+    except subprocess.TimeoutExpired:
+        return None, f"Timed out after {timeout}s"
+
+
+def derive_base_ref(project_dir, base_branch=None):
+    """Derive the base ref for a git repository.
+
+    Loopback round 3: When a run starts in a git repository and no explicit base
+    ref is supplied, derive it as the merge base of HEAD and the project's base
+    branch (defaulting to the repository's default branch).
+
+    Args:
+        project_dir: Path to project directory
+        base_branch: Name of the base branch (e.g., "main"). If None, uses repo default.
+
+    Returns:
+        Base ref SHA as a string, or None if not in a git repo or derivation fails.
+    """
+    try:
+        # Check if this is a git repo
+        result = subprocess.run(
+            ["git", "rev-parse", "--git-dir"],
+            cwd=str(project_dir),
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        if result.returncode != 0:
+            return None
+
+        # If no base_branch specified, get the repository's default branch
+        if not base_branch:
+            # Try to get the default branch from the remote
+            result = subprocess.run(
+                ["git", "symbolic-ref", "refs/remotes/origin/HEAD"],
+                cwd=str(project_dir),
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result.returncode == 0:
+                # Output is like "refs/remotes/origin/main", extract the branch name
+                base_branch = result.stdout.strip().split('/')[-1]
+            else:
+                # Fallback: try common default branch names
+                for candidate in ["main", "master"]:
+                    result = subprocess.run(
+                        ["git", "rev-parse", "--verify", f"refs/heads/{candidate}"],
+                        cwd=str(project_dir),
+                        capture_output=True,
+                        text=True,
+                        timeout=10
+                    )
+                    if result.returncode == 0:
+                        base_branch = candidate
+                        break
+
+            if not base_branch:
+                # Last resort: use HEAD itself
+                result = subprocess.run(
+                    ["git", "rev-parse", "HEAD"],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                if result.returncode == 0:
+                    return result.stdout.strip()
+                return None
+
+        # Find merge base of HEAD and base_branch
+        result = subprocess.run(
+            ["git", "merge-base", "HEAD", base_branch],
+            cwd=str(project_dir),
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        if result.returncode == 0:
+            return result.stdout.strip()
+
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        pass
+
+    return None
+
+
+def resolve_base_ref_config(project_dir, base_ref=None, config_filename="anvil.json"):
+    """Resolve project configuration from base ref using git.
+
+    S4 requirement: check commands and protected paths are resolved from the base
+    ref snapshot taken at run start, never from files the builder changed during
+    the run. This function reads the configuration from the git base ref when
+    available, falling back to the working tree file only when git is not present.
+
+    Args:
+        project_dir: Path to project directory
+        base_ref: Git ref to resolve from (e.g., commit SHA). If None, reads from working tree.
+        config_filename: Name of the config file (default: "anvil.json")
+
+    Returns:
+        Dict with configuration, or empty dict if config cannot be read.
+    """
+    project_path = Path(project_dir)
+    config_file = project_path / config_filename
+
+    # If base_ref is provided, try to resolve from git
+    if base_ref:
+        try:
+            # Check if this is a git repo
+            result = subprocess.run(
+                ["git", "rev-parse", "--git-dir"],
+                cwd=str(project_dir),
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result.returncode == 0:
+                # Read config from base ref using git show
+                result = subprocess.run(
+                    ["git", "show", f"{base_ref}:{config_filename}"],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                if result.returncode == 0:
+                    try:
+                        return json.loads(result.stdout)
+                    except json.JSONDecodeError:
+                        pass
+        except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+            pass
+
+    # Fallback: read from working tree file
+    # This fallback is only safe for projects without a git repo
+    if config_file.exists():
+        try:
+            return json.loads(config_file.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    return {}
+
+
+def _get_base_ref_files(project_dir, base_ref):
+    """Get set of files that existed in the base ref.
+
+    Args:
+        project_dir: Path to project directory
+        base_ref: Git ref to resolve from (if None, tries to infer from git)
+
+    Returns:
+        Set of file paths that existed in base ref, or empty set if can't determine.
+    """
+    try:
+        # Check if this is a git repo
+        result = subprocess.run(
+            ["git", "rev-parse", "--git-dir"],
+            cwd=str(project_dir),
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        if result.returncode == 0:
+            # If no base_ref provided, try to infer it
+            ref_to_use = base_ref
+            if not ref_to_use:
+                # Try HEAD (last commit on current branch)
+                result = subprocess.run(
+                    ["git", "rev-parse", "HEAD"],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                if result.returncode == 0:
+                    ref_to_use = result.stdout.strip()
+
+            if ref_to_use:
+                # Get list of files in base ref
+                result = subprocess.run(
+                    ["git", "ls-tree", "-r", "--name-only", ref_to_use],
+                    cwd=str(project_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                if result.returncode == 0:
+                    return {line.strip() for line in result.stdout.split('\n') if line.strip()}
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        pass
+
+    return set()
+
+
+def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_id, timeout=300, base_ref=None, basis="builder_delta", attempt=None):
+    """Run the checks gate: execute check commands and validate protected paths.
+
+    Loopback round 2 semantics: The protected path check judges only the builder
+    station's changes for the current attempt (the working tree delta across the
+    builder execution). A violation is the builder modifying or deleting a base ref
+    file under a protected prefix. Builder additions are recorded as observed
+    additions, not violations. Each attempt is judged on its own delta.
+
+    Args:
+        phase: "pre-review" or "pre-deploy"
+        base_ref_config: Configuration dict resolved from base ref
+        changed_files: Set of changed file paths relative to project root (builder's delta)
+        project_dir: Path to project directory
+        work_order_id: Work order ID for logging
+        timeout: Timeout in seconds for each check command
+        base_ref: Git ref that the work branched from (for determining base ref files)
+        basis: Description of what files are being judged (e.g., "builder_delta")
+        attempt: Attempt number being judged (optional)
+
+    Returns:
+        Dict with gate results including status, commands, exit_codes,
+        protected_path_verdict, gate_verdict, basis, observed_additions, and output.
+    """
+    checks = base_ref_config.get("checks", [])
+
+    # Get protected paths from base ref config
+    # Default includes the checks configuration file path and tests/
+    if "protected_paths" in base_ref_config:
+        protected_paths = base_ref_config["protected_paths"]
+    else:
+        # Default protected paths: tests/ and the configuration file itself
+        # The config file path comes from the project structure, not hardcoded
+        config_file_name = "anvil.json"  # Standard config file name
+        protected_paths = ["tests/", config_file_name]
+
+    # Build basis description
+    basis_str = f"{basis}" + (f" (attempt {attempt})" if attempt else "")
+
+    # If no checks configured (S6)
+    if not checks:
+        return {
+            "phase": phase,
+            "status": "not_configured",
+            "detail": "No checks configured",
+            "commands": [],
+            "exit_codes": [],
+            "protected_paths": protected_paths,
+            "protected_path_verdict": "pass",
+            "protected_path_findings": [],
+            "observed_additions": [],
+            "gate_verdict": "not_configured",
+            "basis": basis_str,
+            "output": ""
+        }
+
+    # Get base ref files to distinguish additions from modifications/deletions
+    base_ref_files = _get_base_ref_files(project_dir, base_ref)
+
+    # Check for protected path violations (Loopback round 2)
+    # Violations: builder modifying or deleting a base ref file under a protected path
+    # Observed: builder adding a new file under a protected path (not a violation)
+    protected_path_findings = []
+    observed_additions = []
+
+    for changed_file in changed_files:
+        # Check if file is under a protected path
+        is_protected = False
+        matched_prefix = None
+        for protected_path in protected_paths:
+            if changed_file.startswith(protected_path):
+                is_protected = True
+                matched_prefix = protected_path
+                break
+
+        if is_protected:
+            # Determine if this is an addition or modification/deletion
+            if changed_file in base_ref_files:
+                # Modification or deletion of existing base ref file -> VIOLATION
+                protected_path_findings.append(
+                    f"Protected path violation: {changed_file} (base ref file modified/deleted, matches {matched_prefix})")
+            else:
+                # Addition of new file -> OBSERVED, not a violation
+                observed_additions.append(
+                    f"Protected path addition (observed): {changed_file} (matches {matched_prefix})")
+
+    protected_path_verdict = "fail" if protected_path_findings else "pass"
+
+    # Run check commands
+    commands = []
+    exit_codes = []
+    outputs = []
+
+    for check_cmd in checks:
+        commands.append(check_cmd)
+        code, out = _run_shell(str(check_cmd), project_dir, work_order_id, timeout)
+        exit_codes.append(code if code is not None else -1)
+        outputs.append(out)
+
+    # Determine overall gate verdict
+    checks_passed = all(code == 0 for code in exit_codes)
+
+    if protected_path_verdict == "fail":
+        gate_verdict = "fail"
+        status = "failed"
+    elif not checks_passed:
+        gate_verdict = "fail"
+        status = "failed"
+    else:
+        gate_verdict = "pass"
+        status = "passed"
+
+    # Build output summary
+    output_lines = []
+    output_lines.append(f"# Checks Gate: {phase}")
+    output_lines.append(f"Basis: {basis}")
+    if attempt is not None:
+        output_lines.append(f"Attempt: {attempt}")
+    output_lines.append("")
+
+    if protected_path_findings:
+        output_lines.append("# Protected Path Violations")
+        output_lines.extend(protected_path_findings)
+        output_lines.append("")
+
+    if observed_additions:
+        output_lines.append("# Protected Path Additions (Observed, Not Violations)")
+        output_lines.extend(observed_additions)
+        output_lines.append("")
+
+    output_lines.append("# Check Commands")
+    for i, (cmd, code, out) in enumerate(zip(commands, exit_codes, outputs)):
+        output_lines.append(f"## Command {i+1}: {cmd}")
+        output_lines.append(f"Exit code: {code}")
+        output_lines.append("Output:")
+        output_lines.append("```")
+        output_lines.append(out[-2000:] if out else "(no output)")
+        output_lines.append("```")
+        output_lines.append("")
+
+    return {
+        "phase": phase,
+        "status": status,
+        "detail": f"Gate {status}: {len(checks)} checks, protected paths: {protected_path_verdict}",
+        "commands": commands,
+        "exit_codes": exit_codes,
+        "protected_paths": protected_paths,
+        "protected_path_verdict": protected_path_verdict,
+        "protected_path_findings": protected_path_findings,
+        "observed_additions": observed_additions,
+        "gate_verdict": gate_verdict,
+        "basis": basis_str,
+        "output": "\n".join(output_lines)
+    }

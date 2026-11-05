@@ -1,0 +1,1 @@
+Created the observation report at `runs/wo-gh-7/observer.output.md`. The observer station cannot proceed because the deployer hasn't executed yet - there's no release record to observe. The report documents this missing input per the station rules.

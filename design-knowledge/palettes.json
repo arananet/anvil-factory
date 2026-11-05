@@ -1,0 +1,46 @@
+{
+  "dashboard": [
+    {
+      "name": "metrics-blue",
+      "colors": [
+        {"name": "primary", "hex": "#1E40AF"},
+        {"name": "accent", "hex": "#3B82F6"},
+        {"name": "success", "hex": "#10B981"},
+        {"name": "warning", "hex": "#F59E0B"},
+        {"name": "error", "hex": "#EF4444"}
+      ]
+    },
+    {
+      "name": "data-neutral",
+      "colors": [
+        {"name": "primary", "hex": "#374151"},
+        {"name": "accent", "hex": "#6366F1"},
+        {"name": "success", "hex": "#059669"},
+        {"name": "warning", "hex": "#D97706"},
+        {"name": "error", "hex": "#DC2626"}
+      ]
+    }
+  ],
+  "mobile-app": [
+    {
+      "name": "vibrant-primary",
+      "colors": [
+        {"name": "primary", "hex": "#7C3AED"},
+        {"name": "accent", "hex": "#A78BFA"},
+        {"name": "background", "hex": "#F9FAFB"},
+        {"name": "text", "hex": "#111827"}
+      ]
+    }
+  ],
+  "marketing-site": [
+    {
+      "name": "brand-bold",
+      "colors": [
+        {"name": "primary", "hex": "#DB2777"},
+        {"name": "secondary", "hex": "#F472B6"},
+        {"name": "accent", "hex": "#FCD34D"},
+        {"name": "background", "hex": "#FFFFFF"}
+      ]
+    }
+  ]
+}

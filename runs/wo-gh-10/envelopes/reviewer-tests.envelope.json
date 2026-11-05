@@ -1,0 +1,20 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-tests",
+  "to_station": "reviewer-architecture",
+  "work_order_id": "wo-gh-10",
+  "artifact_path": "runs/wo-gh-10/reviewer-tests.output.md",
+  "status": "executed",
+  "created_at": "2026-11-04T03:41:24.186936+00:00",
+  "review": {
+    "station": "reviewer-tests",
+    "verdict": "pass",
+    "findings": []
+  },
+  "configured_model": "review-cheap",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
+}

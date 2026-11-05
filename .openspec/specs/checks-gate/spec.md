@@ -1,0 +1,62 @@
+# Deterministic Checks Gate
+
+Status: approved
+Slug: checks-gate
+
+## Roles
+- implementer: builds the change described here
+- reviewer: checks the change against this spec
+- qa: checks the scenarios below with tests
+- product_owner: owns the purpose and accepts the result
+
+## Purpose
+Reviewers judge work, but nothing in the line first proves the work simply passes the project's own checks, and nothing stops a branch from quietly editing the checks it will be judged by. This spec adds a deterministic gate to the runner: a whole-suite check that runs before any reviewer sees the work, takes its check definitions from the base ref rather than the work branch, refuses branches that touch protected paths, and runs again before anything is deployed or published. The gate is a machine verdict, not a model opinion: the project's configured commands exit zero or they do not.
+
+## Requirements
+- Project configuration declares the checks: an ordered list of commands (the project's test and build commands) in the project config, plus a protected paths list. When a project declares no checks, the gate records itself as not configured and the run proceeds as today; the absence is visible in the report, never silent.
+- Protected paths default to the checks configuration itself and the project's tests directory (tests/). A project may extend or replace the list in its config. Paths are matched as prefixes of repo relative paths.
+- The pre-review gate runs after the builder station completes and before the parallel reviewer stage. The check commands and the protected path list are resolved from the base ref state of the project (the state the work order branched from, as recorded at run start), never from files the builder may have changed during the run. The runner snapshots the base ref check configuration at run start and the gate uses that snapshot.
+- A gate failure (any check command exits non zero, or the run's changed file list touches a protected path) returns the work to the builder with the gate log attached to the builder feedback, and no reviewer station is spawned for that attempt. A gate failure consumes a loopback exactly like a reviewer changes_requested does, and the run's max loopbacks still bound the total.
+- The gate runs a second time after any merge sync and before the deployer or publisher station executes. A failure at that point stops the run before deploy or publish and is recorded as the run's blocking reason.
+- The changed file list for protected path checks is the set of files the run has written or modified relative to the base ref snapshot, tracked by the runner the same way it tracks station outputs. Deleting a protected file counts as touching it.
+- Every gate run is recorded in the run report: when it ran (pre-review or pre-deploy), the commands run, each exit code, the protected path verdict, and the overall gate verdict. The swimlane shows the gate as its own step so a reader can see it without opening the report JSON.
+- This gate complements the scenario-to-test gates, it does not replace or duplicate them: those gates map spec scenarios to tests; this gate is the project's whole-suite exit code plus the protected path rule.
+
+## Scenarios
+
+### Scenario: Passing checks let the reviewers run
+- S1: Given a project whose configured checks all exit zero and a builder output that touches no protected path, when the pre-review gate runs, then the gate verdict is pass, the reviewer stage is spawned, and the run report records the gate with its commands and exit codes.
+
+### Scenario: Failing checks return the work to the builder and no reviewer is spawned
+- S2: Given a project whose configured checks exit non zero, when the pre-review gate runs, then no reviewer station executes for that attempt, the work returns to the builder with the gate log in the builder feedback, the loopback counter increases by one, and the report records the gate failure with the failing command and its exit code.
+
+### Scenario: A branch that touches a protected path fails the gate automatically
+- S3: Given a run whose changed files include a path under a protected prefix (by default the checks configuration or anything under tests/), when the gate runs, then the gate verdict is fail with a protected path finding naming the path, regardless of the check commands' exit codes, and the reviewer stage is not spawned.
+
+### Scenario: Check definitions come from the base ref, not the work branch
+- S4: Given a builder output that modifies the project's checks configuration on the work branch, when the gate resolves which commands to run, then it runs the commands from the base ref snapshot taken at run start, and the modification itself is reported through the protected path rule.
+
+### Scenario: The gate runs again before deploy or publish
+- S5: Given a run that passed review and reaches the deployer or publisher station after a merge sync, when the pre-deploy gate runs and any check fails, then the deployer or publisher station does not execute and the run report records the gate failure as the blocking reason; and given all checks pass, then the deploy or publish step proceeds.
+
+### Scenario: A project with no checks configured records the gate as not configured
+- S6: Given a project with no checks in its configuration, when a run executes, then the report records the gate as not configured, the run proceeds through the reviewer stage as it does today, and no gate failure is recorded.
+
+## Loopback round (2026-11-01)
+
+The gate loopback closes the round 1 findings. Two clarifications this round makes binding:
+
+- S4 means resolution from the base ref itself: the runner records the base ref at run start and reads the check commands and protected paths from that ref's snapshot through git where a repo is present. Reading the working tree file at run start does not satisfy S4, because the working tree at run start is the work branch tip, not the base ref state the work order branched from.
+- A regression test must prove S4 by mutating the checks configuration after the base ref is recorded, once as an uncommitted working tree change and once as a commit on top of the base, and showing the gate runs the base ref commands in both cases.
+
+## Loopback round 2 (2026-11-02)
+
+The second loopback closes one finding, produced by the loopback round's own executed run (Actions run 41576137718). In that run the S4 fix, the pure checks_gate function, the docs, the CHANGELOG entry and the station kind alignment all landed, the configured check command passed (137 tests, exit 0), and the gate still failed the run: its protected path check counted tests/test_checks_gate.py and tests/test_gates.py, both written by the run's own test-writer station from this spec, as protected touches. Reviewers never spawned and the verdict was no_reviews. Under a run cumulative reading of changed files, no run of the sdlc line can ever pass this gate, because the test-writer writes the scenario tests under tests/ on every run before the builder starts; S1 (passing checks let the reviewers run) would be unreachable for any tested work. One clarification this round makes binding:
+
+- In S3 and in the changed file requirement, "changed files" means the builder station's changes for the current attempt: the files the builder created, modified or deleted, measured by the runner as the working tree delta across the builder station's execution. The test-writer's output is part of the judging apparatus (it is written from the spec before the builder runs and is itself judged by reviewer-tests), so test-writer writes never count as protected touches. The threat model is unchanged: what judges the work cannot be altered by the work under review. The builder still fails the gate if it modifies or deletes a base ref file under a protected prefix (an existing test, the checks configuration, a pipeline definition), and check commands and protected paths still resolve from the base ref snapshot per S4. Pure additions by the builder are recorded in the gate output as observed additions; a builder modification or deletion of a base ref protected file is the violation. Each builder attempt is judged on its own delta, so a loopback attempt is not failed by an earlier attempt's writes. The pre-deploy gate (S5) applies the same builder delta basis and re-runs the commands. The gate output records the basis it judged (builder delta, attempt number) alongside the protected path verdict.
+
+## Loopback round 3 (2026-11-02)
+
+The verification run (Actions run 41579344085) was the first run judged by the round 2 gate: the gate passed on the builder delta basis, all five reviewers executed, and reviewer-security's executed output raised one critical finding, verified by the operator against the tree: the S4 control is not wired through the execution path the factory actually uses. anvil/cli.py calls run_pipeline without a base_ref argument, run_pipeline defaults base_ref to None, and resolve_base_ref_config reads the working tree file when base_ref is None. The module level regression tests pass because they inject base_ref directly; no CLI driven run ever supplies one, so on the real path the check commands and protected paths come from the working tree at run start, which is the branch tip state S4 exists to distrust. One clarification this round makes binding:
+
+- S4 binds the CLI execution path, not only the module API. When a run starts in a git repository and no explicit base ref is supplied, the runner records the base ref at run start as the merge base of HEAD and the project's base branch (a new optional base_branch key in the project configuration, defaulting to the repository's default branch), resolves the check commands and protected paths from that ref through git, and records the base ref it used in the run report so the provenance is auditable. A --base-ref option on the run command overrides the derivation. The working tree read remains only as the documented fallback for projects with no git repository, and it is never used when a git repository is present. A regression test must prove the property through the CLI entry path (invoking the run command's own argument handling, not run_pipeline with an injected argument): in a scratch git repo whose base branch carries a known checks configuration, a work branch that first modifies the configuration in the working tree and then commits a modified configuration on top of the base must still be judged by the base ref commands, with the tamper reported through the protected path rule.
