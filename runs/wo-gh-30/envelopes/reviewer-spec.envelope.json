@@ -1,0 +1,27 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-spec",
+  "to_station": "reviewer-security",
+  "work_order_id": "wo-gh-30",
+  "artifact_path": "runs/wo-gh-30/reviewer-spec.output.md",
+  "status": "executed",
+  "created_at": "2026-11-05T03:20:22.382296+00:00",
+  "review": {
+    "station": "reviewer-spec",
+    "verdict": "pass",
+    "findings": [
+      "S1/R2 (upstream steps): intake, spec-writer, test-writer envelopes show configured_model == executed_model == claude-sonnet-5-5; builder envelope shows configured_model == executed_model == openai/gpt-6.1-sol. All executed_model values are present (no null self-report).",
+      "S2/R3/R6: work order carries surfaces [ui], so builder openai/gpt-6.1-sol is the correct policy assignment, not a disagreement. tests/test_model_migration_verification.py encodes UI builder = openai/gpt-6.1-sol and non-UI builder = claude-opus-5-5, with a negative test rejecting wrong values; round 1 defect is corrected.",
+      "S4: no tier label appears as configured_model in any envelope. routing.json selected_models holds tier labels (review-cheap for reviewer-spec/tests, review-balanced for design/ux) as routing input only; resolution to concrete models at hand-off is not yet evidenced for reviewer steps, since reviewer envelopes are written after this review.",
+      "S6/R1: builder output states no repository files changed; git status shows only untracked spec, test and work-order files, which come from the spec-writer, test-writer and intake stations, not the builder.",
+      "S7: checks-gate pre-review passed (exit 0, full suite, 592 tests, 6 skipped).",
+      "Not verifiable from my inputs: S3 (reviewer-design/reviewer-ux execution on Codex and counted review files) and the reviewer-step configured/executed models are produced after this review. The runner must confirm them from the final run report. This is not a failure of the implementation against the spec."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}

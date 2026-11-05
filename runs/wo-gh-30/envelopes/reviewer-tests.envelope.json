@@ -1,0 +1,27 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-tests",
+  "to_station": "reviewer-architecture",
+  "work_order_id": "wo-gh-30",
+  "artifact_path": "runs/wo-gh-30/reviewer-tests.output.md",
+  "status": "executed",
+  "created_at": "2026-11-05T03:20:42.052039+00:00",
+  "review": {
+    "station": "reviewer-tests",
+    "verdict": "pass",
+    "findings": [
+      "Tests are real and mapped: tests/test_model_migration_verification.py (6 tests) maps to spec model-migration-verification R2/R3/R5/R6 and scenarios S1, S2, S4, S5 via test names and docstring; all 6 pass when run with unittest (pytest is not installed in this environment).",
+      "R6 correction is in place: builder policy is encoded as claude-opus-5-5 on non-UI work and openai/gpt-6.1-sol on UI work, asserting configured_model and executed_model both equal the assignment. test_wrong_builder_value_is_rejected_s2 guards against the round 1 defect.",
+      "S5 is covered: a silent runtime leaves executed_model null. Tier labels are asserted absent from configured_model (S4). The test drives the real runner with the standing anvil.yaml overrides, and the fake runtime self-reports the model it was handed.",
+      "Full suite on current main: checks-gate output records 592 tests OK (6 skipped), including the readme showcase link test, so S7 is satisfied.",
+      "Run evidence agrees with policy: builder configured/executed openai/gpt-6.1-sol (correct for the ui surface); intake, spec-writer, test-writer and reviewer-spec are claude-sonnet-5-5 on both sides. No file changes are visible beyond the test-writer's spec, test and work order files, so S6 holds.",
+      "Minor limitation, not a failure: the test omits intake from the per-step agreement check (the fake runtime does not self-report for intake) and does not exercise reviewer-design/reviewer-ux Codex execution (S3). Those depend on the live run's envelopes, which are not yet written at this point in the run."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}
