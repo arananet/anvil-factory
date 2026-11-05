@@ -2,9 +2,6 @@
 Basis: builder_delta
 Attempt: 1
 
-# Protected Path Additions (Observed, Not Violations)
-Protected path addition (observed): tests/test_model_migration_verification.py (matches tests/)
-
 # Check Commands
 ## Command 1: python -m unittest discover -s tests -p 'test_*.py'
 Exit code: 0
@@ -30,15 +27,15 @@ hint: 	git branch -m <name>
 hint:
 hint: Disable this message with "git config set advice.defaultBranchName false"
 Switched to a new branch 'work-branch'
-.............................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 34725)>
+.............................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 43097)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-.../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 34517)>
+.../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 36987)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 .......................................................................................ss..........................................................................................................................................s......s......s......................................................................................................s..........................................................
 ----------------------------------------------------------------------
-Ran 592 tests in 100.322s
+Ran 592 tests in 104.245s
 
 OK (skipped=6)
 

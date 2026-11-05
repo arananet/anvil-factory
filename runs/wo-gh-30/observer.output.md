@@ -1,13 +1,9 @@
-I wrote the observation report to `runs/wo-gh-30/observer.output.md`. It says there is nothing to observe, because no release record exists. The deployer step is `packet_ready` and nothing was released.
+I wrote the observation report to `runs/wo-gh-30/observer.output.md`.
 
-- **Missing inputs:** `runs/wo-gh-30/report.json` is also absent, though the approver and triage-human envelopes point to it. The observer has no envelope yet either.
-- **reviewer-ux failed:** `codex_station` exited 3 with empty output and `executed_model` is null. The work order counts that as a fail.
-- **Conflicting reviewer-ux evidence:** a `reviewer-ux.review.json` with verdict `changes_requested` exists even though the step failed. The report says not to count it until that is explained.
-- **Routes that agree:** configured and executed models match for intake, spec-writer and test-writer (claude-sonnet-5-5). They also match for builder and reviewer-design (openai/gpt-6.1-sol, correct for the UI surface).
-- **Not fully checked:** I did not read the model fields in the reviewer-spec and reviewer-tests envelopes, so the report marks those two as unconfirmed.
-- **reviewer-design:** it requested changes for low text contrast and small mobile touch targets.
-- **Checks gate:** it passed, with 592 tests OK and 6 skipped.
-- **Not verified:** I did not re-run the suite, the route smoke script or the status page.
+- **No release happened.** The deployer envelope has status `packet_ready`, and there is no release record, so there was nothing to observe.
+- **The `reviewer-design` route failed.** Its envelope shows `executed_model: null`. The error is "codex_station: reviewer reviewer-design changed files outside its review file: runs/wo-gh-30/reviewer-design.output.md". The configured model was `openai/gpt-6.1-sol`.
+- **Two design findings exist, but I did not count them as a review.** `reviewer-design.review.json` says `changes_requested`. One finding is APPROVED-badge contrast of 3.10:1 against the required 4.5:1. The other is missing 44x44px touch targets on mobile work-order links. They may have been written despite the failed envelope.
+- **Not checked:** I didn't compare the other stations' `executed_model` values against the migration policy.
 
-The report lists three things needed to finish observing: a release record, the final run report, and a clean reviewer-ux re-run or an explanation of the stray review file.
+The report's next step is to fix the Codex guard that rejected the output file, then re-run. The design findings need a separate decision.
 {"model": "claude-sonnet-5-5"}

@@ -1,18 +1,19 @@
 {
   "station": "reviewer-ux",
-  "verdict": "changes_requested",
+  "verdict": "fail",
   "compliance": {
-    "verdict": "changes_requested",
+    "verdict": "fail",
     "findings": [
-      "Accessibility / visibility of system state: status/index.html identifies the current lifecycle stage only through .stage-current background color and font weight. Both supplied screenshots show APPROVED highlighted, but the markup exposes the same sequence of stage names for every work order without identifying which is current. Add visible current-stage text and an accessible equivalent (for example, aria-current=\"step\") so screen-reader users and users who cannot distinguish the highlight can identify progress.",
-      "Accessibility: design/DESIGN.md requires mobile touch targets of at least 44x44px. In status/index.html, .board-wo-id links are inline 15px text with no target padding; runs/wo-gh-30/evidence/screenshot-390x844.png shows these small work-order links as the entry points to details. Expand each link target to at least 44x44px.",
-      "Route verification: all available executed station envelopes in runs/wo-gh-30/envelopes/ have matching configured_model and executed_model: intake, spec-writer, test-writer, reviewer-spec and reviewer-tests use claude-sonnet-5-5; builder and reviewer-design use openai/gpt-6.1-sol. The UI builder assignment follows the operator ruling. reviewer-security and reviewer-architecture are explicitly routed out. No upstream route failure or missing self-report is evidenced. This review is written through the agentic Codex runtime; its completion envelope and observer execution must be confirmed in the final run report, which is not available at this sequential review point."
+      "Work-order verification fails: runs/wo-gh-30/envelopes/reviewer-design.envelope.json (2026-11-05T03:31:26Z) records status failed, configured_model openai/gpt-6.1-sol and executed_model null. Its error is exit 8: reviewer-design changed files outside its review file, naming runs/wo-gh-30/reviewer-design.output.md. tools/codex_station.py writes output_path before comparing the tree against an allowlist containing only the review file. Correct the wrapper bookkeeping and rerun to obtain a successful envelope, runtime self-report and counted review. The older report.json does not supersede this newer failure.",
+      "Accessibility: work-order navigation links in status/index.html (.board-wo-id) have 15px text without padding or minimum target dimensions. In runs/wo-gh-30/evidence/screenshot-390x844.png, the small ID alone is clickable. Provide at least 44x44px targets as required by design/DESIGN.md Responsive Behavior.",
+      "Task completion on mobile: status/index.html hides the Cost and Artifacts columns at widths up to 768px without an alternate disclosure. Mobile users cannot inspect artifact paths available on desktop. Preserve access through a details control or responsive station cards.",
+      "Evidence limitation: the existing reviewer-ux envelope predates this execution and records a prior failure; this invocation cannot establish its own final envelope or counted-review status. The runner must verify both after collecting this review."
     ]
   },
   "quality": {
     "verdict": "pass",
     "findings": [
-      "Reviewed runs/wo-gh-30/evidence/screenshot-1440x900.png and screenshot-390x844.png alongside status/index.html. The snapshot notice explains freshness and regeneration, work-order labels identify detail destinations, and lifecycle labels wrap on mobile. The physical_product charter criteria (materials, light, contact and physical scale) do not apply to this status interface; no physical product is depicted and no reference anchors were supplied."
+      "Both supplied screenshots were reviewed. The status dashboard clearly identifies itself as a dated snapshot and provides work-order links to station details. The physical-product charter criteria for materials, light, contact and scale have no applicable subject in this interface; no applicable charter-floor violation is evidenced."
     ],
     "anchor": "charter floor only"
   }

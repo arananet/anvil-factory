@@ -1,2 +1,1 @@
-{"station":"reviewer-design","verdict":"changes_requested","review_file":"runs/wo-gh-30/reviewer-design.review.json"}
-{"model": "openai/gpt-6.1-sol"}
+{"station":"reviewer-design","verdict":"changes_requested","compliance":{"verdict":"changes_requested","findings":["APPROVED badges have 3.10:1 text contrast, below the required 4.5:1. See status/index.html and both supplied screenshots. Adjust foreground/background colors.","Mobile work-order links lack the required 44x44px touch targets. See .board-wo-id in status/index.html and screenshot-390x844.png. Add minimum target dimensions."]},"quality":{"verdict":"pass","findings":["Physical-product charter criteria do not apply to the depicted status dashboard."],"anchor":"charter floor only"}}

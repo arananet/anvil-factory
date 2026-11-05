@@ -29,9 +29,9 @@ Surfaces: ui
 
 ## Verdict
 
-Verdict: changes_requested
+Verdict: rejected
 
-Reviewer reviewer-design requested changes. (Counted 3 reviews, expected 4.)
+Reviewer reviewer-ux returned fail. (Counted 3 reviews, expected 4.)
 
 ## Steps
 
@@ -44,8 +44,8 @@ Reviewer reviewer-design requested changes. (Counted 3 reviews, expected 4.)
 - reviewer-security: routed_out
 - reviewer-tests: executed
 - reviewer-architecture: routed_out
-- reviewer-design: executed
-- reviewer-ux: failed
+- reviewer-design: failed
+- reviewer-ux: executed
 - approver: completed
 - approver: loopback
 - triage-human: completed

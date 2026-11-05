@@ -5,17 +5,16 @@
   "work_order_id": "wo-gh-30",
   "artifact_path": "runs/wo-gh-30/reviewer-spec.output.md",
   "status": "executed",
-  "created_at": "2026-11-05T03:20:22.382296+00:00",
+  "created_at": "2026-11-05T03:29:36.604804+00:00",
   "review": {
     "station": "reviewer-spec",
     "verdict": "pass",
     "findings": [
-      "S1/R2 (upstream steps): intake, spec-writer, test-writer envelopes show configured_model == executed_model == claude-sonnet-5-5; builder envelope shows configured_model == executed_model == openai/gpt-6.1-sol. All executed_model values are present (no null self-report).",
-      "S2/R3/R6: work order carries surfaces [ui], so builder openai/gpt-6.1-sol is the correct policy assignment, not a disagreement. tests/test_model_migration_verification.py encodes UI builder = openai/gpt-6.1-sol and non-UI builder = claude-opus-5-5, with a negative test rejecting wrong values; round 1 defect is corrected.",
-      "S4: no tier label appears as configured_model in any envelope. routing.json selected_models holds tier labels (review-cheap for reviewer-spec/tests, review-balanced for design/ux) as routing input only; resolution to concrete models at hand-off is not yet evidenced for reviewer steps, since reviewer envelopes are written after this review.",
-      "S6/R1: builder output states no repository files changed; git status shows only untracked spec, test and work-order files, which come from the spec-writer, test-writer and intake stations, not the builder.",
-      "S7: checks-gate pre-review passed (exit 0, full suite, 592 tests, 6 skipped).",
-      "Not verifiable from my inputs: S3 (reviewer-design/reviewer-ux execution on Codex and counted review files) and the reviewer-step configured/executed models are produced after this review. The runner must confirm them from the final run report. This is not a failure of the implementation against the spec."
+      "S1/R2: intake, spec-writer, test-writer envelopes show configured_model == executed_model == claude-sonnet-5-5, with executed_model self-reported by the runtime. No tier labels appear as configured_model (S4).",
+      "S2/R3: the work order carries a UI surface, so the builder is openai/gpt-6.1-sol. The builder envelope shows configured_model openai/gpt-6.1-sol and executed_model gpt-6.1-sol, which is the Codex runtime's bare-name self-report of the same model, not a disagreement. The builder self-report line in builder.output.md reads {\"model\":\"gpt-6.1-sol\"}.",
+      "S6/R1: builder.output.md reports no files changed. The only tree changes outside runs/ are none; the runs/wo-gh-30 changes are runner-written run records.",
+      "S7: checks-gate envelope status is passed with exit code 0 for the full unittest discover suite, with no protected-path findings.",
+      "Out of scope for this review: S3 (reviewer-design and reviewer-ux on Codex) has not yet been judged at this station. The existing reviewer-ux envelope on disk is stale, a failed round 2 attempt with executed_model null. It must be superseded by the re-fire. If it stays failed, S5 and R5 make that route a fail for the reviewer-ux step."
     ]
   },
   "configured_model": "claude-sonnet-5-5",

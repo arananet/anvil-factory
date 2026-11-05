@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 4777.848,
+      "duration_ms": 3116.423,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-30/intake.output.md"
@@ -27,7 +27,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-30/spec-writer.output.md",
-      "duration_ms": 31127.646,
+      "duration_ms": 17905.249,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-30/spec-writer.output.md"
@@ -46,7 +46,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-30/test-writer.output.md",
-      "duration_ms": 162100.185,
+      "duration_ms": 75110.3,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-30/test-writer.output.md"
@@ -65,13 +65,13 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-30/builder.output.md",
-      "duration_ms": 121158.741,
+      "duration_ms": 109579.856,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-30/builder.output.md"
       ],
       "configured_model": "openai/gpt-6.1-sol",
-      "executed_model": "openai/gpt-6.1-sol",
+      "executed_model": "gpt-6.1-sol",
       "executor": {
         "kind": "command",
         "detail": "python3"
@@ -84,7 +84,7 @@
       "station": "checks-gate",
       "status": "passed",
       "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 100484.574,
+      "duration_ms": 104420.969,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-30/checks-gate.pre-review.output.md"
@@ -115,7 +115,7 @@
       "station": "reviewer-spec",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-30/reviewer-spec.output.md",
-      "duration_ms": 19275.38,
+      "duration_ms": 18820.732,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-30/reviewer-spec.output.md"
@@ -134,7 +134,7 @@
       "station": "reviewer-security",
       "status": "routed_out",
       "detail": "Routed out: Routed out by low risk rule with surface exceptions",
-      "duration_ms": 0.142,
+      "duration_ms": 0.291,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-30/reviewer-security.packet.md"
@@ -150,7 +150,7 @@
       "station": "reviewer-tests",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-30/reviewer-tests.output.md",
-      "duration_ms": 19669.364,
+      "duration_ms": 78495.577,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-30/reviewer-tests.output.md"
@@ -169,7 +169,7 @@
       "station": "reviewer-architecture",
       "status": "routed_out",
       "detail": "Routed out: Routed out by low risk rule with surface exceptions",
-      "duration_ms": 0.146,
+      "duration_ms": 0.319,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-30/reviewer-architecture.packet.md"
@@ -183,34 +183,34 @@
     },
     {
       "station": "reviewer-design",
-      "status": "executed",
-      "detail": "Executed by command; output written to runs/wo-gh-30/reviewer-design.output.md",
-      "duration_ms": 25140.257,
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 8: codex_station: reviewer reviewer-design changed files outside its review file: runs/wo-gh-30/reviewer-design.output.md",
+      "duration_ms": 31147.178,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-30/reviewer-design.output.md"
+        "runs/wo-gh-30/reviewer-design.packet.md"
       ],
       "configured_model": "openai/gpt-6.1-sol",
-      "executed_model": "openai/gpt-6.1-sol",
+      "executed_model": null,
       "executor": {
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 4048,
+      "measured_tokens": 4548,
       "budget": 50000,
       "budget_action": "sent"
     },
     {
       "station": "reviewer-ux",
-      "status": "failed",
-      "detail": "Executor failed: command executor exited 3: codex_station: codex produced empty output for station reviewer-ux",
-      "duration_ms": 28295.7,
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-30/reviewer-ux.output.md",
+      "duration_ms": 25218.997,
       "cost": null,
       "artifacts": [
-        "runs/wo-gh-30/reviewer-ux.packet.md"
+        "runs/wo-gh-30/reviewer-ux.output.md"
       ],
       "configured_model": "openai/gpt-6.1-sol",
-      "executed_model": null,
+      "executed_model": "openai/gpt-6.1-sol",
       "executor": {
         "kind": "command",
         "detail": "python3"
@@ -222,8 +222,8 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: changes_requested",
-      "duration_ms": 0.055,
+      "detail": "Approver verdict: rejected",
+      "duration_ms": 0.053,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-30/report.json"
@@ -239,8 +239,8 @@
       "station": "approver",
       "status": "loopback",
       "return_to": "builder",
-      "detail": "Loopback to builder: S1/R2 (upstream steps): intake, spec-writer, test-writer envelopes show configured_model == executed_model == claude-sonnet-5-5; builder envelope shows configured_model == executed_model == openai/gpt-6.1-sol. All executed_model values are present (no null self-report).; S2/R3/R6: work order carries surfaces [ui], so builder openai/gpt-6.1-sol is the correct policy assignment, not a disagreement. tests/test_model_migration_verification.py encodes UI builder = openai/gpt-6.1-sol and non-UI builder = claude-opus-5-5, with a negative test rejecting wrong values; round 1 defect is corrected.; S4: no tier label appears as configured_model in any envelope. routing.json selected_models holds tier labels (review-cheap for reviewer-spec/tests, review-balanced for design/ux) as routing input only; resolution to concrete models at hand-off is not yet evidenced for reviewer steps, since reviewer envelopes are written after this review.; S6/R1: builder output states no repository files changed; git status shows only untracked spec, test and work-order files, which come from the spec-writer, test-writer and intake stations, not the builder.; S7: checks-gate pre-review passed (exit 0, full suite, 592 tests, 6 skipped).; Not verifiable from my inputs: S3 (reviewer-design/reviewer-ux execution on Codex and counted review files) and the reviewer-step configured/executed models are produced after this review. The runner must confirm them from the final run report. This is not a failure of the implementation against the spec.; Tests are real and mapped: tests/test_model_migration_verification.py (6 tests) maps to spec model-migration-verification R2/R3/R5/R6 and scenarios S1, S2, S4, S5 via test names and docstring; all 6 pass when run with unittest (pytest is not installed in this environment).; R6 correction is in place: builder policy is encoded as claude-opus-5-5 on non-UI work and openai/gpt-6.1-sol on UI work, asserting configured_model and executed_model both equal the assignment. test_wrong_builder_value_is_rejected_s2 guards against the round 1 defect.; S5 is covered: a silent runtime leaves executed_model null. Tier labels are asserted absent from configured_model (S4). The test drives the real runner with the standing anvil.yaml overrides, and the fake runtime self-reports the model it was handed.; Full suite on current main: checks-gate output records 592 tests OK (6 skipped), including the readme showcase link test, so S7 is satisfied.; Run evidence agrees with policy: builder configured/executed openai/gpt-6.1-sol (correct for the ui surface); intake, spec-writer, test-writer and reviewer-spec are claude-sonnet-5-5 on both sides. No file changes are visible beyond the test-writer's spec, test and work order files, so S6 holds.; Minor limitation, not a failure: the test omits intake from the per-step agreement check (the fake runtime does not self-report for intake) and does not exercise reviewer-design/reviewer-ux Codex execution (S3). Those depend on the live run's envelopes, which are not yet written at this point in the run.",
-      "reason": "S1/R2 (upstream steps): intake, spec-writer, test-writer envelopes show configured_model == executed_model == claude-sonnet-5-5; builder envelope shows configured_model == executed_model == openai/gpt-6.1-sol. All executed_model values are present (no null self-report).; S2/R3/R6: work order carries surfaces [ui], so builder openai/gpt-6.1-sol is the correct policy assignment, not a disagreement. tests/test_model_migration_verification.py encodes UI builder = openai/gpt-6.1-sol and non-UI builder = claude-opus-5-5, with a negative test rejecting wrong values; round 1 defect is corrected.; S4: no tier label appears as configured_model in any envelope. routing.json selected_models holds tier labels (review-cheap for reviewer-spec/tests, review-balanced for design/ux) as routing input only; resolution to concrete models at hand-off is not yet evidenced for reviewer steps, since reviewer envelopes are written after this review.; S6/R1: builder output states no repository files changed; git status shows only untracked spec, test and work-order files, which come from the spec-writer, test-writer and intake stations, not the builder.; S7: checks-gate pre-review passed (exit 0, full suite, 592 tests, 6 skipped).; Not verifiable from my inputs: S3 (reviewer-design/reviewer-ux execution on Codex and counted review files) and the reviewer-step configured/executed models are produced after this review. The runner must confirm them from the final run report. This is not a failure of the implementation against the spec.; Tests are real and mapped: tests/test_model_migration_verification.py (6 tests) maps to spec model-migration-verification R2/R3/R5/R6 and scenarios S1, S2, S4, S5 via test names and docstring; all 6 pass when run with unittest (pytest is not installed in this environment).; R6 correction is in place: builder policy is encoded as claude-opus-5-5 on non-UI work and openai/gpt-6.1-sol on UI work, asserting configured_model and executed_model both equal the assignment. test_wrong_builder_value_is_rejected_s2 guards against the round 1 defect.; S5 is covered: a silent runtime leaves executed_model null. Tier labels are asserted absent from configured_model (S4). The test drives the real runner with the standing anvil.yaml overrides, and the fake runtime self-reports the model it was handed.; Full suite on current main: checks-gate output records 592 tests OK (6 skipped), including the readme showcase link test, so S7 is satisfied.; Run evidence agrees with policy: builder configured/executed openai/gpt-6.1-sol (correct for the ui surface); intake, spec-writer, test-writer and reviewer-spec are claude-sonnet-5-5 on both sides. No file changes are visible beyond the test-writer's spec, test and work order files, so S6 holds.; Minor limitation, not a failure: the test omits intake from the per-step agreement check (the fake runtime does not self-report for intake) and does not exercise reviewer-design/reviewer-ux Codex execution (S3). Those depend on the live run's envelopes, which are not yet written at this point in the run.",
+      "detail": "Loopback to builder: S1/R2: intake, spec-writer, test-writer envelopes show configured_model == executed_model == claude-sonnet-5-5, with executed_model self-reported by the runtime. No tier labels appear as configured_model (S4).; S2/R3: the work order carries a UI surface, so the builder is openai/gpt-6.1-sol. The builder envelope shows configured_model openai/gpt-6.1-sol and executed_model gpt-6.1-sol, which is the Codex runtime's bare-name self-report of the same model, not a disagreement. The builder self-report line in builder.output.md reads {\"model\":\"gpt-6.1-sol\"}.; S6/R1: builder.output.md reports no files changed. The only tree changes outside runs/ are none; the runs/wo-gh-30 changes are runner-written run records.; S7: checks-gate envelope status is passed with exit code 0 for the full unittest discover suite, with no protected-path findings.; Out of scope for this review: S3 (reviewer-design and reviewer-ux on Codex) has not yet been judged at this station. The existing reviewer-ux envelope on disk is stale, a failed round 2 attempt with executed_model null. It must be superseded by the re-fire. If it stays failed, S5 and R5 make that route a fail for the reviewer-ux step.; Tests are real and mapped: tests/test_model_migration_verification.py maps to spec R2, R3, R5, R6 and scenarios S1, S2, S4, S5. It encodes the round 2 builder policy: claude-opus-5-5 on non-UI work and openai/gpt-6.1-sol on UI-surface work. It also checks that the opposite value is rejected and that a silent runtime leaves executed_model null.; Passing: the checks-gate envelope is passed, with exit code 0 for the full unittest discover run (592 tests, 6 skipped) and no protected-path findings. I re-ran tests.test_model_migration_verification and tests.test_readme_showcase: 28 tests OK, 3 skipped. The readme showcase link test passes now that the runs/ tree is back.; Evidence agrees with the test policy: the builder envelope shows configured_model openai/gpt-6.1-sol and executed_model gpt-6.1-sol (the Codex bare-name self-report of the same model). The intake, spec-writer and test-writer envelopes show configured_model equal to executed_model, both claude-sonnet-5-5.; Limitation: the tests use a fake command runtime, so they cover wiring and recording, not live execution. Whether reviewer-design and reviewer-ux (S3) executed on Codex is outside this station. reviewer-ux needs a successful re-fire, because the on-disk round 2 attempt failed on an empty Codex output.",
+      "reason": "S1/R2: intake, spec-writer, test-writer envelopes show configured_model == executed_model == claude-sonnet-5-5, with executed_model self-reported by the runtime. No tier labels appear as configured_model (S4).; S2/R3: the work order carries a UI surface, so the builder is openai/gpt-6.1-sol. The builder envelope shows configured_model openai/gpt-6.1-sol and executed_model gpt-6.1-sol, which is the Codex runtime's bare-name self-report of the same model, not a disagreement. The builder self-report line in builder.output.md reads {\"model\":\"gpt-6.1-sol\"}.; S6/R1: builder.output.md reports no files changed. The only tree changes outside runs/ are none; the runs/wo-gh-30 changes are runner-written run records.; S7: checks-gate envelope status is passed with exit code 0 for the full unittest discover suite, with no protected-path findings.; Out of scope for this review: S3 (reviewer-design and reviewer-ux on Codex) has not yet been judged at this station. The existing reviewer-ux envelope on disk is stale, a failed round 2 attempt with executed_model null. It must be superseded by the re-fire. If it stays failed, S5 and R5 make that route a fail for the reviewer-ux step.; Tests are real and mapped: tests/test_model_migration_verification.py maps to spec R2, R3, R5, R6 and scenarios S1, S2, S4, S5. It encodes the round 2 builder policy: claude-opus-5-5 on non-UI work and openai/gpt-6.1-sol on UI-surface work. It also checks that the opposite value is rejected and that a silent runtime leaves executed_model null.; Passing: the checks-gate envelope is passed, with exit code 0 for the full unittest discover run (592 tests, 6 skipped) and no protected-path findings. I re-ran tests.test_model_migration_verification and tests.test_readme_showcase: 28 tests OK, 3 skipped. The readme showcase link test passes now that the runs/ tree is back.; Evidence agrees with the test policy: the builder envelope shows configured_model openai/gpt-6.1-sol and executed_model gpt-6.1-sol (the Codex bare-name self-report of the same model). The intake, spec-writer and test-writer envelopes show configured_model equal to executed_model, both claude-sonnet-5-5.; Limitation: the tests use a fake command runtime, so they cover wiring and recording, not live execution. Whether reviewer-design and reviewer-ux (S3) executed on Codex is outside this station. reviewer-ux needs a successful re-fire, because the on-disk round 2 attempt failed on an empty Codex output.",
       "duration_ms": 0.0,
       "cost": null,
       "artifacts": [],
@@ -252,7 +252,7 @@
       "station": "triage-human",
       "status": "completed",
       "detail": "Human review: required",
-      "duration_ms": 0.008,
+      "duration_ms": 0.009,
       "cost": null,
       "artifacts": [],
       "configured_model": "claude-sonnet-5-5",
@@ -266,7 +266,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-30/deployer.packet.md",
-      "duration_ms": 0.106,
+      "duration_ms": 0.284,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-30/deployer.packet.md"
@@ -282,7 +282,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-30/observer.output.md",
-      "duration_ms": 28091.748,
+      "duration_ms": 14673.053,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-30/observer.output.md"
@@ -298,7 +298,7 @@
       "budget_action": "none"
     }
   ],
-  "verdict": "changes_requested",
+  "verdict": "rejected",
   "human_required": true,
   "max_loopbacks": 2,
   "loopbacks": 1,
@@ -317,8 +317,8 @@
           "verdict": "pass"
         },
         {
-          "station": "reviewer-design",
-          "verdict": "changes_requested"
+          "station": "reviewer-ux",
+          "verdict": "fail"
         }
       ],
       "reviews_expected": [
@@ -327,19 +327,19 @@
         "reviewer-design",
         "reviewer-ux"
       ],
-      "rule": "Reviewer reviewer-design requested changes. (Counted 3 reviews, expected 4.)"
+      "rule": "Reviewer reviewer-ux returned fail. (Counted 3 reviews, expected 4.)"
     },
     "human_gate": {
       "required": true,
-      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "rule": "Verdict is rejected, not approved, so a human is required.",
       "hints_matched": []
     }
   },
   "warnings": [
     "No reference anchors: This visual run has no reference anchors. The review will proceed under the charter floor alone."
   ],
-  "astra_measured_tokens_total": 6863,
-  "base_ref": "3314b31fb9f176f076021a45f73789d8b4dd268c",
+  "astra_measured_tokens_total": 7363,
+  "base_ref": "8d9540b5a2d721f171b83a887c23aec94bce4b41",
   "evidence": [
     {
       "type": "screenshot",

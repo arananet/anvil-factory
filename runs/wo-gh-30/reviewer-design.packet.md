@@ -188,12 +188,46 @@ These bars apply to every product page or interface this project ships.
 
 ## Diff summary
 
+- runs/wo-gh-30/builder.output.md: +6, -2
+- runs/wo-gh-30/checks-gate.pre-review.output.md: +3, -6
+- runs/wo-gh-30/envelopes/builder.envelope.json: +2, -2
+- runs/wo-gh-30/envelopes/checks-gate.envelope.json: +2, -4
+- runs/wo-gh-30/envelopes/intake.envelope.json: +1, -1
+- runs/wo-gh-30/envelopes/reviewer-architecture.envelope.json: +1, -1
+- runs/wo-gh-30/envelopes/reviewer-security.envelope.json: +1, -1
+- runs/wo-gh-30/envelopes/reviewer-spec.envelope.json: +6, -7
+- runs/wo-gh-30/envelopes/reviewer-tests.envelope.json: +5, -7
+- runs/wo-gh-30/envelopes/spec-writer.envelope.json: +1, -1
+- runs/wo-gh-30/envelopes/test-writer.envelope.json: +1, -1
+- runs/wo-gh-30/reviewer-spec.output.md: +8, -7
+- runs/wo-gh-30/reviewer-spec.review.json: +5, -6
+- runs/wo-gh-30/reviewer-tests.output.md: +6, -7
+- runs/wo-gh-30/reviewer-tests.review.json: +4, -6
+- runs/wo-gh-30/spec-writer.output.md: +8, -11
+- runs/wo-gh-30/test-writer.output.md: +8, -18
 
 ## File access allowlist
 
 This packet may only embed content from:
 - design/DESIGN.md
 - design/tokens.json
+- runs/wo-gh-30/builder.output.md
+- runs/wo-gh-30/checks-gate.pre-review.output.md
+- runs/wo-gh-30/envelopes/builder.envelope.json
+- runs/wo-gh-30/envelopes/checks-gate.envelope.json
+- runs/wo-gh-30/envelopes/intake.envelope.json
+- runs/wo-gh-30/envelopes/reviewer-architecture.envelope.json
+- runs/wo-gh-30/envelopes/reviewer-security.envelope.json
+- runs/wo-gh-30/envelopes/reviewer-spec.envelope.json
+- runs/wo-gh-30/envelopes/reviewer-tests.envelope.json
+- runs/wo-gh-30/envelopes/spec-writer.envelope.json
+- runs/wo-gh-30/envelopes/test-writer.envelope.json
+- runs/wo-gh-30/reviewer-spec.output.md
+- runs/wo-gh-30/reviewer-spec.review.json
+- runs/wo-gh-30/reviewer-tests.output.md
+- runs/wo-gh-30/reviewer-tests.review.json
+- runs/wo-gh-30/spec-writer.output.md
+- runs/wo-gh-30/test-writer.output.md
 
 ## Work order
 

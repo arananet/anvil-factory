@@ -58,8 +58,8 @@ Everything else in the round 1 brief stands: no code changes by the builder; rev
 - reviewer-security: routed_out
 - reviewer-tests: executed
 - reviewer-architecture: routed_out
-- reviewer-design: executed
-- reviewer-ux: failed
+- reviewer-design: failed
+- reviewer-ux: executed
 - approver: completed
 - approver: loopback
 - triage-human: completed
