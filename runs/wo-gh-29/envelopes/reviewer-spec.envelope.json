@@ -1,0 +1,26 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-spec",
+  "to_station": "reviewer-security",
+  "work_order_id": "wo-gh-29",
+  "artifact_path": "runs/wo-gh-29/reviewer-spec.output.md",
+  "status": "executed",
+  "created_at": "2026-11-05T02:07:05.303642+00:00",
+  "review": {
+    "station": "reviewer-spec",
+    "verdict": "pass",
+    "findings": [
+      "R1/R2/S1: anvil.yaml carries explicit per-station models (opus-5-5 builder, sonnet-5-5 others, gpt-6.1-sol design reviewers); grep over anvil, tools, stations, pipelines, anvil.yaml and docs finds no claude-sonnet-4-5 or gpt-6-astra. approver and triage-human keep 'default', which the R10 total map resolves to claude-sonnet-5-5; they are outside the sdlc-default executed set.",
+      "R3/R10: tools/dispatch_station.py dispatches by model family and fails loudly on unknown values; anvil/config.py carries the total tier map and CONCRETE_MODELS. Handing the model to the runtime is kept separate from recording executed_model, which stays a runtime self-report.",
+      "R3/R4 Part B: tools/codex_station.py is an agentic runtime that shells out to 'codex exec' against the gateway OpenAI route with the bare id. It has no completion fallback and fails loudly when the CLI is missing. The credential comes from CF_AIG_TOKEN or the cf-aig-authorization header and is redacted from output. Reviewer validation, the single correction and the tree guard mirror the Claude wrapper. The plain completion probe lives in model_route_smoke.py only.",
+      "R6/R7/R8/R9: no invented price entries remain, decision record 0004 exists, and the smoke script exists. No em or en dashes in the checked new files.",
+      "S6: the full suite ran 560 tests, OK with 3 skipped. This review did not exercise the live Codex run; the acceptance evidence for reviewer-design on Codex is this run's own step record."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}

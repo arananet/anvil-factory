@@ -1,0 +1,27 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "checks-gate",
+  "to_station": "reviewer-spec",
+  "work_order_id": "wo-gh-15",
+  "artifact_path": "runs/wo-gh-15/checks-gate.pre-review.output.md",
+  "status": "passed",
+  "created_at": "2026-11-04T21:20:40.304801+00:00",
+  "phase": "pre-review",
+  "commands": [
+    "python -m unittest discover -s tests -p 'test_*.py'"
+  ],
+  "exit_codes": [
+    0
+  ],
+  "protected_paths": [
+    "tests/",
+    "anvil.json",
+    "pipelines/"
+  ],
+  "protected_path_verdict": "pass",
+  "protected_path_findings": [],
+  "observed_additions": [],
+  "basis": "builder_delta (attempt 1)",
+  "gate_verdict": "pass",
+  "configured_model": "default"
+}

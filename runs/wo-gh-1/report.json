@@ -1,0 +1,219 @@
+{
+  "work_order_id": "wo-gh-1",
+  "pipeline": "sdlc-default",
+  "title": "Add per project design systems to ANVIL (design scaffold, packet injection, reviewer-design)",
+  "kind": "feature",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "completed",
+      "detail": "Work order normalized",
+      "duration_ms": 0.013,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-1/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-1/spec-writer.output.md",
+      "duration_ms": 23475.336,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-1/spec-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "test-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-1/test-writer.output.md",
+      "duration_ms": 140522.921,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-1/test-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-1/builder.output.md",
+      "duration_ms": 390238.902,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-1/builder.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-1/reviewer-spec.output.md; review output did not parse as a review JSON",
+      "duration_ms": 104513.235,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-1/reviewer-spec.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-security",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-1/reviewer-security.output.md",
+      "duration_ms": 115634.53,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-1/reviewer-security.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-1/reviewer-tests.output.md",
+      "duration_ms": 67835.5,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-1/reviewer-tests.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-1/reviewer-architecture.output.md; review output did not parse as a review JSON",
+      "duration_ms": 154133.642,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-1/reviewer-architecture.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.035,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-1/report.json"
+      ],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: not_required",
+      "duration_ms": 0.012,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "default",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "detail": "Packet written to runs/wo-gh-1/deployer.packet.md",
+      "duration_ms": 0.045,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-1/deployer.packet.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to runs/wo-gh-1/observer.output.md",
+      "duration_ms": 162127.099,
+      "cost": null,
+      "artifacts": [
+        "runs/wo-gh-1/observer.output.md"
+      ],
+      "configured_model": "claude-sonnet-4-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      }
+    }
+  ],
+  "verdict": "approved",
+  "human_required": false,
+  "max_loopbacks": 2,
+  "loopbacks": 0,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [
+        {
+          "station": "reviewer-security",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        }
+      ],
+      "reviews_expected": [
+        "reviewer-spec",
+        "reviewer-security",
+        "reviewer-tests",
+        "reviewer-architecture"
+      ],
+      "rule": "All counted reviews passed."
+    },
+    "human_gate": {
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
+      "hints_matched": []
+    }
+  }
+}

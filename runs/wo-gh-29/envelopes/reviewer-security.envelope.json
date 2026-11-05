@@ -1,0 +1,26 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-security",
+  "to_station": "reviewer-tests",
+  "work_order_id": "wo-gh-29",
+  "artifact_path": "runs/wo-gh-29/reviewer-security.output.md",
+  "status": "executed",
+  "created_at": "2026-11-05T02:07:24.884927+00:00",
+  "review": {
+    "station": "reviewer-security",
+    "verdict": "pass",
+    "findings": [
+      "Credential handling is sound: tools/codex_station.py hands the gateway token to Codex only through child-environment variables (ANVIL_CODEX_GATEWAY_KEY, ANVIL_CODEX_GATEWAY_AUTH). The token is absent from argv, and failure messages name the missing sources, never their values. Codex stdout and stderr are redacted by exact token match before they are printed or written.",
+      "Low: redaction covers only the exact token string in the Codex process output. Codex runs with --dangerously-bypass-approvals-and-sandbox, and its shell inherits the full environment, including the two token variables and ANTHROPIC_CUSTOM_HEADERS. A prompt-injected packet could make the model write the token into a file. A reviewer's own review.json is not redacted, and the tree guard cannot see git-ignored paths. This matches the Claude wrapper's --dangerously-skip-permissions posture on a throwaway runner, so it is not blocking. Consider scrubbing the token variables from the environment of the shell tool, or redacting the review file after the run.",
+      "Low: the no-edit rule for non-write stations is advisory developer instructions plus a post-run tree check (reviewer_tree_violations). It detects changes but does not prevent them, and it only watches paths git status reports. Stations other than reviewers get the instruction but no post-run guard. The Codex 0.166 limitation is documented in the code. The weaker enforcement versus the Claude denylist should stay on the record.",
+      "Low: tools/dispatch_station.py appends a self-reported model line whenever the underlying wrapper exits 0. Provenance therefore reflects the dispatched model, not independent runtime evidence. Dispatch is a strict allowlist of three concrete models with loud failure and no fallback, so the model cannot be switched silently. This is acceptable under the spec's S8 contract.",
+      "Path-component validation of station and work-order ids (traversal and absolute-path rejection) is carried over into the Codex wrapper before any review path is built. The route derivation fails loudly on an unrecognised ANTHROPIC_BASE_URL and does not guess. The plain completion call is confined to the smoke probe. No invented prices and no new secrets were found in the security-relevant surface."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}
