@@ -70,7 +70,7 @@ footer { color:#8A8A8A; font-size:13px; margin-top:var(--space-32); }
 <main>
 <h1>ANVIL <span class="accent">run status</span></h1>
 <div class="muted mono">project: anvil-factory</div>
-<div class="snapshot">Snapshot generated from the run reports on disk at 2026-11-04 16:44:46 UTC. This page is a snapshot, not a live feed. Regenerate it with <span class="mono">anvil status-page &lt;project&gt;</span>.</div>
+<div class="snapshot">Snapshot generated from the run reports on disk at 2026-11-05 00:16:54 UTC. This page is a snapshot, not a live feed. Regenerate it with <span class="mono">anvil status-page &lt;project&gt;</span>.</div>
 <section class="lifecycle-board">
 <h2 class="board-title">Lifecycle Board</h2>
 <div class="board-description">Stage progression for each work order. Stages: SPEC → BUILD → REVIEW → APPROVED → MERGED.</div>
@@ -146,12 +146,25 @@ footer { color:#8A8A8A; font-size:13px; margin-top:var(--space-32); }
 </div>
 <div class="board-stages">
 <span class="board-stage stage-reached">SPEC</span>
-<span class="board-stage stage-reached stage-current">BUILD</span>
-<span class="board-stage">REVIEW</span>
-<span class="board-stage">APPROVED</span>
+<span class="board-stage stage-reached">BUILD</span>
+<span class="board-stage stage-reached">REVIEW</span>
+<span class="board-stage stage-reached stage-current">APPROVED</span>
 <span class="board-stage">MERGED</span>
 </div>
 <div class="board-badge needs-human">NEEDS HUMAN</div>
+</div>
+<div class="board-row">
+<div class="board-row-header">
+<h3 class="board-wo-id"><a href="#wo-gh-15-detail" class="board-wo-id">wo-gh-15</a></h3>
+<div class="board-wo-title">A standing quality standard for visual deliverables</div>
+</div>
+<div class="board-stages">
+<span class="board-stage stage-reached">SPEC</span>
+<span class="board-stage stage-reached">BUILD</span>
+<span class="board-stage stage-reached">REVIEW</span>
+<span class="board-stage stage-reached stage-current">APPROVED</span>
+<span class="board-stage">MERGED</span>
+</div>
 </div>
 <div class="board-row">
 <div class="board-row-header">
@@ -355,26 +368,50 @@ footer { color:#8A8A8A; font-size:13px; margin-top:var(--space-32); }
 <section class="run" id="wo-gh-14-detail">
 <h2>wo-gh-14</h2>
 <div>Application metrics and post-deploy health verification</div>
-<div class="meta"><span>pipeline: <b>sdlc-default</b></span><span>verdict: <b><span class="status st-idle">no_reviews</span></b></span><span>human review required: <b>True</b></span><span>deployment: <b>-</b></span><span>loopbacks: <b>1</b></span></div>
-<div class="decision"><div><span class='mono muted'>approver:</span> No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 6.)</div><div><span class='mono muted'>human gate:</span> Verdict is no_reviews, not approved, so a human is required.</div></div>
+<div class="meta"><span>pipeline: <b>sdlc-default</b></span><span>verdict: <b><span class="status st-ok">approved</span></b></span><span>human review required: <b>True</b></span><span>deployment: <b>-</b></span><span>loopbacks: <b>0</b></span></div>
+<div class="decision"><div><span class='mono muted'>approver:</span> All counted reviews passed. (Expected 2 reviews after routing.)</div><div><span class='mono muted'>human gate:</span> Verdict approved, but the work order carries the risk hint &#x27;production-deploy&#x27;, so a human is required.</div></div>
 <div class="table-container">
 <table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>
-<tr><td class='mono'>intake<div class='muted'>configured: default</div></td><td><span class="status st-ok">executed</span></td><td>25539.596</td><td>null</td><td class='artifacts'>runs/wo-gh-14/intake.output.md</td></tr>
-<tr><td class='mono'>spec-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>217835.678</td><td>null</td><td class='artifacts'>runs/wo-gh-14/spec-writer.output.md</td></tr>
-<tr><td class='mono'>test-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>342144.842</td><td>null</td><td class='artifacts'>runs/wo-gh-14/test-writer.output.md</td></tr>
-<tr><td class='mono'>builder<div class='muted'>configured: openai/gpt-6-astra</div></td><td><span class="status st-ok">executed</span></td><td>633204.87</td><td>null</td><td class='artifacts'>runs/wo-gh-14/builder.output.md</td></tr>
-<tr><td class='mono'>checks-gate<div class='muted'>configured: default</div></td><td><span class="status st-failed">failed</span></td><td>31477.994</td><td>null</td><td class='artifacts'>runs/wo-gh-14/checks-gate.pre-review.output.md</td></tr>
-<tr><td class='mono'>loopback</td><td><span class="status st-idle">loopback</span></td><td>0.0</td><td>null</td><td class='artifacts'>-</td></tr>
-<tr><td class='mono'>reviewer-spec<div class='muted'>configured: review-balanced</div></td><td><span class="status st-idle">skipped</span></td><td>0.252</td><td>null</td><td class='artifacts'>runs/wo-gh-14/reviewer-spec.packet.md</td></tr>
-<tr><td class='mono'>reviewer-security<div class='muted'>configured: review-strong</div></td><td><span class="status st-idle">skipped</span></td><td>0.211</td><td>null</td><td class='artifacts'>runs/wo-gh-14/reviewer-security.packet.md</td></tr>
-<tr><td class='mono'>reviewer-tests<div class='muted'>configured: review-balanced</div></td><td><span class="status st-idle">skipped</span></td><td>0.237</td><td>null</td><td class='artifacts'>runs/wo-gh-14/reviewer-tests.packet.md</td></tr>
-<tr><td class='mono'>reviewer-architecture<div class='muted'>configured: review-balanced</div></td><td><span class="status st-idle">skipped</span></td><td>0.234</td><td>null</td><td class='artifacts'>runs/wo-gh-14/reviewer-architecture.packet.md</td></tr>
-<tr><td class='mono'>reviewer-design<div class='muted'>configured: openai/gpt-6-astra</div></td><td><span class="status st-idle">skipped</span></td><td>1.231</td><td>null</td><td class='artifacts'>runs/wo-gh-14/reviewer-design.packet.md</td></tr>
-<tr><td class='mono'>reviewer-ux<div class='muted'>configured: openai/gpt-6-astra</div></td><td><span class="status st-idle">skipped</span></td><td>1.063</td><td>null</td><td class='artifacts'>runs/wo-gh-14/reviewer-ux.packet.md</td></tr>
-<tr><td class='mono'>approver<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.026</td><td>null</td><td class='artifacts'>runs/wo-gh-14/report.json</td></tr>
-<tr><td class='mono'>triage-human<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.006</td><td>null</td><td class='artifacts'>-</td></tr>
-<tr><td class='mono'>deployer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-idle">packet_ready</span></td><td>0.213</td><td>null</td><td class='artifacts'>runs/wo-gh-14/deployer.packet.md</td></tr>
-<tr><td class='mono'>observer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>53558.784</td><td>null</td><td class='artifacts'>runs/wo-gh-14/observer.output.md</td></tr>
+<tr><td class='mono'>intake<div class='muted'>configured: default</div></td><td><span class="status st-ok">executed</span></td><td>26643.272</td><td>null</td><td class='artifacts'>runs/wo-gh-14/intake.output.md</td></tr>
+<tr><td class='mono'>spec-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>169079.292</td><td>null</td><td class='artifacts'>runs/wo-gh-14/spec-writer.output.md</td></tr>
+<tr><td class='mono'>test-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>209626.026</td><td>null</td><td class='artifacts'>runs/wo-gh-14/test-writer.output.md</td></tr>
+<tr><td class='mono'>builder<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>197477.031</td><td>null</td><td class='artifacts'>runs/wo-gh-14/builder.output.md</td></tr>
+<tr><td class='mono'>checks-gate<div class='muted'>configured: default</div></td><td><span class="status st-idle">passed</span></td><td>30764.815</td><td>null</td><td class='artifacts'>runs/wo-gh-14/checks-gate.pre-review.output.md</td></tr>
+<tr><td class='mono'>reviewer-spec<div class='muted'>configured: review-cheap</div></td><td><span class="status st-ok">executed</span></td><td>221666.534</td><td>null</td><td class='artifacts'>runs/wo-gh-14/reviewer-spec.output.md</td></tr>
+<tr><td class='mono'>reviewer-security<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-idle">routed_out</span></td><td>0.3</td><td>null</td><td class='artifacts'>runs/wo-gh-14/reviewer-security.packet.md</td></tr>
+<tr><td class='mono'>reviewer-tests<div class='muted'>configured: review-cheap</div></td><td><span class="status st-ok">executed</span></td><td>100739.783</td><td>null</td><td class='artifacts'>runs/wo-gh-14/reviewer-tests.output.md</td></tr>
+<tr><td class='mono'>reviewer-architecture<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-idle">routed_out</span></td><td>0.256</td><td>null</td><td class='artifacts'>runs/wo-gh-14/reviewer-architecture.packet.md</td></tr>
+<tr><td class='mono'>reviewer-design<div class='muted'>configured: openai/gpt-6-astra</div></td><td><span class="status st-idle">routed_out</span></td><td>1.221</td><td>null</td><td class='artifacts'>runs/wo-gh-14/reviewer-design.packet.md</td></tr>
+<tr><td class='mono'>reviewer-ux<div class='muted'>configured: openai/gpt-6-astra</div></td><td><span class="status st-idle">routed_out</span></td><td>0.861</td><td>null</td><td class='artifacts'>runs/wo-gh-14/reviewer-ux.packet.md</td></tr>
+<tr><td class='mono'>approver<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.037</td><td>null</td><td class='artifacts'>runs/wo-gh-14/report.json</td></tr>
+<tr><td class='mono'>triage-human<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.018</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>deployer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-idle">packet_ready</span></td><td>0.208</td><td>null</td><td class='artifacts'>runs/wo-gh-14/deployer.packet.md</td></tr>
+<tr><td class='mono'>observer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>121374.065</td><td>null</td><td class='artifacts'>runs/wo-gh-14/observer.output.md</td></tr>
+</tbody></table>
+</div>
+</section>
+<section class="run" id="wo-gh-15-detail">
+<h2>wo-gh-15</h2>
+<div>A standing quality standard for visual deliverables</div>
+<div class="meta"><span>pipeline: <b>sdlc-default</b></span><span>verdict: <b><span class="status st-ok">approved</span></b></span><span>human review required: <b>False</b></span><span>deployment: <b>-</b></span><span>loopbacks: <b>0</b></span></div>
+<div class="decision"><div><span class='mono muted'>approver:</span> All counted reviews passed. (Expected 5 reviews after routing.)</div><div><span class='mono muted'>human gate:</span> Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.</div></div>
+<div class="table-container">
+<table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>
+<tr><td class='mono'>intake<div class='muted'>configured: default</div></td><td><span class="status st-ok">executed</span></td><td>98961.18</td><td>null</td><td class='artifacts'>runs/wo-gh-15/intake.output.md</td></tr>
+<tr><td class='mono'>spec-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>112680.427</td><td>null</td><td class='artifacts'>runs/wo-gh-15/spec-writer.output.md</td></tr>
+<tr><td class='mono'>test-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>246167.93</td><td>null</td><td class='artifacts'>runs/wo-gh-15/test-writer.output.md</td></tr>
+<tr><td class='mono'>builder<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>676512.262</td><td>null</td><td class='artifacts'>runs/wo-gh-15/builder.output.md</td></tr>
+<tr><td class='mono'>checks-gate<div class='muted'>configured: default</div></td><td><span class="status st-idle">passed</span></td><td>32149.709</td><td>null</td><td class='artifacts'>runs/wo-gh-15/checks-gate.pre-review.output.md</td></tr>
+<tr><td class='mono'>reviewer-spec<div class='muted'>configured: review-balanced</div></td><td><span class="status st-ok">executed</span></td><td>79181.83</td><td>null</td><td class='artifacts'>runs/wo-gh-15/reviewer-spec.output.md</td></tr>
+<tr><td class='mono'>reviewer-security<div class='muted'>configured: review-strong</div></td><td><span class="status st-ok">executed</span></td><td>109259.496</td><td>null</td><td class='artifacts'>runs/wo-gh-15/reviewer-security.output.md</td></tr>
+<tr><td class='mono'>reviewer-tests<div class='muted'>configured: review-balanced</div></td><td><span class="status st-ok">executed</span></td><td>147326.813</td><td>null</td><td class='artifacts'>runs/wo-gh-15/reviewer-tests.output.md</td></tr>
+<tr><td class='mono'>reviewer-architecture<div class='muted'>configured: review-balanced</div></td><td><span class="status st-ok">executed</span></td><td>48952.99</td><td>null</td><td class='artifacts'>runs/wo-gh-15/reviewer-architecture.output.md</td></tr>
+<tr><td class='mono'>reviewer-design<div class='muted'>configured: openai/gpt-6-astra</div></td><td><span class="status st-ok">executed</span></td><td>97815.394</td><td>null</td><td class='artifacts'>runs/wo-gh-15/reviewer-design.output.md</td></tr>
+<tr><td class='mono'>reviewer-ux<div class='muted'>configured: openai/gpt-6-astra</div></td><td><span class="status st-idle">routed_out</span></td><td>1.323</td><td>null</td><td class='artifacts'>runs/wo-gh-15/reviewer-ux.packet.md</td></tr>
+<tr><td class='mono'>approver<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.05</td><td>null</td><td class='artifacts'>runs/wo-gh-15/report.json</td></tr>
+<tr><td class='mono'>triage-human<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.016</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>deployer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-idle">packet_ready</span></td><td>0.417</td><td>null</td><td class='artifacts'>runs/wo-gh-15/deployer.packet.md</td></tr>
+<tr><td class='mono'>observer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>42150.534</td><td>null</td><td class='artifacts'>runs/wo-gh-15/observer.output.md</td></tr>
 </tbody></table>
 </div>
 </section>
