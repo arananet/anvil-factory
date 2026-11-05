@@ -1,0 +1,13 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "pass",
+  "findings": [
+    "R1/R2: docs/OPERATOR-REQUIREMENTS.md covers every GitHub permission (Contents, Actions, Issues, Administration, Secrets) with operation and failure; the write-only secrets fact, merges API, webhooks/labels/Pages 403s and the social preview Settings UI limit are all present (S1).",
+    "R2 note: Contents and Secrets rows say 'No isolated failure on record' instead of inventing a failure; this honors the verified-facts-only rule since the spec names no failure for them.",
+    "R3: the GitHub App client secret vs PAT distinction (401 on GitHub, Cloudflare, gateway), the settings-area confusion and per-repo Repository access / Repository permissions are covered with no app named (S2).",
+    "R4/S3: the Cloudflare section has the user token with API Tokens Edit, 415 permission groups, 403 code 9109, the x-api-key plus cf-aig-authorization Bearer shape via ANTHROPIC_API_KEY and ANTHROPIC_CUSTOM_HEADERS, the placeholder 401 code 2009 and false diagnosis, per-repo CF_AIG_TOKEN, the gateway settings, Unified Billing and the Wrangler env token.",
+    "R5: the closing Placement and care section has credential locations, what breaks without each permission, and both never-again lessons.",
+    "R6/S4: no credential value, token id or secret found in the document, README row or CHANGELOG entry; credentials are referenced by name and purpose only.",
+    "R7: README gets one Documentation table row in the existing style, and CHANGELOG gets one Unreleased entry. No code or tests/ files changed. Grep found no em or en dashes in the produced files. I did not run the full suite; the checks-gate upstream step reports it passed."
+  ]
+}
