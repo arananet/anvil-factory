@@ -15,6 +15,15 @@ A visitor arriving cold from Hacker News, LinkedIn or an awesome list should und
 ## Sequencing requirement
 - This order executes only after capability issues 6 to 10 (work orders wo-gh-6 to wo-gh-10: checks gate with protected paths, intake outcomes, risk and surface routing, rendered design review, per job cost) are merged to main. R3 forbids citing capabilities that are not in main, so running earlier would make the showcase untruthful by construction. If the run starts and the capability minimum is not in the branch history, the builder stops and reports instead of writing around it.
 
+## Loopback context (run 2 and later)
+Run 1 (41944293495) verdict: no_reviews. The checks gate failed (suite exit 1, 502 tests, 3 failures; protected paths PASS) and every reviewer was skipped by design, so the README product is unjudged, not rejected. All three failures were reproduced locally against the run branch tree (showcase module: 22 tests, same 3 failures). All three are defects in tests/test_readme_showcase.py (test-writer station output), not in the builder's README.
+
+### Loopback discipline
+- The README product from run 1 stands as the base: this loopback changes the three tests and refreshes run evidence only.
+- The builder does not touch tests/, anvil.json or pipelines/ (protected paths passed in run 1 and must keep passing).
+- The three test fixes belong to the test-writer station.
+- Playwright and Chromium are now staged in the execute workflow, so the rendered README capture can be produced in this run; a capture_failure.txt citing missing Playwright must not recur.
+
 ## Requirements
 
 ### R1. First screen (above the fold)
@@ -30,7 +39,7 @@ A visitor arriving cold from Hacker News, LinkedIn or an awesome list should und
   3. A human gate always stands before publishing or deploying to production.
 
 ### R3. Claim hygiene
-- Every number in the README is verified against the main tree at execution and merge time: station count (25 at 2026-11-02), pipeline count (8), the factory suite test count (94 on main at 2026-11-02, to be re-measured after the capability merges), and any figure the capability items add.
+- Every number in the README is verified against the main tree at execution and merge time: station count (27 after capability merges, up from 25 with checks-gate and reviewer-ux stations), pipeline count (8), the factory suite test count (to be measured fresh after capability merges), and any figure the capability items add.
 - Corrections this order carries: wherever the current README says four software reviewers, four different reviewers for content, or the approver aggregating four reviews, the real count is five reviewers per line.
 - Nothing may be stated as fact that has not landed: the S4 fix is mentioned only because and when it is merged in main, and capability items are cited only when their runs are approved and merged. The roadmap section may name unlanded work only when labelled as roadmap.
 
@@ -52,12 +61,25 @@ A visitor arriving cold from Hacker News, LinkedIn or an awesome list should und
 - S5: the quickstart, executed from a clean clone by the line, completes in under 5 minutes and its output is recorded as evidence.
 
 ## Tests and verification
+
+### Test defects from run 1 (to be fixed by test-writer)
+1. **test_showcase_external_links_valid**: Asserts live answers through urllib with its default user agent. Operator verified from two separate networks: all three showcase links (Sentia, Platform25, status board) answer 200 to a browser user agent and 403 to the Python urllib agent (Cloudflare bot filtering, not an outage). A deterministic gate test must not assert live network behavior through a bot-filtered agent.
+   - **Fix**: The test skips unless the environment sets ANVIL_LIVE_TESTS=1, and when enabled it sends a browser user agent. The live verification itself stays where the spec puts it: in the run evidence (evidence/link-and-claim-verification.md), refreshed during this run.
+
+2. **test_station_count_accurate_r3**: The test's own station counter returned 0 against the current tree. The factory's station catalog is the stations/ directory loaded by anvil/stations.py (StationRegistry): it holds 27 stations, which is exactly what the README claims, up from 25 before the capability program added the checks-gate and reviewer-ux stations.
+   - **Fix**: The counter counts the registry the factory itself loads (StationRegistry from anvil/stations.py) and asserts the README claim equals it.
+
+3. **test_factory_suite_can_run**: Shells out to pytest, which is not a project dependency and is absent from the run environment. The canonical suite command is the unittest discover command the checks gate itself executes, so a nested suite invocation inside the suite is redundant and recursive.
+   - **Fix**: Remove the nested invocation, or reduce it to a collection-only check that does not execute the suite.
+
+### General verification requirements
 - A link and claim check over the produced README: every relative link resolves in the tree, every external showcase link answers on the merge day, and the R3 claim list is checked item by item against main. These checks are recorded in the run evidence.
 - The rendered README is verified in the real GitHub view (a capture of the rendered page on the run branch), desktop width, with no broken tables or dead images.
-- The factory suite stays green; this order changes no factory code, so any suite change is a regression to report, not to fix inside this order.
+- The factory suite stays green; this order changes no factory code (or in loopback, no factory code or protected paths), so any suite change is a regression to report, not to fix inside this order.
 
 ## Out of scope
-- No factory code changes. This order touches README.md, README assets and run evidence only.
+- Run 1: No factory code changes. This order touches README.md, README assets and run evidence only.
+- Loopback runs: No changes to README.md, README assets, tests/, anvil.json or pipelines/. Only test fixes (by test-writer) and refreshed run evidence.
 - No publishing: no launch posts, no Show HN, no LinkedIn, and no release creation by the line. The release is an operator step after the merge. The order ends at the human gate with the rendered README as evidence.
 
 ## Acceptance criteria
@@ -65,3 +87,4 @@ A visitor arriving cold from Hacker News, LinkedIn or an awesome list should und
 - Quickstart executed from a clean clone with its output as evidence, inside the 5 minute budget.
 - The R3 claim list signed off by the reviewers against main.
 - Built by ANVIL links verified live on the merge day (live check, not from memory).
+- All three test defects from run 1 fixed, factory suite green.

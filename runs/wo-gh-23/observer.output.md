@@ -1,1 +1,1 @@
-Observer station complete. Created `runs/wo-gh-23/observer.output.md` reporting that the deployer hasn't executed yet, so there's no release record to observe. The deployer must run first to produce the release record input.
+Observer report complete. The station cannot observe a release because no deployment has occurred—the deployer has not executed and produced a release record. The work order remains on branch anvil/run-readme-showcase with no merge to main.

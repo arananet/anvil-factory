@@ -5,33 +5,25 @@ Title: Showcase README: first screen demo, Built by ANVIL, quickstart, trust sec
 Kind: task
 Status: new
 
-## Intake Outcome
-
-Outcome: accepted
-
-Risk: low
-
-Surfaces: content
-
 ## Routing
 
-**Decision**: Low risk with no UI and no security surface: reduced panel at cheaper model
+**Decision**: Default applied: work is unrated, using full panel at policy models
 
-**Selected reviewers** (2):
-- reviewer-spec (model: review-cheap)
-- reviewer-tests (model: review-cheap)
+**Selected reviewers** (5):
+- reviewer-spec (model: review-balanced)
+- reviewer-security (model: review-strong)
+- reviewer-tests (model: review-balanced)
+- reviewer-architecture (model: review-balanced)
+- reviewer-design (model: review-balanced)
 
-**Routed out** (4):
-- reviewer-ux: Routed out by low risk rule (not in reduced panel)
-- reviewer-security: Routed out by low risk rule (not in reduced panel)
-- reviewer-design: Routed out by low risk rule (not in reduced panel)
-- reviewer-architecture: Routed out by low risk rule (not in reduced panel)
+**Routed out** (1):
+- reviewer-ux: Routed out: no UI surface
 
 ## Verdict
 
 Verdict: no_reviews
 
-No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 2.)
+No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)
 
 ## Steps
 

@@ -188,14 +188,66 @@ These bars apply to every product page or interface this project ships.
 
 ## Diff summary
 
-- README.md: +89, -7
+- .openspec/specs/readme-showcase/spec.md: +26, -3
+- runs/wo-gh-23/builder.output.md: +38, -24
+- runs/wo-gh-23/builder.packet.md: +12, -19
+- runs/wo-gh-23/checks-gate.pre-review.output.md: +34, -35
+- runs/wo-gh-23/envelopes/builder.envelope.json: +1, -1
+- runs/wo-gh-23/envelopes/checks-gate.envelope.json: +6, -4
+- runs/wo-gh-23/envelopes/intake.envelope.json: +1, -1
+- runs/wo-gh-23/envelopes/reviewer-architecture.envelope.json: +2, -2
+- runs/wo-gh-23/envelopes/reviewer-security.envelope.json: +2, -2
+- runs/wo-gh-23/envelopes/reviewer-spec.envelope.json: +2, -2
+- runs/wo-gh-23/envelopes/reviewer-tests.envelope.json: +2, -2
+- runs/wo-gh-23/envelopes/spec-writer.envelope.json: +1, -1
+- runs/wo-gh-23/envelopes/test-writer.envelope.json: +1, -1
+- runs/wo-gh-23/evidence/EVIDENCE-SUMMARY.md: +40, -18
+- runs/wo-gh-23/intake.output.md: +5, -17
+- runs/wo-gh-23/intake.packet.md: +12, -0
+- runs/wo-gh-23/reviewer-architecture.packet.md: +12, -0
+- runs/wo-gh-23/reviewer-security.packet.md: +12, -0
+- runs/wo-gh-23/reviewer-spec.packet.md: +12, -0
+- runs/wo-gh-23/reviewer-tests.packet.md: +12, -0
+- runs/wo-gh-23/routing.json: +11, -17
+- runs/wo-gh-23/spec-writer.output.md: +12, -15
+- runs/wo-gh-23/spec-writer.packet.md: +12, -0
+- runs/wo-gh-23/test-writer.output.md: +19, -12
+- runs/wo-gh-23/test-writer.packet.md: +12, -0
+- tests/test_readme_showcase.py: +55, -41
+- work_orders/wo-gh-23.json: +3, -8
 
 ## File access allowlist
 
 This packet may only embed content from:
 - design/DESIGN.md
 - design/tokens.json
-- README.md
+- .openspec/specs/readme-showcase/spec.md
+- runs/wo-gh-23/builder.output.md
+- runs/wo-gh-23/builder.packet.md
+- runs/wo-gh-23/checks-gate.pre-review.output.md
+- runs/wo-gh-23/envelopes/builder.envelope.json
+- runs/wo-gh-23/envelopes/checks-gate.envelope.json
+- runs/wo-gh-23/envelopes/intake.envelope.json
+- runs/wo-gh-23/envelopes/reviewer-architecture.envelope.json
+- runs/wo-gh-23/envelopes/reviewer-security.envelope.json
+- runs/wo-gh-23/envelopes/reviewer-spec.envelope.json
+- runs/wo-gh-23/envelopes/reviewer-tests.envelope.json
+- runs/wo-gh-23/envelopes/spec-writer.envelope.json
+- runs/wo-gh-23/envelopes/test-writer.envelope.json
+- runs/wo-gh-23/evidence/EVIDENCE-SUMMARY.md
+- runs/wo-gh-23/intake.output.md
+- runs/wo-gh-23/intake.packet.md
+- runs/wo-gh-23/reviewer-architecture.packet.md
+- runs/wo-gh-23/reviewer-security.packet.md
+- runs/wo-gh-23/reviewer-spec.packet.md
+- runs/wo-gh-23/reviewer-tests.packet.md
+- runs/wo-gh-23/routing.json
+- runs/wo-gh-23/spec-writer.output.md
+- runs/wo-gh-23/spec-writer.packet.md
+- runs/wo-gh-23/test-writer.output.md
+- runs/wo-gh-23/test-writer.packet.md
+- tests/test_readme_showcase.py
+- work_orders/wo-gh-23.json
 
 ## Work order
 
@@ -224,6 +276,18 @@ Tests and evidence, per the spec: a link and claim check over the produced READM
 Guardrails: no em dash or en dash character in any produced file (project style rule). The reviewer writes its review to the authoritative review file named in its packet; prose outside that file is not a review. Nothing in this order publishes anything: no posts, no release, no metadata changes by the line.
 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/23
+
+GATE LOOPBACK BRIEF (operator, after run 41944293495):
+
+The first run's verdict was no_reviews: the checks gate failed (suite exit 1, 502 tests, 3 failures; protected paths verdict PASS) and every reviewer was skipped by design, so the README product is unjudged, not rejected. The operator reproduced all three failures locally against the run branch tree (the showcase module alone: 22 tests, the same 3 failures). All three are defects in tests/test_readme_showcase.py, the test-writer station's output, not in the builder's README:
+
+1. test_showcase_external_links_valid asserts live answers through urllib with its default user agent. The operator verified from two separate networks: all three showcase links (Sentia, Platform25, the status board) answer 200 to a browser user agent and 403 to the Python urllib agent, which is Cloudflare bot filtering, not an outage. A deterministic gate test must not assert live network behavior through a bot-filtered agent. Fix: the test skips unless the environment sets ANVIL_LIVE_TESTS=1, and when enabled it sends a browser user agent. The live verification itself stays where the spec puts it: in the run evidence (evidence/link-and-claim-verification.md), refreshed during this run.
+
+2. test_station_count_accurate_r3: the test's own station counter returned 0 against the current tree. The factory's station catalog is the stations/ directory loaded by anvil/stations.py (StationRegistry): it holds 27 stations, which is exactly what the README claims, up from 25 before the capability program added the checks-gate and reviewer-ux stations. Fix: the counter counts the registry the factory itself loads and asserts the README claim equals it.
+
+3. test_factory_suite_can_run shells out to pytest, which is not a project dependency and is absent from the run environment. The canonical suite command is the unittest discover command the checks gate itself executes, so a nested suite invocation inside the suite is redundant and recursive. Fix: remove the nested invocation, or reduce it to a collection-only check that does not execute the suite.
+
+Discipline for this loopback, per the wo-gh-7 closing precedent: the builder does not touch tests/, anvil.json or pipelines/ (protected paths passed in run 1 and must keep passing); the three test fixes belong to the test-writer station. The README product from run 1 stands as the base: this loopback changes the three tests and refreshes run evidence only. The operator has staged Playwright and Chromium in the execute workflow (the same staging the wo-gh-9 line needed), so the rendered README capture the spec requires can be produced in this run; a capture_failure.txt citing missing Playwright must not recur for the desktop capture.
 - risk_hints: 
 - status: new
 
@@ -271,23 +335,4 @@ No specific product type declared. Using general guidelines only.
 **Spacing:**
 - Use consistent spacing scale throughout (e.g., 4px, 8px, 16px, 24px, 32px)
 - Group related elements together with whitespace separating distinct sections
-
-
-## Quality Charter
-
-Product type: physical_product
-
-Observable criteria:
-
-- **Materials**: Surfaces read as the materials the product is actually made of
-- **Light**: One coherent light story, with shadows and reflections that agree with it
-- **Contact**: Objects meet skin, surfaces and each other the way physical things do
-- **Scale**: The object's size reads true against its context and human anatomy
-
-
-## Reference Anchors
-
-⚠️ **WARNING**: This run has no reference anchors.
-
-The review will proceed under the charter floor alone.
 

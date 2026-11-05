@@ -48,6 +48,18 @@ Tests and evidence, per the spec: a link and claim check over the produced READM
 Guardrails: no em dash or en dash character in any produced file (project style rule). The reviewer writes its review to the authoritative review file named in its packet; prose outside that file is not a review. Nothing in this order publishes anything: no posts, no release, no metadata changes by the line.
 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/23
+
+GATE LOOPBACK BRIEF (operator, after run 41944293495):
+
+The first run's verdict was no_reviews: the checks gate failed (suite exit 1, 502 tests, 3 failures; protected paths verdict PASS) and every reviewer was skipped by design, so the README product is unjudged, not rejected. The operator reproduced all three failures locally against the run branch tree (the showcase module alone: 22 tests, the same 3 failures). All three are defects in tests/test_readme_showcase.py, the test-writer station's output, not in the builder's README:
+
+1. test_showcase_external_links_valid asserts live answers through urllib with its default user agent. The operator verified from two separate networks: all three showcase links (Sentia, Platform25, the status board) answer 200 to a browser user agent and 403 to the Python urllib agent, which is Cloudflare bot filtering, not an outage. A deterministic gate test must not assert live network behavior through a bot-filtered agent. Fix: the test skips unless the environment sets ANVIL_LIVE_TESTS=1, and when enabled it sends a browser user agent. The live verification itself stays where the spec puts it: in the run evidence (evidence/link-and-claim-verification.md), refreshed during this run.
+
+2. test_station_count_accurate_r3: the test's own station counter returned 0 against the current tree. The factory's station catalog is the stations/ directory loaded by anvil/stations.py (StationRegistry): it holds 27 stations, which is exactly what the README claims, up from 25 before the capability program added the checks-gate and reviewer-ux stations. Fix: the counter counts the registry the factory itself loads and asserts the README claim equals it.
+
+3. test_factory_suite_can_run shells out to pytest, which is not a project dependency and is absent from the run environment. The canonical suite command is the unittest discover command the checks gate itself executes, so a nested suite invocation inside the suite is redundant and recursive. Fix: remove the nested invocation, or reduce it to a collection-only check that does not execute the suite.
+
+Discipline for this loopback, per the wo-gh-7 closing precedent: the builder does not touch tests/, anvil.json or pipelines/ (protected paths passed in run 1 and must keep passing); the three test fixes belong to the test-writer station. The README product from run 1 stands as the base: this loopback changes the three tests and refreshes run evidence only. The operator has staged Playwright and Chromium in the execute workflow (the same staging the wo-gh-9 line needed), so the rendered README capture the spec requires can be produced in this run; a capture_failure.txt citing missing Playwright must not recur for the desktop capture.
 - risk_hints: 
 - status: new
 

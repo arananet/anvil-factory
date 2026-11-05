@@ -1,17 +1,14 @@
-The spec at `.openspec/specs/readme-showcase/spec.md` already exists and is complete. I've verified it against the work order wo-gh-23 and confirmed it covers all requirements:
+Spec revision complete. I've updated `.openspec/specs/readme-showcase/spec.md` to incorporate the gate loopback brief from run 1.
 
-**Spec completeness check:**
-- ✓ Purpose and sequencing requirement (execute only after wo-gh-6 to wo-gh-10 are merged)
-- ✓ R1: First screen with demo, Built by ANVIL block, and quickstart
-- ✓ R2: Trust section with three mechanisms
-- ✓ R3: Claim hygiene with verification against main tree
-- ✓ R4: Repo metadata as operator steps, social preview production
-- ✓ R5: Closing sections per house template
-- ✓ Scenarios S1-S5 for validation
-- ✓ Tests and verification requirements
-- ✓ Out of scope boundaries
-- ✓ Acceptance criteria
+**Key changes:**
+- Added "Loopback context" section documenting run 1's no_reviews verdict and the three test defects
+- Specified loopback discipline: README from run 1 stands as base, this run fixes tests only
+- Detailed the three test defects with fixes for test-writer:
+  1. test_showcase_external_links_valid: skip unless ANVIL_LIVE_TESTS=1, use browser user agent
+  2. test_station_count_accurate_r3: count StationRegistry from anvil/stations.py (27 stations)
+  3. test_factory_suite_can_run: remove nested pytest invocation
+- Updated R3 claim hygiene: station count now 27 (up from 25 with checks-gate and reviewer-ux)
+- Clarified scope: loopback changes tests and evidence only, not README or protected paths
+- Added acceptance criteria: all three test defects fixed, suite green
 
-The spec is ready for implementation. The work order's guardrails (em/en dash rule, review file procedures) are builder process constraints, not spec requirements, and are correctly handled separately.
-
-**Output**: `.openspec/specs/readme-showcase/spec.md` (no changes needed)
+Output: `.openspec/specs/readme-showcase/spec.md` (90 lines), `runs/wo-gh-23/spec-writer.output.md`

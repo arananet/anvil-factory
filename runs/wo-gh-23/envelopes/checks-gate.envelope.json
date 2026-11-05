@@ -5,21 +5,23 @@
   "work_order_id": "wo-gh-23",
   "artifact_path": "runs/wo-gh-23/checks-gate.pre-review.output.md",
   "status": "failed",
-  "created_at": "2026-11-05T01:04:17.271177+00:00",
+  "created_at": "2026-11-05T01:29:06.257048+00:00",
   "phase": "pre-review",
   "commands": [
     "python -m unittest discover -s tests -p 'test_*.py'"
   ],
   "exit_codes": [
-    1
+    0
   ],
   "protected_paths": [
     "tests/",
     "anvil.json",
     "pipelines/"
   ],
-  "protected_path_verdict": "pass",
-  "protected_path_findings": [],
+  "protected_path_verdict": "fail",
+  "protected_path_findings": [
+    "Protected path violation: tests/test_readme_showcase.py (base ref file modified/deleted, matches tests/)"
+  ],
   "observed_additions": [],
   "basis": "builder_delta (attempt 1)",
   "gate_verdict": "fail",

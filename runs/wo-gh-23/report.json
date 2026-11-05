@@ -7,8 +7,8 @@
     {
       "station": "intake",
       "status": "executed",
-      "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 55840.216,
+      "detail": "Executed by command; outcome: unknown",
+      "duration_ms": 42197.382,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/intake.output.md"
@@ -19,7 +19,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2249,
+      "measured_tokens": 3032,
       "budget": 0,
       "budget_action": "none"
     },
@@ -27,7 +27,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-23/spec-writer.output.md",
-      "duration_ms": 119770.581,
+      "duration_ms": 160353.279,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/spec-writer.output.md"
@@ -38,7 +38,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 1526,
+      "measured_tokens": 2309,
       "budget": 0,
       "budget_action": "none"
     },
@@ -46,7 +46,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-23/test-writer.output.md",
-      "duration_ms": 116644.888,
+      "duration_ms": 327785.066,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/test-writer.output.md"
@@ -57,7 +57,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 1532,
+      "measured_tokens": 2315,
       "budget": 0,
       "budget_action": "none"
     },
@@ -65,7 +65,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-23/builder.output.md",
-      "duration_ms": 470980.437,
+      "duration_ms": 321711.977,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/builder.output.md"
@@ -76,15 +76,15 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 3305,
+      "measured_tokens": 3934,
       "budget": 50000,
       "budget_action": "sent"
     },
     {
       "station": "checks-gate",
       "status": "failed",
-      "detail": "Gate failed: 1 checks, protected paths: pass",
-      "duration_ms": 50260.426,
+      "detail": "Gate failed: 1 checks, protected paths: fail",
+      "duration_ms": 122308.875,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/checks-gate.pre-review.output.md"
@@ -100,23 +100,25 @@
         "python -m unittest discover -s tests -p 'test_*.py'"
       ],
       "exit_codes": [
-        1
+        0
       ],
       "protected_paths": [
         "tests/",
         "anvil.json",
         "pipelines/"
       ],
-      "protected_path_verdict": "pass",
-      "protected_path_findings": [],
+      "protected_path_verdict": "fail",
+      "protected_path_findings": [
+        "Protected path violation: tests/test_readme_showcase.py (base ref file modified/deleted, matches tests/)"
+      ],
       "gate_verdict": "fail"
     },
     {
       "station": "loopback",
       "status": "loopback",
       "return_to": "builder",
-      "detail": "Loopback to builder: Gate checks failed",
-      "reason": "Gate checks failed",
+      "detail": "Loopback to builder: Gate failure: Protected path violation: tests/test_readme_showcase.py (base ref file modified/deleted, matches tests/)",
+      "reason": "Gate failure: Protected path violation: tests/test_readme_showcase.py (base ref file modified/deleted, matches tests/)",
       "duration_ms": 0.0,
       "cost": null,
       "artifacts": [],
@@ -130,12 +132,12 @@
       "station": "reviewer-spec",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 0.191,
+      "duration_ms": 0.39,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/reviewer-spec.packet.md"
       ],
-      "configured_model": "review-cheap",
+      "configured_model": "review-balanced",
       "executed_model": null,
       "executor": null,
       "measured_tokens": 0,
@@ -146,12 +148,12 @@
       "station": "reviewer-security",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 0.131,
+      "duration_ms": 0.351,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/reviewer-security.packet.md"
       ],
-      "configured_model": "claude-sonnet-4-5",
+      "configured_model": "review-strong",
       "executed_model": null,
       "executor": null,
       "measured_tokens": 0,
@@ -162,12 +164,12 @@
       "station": "reviewer-tests",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 0.121,
+      "duration_ms": 0.358,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/reviewer-tests.packet.md"
       ],
-      "configured_model": "review-cheap",
+      "configured_model": "review-balanced",
       "executed_model": null,
       "executor": null,
       "measured_tokens": 0,
@@ -178,12 +180,12 @@
       "station": "reviewer-architecture",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 0.122,
+      "duration_ms": 0.327,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/reviewer-architecture.packet.md"
       ],
-      "configured_model": "claude-sonnet-4-5",
+      "configured_model": "review-balanced",
       "executed_model": null,
       "executor": null,
       "measured_tokens": 0,
@@ -194,7 +196,7 @@
       "station": "reviewer-design",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 5.657,
+      "duration_ms": 22.309,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/reviewer-design.packet.md"
@@ -210,7 +212,7 @@
       "station": "reviewer-ux",
       "status": "skipped",
       "detail": "Skipped due to gate failure",
-      "duration_ms": 0.824,
+      "duration_ms": 2.592,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/reviewer-ux.packet.md"
@@ -226,7 +228,7 @@
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.03,
+      "duration_ms": 0.045,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/report.json"
@@ -256,7 +258,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-23/deployer.packet.md",
-      "duration_ms": 0.133,
+      "duration_ms": 0.34,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/deployer.packet.md"
@@ -264,7 +266,7 @@
       "configured_model": "claude-sonnet-4-5",
       "executed_model": null,
       "executor": null,
-      "measured_tokens": 1622,
+      "measured_tokens": 2405,
       "budget": 0,
       "budget_action": "none"
     },
@@ -272,7 +274,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-23/observer.output.md",
-      "duration_ms": 40640.411,
+      "duration_ms": 74742.166,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-23/observer.output.md"
@@ -283,7 +285,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 1629,
+      "measured_tokens": 2412,
       "budget": 0,
       "budget_action": "none"
     }
@@ -300,9 +302,12 @@
       "reviews_counted": [],
       "reviews_expected": [
         "reviewer-spec",
-        "reviewer-tests"
+        "reviewer-security",
+        "reviewer-tests",
+        "reviewer-architecture",
+        "reviewer-design"
       ],
-      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 2.)"
+      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)"
     },
     "human_gate": {
       "required": true,
@@ -311,9 +316,24 @@
     }
   },
   "warnings": [],
-  "astra_measured_tokens_total": 3305,
-  "base_ref": "fa2c07c14b8b865a8d77dc7b2fe5713deadac212",
-  "evidence": [],
+  "astra_measured_tokens_total": 3934,
+  "base_ref": "9582290dbeed26f602aaa66d7a27655c840a4831",
+  "evidence": [
+    {
+      "type": "screenshot",
+      "breakpoint": "390x844",
+      "path": "runs/wo-gh-23/evidence/screenshot-390x844.png",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "type": "screenshot",
+      "breakpoint": "1440x900",
+      "path": "runs/wo-gh-23/evidence/screenshot-1440x900.png",
+      "width": 1440,
+      "height": 900
+    }
+  ],
   "cost": {
     "total": 0,
     "measured_steps": 0,

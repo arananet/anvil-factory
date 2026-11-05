@@ -1,29 +1,23 @@
 {
   "selected_reviewers": [
     "reviewer-spec",
-    "reviewer-tests"
+    "reviewer-security",
+    "reviewer-tests",
+    "reviewer-architecture",
+    "reviewer-design"
   ],
   "routed_out": [
     {
       "reviewer": "reviewer-ux",
-      "reason": "Routed out by low risk rule (not in reduced panel)"
-    },
-    {
-      "reviewer": "reviewer-security",
-      "reason": "Routed out by low risk rule (not in reduced panel)"
-    },
-    {
-      "reviewer": "reviewer-design",
-      "reason": "Routed out by low risk rule (not in reduced panel)"
-    },
-    {
-      "reviewer": "reviewer-architecture",
-      "reason": "Routed out by low risk rule (not in reduced panel)"
+      "reason": "Routed out: no UI surface"
     }
   ],
   "selected_models": {
-    "reviewer-spec": "review-cheap",
-    "reviewer-tests": "review-cheap"
+    "reviewer-design": "review-balanced",
+    "reviewer-security": "review-strong",
+    "reviewer-architecture": "review-balanced",
+    "reviewer-tests": "review-balanced",
+    "reviewer-spec": "review-balanced"
   },
-  "reason": "Low risk with no UI and no security surface: reduced panel at cheaper model"
+  "reason": "Default applied: work is unrated, using full panel at policy models"
 }

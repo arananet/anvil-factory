@@ -1,9 +1,18 @@
-# Evidence Summary - wo-gh-23
+# Evidence Summary - wo-gh-23 Loopback Run
 
-Build date: 2026-11-05
-Work order: Showcase README implementation
+Build date: 2026-11-05 (loopback run)  
+Work order: Showcase README implementation  
+Context: Loopback after run 1 verdict no_reviews (checks gate failed, 3 test defects)
 
-## Evidence Files Created
+## Loopback Discipline
+
+Per spec section "Loopback context":
+- The README product from run 1 stands as the base (no changes to README.md)
+- This loopback refreshes run evidence only
+- Test fixes belong to the test-writer station (builder does not touch tests/)
+- Playwright and Chromium now staged in execute workflow
+
+## Evidence Files
 
 All files in runs/wo-gh-23/evidence/:
 
@@ -38,8 +47,17 @@ All files in runs/wo-gh-23/evidence/:
 - **Result**: All checks passed
 - **Spec requirement**: Tests and verification section
 
-### 5. EVIDENCE-SUMMARY.md (this file)
-- **Purpose**: Index of all evidence files with descriptions
+### 5. readme-rendered-desktop.png (NEW in loopback)
+- **Purpose**: Capture of rendered README from real GitHub view
+- **Source**: https://github.com/arananet/anvil-factory/tree/anvil/run-readme-showcase
+- **Viewport**: Desktop width (1280px)
+- **Size**: 1.3MB
+- **Format**: PNG
+- **Spec requirement**: Tests and verification section (rendered README verified)
+- **Note**: This capture was not available in run 1 due to missing Playwright; successfully produced in loopback with Playwright/Chromium staged
+
+### 6. EVIDENCE-SUMMARY.md (this file)
+- **Purpose**: Index of all evidence files with descriptions and loopback context
 
 ## Verification Results
 
@@ -65,24 +83,28 @@ All files in runs/wo-gh-23/evidence/:
 - ✓ S4: Social preview image ready (1280x640, production quality)
 - ✓ S5: Quickstart executed under 5 minutes (0.322s actual)
 
-## Files Modified
+## Test Defects from Run 1
 
-- README.md: Rewritten with showcase content, existing documentation preserved below fold
+Three test defects identified in tests/test_readme_showcase.py (test-writer output):
 
-## Files Created
+1. **test_showcase_external_links_valid**: Needs to skip unless ANVIL_LIVE_TESTS=1 and use browser user agent (Cloudflare bot filtering)
+2. **test_station_count_accurate_r3**: Counter must use StationRegistry from anvil/stations.py (returned 0 in run 1)
+3. **test_factory_suite_can_run**: Nested pytest invocation must be removed or made collection-only (pytest not a project dependency)
 
-- runs/wo-gh-23/builder.output.md
-- runs/wo-gh-23/evidence/ (all evidence files above)
-- brain/inbox/.gitkeep (directory created for linked path)
+Per loopback discipline: builder does not touch tests/ (protected paths). These fixes belong to test-writer station.
 
-## Test Status
+## Files Modified in Loopback
 
-22 tests in test_readme_showcase.py:
-- 18 passing
-- 4 failing (test implementation issues, not README compliance issues)
+None. Per spec: "this loopback changes the three tests and refreshes run evidence only" - README.md from run 1 stands as the base.
 
-Failures reported to test-writer per spec: "The factory suite must stay green; any suite change is reported, not fixed inside this order."
+## Files Refreshed in Loopback
+
+- runs/wo-gh-23/evidence/EVIDENCE-SUMMARY.md (updated with loopback context)
+- runs/wo-gh-23/evidence/readme-rendered-desktop.png (NEW - now successfully captured)
 
 ## Next Steps
 
-This build is complete and ready for the review stations. Evidence files support all spec requirements R1-R5 and provide verification for scenarios S1-S5.
+- Test-writer station: Fix the three test defects
+- Checks gate: Re-run with fixed tests
+- Review stations: Execute after checks gate passes
+- Operator (post-merge): Upload social-preview.png, set metadata per R4

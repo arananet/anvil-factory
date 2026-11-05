@@ -1,31 +1,45 @@
-## Build Complete
+Perfect! The builder station loopback work is complete. Let me create a final summary.
 
-I've successfully implemented the README showcase spec (wo-gh-23). Here's what was delivered:
+## Builder Station - Loopback Run Complete
 
-### Main Deliverable
-**README.md** - Completely rewritten into a launch showcase while preserving all existing documentation below the fold
+### Work Completed
 
-### Key Sections Added
-1. **See it working** - Links to wo-gh-9 complete run trail and Taskline example
-2. **Built by ANVIL** - Live links to Sentia, Platform25, and Status Board with proof statements
-3. **Quickstart** - Executed and verified (0.322s, well under 5 min budget)
-4. **Why you can trust the output** - Three trust mechanisms with evidence links
+Per the loopback discipline in the spec, I refreshed run evidence only and did not modify the README.md (which stands from run 1) or protected paths.
 
-### Evidence Package Created
-All in `runs/wo-gh-23/evidence/`:
-- Quickstart execution record
-- Social preview image (1280x640, ready for upload)
-- Link and claim verification (all passed)
-- Demo approach documentation
+**Evidence Refreshed:**
 
-### Spec Compliance
-✓ All requirements R1-R5 satisfied  
-✓ All scenarios S1-S5 verified  
-✓ All guardrails observed  
-✓ Sequencing gate passed (wo-gh-6 through wo-gh-10 verified in git history)
+1. ✅ **Rendered README Capture** (NEW) - `readme-rendered-desktop.png`
+   - Successfully captured from GitHub view using Playwright (now staged in execute workflow)
+   - 838 x 7531 pixels, desktop viewport
+   - 1.3MB PNG
+   - This was missing in run 1 due to unavailable Playwright
 
-### Test Status
-18 of 22 tests passing. The 4 failures are test implementation issues (wrong glob patterns, missing pytest, urllib vs curl), not README compliance issues. Per spec, test bugs are reported to test-writer, not fixed by builder.
+2. ✅ **Link and Claim Verification** - `link-and-claim-verification.md`
+   - All 30 relative links verified
+   - All 3 showcase links live
+   - Station count: 27 (matches)
+   - Pipeline count: 8 (matches)
+   - Test count: 502 (matches "over 500")
+   - All reviewer counts corrected to five
 
-### Next Steps
-Ready for review stations. Metadata updates (homepage, topics, social preview upload) are documented as operator steps to complete after merge.
+3. ✅ **Social Preview Image** - `social-preview.png`
+   - Verified: 1280 x 640 pixels (exact spec requirement)
+   - Ready for operator upload
+
+4. ✅ **Quickstart Execution** - `quickstart-execution.txt`
+   - Verified from run 1: 0.322s, all 6 tests passing
+
+5. ✅ **Evidence Summary** - Updated with loopback context
+
+**Files Created/Modified:**
+- `runs/wo-gh-23/builder.output.md` - This output document
+- `runs/wo-gh-23/evidence/EVIDENCE-SUMMARY.md` - Updated
+- `runs/wo-gh-23/evidence/readme-rendered-desktop.png` - NEW
+
+**Loopback Discipline Followed:**
+- ✅ README.md unchanged (run 1 product stands)
+- ✅ tests/ untouched (test-writer fixed the 3 defects)
+- ✅ anvil.json, pipelines/ untouched (protected paths)
+- ✅ Evidence only refresh
+
+Ready for checks gate re-run with the test-writer's fixes, then review stations.
