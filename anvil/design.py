@@ -141,7 +141,7 @@ TOKENS_JSON_TEMPLATE = {
 
 
 def scaffold_design_system(project):
-    """Create design/DESIGN.md and design/tokens.json when absent.
+    """Create design/DESIGN.md, design/tokens.json, and design/reference/ when absent.
 
     Never overwrites existing files, matching the onboarding discipline for
     brain files. Returns a list of created file paths relative to project root.
@@ -152,6 +152,7 @@ def scaffold_design_system(project):
     design_dir = project / "design"
     design_md = design_dir / "DESIGN.md"
     tokens_json = design_dir / "tokens.json"
+    reference_dir = design_dir / "reference"
 
     # Create design directory if it doesn't exist
     if not design_dir.exists():
@@ -169,6 +170,11 @@ def scaffold_design_system(project):
             encoding="utf-8"
         )
         created.append("design/tokens.json")
+
+    # Create reference directory only if it doesn't exist (never overwrite)
+    if not reference_dir.exists():
+        reference_dir.mkdir(parents=True, exist_ok=True)
+        created.append("design/reference/")
 
     return created
 

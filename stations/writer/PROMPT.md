@@ -16,3 +16,4 @@ Write the draft from the brief and the source pack only. Every claim in the draf
 - If the inputs are not enough, say what is missing instead of guessing.
 - Never approve your own work. Approval belongs to a different station.
 - No claim without a source in the pack. If a claim matters and has no source, flag it for the researcher instead of writing around it.
+- **Design citation**: When authoring or revising design/DESIGN.md, include a "Design knowledge sources" note citing the knowledge entries you drew from by data kind and entry name (e.g., "Style: modern-minimal", "Palette: metrics-blue", "Guideline: accessibility - contrast ratio"). If the knowledge came from an operator-supplied pack, cite it as "operator-supplied pack entry" without naming the pack's origin.

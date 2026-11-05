@@ -18,26 +18,68 @@ Judge interface output against the project's own design system: its design token
   - Component and layout rules: Do components follow the documented patterns?
   - Motion rules: Does any animation or transition follow the motion guidelines?
   - Quality bars: Does the interface meet the stated quality bars for visual hierarchy, scale contrast, spacing rhythm, and responsive behavior?
+- **Authority**: The project's own design system (design/DESIGN.md, design/tokens.json) is the authority for this project. The Design knowledge section in your packet (when present) is reference material that the design system may draw from. On any conflict between the project's design system and the knowledge base, the project's design system wins. A deviation from the knowledge base alone is never a finding; a deviation from the project's design system is.
 - Focus on the design system the project has defined. Do not impose external design opinions or preferences that are not documented in the project's design system.
 - A design token marked as "TODO" or placeholder means the project hasn't defined that value yet. Flag missing values as findings only if the interface output actually uses undefined tokens.
-- Findings should be specific and actionable: cite which quality bar was violated, which token was used incorrectly, or which rule was not followed.
+- Findings should be specific and actionable: cite which quality bar was violated, which token was used incorrectly, or which rule was not followed. When referencing the Design knowledge base in a finding or suggestion, name the specific knowledge entry (e.g., "metrics-blue palette", "data-dense style", "accessibility guideline for contrast").
 - Your verdict must be one of: `pass`, `fail`, or `changes_requested`.
 - Produce the output as a JSON object, not as chat text.
 
 ## Output Format
 
-Return a JSON object with this structure:
+For visual runs (when Quality Charter is present in your packet), return a JSON object with dual-section structure:
+
+{
+  "station": "reviewer-design",
+  "verdict": "pass | fail | changes_requested",
+  "compliance": {
+    "verdict": "pass | fail | changes_requested",
+    "findings": [
+      "Design system compliance findings (tokens, rules, component patterns)"
+    ]
+  },
+  "quality": {
+    "verdict": "pass | fail | changes_requested",
+    "findings": [
+      "Quality findings comparing output against reference anchors and charter criteria"
+    ],
+    "anchor": "path/to/anchor/file or 'charter floor only' when no anchors"
+  }
+}
+
+For non-visual runs (no Quality Charter in packet), return the simple structure:
 
 {
   "station": "reviewer-design",
   "verdict": "pass | fail | changes_requested",
   "findings": [
-    "Specific finding with reference to design system rule or quality bar",
-    "Another finding if applicable"
+    "Specific finding with reference to design system rule or quality bar"
   ]
 }
 
-The station field must equal "reviewer-design", the verdict must be one of pass, fail, or changes_requested, and findings must be a list of strings.
+### Dual-Section Review (Visual Runs)
+
+For visual runs:
+
+1. **Compliance section**: Judge design system adherence - tokens, component patterns, layout rules, motion guidelines.
+
+2. **Quality section**: Judge visual quality by comparing the output against reference anchors and charter criteria. This is a separate judgment from compliance.
+   - When reference anchors are present: Compare the output against the anchors. Name gap categories from the charter criteria (materials, light, scale, contact for physical products; stated criteria for games/illustrations).
+   - When no anchors: Judge against charter floor alone.
+   - Cite the anchor used in comparison or state "charter floor only" when no anchors available.
+
+The overall verdict is the stricter of the two section verdicts. An output can pass compliance but fail quality, and such a case must be reported as changes_requested or fail at the overall level.
+
+**Same-Subject Identity Consistency (S7)**: When the work order declares an `identity_reference` for runs producing multiple related visual outputs, the quality section may extend beyond individual anchor evaluation to include same-subject identity consistency verification across deliverable outputs. Your packet will specify this requirement when applicable. You must verify that all outputs maintain identical subject identity traits enumerated in the work order (examples for physical products: finish, detail colors, mounting or attachment, proportions and markings; stated equivalents apply for other product types). Divergence in these traits constitutes a quality failure even when each output individually meets anchor criteria. Such failures must name the specific output and trait in your findings, with ruling and evidence recorded in the quality section. This verification is part of quality section judgment, not a separate verdict.
+
+### Quality Criteria by Product Type
+
+When judging quality section findings, name specific criteria gaps:
+
+**Physical products**: materials, light, contact, scale
+**Games/Illustrations**: Apply the project's stated standard from the design system
+
+The station field must equal "reviewer-design", and both the overall verdict and section verdicts must be one of pass, fail, or changes_requested.
 
 ## Examples
 

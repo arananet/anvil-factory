@@ -19,6 +19,7 @@ class Station:
     model: str = ""
     prompt_path: str = ""
     tools: list = field(default_factory=list)
+    guided: bool = False
 
 class StationRegistry:
     def __init__(self, stations):
@@ -65,7 +66,8 @@ def load_registry(stations_dir):
                                 context=list(data.get("context", ["brain/project.md", ".openspec/specs/"])),
                                 model=str(data.get("model", default_model(data["id"]))),
                                 prompt_path=str(data.get("prompt", f"stations/{data['id']}/PROMPT.md")),
-                                tools=list(data.get("tools", []))))
+                                tools=list(data.get("tools", [])),
+                                guided=bool(data.get("guided", False))))
     return StationRegistry(stations)
 
 load_stations = load_registry

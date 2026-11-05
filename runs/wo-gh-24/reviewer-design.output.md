@@ -1,1 +1,0 @@
-Design review complete. This work order contains only backend Python infrastructure changes with no interface output to review against the design system, so the verdict is pass. Review written to runs/wo-gh-24/reviewer-design.review.json.

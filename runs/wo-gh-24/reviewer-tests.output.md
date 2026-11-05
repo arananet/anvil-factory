@@ -1,1 +1,0 @@
-Review complete. All tests are real, mapped to spec scenarios, and passing. The full factory suite (151 tests) is green, including all review producer tests (24) and review parsing integrity tests (21). Both Round 3 findings have passing test coverage.

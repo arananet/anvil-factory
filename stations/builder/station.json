@@ -16,5 +16,7 @@
   ],
   "model": "fast-builder",
   "prompt": "stations/builder/PROMPT.md",
-  "tools": []
+  "tools": [],
+  "guided": true,
+  "designation": "guided design station"
 }

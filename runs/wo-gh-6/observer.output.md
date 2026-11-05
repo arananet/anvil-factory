@@ -1,0 +1,1 @@
+Observer output created. The deployer station hasn't executed yet, so there's no release record to observe. The output file documents the missing input and what needs to happen next - the deployer must run first and produce its release record before the observer can report on the actual behavior of the deployed change.

@@ -1,0 +1,58 @@
+[
+  {
+    "guideline": "Maintain minimum 4.5:1 contrast ratio for normal text, 3:1 for large text (18pt+)",
+    "concern": "accessibility"
+  },
+  {
+    "guideline": "Touch targets must be at least 44x44px on mobile devices",
+    "concern": "accessibility"
+  },
+  {
+    "guideline": "Use consistent spacing scale throughout (e.g., 4px, 8px, 16px, 24px, 32px)",
+    "concern": "spacing"
+  },
+  {
+    "guideline": "Group related elements together with whitespace separating distinct sections",
+    "concern": "spacing"
+  },
+  {
+    "guideline": "Establish clear visual hierarchy using size, weight, and color",
+    "concern": "hierarchy"
+  },
+  {
+    "guideline": "Important actions should be visually prominent and easy to locate",
+    "concern": "hierarchy"
+  },
+  {
+    "guideline": "Test layouts at mobile (320-768px), tablet (768-1024px), and desktop (1024px+) breakpoints",
+    "concern": "responsive"
+  },
+  {
+    "guideline": "Avoid horizontal scrolling on standard viewports",
+    "concern": "responsive"
+  },
+  {
+    "guideline": "Keep animation durations between 200-400ms for most transitions",
+    "concern": "motion"
+  },
+  {
+    "guideline": "Provide reduced motion alternatives for users with vestibular sensitivity",
+    "concern": "motion"
+  },
+  {
+    "guideline": "Form fields should have clear labels and validation feedback",
+    "concern": "forms"
+  },
+  {
+    "guideline": "Error messages should explain what went wrong and how to fix it",
+    "concern": "forms"
+  },
+  {
+    "guideline": "Loading states should appear after 300ms delay to avoid flashing",
+    "concern": "feedback"
+  },
+  {
+    "guideline": "Provide immediate visual feedback for user actions",
+    "concern": "feedback"
+  }
+]

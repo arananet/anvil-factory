@@ -17,6 +17,35 @@ human_required flag and the executed reviewer steps, and labels it
 "derived from the run record" so nobody mistakes it for the runner's own
 words.
 
+## Lifecycle board
+
+The page leads with a lifecycle board: one row per work order showing its
+stage progression at a glance. The stages are fixed vocabulary (SPEC, BUILD,
+REVIEW, APPROVED, MERGED) derived from evidence in each run's report:
+
+- **SPEC**: spec-writer step executed
+- **BUILD**: builder step executed
+- **REVIEW**: at least one reviewer step executed
+- **APPROVED**: verdict is approved
+- **MERGED**: a merge record exists in `merge_records/<work-order-id>.json` with `merged: true`
+
+Each row shows the work order ID (as a real anchor link to that job's detailed
+run section), title, and stage sequence with reached stages marked and the
+current stage (the furthest reached) highlighted. When a work order's latest
+run requires human review, a NEEDS HUMAN badge appears next to the stages.
+Intake states (PARKED from a `waiting_info` verdict, REJECTED from a
+`rejected` verdict) replace the stage progression when the run ended in that
+state.
+
+The board is regenerated from run reports and merge records on disk each time
+the page is generated, with no network calls and no inference from branch
+names or commit messages. Regenerating from the same data produces the same
+board.
+
+The board styling uses a consistent spacing scale (CSS custom properties),
+adapts to narrow viewports without horizontal scrolling, and all text meets
+WCAG 4.5:1 contrast minimums for accessibility.
+
 ## Generate
 
 ```bash

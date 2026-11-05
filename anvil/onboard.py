@@ -67,8 +67,18 @@ def onboard_project(path, name=None, description=None, contact=None):
     """Bring an existing project onto the line. Never overwrites a file."""
     root = Path(path)
     report = analyze_project(root)
-    if report["already_onboarded"]:
-        raise ValueError(f"{root} is already onboarded (anvil.json exists). Refusing to onboard twice.")
+
+    # Check if already onboarded by looking for onboarded:true in anvil.json
+    config_path = root / "anvil.json"
+    if config_path.exists():
+        try:
+            existing_config = json.loads(config_path.read_text(encoding="utf-8"))
+            if existing_config.get("onboarded") is True:
+                raise ValueError(f"{root} is already onboarded (anvil.json has onboarded:true). Refusing to onboard twice.")
+        except (json.JSONDecodeError, OSError):
+            # If we can't read the config, proceed and let _write_if_missing handle it
+            pass
+
     name = name or report["name"]
     created, kept = [], []
 
@@ -113,7 +123,20 @@ def onboard_project(path, name=None, description=None, contact=None):
     )
     _write_if_missing(root, ".openspec/specs/existing-baseline/spec.md", baseline, created, kept)
     _write_if_missing(root, "anvil.yaml", render_anvil_yaml(STATION_IDS), created, kept)
-    _write_if_missing(root, "anvil.json", json.dumps({"pipeline": "sdlc-default", "project": name, "mode": "brownfield", "onboarded": True}, indent=2) + "\n", created, kept)
+
+    # Create onboarding configuration with metrics slot
+    onboard_config = {
+        "pipeline": "sdlc-default",
+        "project": name,
+        "mode": "brownfield",
+        "onboarded": True,
+        "metrics": {
+            "_comment": "Optional: Configure your application metrics endpoint and provider credentials here to connect your own metrics provider",
+            "endpoint": "",
+            "provider_key": ""
+        }
+    }
+    _write_if_missing(root, "anvil.json", json.dumps(onboard_config, indent=2) + "\n", created, kept)
     # Scaffold design system (never overwrites existing files)
     for design_file in scaffold_design_system(root):
         created.append(design_file)

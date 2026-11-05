@@ -1,0 +1,23 @@
+{
+  "selected_reviewers": [
+    "reviewer-spec",
+    "reviewer-security",
+    "reviewer-tests"
+  ],
+  "routed_out": [
+    {
+      "reviewer": "reviewer-architecture",
+      "reason": "Routed out by low risk rule with surface exceptions"
+    },
+    {
+      "reviewer": "reviewer-design",
+      "reason": "Routed out by low risk rule with surface exceptions"
+    }
+  ],
+  "selected_models": {
+    "reviewer-spec": "review-cheap",
+    "reviewer-tests": "review-cheap",
+    "reviewer-security": "review-strong"
+  },
+  "reason": "Low risk; security surface keeps reviewer-security"
+}
