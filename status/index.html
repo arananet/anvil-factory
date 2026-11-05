@@ -70,7 +70,7 @@ footer { color:#8A8A8A; font-size:13px; margin-top:var(--space-32); }
 <main>
 <h1>ANVIL <span class="accent">run status</span></h1>
 <div class="muted mono">project: anvil-factory</div>
-<div class="snapshot">Snapshot generated from the run reports on disk at 2026-11-05 00:16:54 UTC. This page is a snapshot, not a live feed. Regenerate it with <span class="mono">anvil status-page &lt;project&gt;</span>.</div>
+<div class="snapshot">Snapshot generated from the run reports on disk at 2026-11-05 00:24:46 UTC. This page is a snapshot, not a live feed. Regenerate it with <span class="mono">anvil status-page &lt;project&gt;</span>.</div>
 <section class="lifecycle-board">
 <h2 class="board-title">Lifecycle Board</h2>
 <div class="board-description">Stage progression for each work order. Stages: SPEC → BUILD → REVIEW → APPROVED → MERGED.</div>
@@ -183,6 +183,32 @@ footer { color:#8A8A8A; font-size:13px; margin-top:var(--space-32); }
 <div class="board-row-header">
 <h3 class="board-wo-id"><a href="#wo-gh-20-detail" class="board-wo-id">wo-gh-20</a></h3>
 <div class="board-wo-title">Community files by default in every project ANVIL generates</div>
+</div>
+<div class="board-stages">
+<span class="board-stage stage-reached">SPEC</span>
+<span class="board-stage stage-reached">BUILD</span>
+<span class="board-stage stage-reached">REVIEW</span>
+<span class="board-stage stage-reached stage-current">APPROVED</span>
+<span class="board-stage">MERGED</span>
+</div>
+</div>
+<div class="board-row">
+<div class="board-row-header">
+<h3 class="board-wo-id"><a href="#wo-gh-21-detail" class="board-wo-id">wo-gh-21</a></h3>
+<div class="board-wo-title">Fix the excessive Astra route consumption</div>
+</div>
+<div class="board-stages">
+<span class="board-stage stage-reached">SPEC</span>
+<span class="board-stage stage-reached">BUILD</span>
+<span class="board-stage stage-reached">REVIEW</span>
+<span class="board-stage stage-reached stage-current">APPROVED</span>
+<span class="board-stage">MERGED</span>
+</div>
+</div>
+<div class="board-row">
+<div class="board-row-header">
+<h3 class="board-wo-id"><a href="#wo-gh-25-detail" class="board-wo-id">wo-gh-25</a></h3>
+<div class="board-wo-title">Render crash tolerance: judge chunks by their outputs, sweep the missing ranges</div>
 </div>
 <div class="board-stages">
 <span class="board-stage stage-reached">SPEC</span>
@@ -461,6 +487,52 @@ footer { color:#8A8A8A; font-size:13px; margin-top:var(--space-32); }
 </tbody></table>
 </div>
 </section>
+<section class="run" id="wo-gh-21-detail">
+<h2>wo-gh-21</h2>
+<div>Fix the excessive Astra route consumption</div>
+<div class="meta"><span>pipeline: <b>sdlc-default</b></span><span>verdict: <b><span class="status st-ok">approved</span></b></span><span>human review required: <b>False</b></span><span>deployment: <b>-</b></span><span>loopbacks: <b>0</b></span></div>
+<div class="decision"><div><span class='mono muted'>approver:</span> All counted reviews passed. (Counted 4 reviews, expected 5.)</div><div><span class='mono muted'>human gate:</span> Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.</div></div>
+<div class="table-container">
+<table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>
+<tr><td class='mono'>intake<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.012</td><td>null</td><td class='artifacts'>runs/wo-gh-21/report.json</td></tr>
+<tr><td class='mono'>spec-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>629445.678</td><td>null</td><td class='artifacts'>runs/wo-gh-21/spec-writer.output.md</td></tr>
+<tr><td class='mono'>test-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>221077.287</td><td>null</td><td class='artifacts'>runs/wo-gh-21/test-writer.output.md</td></tr>
+<tr><td class='mono'>builder<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>231487.561</td><td>null</td><td class='artifacts'>runs/wo-gh-21/builder.output.md</td></tr>
+<tr><td class='mono'>reviewer-spec<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>332574.348</td><td>null</td><td class='artifacts'>runs/wo-gh-21/reviewer-spec.output.md</td></tr>
+<tr><td class='mono'>reviewer-security<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>216822.993</td><td>null</td><td class='artifacts'>runs/wo-gh-21/reviewer-security.output.md</td></tr>
+<tr><td class='mono'>reviewer-tests<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>121931.93</td><td>null</td><td class='artifacts'>runs/wo-gh-21/reviewer-tests.output.md</td></tr>
+<tr><td class='mono'>reviewer-architecture<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>125810.25</td><td>null</td><td class='artifacts'>runs/wo-gh-21/reviewer-architecture.output.md</td></tr>
+<tr><td class='mono'>reviewer-design<div class='muted'>configured: review-balanced</div></td><td><span class="status st-ok">executed</span></td><td>49362.653</td><td>null</td><td class='artifacts'>runs/wo-gh-21/reviewer-design.output.md</td></tr>
+<tr><td class='mono'>approver<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.04</td><td>null</td><td class='artifacts'>runs/wo-gh-21/report.json</td></tr>
+<tr><td class='mono'>triage-human<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.01</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>deployer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-idle">packet_ready</span></td><td>0.23</td><td>null</td><td class='artifacts'>runs/wo-gh-21/deployer.packet.md</td></tr>
+<tr><td class='mono'>observer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>81604.672</td><td>null</td><td class='artifacts'>runs/wo-gh-21/observer.output.md</td></tr>
+</tbody></table>
+</div>
+</section>
+<section class="run" id="wo-gh-25-detail">
+<h2>wo-gh-25</h2>
+<div>Render crash tolerance: judge chunks by their outputs, sweep the missing ranges</div>
+<div class="meta"><span>pipeline: <b>sdlc-default</b></span><span>verdict: <b><span class="status st-ok">approved</span></b></span><span>human review required: <b>False</b></span><span>deployment: <b>-</b></span><span>loopbacks: <b>0</b></span></div>
+<div class="decision"><div><span class='mono muted'>approver:</span> All counted reviews passed.</div><div><span class='mono muted'>human gate:</span> Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.</div></div>
+<div class="table-container">
+<table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>
+<tr><td class='mono'>intake<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.014</td><td>null</td><td class='artifacts'>runs/wo-gh-25/report.json</td></tr>
+<tr><td class='mono'>spec-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>343143.259</td><td>null</td><td class='artifacts'>runs/wo-gh-25/spec-writer.output.md</td></tr>
+<tr><td class='mono'>test-writer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>501608.961</td><td>null</td><td class='artifacts'>runs/wo-gh-25/test-writer.output.md</td></tr>
+<tr><td class='mono'>builder<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>378053.87</td><td>null</td><td class='artifacts'>runs/wo-gh-25/builder.output.md</td></tr>
+<tr><td class='mono'>reviewer-spec<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>147070.308</td><td>null</td><td class='artifacts'>runs/wo-gh-25/reviewer-spec.output.md</td></tr>
+<tr><td class='mono'>reviewer-security<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>129792.756</td><td>null</td><td class='artifacts'>runs/wo-gh-25/reviewer-security.output.md</td></tr>
+<tr><td class='mono'>reviewer-tests<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>159121.752</td><td>null</td><td class='artifacts'>runs/wo-gh-25/reviewer-tests.output.md</td></tr>
+<tr><td class='mono'>reviewer-architecture<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-ok">executed</span></td><td>100262.605</td><td>null</td><td class='artifacts'>runs/wo-gh-25/reviewer-architecture.output.md</td></tr>
+<tr><td class='mono'>reviewer-design<div class='muted'>configured: review-balanced</div></td><td><span class="status st-ok">executed</span></td><td>49060.298</td><td>null</td><td class='artifacts'>runs/wo-gh-25/reviewer-design.output.md</td></tr>
+<tr><td class='mono'>approver<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.038</td><td>null</td><td class='artifacts'>runs/wo-gh-25/report.json</td></tr>
+<tr><td class='mono'>triage-human<div class='muted'>configured: default</div></td><td><span class="status st-ok">completed</span></td><td>0.011</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>deployer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-idle">packet_ready</span></td><td>0.243</td><td>null</td><td class='artifacts'>runs/wo-gh-25/deployer.packet.md</td></tr>
+<tr><td class='mono'>observer<div class='muted'>configured: claude-sonnet-4-5</div></td><td><span class="status st-failed">failed</span></td><td>25308.734</td><td>null</td><td class='artifacts'>runs/wo-gh-25/observer.packet.md</td></tr>
+</tbody></table>
+</div>
+</section>
 <section class="run" id="wo-gh-6-detail">
 <h2>wo-gh-6</h2>
 <div>Deterministic checks gate with protected paths</div>
@@ -558,5 +630,6 @@ footer { color:#8A8A8A; font-size:13px; margin-top:var(--space-32); }
 </div>
 </section>
 <footer>Generated by ANVIL from runs/*/report.json. Cost is null unless a runtime reported it; ANVIL never invents a number.
+<br>Skipped run folders with a missing or unreadable report.json: unknown.
 </footer>
 </main></body></html>
