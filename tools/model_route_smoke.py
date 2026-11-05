@@ -20,6 +20,10 @@ import json
 import os
 import sys
 import urllib.request
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from codex_station import gateway_openai_config  # noqa: E402
 
 
 def probe_anthropic(model, description):
@@ -62,11 +66,11 @@ def probe_anthropic(model, description):
 
 def probe_openai_text(model, description):
     """Probe OpenAI route through AI Gateway with text."""
-    base_url = os.environ.get("OPENAI_BASE_URL")
-    api_key = os.environ.get("OPENAI_API_KEY")
-
-    if not base_url or not api_key:
-        return False, "Missing OPENAI_BASE_URL or OPENAI_API_KEY environment variables"
+    # R11: same gateway environment as the OpenAI runtime (no OPENAI_* variables)
+    try:
+        base_url, api_key = gateway_openai_config()
+    except RuntimeError as e:
+        return False, f"{description}: {e}"
 
     # Use bare model id for OpenAI
     bare_model = model.split("/")[-1] if "/" in model else model
@@ -79,12 +83,13 @@ def probe_openai_text(model, description):
 
     try:
         req = urllib.request.Request(
-            f"{base_url}/v1/chat/completions",
+            f"{base_url}/chat/completions",
             data=json.dumps(payload).encode("utf-8"),
             method="POST"
         )
         req.add_header("Content-Type", "application/json")
         req.add_header("Authorization", f"Bearer {api_key}")
+        req.add_header("cf-aig-authorization", f"Bearer {api_key}")
 
         with urllib.request.urlopen(req, timeout=30) as resp:
             body = json.loads(resp.read().decode("utf-8"))
@@ -101,11 +106,11 @@ def probe_openai_text(model, description):
 
 def probe_openai_vision(model, description):
     """Probe OpenAI route through AI Gateway with vision (small image)."""
-    base_url = os.environ.get("OPENAI_BASE_URL")
-    api_key = os.environ.get("OPENAI_API_KEY")
-
-    if not base_url or not api_key:
-        return False, "Missing OPENAI_BASE_URL or OPENAI_API_KEY environment variables"
+    # R11: same gateway environment as the OpenAI runtime (no OPENAI_* variables)
+    try:
+        base_url, api_key = gateway_openai_config()
+    except RuntimeError as e:
+        return False, f"{description}: {e}"
 
     # Generate a tiny 1x1 red PNG
     # PNG signature + IHDR + IDAT + IEND
@@ -133,12 +138,13 @@ def probe_openai_vision(model, description):
 
     try:
         req = urllib.request.Request(
-            f"{base_url}/v1/chat/completions",
+            f"{base_url}/chat/completions",
             data=json.dumps(payload).encode("utf-8"),
             method="POST"
         )
         req.add_header("Content-Type", "application/json")
         req.add_header("Authorization", f"Bearer {api_key}")
+        req.add_header("cf-aig-authorization", f"Bearer {api_key}")
 
         with urllib.request.urlopen(req, timeout=30) as resp:
             body = json.loads(resp.read().decode("utf-8"))

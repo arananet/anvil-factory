@@ -60,6 +60,13 @@ Dispatch:
   fallback chain and no silent model switching anywhere in the dispatch.
 The executed model recorded in the run report comes from runtime evidence
 (the runtime reports what it ran), never copied from the configured label.
+Handing the configured model to the runtime is not recording it: executor and
+runner record executed_model only from the runtime's self-report, and it is
+null when the runtime reports none (agent-execution S8 holds unchanged). The
+dispatch wrapper self-reports the model it actually dispatched through the
+existing self-report channel. Every executor the runner can call (command,
+HTTP, packet-only, and the suite's fake executors) accepts the model hand-off
+consistently; no call site raises on it.
 
 R4. Review channel invariants hold for every runtime. Reviewer stations,
 design reviewers included, write exactly their own review file through the
@@ -75,12 +82,12 @@ openai/gpt-6.1-sol through the R3 dispatch. On non-UI work the builder
 executes on claude-opus-5-5. The assignment is visible per step in the run
 report (configured versus executed).
 
-R6. Cost measurement. The price table gains entries for claude-opus-5-5,
-claude-sonnet-5-5 and openai/gpt-6.1-sol, each with its source and the date
-recorded, per the labeled price rule of the cost measurement capability. A
-model without a verifiable price is left out and its steps record measured
-false with the reason, as the cost spec already provides; no price is
-invented.
+R6. Cost measurement. An entry for claude-opus-5-5, claude-sonnet-5-5 or
+openai/gpt-6.1-sol may be added only with a verifiable source a reviewer can
+check, labelled with that source and a current date, per the labeled price
+rule of the cost measurement capability. Absent such a source the model stays
+unpriced and its steps record measured false with the reason, as the cost
+spec already provides. No source, date or price is invented or backdated.
 
 R7. Decision record. brain/decisions/0004 records this switch following the
 existing convention (records at brain/decisions/NNNN-slug.md, heading
@@ -129,3 +136,40 @@ S7. tools/model_route_smoke.py exists, is executable by the workflows, and
 its failure mode is a non-zero exit with the failing route named (its live
 pass is proven by the operator's post-merge verification run, not by this
 order's own run, which executes on the wiring it replaces).
+
+R10. Tier resolution at hand-off. The runner resolves every model label to a
+concrete model when it computes a step's effective model, after registry,
+project config, routing and guided resolution. One total map covers every
+label the runner can produce:
+- review-balanced, review-strong: claude-sonnet-5-5
+- fast-builder, reasoning-strong: claude-opus-5-5
+- writing-strong, fast-reader, media-gen, default: claude-sonnet-5-5
+- a value already concrete (claude-opus-5-5, claude-sonnet-5-5,
+  openai/gpt-6.1-sol) passes through unchanged.
+No label reaches the runtime unresolved, and configured_model in the report
+is always a concrete model. The dispatcher still fails loudly on anything
+that is not a known concrete model. Routing's tier vocabulary and its spec do
+not change; resolution happens at hand-off only.
+
+R11. OpenAI runtime environment. The OpenAI runtime (Codex) builds its
+endpoint and credential from the gateway environment the workflows already
+supply, with no new secrets and no OPENAI_* variables required:
+- endpoint: the gateway OpenAI provider route derived from the gateway
+  coordinates in ANTHROPIC_BASE_URL, or ANVIL_GATEWAY_OPENAI_URL when set
+- credential: CF_AIG_TOKEN
+- model: the bare id gpt-6.1-sol
+It fails loudly only when that gateway environment is absent, naming the
+missing variables and never printing their values.
+
+S8. Unit tests prove every label in the R10 map resolves as listed, the map
+is total over the labels the runner can produce, a routed reviewer's hand-off
+to a fake runtime carries the concrete model, and configured_model in the
+report is concrete for routed reviewers.
+S9. A unit test proves the OpenAI runtime constructs its configuration from
+CF_AIG_TOKEN and ANTHROPIC_BASE_URL alone, honours ANVIL_GATEWAY_OPENAI_URL
+when set, and fails loudly when the gateway environment is absent.
+S10. The agent-execution S8 provenance tests pass unmodified: executed_model
+is null when the runtime reports none and equals the self-reported value when
+it reports one, under every executor class.
+S11. The price table contains no entry without a verifiable source and date;
+the three new models are unpriced unless such a source is provided.

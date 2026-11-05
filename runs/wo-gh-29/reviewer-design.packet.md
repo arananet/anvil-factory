@@ -247,6 +247,13 @@ Dispatch:
   fallback chain and no silent model switching anywhere in the dispatch.
 The executed model recorded in the run report comes from runtime evidence
 (the runtime reports what it ran), never copied from the configured label.
+Handing the configured model to the runtime is not recording it: executor and
+runner record executed_model only from the runtime's self-report, and it is
+null when the runtime reports none (agent-execution S8 holds unchanged). The
+dispatch wrapper self-reports the model it actually dispatched through the
+existing self-report channel. Every executor the runner can call (command,
+HTTP, packet-only, and the suite's fake executors) accepts the model hand-off
+consistently; no call site raises on it.
 
 R4. Review channel invariants hold for every runtime. Reviewer stations,
 design reviewers included, write exactly their own review file through the
@@ -262,12 +269,12 @@ openai/gpt-6.1-sol through the R3 dispatch. On non-UI work the builder
 executes on claude-opus-5-5. The assignment is visible per step in the run
 report (configured versus executed).
 
-R6. Cost measurement. The price table gains entries for claude-opus-5-5,
-claude-sonnet-5-5 and openai/gpt-6.1-sol, each with its source and the date
-recorded, per the labeled price rule of the cost measurement capability. A
-model without a verifiable price is left out and its steps record measured
-false with the reason, as the cost spec already provides; no price is
-invented.
+R6. Cost measurement. An entry for claude-opus-5-5, claude-sonnet-5-5 or
+openai/gpt-6.1-sol may be added only with a verifiable source a reviewer can
+check, labelled with that source and a current date, per the labeled price
+rule of the cost measurement capability. Absent such a source the model stays
+unpriced and its steps record measured false with the reason, as the cost
+spec already provides. No source, date or price is invented or backdated.
 
 R7. Decision record. brain/decisions/0004 records this switch following the
 existing convention (records at brain/decisions/NNNN-slug.md, heading
@@ -317,39 +324,77 @@ its failure mode is a non-zero exit with the failing route named (its live
 pass is proven by the operator's post-merge verification run, not by this
 order's own run, which executes on the wiring it replaces).
 
+R10. Tier resolution at hand-off. The runner resolves every model label to a
+concrete model when it computes a step's effective model, after registry,
+project config, routing and guided resolution. One total map covers every
+label the runner can produce:
+- review-balanced, review-strong: claude-sonnet-5-5
+- fast-builder, reasoning-strong: claude-opus-5-5
+- writing-strong, fast-reader, media-gen, default: claude-sonnet-5-5
+- a value already concrete (claude-opus-5-5, claude-sonnet-5-5,
+  openai/gpt-6.1-sol) passes through unchanged.
+No label reaches the runtime unresolved, and configured_model in the report
+is always a concrete model. The dispatcher still fails loudly on anything
+that is not a known concrete model. Routing's tier vocabulary and its spec do
+not change; resolution happens at hand-off only.
+
+R11. OpenAI runtime environment. The OpenAI runtime (Codex) builds its
+endpoint and credential from the gateway environment the workflows already
+supply, with no new secrets and no OPENAI_* variables required:
+- endpoint: the gateway OpenAI provider route derived from the gateway
+  coordinates in ANTHROPIC_BASE_URL, or ANVIL_GATEWAY_OPENAI_URL when set
+- credential: CF_AIG_TOKEN
+- model: the bare id gpt-6.1-sol
+It fails loudly only when that gateway environment is absent, naming the
+missing variables and never printing their values.
+
+S8. Unit tests prove every label in the R10 map resolves as listed, the map
+is total over the labels the runner can produce, a routed reviewer's hand-off
+to a fake runtime carries the concrete model, and configured_model in the
+report is concrete for routed reviewers.
+S9. A unit test proves the OpenAI runtime constructs its configuration from
+CF_AIG_TOKEN and ANTHROPIC_BASE_URL alone, honours ANVIL_GATEWAY_OPENAI_URL
+when set, and fails loudly when the gateway environment is absent.
+S10. The agent-execution S8 provenance tests pass unmodified: executed_model
+is null when the runtime reports none and equals the self-reported value when
+it reports one, under every executor class.
+S11. The price table contains no entry without a verifiable source and date;
+the three new models are unpriced unless such a source is provided.
+
 
 ## Diff summary
 
-- CHANGELOG.md: +1, -1
-- anvil.yaml: +0, -20
-- anvil/executor.py: +6, -8
-- anvil/runner.py: +20, -2
-- brain/decisions/0004-model-migration.md: +1, -1
-- runs/wo-gh-29/builder.output.md: +7, -52
-- runs/wo-gh-29/builder.packet.md: +29, -0
-- runs/wo-gh-29/checks-gate.pre-review.output.md: +31, -35
-- runs/wo-gh-29/envelopes/builder.envelope.json: +3, -3
-- runs/wo-gh-29/envelopes/checks-gate.envelope.json: +5, -8
-- runs/wo-gh-29/envelopes/intake.envelope.json: +3, -3
-- runs/wo-gh-29/envelopes/reviewer-architecture.envelope.json: +9, -3
-- runs/wo-gh-29/envelopes/reviewer-security.envelope.json: +9, -3
-- runs/wo-gh-29/envelopes/reviewer-spec.envelope.json: +9, -3
-- runs/wo-gh-29/envelopes/reviewer-tests.envelope.json: +9, -3
-- runs/wo-gh-29/envelopes/spec-writer.envelope.json: +3, -3
-- runs/wo-gh-29/envelopes/test-writer.envelope.json: +3, -3
-- runs/wo-gh-29/intake.output.md: +1, -23
+- .openspec/specs/model-migration/spec.md: +50, -6
+- CHANGELOG.md: +1, -0
+- anvil/config.py: +25, -0
+- anvil/runner.py: +10, -4
+- runs/wo-gh-29/builder.output.md: +19, -6
+- runs/wo-gh-29/builder.packet.md: +10, -0
+- runs/wo-gh-29/checks-gate.pre-review.output.md: +44, -5
+- runs/wo-gh-29/envelopes/builder.envelope.json: +1, -1
+- runs/wo-gh-29/envelopes/checks-gate.envelope.json: +40, -2
+- runs/wo-gh-29/envelopes/intake.envelope.json: +1, -1
+- runs/wo-gh-29/envelopes/reviewer-architecture.envelope.json: +1, -1
+- runs/wo-gh-29/envelopes/reviewer-security.envelope.json: +1, -1
+- runs/wo-gh-29/envelopes/reviewer-spec.envelope.json: +1, -1
+- runs/wo-gh-29/envelopes/reviewer-tests.envelope.json: +1, -1
+- runs/wo-gh-29/envelopes/spec-writer.envelope.json: +1, -1
+- runs/wo-gh-29/envelopes/test-writer.envelope.json: +1, -1
+- runs/wo-gh-29/intake.output.md: +2, -1
 - runs/wo-gh-29/intake.packet.md: +10, -0
-- runs/wo-gh-29/reviewer-architecture.packet.md: +14, -5
-- runs/wo-gh-29/reviewer-security.packet.md: +12, -3
-- runs/wo-gh-29/reviewer-spec.packet.md: +11, -2
-- runs/wo-gh-29/reviewer-tests.packet.md: +13, -4
-- runs/wo-gh-29/routing.json: +4, -4
-- runs/wo-gh-29/spec-writer.output.md: +9, -8
+- runs/wo-gh-29/reviewer-architecture.packet.md: +10, -0
+- runs/wo-gh-29/reviewer-security.packet.md: +10, -0
+- runs/wo-gh-29/reviewer-spec.packet.md: +10, -0
+- runs/wo-gh-29/reviewer-tests.packet.md: +10, -0
+- runs/wo-gh-29/routing.json: +2, -2
+- runs/wo-gh-29/spec-writer.output.md: +15, -10
 - runs/wo-gh-29/spec-writer.packet.md: +10, -0
-- runs/wo-gh-29/test-writer.output.md: +8, -25
+- runs/wo-gh-29/test-writer.output.md: +15, -7
 - runs/wo-gh-29/test-writer.packet.md: +10, -0
-- tools/dispatch_station.py: +20, -0
-- work_orders/wo-gh-29.json: +5, -1
+- tests/test_model_migration_loopback.py: +2, -2
+- tools/codex_station.py: +41, -12
+- tools/model_route_smoke.py: +18, -12
+- work_orders/wo-gh-29.json: +3, -4
 
 ## File access allowlist
 
@@ -357,11 +402,10 @@ This packet may only embed content from:
 - design/DESIGN.md
 - design/tokens.json
 - .openspec/specs/model-migration/spec.md
+- .openspec/specs/model-migration/spec.md
 - CHANGELOG.md
-- anvil.yaml
-- anvil/executor.py
+- anvil/config.py
 - anvil/runner.py
-- brain/decisions/0004-model-migration.md
 - runs/wo-gh-29/builder.output.md
 - runs/wo-gh-29/builder.packet.md
 - runs/wo-gh-29/checks-gate.pre-review.output.md
@@ -385,7 +429,9 @@ This packet may only embed content from:
 - runs/wo-gh-29/spec-writer.packet.md
 - runs/wo-gh-29/test-writer.output.md
 - runs/wo-gh-29/test-writer.packet.md
-- tools/dispatch_station.py
+- tests/test_model_migration_loopback.py
+- tools/codex_station.py
+- tools/model_route_smoke.py
 - work_orders/wo-gh-29.json
 
 ## Work order
@@ -433,6 +479,16 @@ GATE LOOPBACK (round 2). Round 1 verdict: no_reviews. The implementation was bui
 3. INVENTED PRICES (spec R6 and S5). Round 1 added price entries labelled 'anthropic-pricing-2024-12' (dated 2024-12-15) and 'openai-pricing-2024-11' for models that did not exist under those names in 2024. Those sources are fabricated and the entries violate R6: no price is invented. Remove all three entries (claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol). The models stay unpriced; their steps record measured false with the reason, per the cost spec. Entries may return only with a verifiable source the reviewer can check, labelled with that source and a current date.
 
 Loopback scope is exactly these three fixes on top of the standing round 1 tree. Do not revisit the parts no reviewer or gate faulted. HARD CONSTRAINTS unchanged: full suite green (the two S8 provenance tests and the whole test_execution module included, unmodified); do NOT modify or delete any existing file under tests/ (new tests only in new files); review parsing contract, producer mechanism and checks gate base ref behavior frozen; no em dash or en dash characters in any produced file.
+
+GATE LOOPBACK (round 3). Round 2 verdict: no_reviews, but the failure class changed completely and the round 2 fixes are confirmed working: the checks gate PASSED (the S8 provenance regressions and the executor signature errors are gone), and the Claude stations executed on the new wiring with honest provenance (intake, spec-writer, test-writer and observer on claude-sonnet-5-5 self-reported; builder on claude-opus-5-5 self-reported). All five selected reviewers FAILED before executing, for exactly two reasons, both in the run envelopes:
+
+1. TIER LABELS REACH THE DISPATCHER (reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture). Error of record: "dispatch_station: unknown model 'review-balanced'. Known models: claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol". The routing step assigns abstract tier labels (review-balanced, review-strong) as selected_models, the runner passes them through as the effective model, and the dispatcher rightly refuses them. The old wrapper ignored model labels entirely, so tiers never mattered until this order made the label load-bearing. The missing layer is tier resolution: a single concrete model map, applied by the runner when it computes the step's effective model (after registry, project config, routing and guided resolution), covering every label the runner can produce: review-balanced, review-strong, fast-builder, reasoning-strong, writing-strong, fast-reader, media-gen and default. Resolution follows R1: review-balanced and review-strong resolve to claude-sonnet-5-5 (every non-design reviewer runs claude-sonnet-5-5, security included); fast-builder and reasoning-strong resolve to claude-opus-5-5; writing-strong, fast-reader, media-gen and default resolve to claude-sonnet-5-5. The map is total: no label reaches the runtime unresolved, the report's configured_model is always a concrete model, and the dispatcher keeps failing loudly on anything that is not a known concrete model. Routing's own tier vocabulary and its spec do not change; resolution happens at hand-off. Unit tests prove each tier resolves per this table, that a routed reviewer's hand-off to a fake runtime carries the concrete model, and that configured_model in the report is concrete for routed reviewers.
+
+2. THE OPENAI RUNTIME DEMANDS ENVIRONMENT THE LINE NEVER SUPPLIES (reviewer-design). Error of record: "codex_station: Missing OPENAI_BASE_URL or OPENAI_API_KEY environment variables". The standing execute workflows supply exactly the gateway environment the Anthropic route uses: ANTHROPIC_BASE_URL (which carries the gateway coordinates), ANTHROPIC_CUSTOM_HEADERS and the CF_AIG_TOKEN secret. No OPENAI_* variables exist anywhere in the line, and this order may not require new secrets. The OpenAI runtime must build its endpoint and credential from that same environment: the gateway OpenAI provider route derived from the gateway coordinates in ANTHROPIC_BASE_URL (or an explicit ANVIL_GATEWAY_OPENAI_URL when provided), authorized with CF_AIG_TOKEN, called with the bare model id gpt-6.1-sol. It fails loudly only when that gateway environment is absent. A unit test proves the runtime constructs its configuration from CF_AIG_TOKEN and ANTHROPIC_BASE_URL alone.
+
+Noted for the record, not a defect: reviewer-ux was routed out by routing on intake's own assessment of this run (no UI surface in intake's outcome), which is the routing capability working as designed.
+
+Loopback scope is exactly these two fixes on top of the standing tree. HARD CONSTRAINTS unchanged: full suite green with existing tests unmodified; new tests only in new files; review parsing contract, producer mechanism, routing tier vocabulary and checks gate base ref behavior frozen; no em dash or en dash characters in any produced file.
 - risk_hints: 
 - status: new
 

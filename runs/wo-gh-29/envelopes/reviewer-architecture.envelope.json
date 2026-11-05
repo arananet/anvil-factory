@@ -5,7 +5,7 @@
   "work_order_id": "wo-gh-29",
   "artifact_path": "runs/wo-gh-29/reviewer-architecture.packet.md",
   "status": "failed",
-  "created_at": "2026-11-05T01:17:50.735076+00:00",
+  "created_at": "2026-11-05T01:31:40.153069+00:00",
   "error": "command executor exited 1: dispatch_station: unknown model 'review-balanced'. Known models: claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol",
   "configured_model": "review-balanced",
   "executor": {

@@ -5,6 +5,6 @@
   "work_order_id": "wo-gh-29",
   "artifact_path": "runs/wo-gh-29/reviewer-ux.packet.md",
   "status": "routed_out",
-  "created_at": "2026-11-05T01:17:50.819217+00:00",
+  "created_at": "2026-11-05T01:31:40.256231+00:00",
   "configured_model": "openai/gpt-6.1-sol"
 }

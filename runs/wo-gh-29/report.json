@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 5179.985,
+      "duration_ms": 3662.322,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/intake.output.md"
@@ -19,7 +19,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 3260,
+      "measured_tokens": 4341,
       "budget": 0,
       "budget_action": "none"
     },
@@ -27,7 +27,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-29/spec-writer.output.md",
-      "duration_ms": 90722.609,
+      "duration_ms": 18067.466,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/spec-writer.output.md"
@@ -38,7 +38,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2537,
+      "measured_tokens": 3618,
       "budget": 0,
       "budget_action": "none"
     },
@@ -46,7 +46,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-29/test-writer.output.md",
-      "duration_ms": 84982.92,
+      "duration_ms": 73435.916,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/test-writer.output.md"
@@ -57,7 +57,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2543,
+      "measured_tokens": 3624,
       "budget": 0,
       "budget_action": "none"
     },
@@ -65,7 +65,7 @@
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-29/builder.output.md",
-      "duration_ms": 68885.23,
+      "duration_ms": 154050.713,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/builder.output.md"
@@ -76,7 +76,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 4316,
+      "measured_tokens": 5397,
       "budget": 50000,
       "budget_action": "sent"
     },
@@ -84,7 +84,7 @@
       "station": "checks-gate",
       "status": "passed",
       "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 34087.585,
+      "duration_ms": 48040.815,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/checks-gate.pre-review.output.md"
@@ -115,7 +115,7 @@
       "station": "reviewer-spec",
       "status": "failed",
       "detail": "Executor failed: command executor exited 1: dispatch_station: unknown model 'review-balanced'. Known models: claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol",
-      "duration_ms": 27.442,
+      "duration_ms": 32.018,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/reviewer-spec.packet.md"
@@ -126,7 +126,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2747,
+      "measured_tokens": 3828,
       "budget": 0,
       "budget_action": "none"
     },
@@ -134,7 +134,7 @@
       "station": "reviewer-security",
       "status": "failed",
       "detail": "Executor failed: command executor exited 1: dispatch_station: unknown model 'review-strong'. Known models: claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol",
-      "duration_ms": 26.728,
+      "duration_ms": 32.385,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/reviewer-security.packet.md"
@@ -145,7 +145,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2757,
+      "measured_tokens": 3839,
       "budget": 0,
       "budget_action": "none"
     },
@@ -153,7 +153,7 @@
       "station": "reviewer-tests",
       "status": "failed",
       "detail": "Executor failed: command executor exited 1: dispatch_station: unknown model 'review-balanced'. Known models: claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol",
-      "duration_ms": 26.029,
+      "duration_ms": 32.125,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/reviewer-tests.packet.md"
@@ -164,7 +164,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2759,
+      "measured_tokens": 3840,
       "budget": 0,
       "budget_action": "none"
     },
@@ -172,7 +172,7 @@
       "station": "reviewer-architecture",
       "status": "failed",
       "detail": "Executor failed: command executor exited 1: dispatch_station: unknown model 'review-balanced'. Known models: claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol",
-      "duration_ms": 26.131,
+      "duration_ms": 31.735,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/reviewer-architecture.packet.md"
@@ -183,15 +183,15 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2782,
+      "measured_tokens": 3863,
       "budget": 0,
       "budget_action": "none"
     },
     {
       "station": "reviewer-design",
       "status": "failed",
-      "detail": "Executor failed: command executor exited 2: codex_station: Missing OPENAI_BASE_URL or OPENAI_API_KEY environment variables",
-      "duration_ms": 82.006,
+      "detail": "Executor failed: command executor exited 2: codex_station: gateway environment absent, missing: CF_AIG_TOKEN",
+      "duration_ms": 101.292,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/reviewer-design.packet.md"
@@ -202,7 +202,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 8462,
+      "measured_tokens": 10365,
       "budget": 50000,
       "budget_action": "sent"
     },
@@ -210,7 +210,7 @@
       "station": "reviewer-ux",
       "status": "routed_out",
       "detail": "Routed out: Routed out: no UI surface",
-      "duration_ms": 0.974,
+      "duration_ms": 1.153,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/reviewer-ux.packet.md"
@@ -226,7 +226,7 @@
       "station": "approver",
       "status": "completed",
       "detail": "Approver verdict: no_reviews",
-      "duration_ms": 0.021,
+      "duration_ms": 0.026,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/report.json"
@@ -256,7 +256,7 @@
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to runs/wo-gh-29/deployer.packet.md",
-      "duration_ms": 0.218,
+      "duration_ms": 0.233,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/deployer.packet.md"
@@ -264,7 +264,7 @@
       "configured_model": "claude-sonnet-5-5",
       "executed_model": null,
       "executor": null,
-      "measured_tokens": 2626,
+      "measured_tokens": 3708,
       "budget": 0,
       "budget_action": "none"
     },
@@ -272,7 +272,7 @@
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to runs/wo-gh-29/observer.output.md",
-      "duration_ms": 22604.164,
+      "duration_ms": 41415.624,
       "cost": null,
       "artifacts": [
         "runs/wo-gh-29/observer.output.md"
@@ -283,7 +283,7 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 2633,
+      "measured_tokens": 3715,
       "budget": 0,
       "budget_action": "none"
     }
@@ -316,8 +316,8 @@
   "warnings": [
     "No reference anchors: This visual run has no reference anchors. The review will proceed under the charter floor alone."
   ],
-  "astra_measured_tokens_total": 12778,
-  "base_ref": "2e2ebf27325e06aa5d2258ff1a451951a21c36b3",
+  "astra_measured_tokens_total": 15762,
+  "base_ref": "5fc670ed1f16b4636c96149501f15b2be63f6198",
   "evidence": [
     {
       "type": "screenshot",

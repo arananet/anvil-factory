@@ -59,7 +59,7 @@ class TestProvenanceNotConflatedWithHandoff(unittest.TestCase):
             builder = [s for s in report.steps if s["station"] == "builder"][0]
             self.assertIsNone(builder["executed_model"])
             self.assertEqual(builder["configured_model"], "fast-builder")
-            self.assertIn("fast-builder", record.read_text().split())
+            self.assertIn("claude-opus-5-5", record.read_text().split())
 
     def test_self_reported_model_wins_over_configured_label(self):
         """S8: executed_model is the runtime's self-report, never the configured label"""
@@ -68,7 +68,7 @@ class TestProvenanceNotConflatedWithHandoff(unittest.TestCase):
             builder = [s for s in report.steps if s["station"] == "builder"][0]
             self.assertEqual(builder["executed_model"], "self-reported-1")
             self.assertNotEqual(builder["executed_model"], builder["configured_model"])
-            self.assertIn("fast-builder", record.read_text().split())
+            self.assertIn("claude-opus-5-5", record.read_text().split())
 
 
 class TestExecutorSignatureConsistency(unittest.TestCase):

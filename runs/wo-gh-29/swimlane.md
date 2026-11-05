@@ -6,21 +6,21 @@ Routing: 5 reviewers (reduced panel, 1 routed out)
 
 | Station | Status | Duration ms | Artifacts | Cost |
 |---|---|---|---|---|
-| intake | executed | 5179.985 | runs/wo-gh-29/intake.output.md | null |
-| spec-writer | executed | 90722.609 | runs/wo-gh-29/spec-writer.output.md | null |
-| test-writer | executed | 84982.92 | runs/wo-gh-29/test-writer.output.md | null |
-| builder | executed | 68885.23 | runs/wo-gh-29/builder.output.md | null |
-| checks-gate | passed | 34087.585 | runs/wo-gh-29/checks-gate.pre-review.output.md | null |
-| reviewer-spec | failed | 27.442 | runs/wo-gh-29/reviewer-spec.packet.md | null |
-| reviewer-security | failed | 26.728 | runs/wo-gh-29/reviewer-security.packet.md | null |
-| reviewer-tests | failed | 26.029 | runs/wo-gh-29/reviewer-tests.packet.md | null |
-| reviewer-architecture | failed | 26.131 | runs/wo-gh-29/reviewer-architecture.packet.md | null |
-| reviewer-design | failed | 82.006 | runs/wo-gh-29/reviewer-design.packet.md | null |
-| reviewer-ux | routed_out | 0.974 | runs/wo-gh-29/reviewer-ux.packet.md | null |
-| approver | completed | 0.021 | runs/wo-gh-29/report.json | null |
+| intake | executed | 3662.322 | runs/wo-gh-29/intake.output.md | null |
+| spec-writer | executed | 18067.466 | runs/wo-gh-29/spec-writer.output.md | null |
+| test-writer | executed | 73435.916 | runs/wo-gh-29/test-writer.output.md | null |
+| builder | executed | 154050.713 | runs/wo-gh-29/builder.output.md | null |
+| checks-gate | passed | 48040.815 | runs/wo-gh-29/checks-gate.pre-review.output.md | null |
+| reviewer-spec | failed | 32.018 | runs/wo-gh-29/reviewer-spec.packet.md | null |
+| reviewer-security | failed | 32.385 | runs/wo-gh-29/reviewer-security.packet.md | null |
+| reviewer-tests | failed | 32.125 | runs/wo-gh-29/reviewer-tests.packet.md | null |
+| reviewer-architecture | failed | 31.735 | runs/wo-gh-29/reviewer-architecture.packet.md | null |
+| reviewer-design | failed | 101.292 | runs/wo-gh-29/reviewer-design.packet.md | null |
+| reviewer-ux | routed_out | 1.153 | runs/wo-gh-29/reviewer-ux.packet.md | null |
+| approver | completed | 0.026 | runs/wo-gh-29/report.json | null |
 | triage-human | completed | 0.007 | - | null |
-| deployer | packet_ready | 0.218 | runs/wo-gh-29/deployer.packet.md | null |
-| observer | executed | 22604.164 | runs/wo-gh-29/observer.output.md | null |
+| deployer | packet_ready | 0.233 | runs/wo-gh-29/deployer.packet.md | null |
+| observer | executed | 41415.624 | runs/wo-gh-29/observer.output.md | null |
 
 ## Decision
 

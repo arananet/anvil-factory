@@ -5,8 +5,8 @@
   "work_order_id": "wo-gh-29",
   "artifact_path": "runs/wo-gh-29/reviewer-design.packet.md",
   "status": "failed",
-  "created_at": "2026-11-05T01:17:50.817806+00:00",
-  "error": "command executor exited 2: codex_station: Missing OPENAI_BASE_URL or OPENAI_API_KEY environment variables",
+  "created_at": "2026-11-05T01:31:40.254684+00:00",
+  "error": "command executor exited 2: codex_station: gateway environment absent, missing: CF_AIG_TOKEN",
   "configured_model": "openai/gpt-6.1-sol",
   "executor": {
     "kind": "command",

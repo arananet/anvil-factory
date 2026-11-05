@@ -5,16 +5,21 @@ Similar to claude_station.py but executes through an OpenAI-compatible agentic
 runtime (Codex). Uses the same permission model and review contract as the
 Claude runtime.
 
-Environment variables:
-- OPENAI_BASE_URL: API endpoint (e.g., Cloudflare AI Gateway OpenAI route)
-- OPENAI_API_KEY: API key for authentication
-- ANVIL_CONFIGURED_MODEL: The bare model id (e.g., gpt-6.1-sol)
+Environment variables (model-migration R11: the gateway environment the
+execute workflows already supply; no OPENAI_* variables and no new secrets):
+- ANTHROPIC_BASE_URL: gateway coordinates; the OpenAI provider route is
+  derived from it by swapping the trailing anthropic provider segment for openai
+- ANVIL_GATEWAY_OPENAI_URL: optional explicit OpenAI provider route, wins when set
+- CF_AIG_TOKEN: gateway credential
+- ANVIL_CONFIGURED_MODEL: the assigned model (openai/gpt-6.1-sol); the bare id
+  gpt-6.1-sol is what the gateway is called with
 
 Station permissions and review contract match claude_station.py exactly.
 """
 
 import json
 import os
+import re
 import sys
 import urllib.request
 from pathlib import Path
@@ -109,13 +114,36 @@ def validate_review_file(review_path, station_id):
     return True, ""
 
 
-def call_openai_api(prompt, model, max_tokens=4000):
-    """Call OpenAI chat completions API."""
-    base_url = os.environ.get("OPENAI_BASE_URL")
-    api_key = os.environ.get("OPENAI_API_KEY")
+def gateway_openai_config():
+    """Build (endpoint, token) for the gateway OpenAI provider route (R11).
 
-    if not base_url or not api_key:
-        raise RuntimeError("Missing OPENAI_BASE_URL or OPENAI_API_KEY environment variables")
+    Raises RuntimeError naming the missing variables, never their values.
+    """
+    token = os.environ.get("CF_AIG_TOKEN", "").strip()
+    explicit = os.environ.get("ANVIL_GATEWAY_OPENAI_URL", "").strip()
+    anthropic_base = os.environ.get("ANTHROPIC_BASE_URL", "").strip()
+    missing = []
+    if not token:
+        missing.append("CF_AIG_TOKEN")
+    if not explicit and not anthropic_base:
+        missing.append("ANTHROPIC_BASE_URL (or ANVIL_GATEWAY_OPENAI_URL)")
+    if missing:
+        raise RuntimeError("gateway environment absent, missing: " + ", ".join(missing))
+    if explicit:
+        route = explicit.rstrip("/")
+    else:
+        base = anthropic_base.rstrip("/")
+        route, count = re.subn(r"/anthropic(/.*)?$", "/openai", base)
+        if count != 1:
+            raise RuntimeError("cannot derive the gateway OpenAI route: ANTHROPIC_BASE_URL "
+                               "does not end in an anthropic provider segment; set "
+                               "ANVIL_GATEWAY_OPENAI_URL")
+    return route, token
+
+
+def call_openai_api(prompt, model, max_tokens=4000):
+    """Call the gateway OpenAI provider route (chat completions)."""
+    base_url, token = gateway_openai_config()
 
     # Use bare model id (strip openai/ prefix if present)
     bare_model = model.split("/")[-1] if "/" in model else model
@@ -128,12 +156,13 @@ def call_openai_api(prompt, model, max_tokens=4000):
 
     try:
         req = urllib.request.Request(
-            f"{base_url}/v1/chat/completions",
+            f"{base_url}/chat/completions",
             data=json.dumps(payload).encode("utf-8"),
             method="POST"
         )
         req.add_header("Content-Type", "application/json")
-        req.add_header("Authorization", f"Bearer {api_key}")
+        req.add_header("Authorization", f"Bearer {token}")
+        req.add_header("cf-aig-authorization", f"Bearer {token}")
 
         with urllib.request.urlopen(req, timeout=TIMEOUT_SECONDS) as resp:
             body = json.loads(resp.read().decode("utf-8"))

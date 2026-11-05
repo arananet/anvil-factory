@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 from .model import WorkOrder, Review
-from .config import default_model, load_anvil_config, health_config, CHARS_PER_TOKEN, get_station_budget
+from .config import default_model, resolve_model, load_anvil_config, health_config, CHARS_PER_TOKEN, get_station_budget
 from .brain import packet_learnings_section
 from .design import packet_design_section, load_design_system
 from .capture import capture_breakpoints, packet_rendered_evidence_section
@@ -1208,7 +1208,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         configured_model = station.model if station is not None and station.model else default_model(station_id)
         # Apply routing model overrides if routing selected a specific model for this station
         if routing_record and station_id in routing_record.selected_models:
-            configured_model = routing_record.selected_models[station_id]
+            # R10: routing speaks tier labels; resolve them at hand-off so the
+            # report's configured_model for a routed station is concrete.
+            configured_model = resolve_model(routing_record.selected_models[station_id])
         # Apply guided designation: guided design stations use the design model from routing policy
         # For the builder, only apply guided model when working on UI surface
         if station and station.guided:
@@ -1216,6 +1218,10 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 pass  # Builder not on UI surface, keep configured model
             else:
                 configured_model = get_design_model_from_routing()
+        # R10: the model handed to the runtime is always concrete. The report
+        # keeps the configured value (agent-execution S8 records the label for
+        # unrouted stations); the hand-off never carries an unresolved label.
+        handoff_model = resolve_model(configured_model)
         step_executor = None
         step_executed_model = None
         status = "completed"
@@ -1304,7 +1310,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 try:
                     result = _call_executor(executor, packet_text, station_id, packet_path=packet,
                                               output_path=output_file, cwd=project,
-                                              configured_model=configured_model)
+                                              configured_model=handoff_model)
                     output_text = result.get("output", "") if isinstance(result, dict) else str(result)
                     usage = result.get("usage") if isinstance(result, dict) else None
                     executed_model_from_result = result.get("model") if isinstance(result, dict) else None
@@ -1640,7 +1646,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 try:
                     result = _call_executor(executor, packet_text, station_id, packet_path=packet,
                                               output_path=output_file, cwd=project,
-                                              configured_model=configured_model)
+                                              configured_model=handoff_model)
                     output_text = result.get("output", "") if isinstance(result, dict) else str(result)
                     usage = result.get("usage") if isinstance(result, dict) else None
                     executed_model_from_result = result.get("model") if isinstance(result, dict) else None

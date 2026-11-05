@@ -18,6 +18,31 @@ DEFAULT_MODELS = {
     "supervisor": "reasoning-strong",
 }
 
+# model-migration R10: tier resolution at hand-off. Station definitions and
+# routing speak in abstract tier labels; the runtime dispatcher only knows
+# concrete models. This one total map resolves every label the runner can
+# produce. A value that is already concrete passes through unchanged; any
+# other value also passes through so the dispatcher fails on it loudly.
+MODEL_TIER_MAP = {
+    "review-balanced": "claude-sonnet-5-5",
+    "review-strong": "claude-sonnet-5-5",
+    "fast-builder": "claude-opus-5-5",
+    "reasoning-strong": "claude-opus-5-5",
+    "writing-strong": "claude-sonnet-5-5",
+    "fast-reader": "claude-sonnet-5-5",
+    "media-gen": "claude-sonnet-5-5",
+    "default": "claude-sonnet-5-5",
+}
+
+CONCRETE_MODELS = ("claude-opus-5-5", "claude-sonnet-5-5", "openai/gpt-6.1-sol")
+
+
+def resolve_model(label):
+    """Resolve a tier label to its concrete model (R10); concrete values pass through."""
+    if label is None:
+        return None
+    return MODEL_TIER_MAP.get(label, label)
+
 # S1: Token estimator constant (visible in config per spec)
 CHARS_PER_TOKEN = 3.5
 

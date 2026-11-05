@@ -11,7 +11,7 @@ Outcome: accepted
 
 Risk: high
 
-Surfaces: api, security, data, content, deploy
+Surfaces: api, security, deploy, content
 
 ## Routing
 
