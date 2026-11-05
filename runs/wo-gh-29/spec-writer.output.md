@@ -1,16 +1,7 @@
-I revised `.openspec/specs/model-migration/spec.md` to cover the round 2 and round 3 findings. I didn't run the test suite. The file has no em or en dashes.
+I revised `.openspec/specs/model-migration/spec.md` for the round 4 loopback. I did not run the test suite, since this station only writes the spec. The file has no em or en dashes.
 
-- **R3 (changed):** Handing the configured model to the runtime is now separate from recording it. `executed_model` comes only from runtime self-report, and is null when the runtime reports none. The dispatch wrapper self-reports what it actually dispatched. Every executor class accepts the model hand-off.
-- **R6 (changed):** Price entries for the three new models are allowed only with a verifiable source and a current date. Otherwise the models stay unpriced and their steps record measured false. No invented or backdated sources.
-- **R10 (new):** The runner resolves every label to a concrete model when it computes the step's effective model, using one total map:
-  - `review-balanced`, `review-strong`, `writing-strong`, `fast-reader`, `media-gen` and `default` resolve to `claude-sonnet-5-5`.
-  - `fast-builder` and `reasoning-strong` resolve to `claude-opus-5-5`.
-  - Concrete models pass through unchanged.
-  - The dispatcher still fails loudly on unknown values, and routing's tier vocabulary doesn't change.
-- **R11 (new):** The OpenAI runtime builds its endpoint from `ANTHROPIC_BASE_URL`, or from `ANVIL_GATEWAY_OPENAI_URL` when set. It authenticates with `CF_AIG_TOKEN` and uses the bare id `gpt-6.1-sol`. It fails only when the gateway environment is absent, and it never prints the values.
-- **Scenarios (new, S8 to S11):**
-  - S8 covers the tier map and the concrete `configured_model` for routed reviewers.
-  - S9 covers the OpenAI runtime's gateway-only configuration.
-  - S10 covers the agent-execution S8 provenance tests passing unmodified.
-  - S11 covers the price table containing no unsourced entries.
+- **R10, tier resolution:** resolution now happens at the hand-off itself, after all overrides (registry, project config, routing, guided). It runs before the runner records `configured_model` and before it passes the model to the runtime. The spec says this covers every station and every executing branch, intake included. It also names the routed path, where the routing record's `selected_models` replace the first computed model inside `run_pipeline`. The tier map is unchanged.
+- **R11, Codex credential:** the credential is `CF_AIG_TOKEN` when set. Otherwise it is the `cf-aig-authorization` bearer value parsed out of `ANTHROPIC_CUSTOM_HEADERS`. It fails loudly only when neither source is present or the gateway coordinates are missing. The spec says the credential value is never printed, logged or written to a file.
+- **S8:** now requires an integration test that drives `run_pipeline`. The test uses a routing record with tier `selected_models` and a fake command runtime. It must assert that the runtime received the concrete model and that the recorded `configured_model` is concrete. A test of the map function alone does not satisfy S8.
+- **S9:** now requires a headers fixture string proving the parse, the direct `CF_AIG_TOKEN` path, the `ANVIL_GATEWAY_OPENAI_URL` override, the loud failure, and no credential in the output.
 {"model": "claude-sonnet-5-5"}

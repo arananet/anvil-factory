@@ -757,6 +757,16 @@ def _reported_model(text):
             return obj["model"]
     return None
 
+def _consumes_model_handoff(executor):
+    """True when the executor hands the assigned model to its runtime.
+
+    The command executor exports it as ANVIL_CONFIGURED_MODEL and the
+    dispatcher selects the runtime by it; the http executor always runs the
+    model named in its own config.
+    """
+    return getattr(executor, "kind", None) == "command"
+
+
 def _call_executor(executor, packet_text, station_id, configured_model=None, **kwargs):
     """Call executor.execute, handing it the assigned model when it accepts one.
 
@@ -1222,6 +1232,15 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         # keeps the configured value (agent-execution S8 records the label for
         # unrouted stations); the hand-off never carries an unresolved label.
         handoff_model = resolve_model(configured_model)
+        # R10 (round 4): resolution happens here, once, after every override
+        # (registry, project config, routing, guided) has produced the final
+        # label. When the step runs on a runtime that consumes the hand-off,
+        # the recorded configured_model is that same concrete model, so the
+        # record and the hand-off always agree. Packet mode and the http
+        # executor (which runs its own endpoint model, ignoring the hand-off)
+        # keep recording the configured label (agent-execution S8).
+        if execute_mode and _consumes_model_handoff(executor):
+            configured_model = handoff_model
         step_executor = None
         step_executed_model = None
         status = "completed"

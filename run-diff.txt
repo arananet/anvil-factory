@@ -1,47 +1,45 @@
- .openspec/specs/model-migration/spec.md            |  56 +++++-
- CHANGELOG.md                                       |   1 +
- anvil/config.py                                    |  25 +++
- anvil/runner.py                                    |  14 +-
- runs/wo-gh-29/builder.output.md                    |  25 ++-
- runs/wo-gh-29/builder.packet.md                    |  10 +
- runs/wo-gh-29/checks-gate.pre-review.output.md     |  49 ++++-
- runs/wo-gh-29/deployer.packet.md                   |  10 +
+ .openspec/specs/model-migration/spec.md            |  38 ++--
+ anvil/runner.py                                    |  19 ++
+ anvil/supervisor.py                                |  17 +-
+ runs/wo-gh-29/builder.output.md                    |  32 ++-
+ runs/wo-gh-29/builder.packet.md                    |   8 +
+ runs/wo-gh-29/checks-gate.pre-review.output.md     | 121 +++++-----
+ runs/wo-gh-29/deployer.packet.md                   |  23 +-
  runs/wo-gh-29/envelopes/approver.envelope.json     |   2 +-
  runs/wo-gh-29/envelopes/builder.envelope.json      |   2 +-
- runs/wo-gh-29/envelopes/checks-gate.envelope.json  |  42 ++++-
+ runs/wo-gh-29/envelopes/checks-gate.envelope.json  |  69 +++---
  runs/wo-gh-29/envelopes/deployer.envelope.json     |   2 +-
  runs/wo-gh-29/envelopes/intake.envelope.json       |   2 +-
  runs/wo-gh-29/envelopes/observer.envelope.json     |   2 +-
- .../envelopes/reviewer-architecture.envelope.json  |   2 +-
- .../envelopes/reviewer-design.envelope.json        |   4 +-
- .../envelopes/reviewer-security.envelope.json      |   2 +-
- .../wo-gh-29/envelopes/reviewer-spec.envelope.json |   2 +-
- .../envelopes/reviewer-tests.envelope.json         |   2 +-
- runs/wo-gh-29/envelopes/reviewer-ux.envelope.json  |   2 +-
+ .../envelopes/reviewer-architecture.envelope.json  |  12 +-
+ .../envelopes/reviewer-design.envelope.json        |  12 +-
+ .../envelopes/reviewer-security.envelope.json      |  12 +-
+ .../wo-gh-29/envelopes/reviewer-spec.envelope.json |  12 +-
+ .../envelopes/reviewer-tests.envelope.json         |  12 +-
+ runs/wo-gh-29/envelopes/reviewer-ux.envelope.json  |   4 +-
  runs/wo-gh-29/envelopes/spec-writer.envelope.json  |   2 +-
  runs/wo-gh-29/envelopes/test-writer.envelope.json  |   2 +-
  runs/wo-gh-29/envelopes/triage-human.envelope.json |   2 +-
- runs/wo-gh-29/intake.output.md                     |   3 +-
- runs/wo-gh-29/intake.packet.md                     |  10 +
- runs/wo-gh-29/observer.output.md                   |  16 +-
- runs/wo-gh-29/observer.packet.md                   |  10 +
- runs/wo-gh-29/report.json                          |  56 +++---
- runs/wo-gh-29/report.md                            |   2 +-
- runs/wo-gh-29/reviewer-architecture.packet.md      |  10 +
- runs/wo-gh-29/reviewer-design.packet.md            | 130 +++++++++----
- runs/wo-gh-29/reviewer-security.packet.md          |  10 +
- runs/wo-gh-29/reviewer-spec.packet.md              |  10 +
- runs/wo-gh-29/reviewer-tests.packet.md             |  10 +
- runs/wo-gh-29/reviewer-ux.packet.md                |  10 +
- runs/wo-gh-29/routing.json                         |   4 +-
- runs/wo-gh-29/spec-writer.output.md                |  25 ++-
- runs/wo-gh-29/spec-writer.packet.md                |  10 +
- runs/wo-gh-29/swimlane.md                          |  28 +--
- runs/wo-gh-29/test-writer.output.md                |  22 ++-
- runs/wo-gh-29/test-writer.packet.md                |  10 +
- tests/test_model_migration_loopback.py             |   4 +-
- tests/test_model_migration_tiers.py                | 206 +++++++++++++++++++++
- tools/codex_station.py                             |  53 ++++--
- tools/model_route_smoke.py                         |  30 +--
+ runs/wo-gh-29/intake.output.md                     |   2 +-
+ runs/wo-gh-29/intake.packet.md                     |   8 +
+ runs/wo-gh-29/observer.output.md                   |  20 +-
+ runs/wo-gh-29/observer.packet.md                   |  23 +-
+ runs/wo-gh-29/report.json                          | 142 ++++++------
+ runs/wo-gh-29/report.md                            |  17 +-
+ runs/wo-gh-29/reviewer-architecture.packet.md      |  17 +-
+ runs/wo-gh-29/reviewer-design.packet.md            | 102 +++++----
+ runs/wo-gh-29/reviewer-security.packet.md          |  13 +-
+ runs/wo-gh-29/reviewer-spec.packet.md              |  11 +-
+ runs/wo-gh-29/reviewer-tests.packet.md             |  15 +-
+ runs/wo-gh-29/reviewer-ux.packet.md                |  21 +-
+ runs/wo-gh-29/routing.json                         |   6 +-
+ runs/wo-gh-29/spec-writer.output.md                |  19 +-
+ runs/wo-gh-29/spec-writer.packet.md                |   8 +
+ runs/wo-gh-29/swimlane.md                          |  31 +--
+ runs/wo-gh-29/test-writer.output.md                |  33 +--
+ runs/wo-gh-29/test-writer.packet.md                |   8 +
+ tests/test_model_migration_round4.py               | 253 +++++++++++++++++++++
+ tests/test_model_migration_supervisor_handoff.py   |  50 ++++
+ tools/codex_station.py                             |  28 ++-
  work_orders/wo-gh-29.json                          |   7 +-
- 46 files changed, 763 insertions(+), 175 deletions(-)
+ 44 files changed, 847 insertions(+), 394 deletions(-)

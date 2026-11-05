@@ -92,6 +92,14 @@ GATE LOOPBACK (round 3). Round 2 verdict: no_reviews, but the failure class chan
 Noted for the record, not a defect: reviewer-ux was routed out by routing on intake's own assessment of this run (no UI surface in intake's outcome), which is the routing capability working as designed.
 
 Loopback scope is exactly these two fixes on top of the standing tree. HARD CONSTRAINTS unchanged: full suite green with existing tests unmodified; new tests only in new files; review parsing contract, producer mechanism, routing tier vocabulary and checks gate base ref behavior frozen; no em dash or en dash characters in any produced file.
+
+GATE LOOPBACK (round 4, final). Round 3 verdict: no_reviews again; gate passed; Claude stations again executed on the new models with honest provenance. Both round 3 items were attempted and both miss their target by one mechanism each. The errors of record:
+
+1. TIER RESOLUTION NOT ON THE ROUTED PATH. reviewer-spec envelope, unchanged: "dispatch_station: unknown model 'review-balanced'", and the step's configured_model still records the tier. Round 3 added a resolution map (anvil/config.py) but the routed reviewer path never passes through it: in run_pipeline the routing override replaces configured_model with routing_record.selected_models (tier labels) after the initial computation, and the executor hand-off uses that value. Resolution must be applied at the hand-off itself: after ALL overrides (registry, project config, routing, guided) have produced the step's final model label, the runner resolves that label through the concrete map before recording configured_model and before passing the model to the runtime, for every station and every branch that executes (intake included). Proof requirement, stated plainly because round 3's tests passed while the wired path stayed broken: an integration test that drives run_pipeline with a routing record selecting tier models and a fake command runtime, asserting the runtime received the concrete model and the recorded configured_model is concrete. A test of the map function in isolation does not count.
+
+2. CODEX CREDENTIAL SOURCE. reviewer-design envelope: "codex_station: gateway environment absent, missing: CF_AIG_TOKEN". The standing workflows never export CF_AIG_TOKEN as its own variable; the gateway credential travels inside ANTHROPIC_CUSTOM_HEADERS as the header 'cf-aig-authorization: Bearer <token>', which IS present in the runtime's environment (the Claude wrapper inherits the same environment). The OpenAI runtime must take the credential from that header when CF_AIG_TOKEN is not set: parse the cf-aig-authorization value out of ANTHROPIC_CUSTOM_HEADERS, use CF_AIG_TOKEN directly when it is set, and fail loudly only when neither is present. The credential value is never printed, logged or written to any file. Unit test with a headers fixture string proving the parse, plus the direct variable path.
+
+This is the final loopback for this order. Scope is exactly these two mechanisms on the standing tree; nothing else changes. HARD CONSTRAINTS unchanged: full suite green with existing tests unmodified; new tests only in new files; review parsing contract, producer mechanism, routing tier vocabulary and checks gate base ref behavior frozen; no em dash or en dash characters in any produced file.
 - risk_hints: 
 - status: new
 
@@ -101,10 +109,11 @@ Loopback scope is exactly these two fixes on top of the standing tree. HARD CONS
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: passed
-- reviewer-spec: failed
-- reviewer-security: failed
-- reviewer-tests: failed
+- checks-gate: failed
+- loopback: loopback
+- reviewer-spec: skipped
+- reviewer-security: skipped
+- reviewer-tests: skipped
 
 ## Output contract
 

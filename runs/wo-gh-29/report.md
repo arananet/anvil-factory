@@ -11,7 +11,7 @@ Outcome: accepted
 
 Risk: high
 
-Surfaces: api, security, deploy, content
+Surfaces: api, deploy, security, content, data
 
 ## Routing
 
@@ -39,13 +39,14 @@ No reviews were produced in this run, so the verdict is no_reviews; standing pro
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: passed
-- reviewer-spec: failed
-- reviewer-security: failed
-- reviewer-tests: failed
-- reviewer-architecture: failed
-- reviewer-design: failed
-- reviewer-ux: routed_out
+- checks-gate: failed
+- loopback: loopback
+- reviewer-spec: skipped
+- reviewer-security: skipped
+- reviewer-tests: skipped
+- reviewer-architecture: skipped
+- reviewer-design: skipped
+- reviewer-ux: skipped
 - approver: completed
 - triage-human: completed
 - deployer: packet_ready

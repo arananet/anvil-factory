@@ -10,7 +10,10 @@ execute workflows already supply; no OPENAI_* variables and no new secrets):
 - ANTHROPIC_BASE_URL: gateway coordinates; the OpenAI provider route is
   derived from it by swapping the trailing anthropic provider segment for openai
 - ANVIL_GATEWAY_OPENAI_URL: optional explicit OpenAI provider route, wins when set
-- CF_AIG_TOKEN: gateway credential
+- CF_AIG_TOKEN: gateway credential, used directly when set
+- ANTHROPIC_CUSTOM_HEADERS: when CF_AIG_TOKEN is not set, the credential is
+  taken from its 'cf-aig-authorization: Bearer <token>' header, which is how
+  the standing workflows carry it. The value is never printed or written.
 - ANVIL_CONFIGURED_MODEL: the assigned model (openai/gpt-6.1-sol); the bare id
   gpt-6.1-sol is what the gateway is called with
 
@@ -114,17 +117,36 @@ def validate_review_file(review_path, station_id):
     return True, ""
 
 
+def _header_credential(headers):
+    """Return the bearer token of the cf-aig-authorization header, or "".
+
+    headers is the ANTHROPIC_CUSTOM_HEADERS value: one 'Name: value' header
+    per line (LF or CRLF). The header name matches case-insensitively.
+    """
+    for line in (headers or "").splitlines():
+        name, sep, value = line.partition(":")
+        if not sep or name.strip().lower() != "cf-aig-authorization":
+            continue
+        value = value.strip()
+        if value[:7].lower() == "bearer ":
+            value = value[7:].strip()
+        if value:
+            return value
+    return ""
+
+
 def gateway_openai_config():
     """Build (endpoint, token) for the gateway OpenAI provider route (R11).
 
     Raises RuntimeError naming the missing variables, never their values.
     """
-    token = os.environ.get("CF_AIG_TOKEN", "").strip()
+    token = os.environ.get("CF_AIG_TOKEN", "").strip() or _header_credential(
+        os.environ.get("ANTHROPIC_CUSTOM_HEADERS", ""))
     explicit = os.environ.get("ANVIL_GATEWAY_OPENAI_URL", "").strip()
     anthropic_base = os.environ.get("ANTHROPIC_BASE_URL", "").strip()
     missing = []
     if not token:
-        missing.append("CF_AIG_TOKEN")
+        missing.append("CF_AIG_TOKEN (or a cf-aig-authorization header in ANTHROPIC_CUSTOM_HEADERS)")
     if not explicit and not anthropic_base:
         missing.append("ANTHROPIC_BASE_URL (or ANVIL_GATEWAY_OPENAI_URL)")
     if missing:

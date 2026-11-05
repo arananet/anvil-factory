@@ -325,8 +325,13 @@ pass is proven by the operator's post-merge verification run, not by this
 order's own run, which executes on the wiring it replaces).
 
 R10. Tier resolution at hand-off. The runner resolves every model label to a
-concrete model when it computes a step's effective model, after registry,
-project config, routing and guided resolution. One total map covers every
+concrete model at the hand-off itself: after ALL overrides (registry, project
+config, routing and guided) have produced the step's final model label, and
+before both recording configured_model and passing the model to the runtime.
+This holds for every station and every executing branch, intake included,
+and in particular for the routed path where the routing record's
+selected_models (tier labels) replace the initially computed model inside
+run_pipeline. One total map covers every
 label the runner can produce:
 - review-balanced, review-strong: claude-sonnet-5-5
 - fast-builder, reasoning-strong: claude-opus-5-5
@@ -343,18 +348,25 @@ endpoint and credential from the gateway environment the workflows already
 supply, with no new secrets and no OPENAI_* variables required:
 - endpoint: the gateway OpenAI provider route derived from the gateway
   coordinates in ANTHROPIC_BASE_URL, or ANVIL_GATEWAY_OPENAI_URL when set
-- credential: CF_AIG_TOKEN
+- credential: CF_AIG_TOKEN when set; otherwise the bearer token carried by the
+  cf-aig-authorization header inside ANTHROPIC_CUSTOM_HEADERS, which is how
+  the standing workflows supply the gateway credential
 - model: the bare id gpt-6.1-sol
-It fails loudly only when that gateway environment is absent, naming the
-missing variables and never printing their values.
+It fails loudly only when neither credential source is present or the gateway
+coordinates are absent, naming what is missing and never printing, logging or
+writing any credential value.
 
-S8. Unit tests prove every label in the R10 map resolves as listed, the map
-is total over the labels the runner can produce, a routed reviewer's hand-off
-to a fake runtime carries the concrete model, and configured_model in the
-report is concrete for routed reviewers.
-S9. A unit test proves the OpenAI runtime constructs its configuration from
-CF_AIG_TOKEN and ANTHROPIC_BASE_URL alone, honours ANVIL_GATEWAY_OPENAI_URL
-when set, and fails loudly when the gateway environment is absent.
+S8. Unit tests prove every label in the R10 map resolves as listed and the
+map is total over the labels the runner can produce. An integration test
+drives run_pipeline with a routing record whose selected_models are tier
+labels and a fake command runtime, and asserts the runtime received the
+concrete model and the recorded configured_model is concrete. A test of the
+map function alone does not satisfy this scenario.
+S9. Unit tests prove the OpenAI runtime constructs its configuration from
+ANTHROPIC_BASE_URL plus either CF_AIG_TOKEN directly or the
+cf-aig-authorization value parsed from an ANTHROPIC_CUSTOM_HEADERS fixture
+string, honours ANVIL_GATEWAY_OPENAI_URL when set, fails loudly when neither
+credential source is present, and never emits the credential value.
 S10. The agent-execution S8 provenance tests pass unmodified: executed_model
 is null when the runtime reports none and equals the self-reported value when
 it reports one, under every executor class.
@@ -364,37 +376,34 @@ the three new models are unpriced unless such a source is provided.
 
 ## Diff summary
 
-- .openspec/specs/model-migration/spec.md: +50, -6
-- CHANGELOG.md: +1, -0
-- anvil/config.py: +25, -0
-- anvil/runner.py: +10, -4
-- runs/wo-gh-29/builder.output.md: +19, -6
-- runs/wo-gh-29/builder.packet.md: +10, -0
-- runs/wo-gh-29/checks-gate.pre-review.output.md: +44, -5
+- .openspec/specs/model-migration/spec.md: +25, -13
+- anvil/runner.py: +19, -0
+- anvil/supervisor.py: +15, -2
+- runs/wo-gh-29/builder.output.md: +15, -17
+- runs/wo-gh-29/builder.packet.md: +8, -0
+- runs/wo-gh-29/checks-gate.pre-review.output.md: +62, -59
 - runs/wo-gh-29/envelopes/builder.envelope.json: +1, -1
-- runs/wo-gh-29/envelopes/checks-gate.envelope.json: +40, -2
+- runs/wo-gh-29/envelopes/checks-gate.envelope.json: +36, -33
 - runs/wo-gh-29/envelopes/intake.envelope.json: +1, -1
-- runs/wo-gh-29/envelopes/reviewer-architecture.envelope.json: +1, -1
-- runs/wo-gh-29/envelopes/reviewer-security.envelope.json: +1, -1
-- runs/wo-gh-29/envelopes/reviewer-spec.envelope.json: +1, -1
-- runs/wo-gh-29/envelopes/reviewer-tests.envelope.json: +1, -1
+- runs/wo-gh-29/envelopes/reviewer-architecture.envelope.json: +3, -9
+- runs/wo-gh-29/envelopes/reviewer-security.envelope.json: +3, -9
+- runs/wo-gh-29/envelopes/reviewer-spec.envelope.json: +3, -9
+- runs/wo-gh-29/envelopes/reviewer-tests.envelope.json: +3, -9
 - runs/wo-gh-29/envelopes/spec-writer.envelope.json: +1, -1
 - runs/wo-gh-29/envelopes/test-writer.envelope.json: +1, -1
-- runs/wo-gh-29/intake.output.md: +2, -1
-- runs/wo-gh-29/intake.packet.md: +10, -0
-- runs/wo-gh-29/reviewer-architecture.packet.md: +10, -0
-- runs/wo-gh-29/reviewer-security.packet.md: +10, -0
-- runs/wo-gh-29/reviewer-spec.packet.md: +10, -0
-- runs/wo-gh-29/reviewer-tests.packet.md: +10, -0
-- runs/wo-gh-29/routing.json: +2, -2
-- runs/wo-gh-29/spec-writer.output.md: +15, -10
-- runs/wo-gh-29/spec-writer.packet.md: +10, -0
-- runs/wo-gh-29/test-writer.output.md: +15, -7
-- runs/wo-gh-29/test-writer.packet.md: +10, -0
-- tests/test_model_migration_loopback.py: +2, -2
-- tools/codex_station.py: +41, -12
-- tools/model_route_smoke.py: +18, -12
-- work_orders/wo-gh-29.json: +3, -4
+- runs/wo-gh-29/intake.output.md: +1, -1
+- runs/wo-gh-29/intake.packet.md: +8, -0
+- runs/wo-gh-29/reviewer-architecture.packet.md: +13, -4
+- runs/wo-gh-29/reviewer-security.packet.md: +11, -2
+- runs/wo-gh-29/reviewer-spec.packet.md: +10, -1
+- runs/wo-gh-29/reviewer-tests.packet.md: +12, -3
+- runs/wo-gh-29/routing.json: +3, -3
+- runs/wo-gh-29/spec-writer.output.md: +5, -14
+- runs/wo-gh-29/spec-writer.packet.md: +8, -0
+- runs/wo-gh-29/test-writer.output.md: +19, -14
+- runs/wo-gh-29/test-writer.packet.md: +8, -0
+- tools/codex_station.py: +25, -3
+- work_orders/wo-gh-29.json: +4, -3
 
 ## File access allowlist
 
@@ -403,9 +412,8 @@ This packet may only embed content from:
 - design/tokens.json
 - .openspec/specs/model-migration/spec.md
 - .openspec/specs/model-migration/spec.md
-- CHANGELOG.md
-- anvil/config.py
 - anvil/runner.py
+- anvil/supervisor.py
 - runs/wo-gh-29/builder.output.md
 - runs/wo-gh-29/builder.packet.md
 - runs/wo-gh-29/checks-gate.pre-review.output.md
@@ -429,9 +437,7 @@ This packet may only embed content from:
 - runs/wo-gh-29/spec-writer.packet.md
 - runs/wo-gh-29/test-writer.output.md
 - runs/wo-gh-29/test-writer.packet.md
-- tests/test_model_migration_loopback.py
 - tools/codex_station.py
-- tools/model_route_smoke.py
 - work_orders/wo-gh-29.json
 
 ## Work order
@@ -489,6 +495,14 @@ GATE LOOPBACK (round 3). Round 2 verdict: no_reviews, but the failure class chan
 Noted for the record, not a defect: reviewer-ux was routed out by routing on intake's own assessment of this run (no UI surface in intake's outcome), which is the routing capability working as designed.
 
 Loopback scope is exactly these two fixes on top of the standing tree. HARD CONSTRAINTS unchanged: full suite green with existing tests unmodified; new tests only in new files; review parsing contract, producer mechanism, routing tier vocabulary and checks gate base ref behavior frozen; no em dash or en dash characters in any produced file.
+
+GATE LOOPBACK (round 4, final). Round 3 verdict: no_reviews again; gate passed; Claude stations again executed on the new models with honest provenance. Both round 3 items were attempted and both miss their target by one mechanism each. The errors of record:
+
+1. TIER RESOLUTION NOT ON THE ROUTED PATH. reviewer-spec envelope, unchanged: "dispatch_station: unknown model 'review-balanced'", and the step's configured_model still records the tier. Round 3 added a resolution map (anvil/config.py) but the routed reviewer path never passes through it: in run_pipeline the routing override replaces configured_model with routing_record.selected_models (tier labels) after the initial computation, and the executor hand-off uses that value. Resolution must be applied at the hand-off itself: after ALL overrides (registry, project config, routing, guided) have produced the step's final model label, the runner resolves that label through the concrete map before recording configured_model and before passing the model to the runtime, for every station and every branch that executes (intake included). Proof requirement, stated plainly because round 3's tests passed while the wired path stayed broken: an integration test that drives run_pipeline with a routing record selecting tier models and a fake command runtime, asserting the runtime received the concrete model and the recorded configured_model is concrete. A test of the map function in isolation does not count.
+
+2. CODEX CREDENTIAL SOURCE. reviewer-design envelope: "codex_station: gateway environment absent, missing: CF_AIG_TOKEN". The standing workflows never export CF_AIG_TOKEN as its own variable; the gateway credential travels inside ANTHROPIC_CUSTOM_HEADERS as the header 'cf-aig-authorization: Bearer <token>', which IS present in the runtime's environment (the Claude wrapper inherits the same environment). The OpenAI runtime must take the credential from that header when CF_AIG_TOKEN is not set: parse the cf-aig-authorization value out of ANTHROPIC_CUSTOM_HEADERS, use CF_AIG_TOKEN directly when it is set, and fail loudly only when neither is present. The credential value is never printed, logged or written to any file. Unit test with a headers fixture string proving the parse, plus the direct variable path.
+
+This is the final loopback for this order. Scope is exactly these two mechanisms on the standing tree; nothing else changes. HARD CONSTRAINTS unchanged: full suite green with existing tests unmodified; new tests only in new files; review parsing contract, producer mechanism, routing tier vocabulary and checks gate base ref behavior frozen; no em dash or en dash characters in any produced file.
 - risk_hints: 
 - status: new
 

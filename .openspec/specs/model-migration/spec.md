@@ -138,8 +138,13 @@ pass is proven by the operator's post-merge verification run, not by this
 order's own run, which executes on the wiring it replaces).
 
 R10. Tier resolution at hand-off. The runner resolves every model label to a
-concrete model when it computes a step's effective model, after registry,
-project config, routing and guided resolution. One total map covers every
+concrete model at the hand-off itself: after ALL overrides (registry, project
+config, routing and guided) have produced the step's final model label, and
+before both recording configured_model and passing the model to the runtime.
+This holds for every station and every executing branch, intake included,
+and in particular for the routed path where the routing record's
+selected_models (tier labels) replace the initially computed model inside
+run_pipeline. One total map covers every
 label the runner can produce:
 - review-balanced, review-strong: claude-sonnet-5-5
 - fast-builder, reasoning-strong: claude-opus-5-5
@@ -156,18 +161,25 @@ endpoint and credential from the gateway environment the workflows already
 supply, with no new secrets and no OPENAI_* variables required:
 - endpoint: the gateway OpenAI provider route derived from the gateway
   coordinates in ANTHROPIC_BASE_URL, or ANVIL_GATEWAY_OPENAI_URL when set
-- credential: CF_AIG_TOKEN
+- credential: CF_AIG_TOKEN when set; otherwise the bearer token carried by the
+  cf-aig-authorization header inside ANTHROPIC_CUSTOM_HEADERS, which is how
+  the standing workflows supply the gateway credential
 - model: the bare id gpt-6.1-sol
-It fails loudly only when that gateway environment is absent, naming the
-missing variables and never printing their values.
+It fails loudly only when neither credential source is present or the gateway
+coordinates are absent, naming what is missing and never printing, logging or
+writing any credential value.
 
-S8. Unit tests prove every label in the R10 map resolves as listed, the map
-is total over the labels the runner can produce, a routed reviewer's hand-off
-to a fake runtime carries the concrete model, and configured_model in the
-report is concrete for routed reviewers.
-S9. A unit test proves the OpenAI runtime constructs its configuration from
-CF_AIG_TOKEN and ANTHROPIC_BASE_URL alone, honours ANVIL_GATEWAY_OPENAI_URL
-when set, and fails loudly when the gateway environment is absent.
+S8. Unit tests prove every label in the R10 map resolves as listed and the
+map is total over the labels the runner can produce. An integration test
+drives run_pipeline with a routing record whose selected_models are tier
+labels and a fake command runtime, and asserts the runtime received the
+concrete model and the recorded configured_model is concrete. A test of the
+map function alone does not satisfy this scenario.
+S9. Unit tests prove the OpenAI runtime constructs its configuration from
+ANTHROPIC_BASE_URL plus either CF_AIG_TOKEN directly or the
+cf-aig-authorization value parsed from an ANTHROPIC_CUSTOM_HEADERS fixture
+string, honours ANVIL_GATEWAY_OPENAI_URL when set, fails loudly when neither
+credential source is present, and never emits the credential value.
 S10. The agent-execution S8 provenance tests pass unmodified: executed_model
 is null when the runtime reports none and equals the self-reported value when
 it reports one, under every executor class.

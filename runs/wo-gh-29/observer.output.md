@@ -1,12 +1,14 @@
-I wrote the observation report to `runs/wo-gh-29/observer.output.md`. Nothing was released: the deployer record is only `packet_ready`, so it covers what the run record shows and nothing after release.
+I couldn't write `runs/wo-gh-29/observer.output.md`. The Write tool is disabled for this session, and I didn't want to get around that with a shell redirect. Tell me if you want me to write the file with Bash instead.
 
-- **Verdict:** `no_reviews`. 0 reviews were counted and 5 were expected. The approver and triage-human steps show `completed`, but with no reviews behind them I did not count that as an approval.
-- **Claude stations:** the intake, spec-writer, test-writer, builder and observer steps ran on the new models. Each recorded the model the runtime reported, and steps that ran no model recorded null.
-- **Tier labels:** four reviewers still failed with `unknown model 'review-balanced'` or `'review-strong'`, even though the round 3 tier map is in the working tree.
-  - **Likely cause (my inference, not confirmed):** the runner process loaded its code before the builder edited it during this run. The run's own reviewers therefore ran on old runner code, so this run does not prove the tier fix.
-  - **Stale evidence:** `report.json` is stamped 01:22:59, before the builder step, and still shows the old picture. I left it and `report.md` untouched.
-- **OpenAI runtime:** reviewer-design failed with `codex_station: gateway environment absent, missing: CF_AIG_TOKEN`. The error text differs from round 2, so the new code did run and failed loudly as designed. The record cannot show whether the execute workflow passes `CF_AIG_TOKEN` to that step.
-- **Not observed:** the review channel invariants under either runtime, any live proof of the Sol route, and any post-deploy health signal.
+**There is no release to observe.** The observer's only input is the release record, and `runs/wo-gh-29/` doesn't have one.
+- The only deployer artifact is `deployer.packet.md`, which is the task packet.
+- `envelopes/deployer.envelope.json` has status `packet_ready`, so the deployer was prepared but never ran a release.
+- There is no post-deploy health evidence in the run directory.
 
-The report recommends not releasing. It says to rerun the reviewers from a fresh runner process, confirm `CF_AIG_TOKEN` reaches the OpenAI runtime step, and run the R8 smoke script before treating the Sol route as proven.
+**What the run directory does show:**
+- `envelopes/checks-gate.envelope.json` records `gate_verdict: fail`, with exit code 1 from the full test suite.
+- `report.md` says the opposite: checks-gate `passed`, the five selected reviewers `failed`, reviewer-ux routed out, and verdict `no_reviews`. The reviewer envelopes I read all say `skipped`. The report and the envelopes come from different loopback rounds, and I didn't try to reconcile them.
+- Approver and triage-human are `completed`, but with no reviews counted, nothing was approved on review evidence.
+
+**Still needed from the operator:** the order says live proof of the new model wiring is the post-merge verification run plus `tools/model_route_smoke.py` (R8). Neither is in this run's inputs. After an actual release, rerun the observer with the release record so it can report the executed models per step and whether they match the configured ones.
 {"model": "claude-sonnet-5-5"}

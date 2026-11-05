@@ -1,23 +1,21 @@
-Both round 3 gate fixes are in and the full suite passes (526 tests, 3 skipped). One catch: the spec's "configured_model in the report is always concrete" rule can't fully hold without breaking protected tests, so I applied it only to routed stations (see the first decision below).
+I built both round 4 mechanisms and all 14 round 4 tests pass, but the full suite is not green. Two protected tests from earlier rounds directly contradict what the round 4 brief and spec ask for. Rewriting either one is forbidden, so I'm reporting the conflict instead of guessing which side gives way.
 
-**1. Tier labels no longer reach the dispatcher (R10)**
-- `anvil/config.py` now has one complete map from each tier label to a concrete model (`MODEL_TIER_MAP`, applied by `resolve_model`). It follows your table exactly. Values that are already concrete pass through unchanged. Anything else also passes through, so the dispatcher still rejects it loudly.
-- `anvil/runner.py` works out the step's model as before (registry, project config, routing, guided), then resolves it. Both executor calls hand the runtime only the resolved model.
-- Routing's choices are resolved when they're applied, so routed reviewers show a concrete model in the report.
-- `tools/dispatch_station.py` is unchanged and still refuses `review-balanced`, which the new test confirms.
+**Suite result:**
+- **In this workflow environment:** 540 tests, 3 failures. This is the environment the checks gate runs in, so the gate will fail.
+- **With `ANTHROPIC_CUSTOM_HEADERS` unset:** 542 tests, 1 failure. That count includes my two new supervisor tests.
 
-**2. The OpenAI runtime uses the gateway environment the line already has (R11)**
-- `tools/codex_station.py` no longer needs any `OPENAI_*` variables. It builds the gateway OpenAI route from `ANTHROPIC_BASE_URL` by swapping the trailing `/anthropic` segment for `/openai`, or uses `ANVIL_GATEWAY_OPENAI_URL` when that is set.
-- It authenticates with `CF_AIG_TOKEN`, sent in both the `Authorization` and `cf-aig-authorization` headers, and calls the bare model id `gpt-6.1-sol`.
-- If that environment is missing, it fails with an error naming the missing variables and never printing their values.
+## What changed
+1. **Tier labels resolved at the hand-off** (`anvil/runner.py`). After every override has set the step's final label, the runner resolves it to a concrete model. When the step runs on the command runtime, which is the one that uses the model it is handed, that concrete model is also what gets recorded as `configured_model`. Packet mode and the HTTP executor still record the label, as the existing provenance tests require; the HTTP executor runs its own endpoint model anyway.
+2. **The supervisor now passes a model too** (`anvil/supervisor.py`). It is another path that runs a station, and it never passed a model, so the dispatcher would have refused it. It now hands over the resolved model (`reasoning-strong` becomes `claude-opus-5-5`). Older executor test doubles without the new argument still work. Tests are in `tests/test_model_migration_supervisor_handoff.py`.
+3. **Codex credential** (`tools/codex_station.py`). It uses `CF_AIG_TOKEN` when set. Otherwise it reads the token from the `cf-aig-authorization` header inside `ANTHROPIC_CUSTOM_HEADERS` (name matched case-insensitively, CRLF tolerated). If neither is present it fails loudly, naming the missing sources without printing any value.
 
-**Decisions for the reviewers**
-- **Report field, a deviation from R10's wording:** R10 says `configured_model` in the report is always concrete. Protected `tests/test_execution.py` (lines 356 to 357 and 401) requires the label (`fast-builder`, `review-balanced`) for unrouted stations in packet mode and for the HTTP executor. So the report shows a concrete model only for routed stations, while the model handed to the runtime is always concrete. That satisfies the protected tests, the round 2 loopback test and the new tier tests together. `executed_model` still comes only from what the runtime reports.
-- **Smoke script, outside the stated scope:** `tools/model_route_smoke.py` had the same `OPENAI_*` dependency in its two OpenAI probes. I pointed them at the same gateway config, because R8 requires the workflow credentials.
+## The two conflicts (need an operator decision)
+1. **`tests/test_model_migration_loopback.py:61`** (round 2, protected). It requires a builder run on the command runtime to record `configured_model == "fast-builder"`. The round 4 spec and `tests/test_model_migration_round4.py` require that same kind of step to record the concrete model. The only differences between the two tests are the pipeline and the fixture, so no principled rule satisfies both. I followed the final brief, and this test fails in every environment.
+2. **`tests/test_model_migration_tiers.py::test_missing_gateway_env_fails_loudly_without_values_s9`** (round 3, protected, 2 subtests). It expects a failure when `CF_AIG_TOKEN` is absent, but it doesn't clear `ANTHROPIC_CUSTOM_HEADERS` from its environment. The execute workflow sets that header for the whole job, and the checks gate passes its environment through to the suite. The new header fallback, which round 4 requires, therefore finds the real credential and the failure never happens. It passes wherever the header is unset, such as `factory.yml` CI.
 
-**Still open**
-- The smoke script's Anthropic probes still read `ANTHROPIC_API_KEY`, which the line may not supply. I left them alone as outside this loopback's scope; the operator's post-merge smoke run will show whether that route needs the same fix.
-- The test-writer changed `tests/test_model_migration_loopback.py`, a file added by this order in an earlier round, so the builder hand-off now expects the concrete model. I didn't touch any test files.
+**Decision needed:** one of these to reach a green gate:
+- allow those two assertions to be changed (or the files replaced);
+- or have the gate run the suite without the credential environment. That would change frozen gate behaviour, so I didn't do it.
 
-`CHANGELOG.md` Unreleased has a round 3 entry, and no changed file contains em or en dashes.
+Nothing is committed.
 {"model": "claude-opus-5-5"}
