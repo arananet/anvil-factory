@@ -1,0 +1,10 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-architecture",
+  "to_station": "reviewer-design",
+  "work_order_id": "wo-gh-31",
+  "artifact_path": "runs/wo-gh-31/reviewer-architecture.packet.md",
+  "status": "routed_out",
+  "created_at": "2026-11-05T02:50:13.326732+00:00",
+  "configured_model": "claude-sonnet-5-5"
+}

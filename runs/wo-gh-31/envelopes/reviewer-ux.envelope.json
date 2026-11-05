@@ -1,0 +1,10 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-ux",
+  "to_station": "approver",
+  "work_order_id": "wo-gh-31",
+  "artifact_path": "runs/wo-gh-31/reviewer-ux.packet.md",
+  "status": "routed_out",
+  "created_at": "2026-11-05T02:50:13.338315+00:00",
+  "configured_model": "openai/gpt-6.1-sol"
+}
