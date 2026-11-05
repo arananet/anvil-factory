@@ -1109,10 +1109,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                        "but the project has no design/DESIGN.md. Define the design system to enable "
                        "design review.")
 
-    # S5: Track Astra-bound stations' measured tokens for report total
-    # Astra route: openai/gpt-6-astra through Codex (UI and design stations)
-    astra_bound_stations = interface_stations  # Interface stations use Astra route
-    astra_measured_tokens_total = 0
+    # S5: Track interface stations' measured tokens for report total
+    # Interface stations (builder, writer, media-producer, brief-writer, reviewer-design)
+    # use the design model from routing policy (currently openai/gpt-6.1-sol)
+    astra_bound_stations = interface_stations  # Field name kept for continuity
+    astra_measured_tokens_total = 0  # Field name kept for continuity
     # S2: Add warning for visual runs with no reference anchors
     if is_visual_run(work_order):
         ref_dir = project / "design" / "reference"
@@ -1284,11 +1285,16 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 output_file = run_dir / f"{station_id}.output.md"
                 try:
                     result = executor.execute(packet_text, station_id, packet_path=packet,
-                                              output_path=output_file, cwd=project)
+                                              output_path=output_file, cwd=project,
+                                              configured_model=configured_model)
                     output_text = result.get("output", "") if isinstance(result, dict) else str(result)
                     usage = result.get("usage") if isinstance(result, dict) else None
+                    executed_model_from_result = result.get("model") if isinstance(result, dict) else None
                     output_file.write_text(output_text, encoding="utf-8")
                     step_executor, step_executed_model = _executor_provenance(executor, output_text)
+                    # Use model from result if available (runtime evidence)
+                    if executed_model_from_result:
+                        step_executed_model = executed_model_from_result
                     if isinstance(usage, dict):
                         step_usage = usage
 
@@ -1615,14 +1621,19 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
 
                 try:
                     result = executor.execute(packet_text, station_id, packet_path=packet,
-                                              output_path=output_file, cwd=project)
+                                              output_path=output_file, cwd=project,
+                                              configured_model=configured_model)
                     output_text = result.get("output", "") if isinstance(result, dict) else str(result)
                     usage = result.get("usage") if isinstance(result, dict) else None
+                    executed_model_from_result = result.get("model") if isinstance(result, dict) else None
                     output_file.write_text(output_text, encoding="utf-8")
                     status = "executed"
                     detail = f"Executed by {executor.name}; output written to {output_file}"
                     artifact = str(output_file)
                     step_executor, step_executed_model = _executor_provenance(executor, output_text)
+                    # Use model from result if available (runtime evidence)
+                    if executed_model_from_result:
+                        step_executed_model = executed_model_from_result
                     extra_envelope = {}
                     if isinstance(usage, dict):
                         step_usage = usage
@@ -1720,7 +1731,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     step[key] = extra_envelope[key]
         steps.append(step)
 
-        # S5: Track Astra-bound stations' measured tokens for report total
+        # S5: Track interface stations' measured tokens for report total
         if station_id in astra_bound_stations and measured_tokens > 0:
             astra_measured_tokens_total += measured_tokens
 

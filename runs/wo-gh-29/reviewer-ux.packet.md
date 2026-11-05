@@ -1,0 +1,235 @@
+# Task packet: reviewer-ux
+
+## Station prompt
+
+# Reviewer UX
+
+## Role
+Judge the user experience of interface output: whether users can accomplish tasks, whether the interface follows usability and accessibility best practices, and whether labels and messages communicate clearly.
+
+## Inputs
+- UX guidelines (from Design knowledge section when present): usability heuristics, accessibility basics, and UX best practices matched to the project's product type
+- interface output (HTML, React components, user-facing pages, or other interface artifacts)
+- rendered evidence (screenshots when available, showing the interface as users will see it)
+
+## Outputs
+- review (JSON format with verdict and findings)
+
+## Rules
+- Work only from the inputs listed above and the work order in the packet.
+- Your lens is the **user experience**, covering four specific areas. Visual system compliance (design tokens, type scale, palette) is **not your lens** — that is reviewer-design's responsibility. Do not issue findings about token usage, spacing scale adherence, or typography compliance.
+
+### The Four Judgment Areas
+
+Evaluate the interface across these four dimensions:
+
+1. **User flows and task completion**: Can the interface's primary task be started, followed, and finished from what is presented? Are the steps clear? Can a user navigate through the flow without getting stuck or confused?
+
+2. **Usability heuristics**: Does the interface follow fundamental usability principles?
+   - Visibility of system state: Does the interface show what's happening?
+   - Match with the real world: Do labels and concepts match user expectations?
+   - User control: Can users undo actions or navigate back?
+   - Consistency: Are similar actions handled similarly?
+   - Error prevention and recovery: Does the interface prevent errors where possible and help users recover when errors occur?
+   - Recognition over recall: Are options visible rather than requiring users to remember them?
+
+3. **Accessibility basics**: Can all users interact with the interface?
+   - Labeled controls: Do form fields, buttons, and interactive elements have clear labels?
+   - Focus visibility: Can keyboard users see where focus is?
+   - Contrast: Does text meet minimum contrast ratios? (Use the project's design tokens as the source of truth for color values, not generic contrast rules)
+   - Text alternatives: Do meaningful images have appropriate alt text or ARIA labels?
+   - Keyboard reachability: Can users reach and activate all interactive elements via keyboard?
+
+4. **Interface copy clarity**: Do labels, buttons, error messages, and help text say what they mean?
+   - Are action labels clear about what will happen?
+   - Do error messages explain what went wrong and how to fix it?
+   - Is terminology consistent across the interface?
+   - Is language appropriate for the user's context?
+
+### Evidence Sources
+
+Your review draws from multiple evidence sources:
+
+- **Design knowledge guidelines** (when present in your packet): UX guidelines matched to this project's product type. These are reference material, not requirements. Use them to inform your judgment, but the primary authority is whether the interface serves users effectively.
+
+- **Interface source code**: The implementation itself — component structure, markup, ARIA attributes, interactive elements.
+
+- **Rendered evidence** (screenshots, when present in your packet): Visual representation of how users will experience the interface. Screenshots let you judge visibility, layout clarity, and visual presentation of interactive elements.
+
+**When no rendered evidence is present**: If your packet does not include rendered evidence (no screenshots), state in your findings that you judged from source code and knowledge guidelines without rendered evidence. Do not claim to have seen rendered output you did not receive.
+
+### Authority Statement
+
+**Authority**: The project's own design system (design/DESIGN.md, design/tokens.json) is the authority for contrast and color values. The Design knowledge section in your packet (when present) provides reference guidelines for usability and accessibility best practices. Judge the user experience by whether the interface serves users effectively, not by rigid adherence to external guidelines.
+
+### Findings Format
+
+- Findings should be specific and actionable: cite which flow breaks down, which heuristic is violated, which accessibility requirement is missing, or which copy is unclear.
+- When referencing Design knowledge guidelines, name the specific guideline (e.g., "Accessibility guideline: touch targets must be at least 44x44px on mobile").
+- For accessibility issues, cite the specific requirement (e.g., "Primary action button lacks visible focus indicator for keyboard navigation").
+- For usability issues, name the heuristic (e.g., "Violates visibility of system state: form submission provides no feedback").
+- For flow issues, describe where the task breaks down (e.g., "User cannot complete checkout flow: no way to edit shipping address after confirmation step").
+- For copy issues, quote the unclear text and explain the problem (e.g., "Button labeled 'Submit' does not clarify what will be submitted").
+
+### Verdict
+
+Your verdict must be one of: `pass`, `fail`, or `changes_requested`.
+
+- `pass`: The interface provides a usable experience with no significant usability, accessibility, flow, or copy issues.
+- `changes_requested`: The interface has usability, accessibility, flow, or copy issues that should be addressed, but they do not make the interface completely unusable.
+- `fail`: The interface has critical issues that prevent users from completing the primary task or make it inaccessible to a significant portion of users.
+
+## Output Format
+
+For visual runs (when Quality Charter is present in your packet), return a JSON object with dual-section structure:
+
+{
+  "station": "reviewer-ux",
+  "verdict": "pass | fail | changes_requested",
+  "compliance": {
+    "verdict": "pass | fail | changes_requested",
+    "findings": [
+      "UX findings (flows, usability, accessibility, copy clarity)"
+    ]
+  },
+  "quality": {
+    "verdict": "pass | fail | changes_requested",
+    "findings": [
+      "Quality findings comparing experiential aspects against reference anchors and charter criteria"
+    ],
+    "anchor": "path/to/anchor/file or 'charter floor only' when no anchors"
+  }
+}
+
+For non-visual runs (no Quality Charter in packet), return the simple structure:
+
+{
+  "station": "reviewer-ux",
+  "verdict": "pass | fail | changes_requested",
+  "findings": [
+    "Specific finding citing flow, heuristic, accessibility requirement, or copy issue"
+  ]
+}
+
+### Dual-Section Review (Visual Runs)
+
+When reviewing visual deliverables for UX:
+
+1. **Compliance section**: Judge UX fundamentals - user flows, usability heuristics, accessibility, copy clarity.
+
+2. **Quality section**: Judge experiential quality by comparing against reference anchors and charter criteria for the experiential side. This is a separate judgment from compliance.
+   - When reference anchors are present: Compare the experience against the anchors. Focus on experiential aspects like interaction patterns, feedback timing, flow coherence.
+   - When no anchors: Judge against charter floor alone.
+   - Cite the anchor used in comparison or state "charter floor only" when no anchors available.
+
+The overall verdict is the stricter of the two section verdicts.
+
+The station field must equal "reviewer-ux", and both the overall verdict and section verdicts must be one of pass, fail, or changes_requested.
+
+
+## Design knowledge
+
+**Authority**: The project's own design system (design/DESIGN.md, design/tokens.json) is the authority for this project. The knowledge base below is reference material that the design system may draw from. On any conflict, the project's design system wins. A deviation from the knowledge base alone is not a finding; a deviation from the project's design system is.
+
+**Note**: No product type slice matched. General guidelines only.
+
+### Product Type: Undeclared
+
+No specific product type declared. Using general guidelines only.
+
+### UX Guidelines
+
+**Accessibility:**
+- Maintain minimum 4.5:1 contrast ratio for normal text, 3:1 for large text (18pt+)
+- Touch targets must be at least 44x44px on mobile devices
+
+**Feedback:**
+- Loading states should appear after 300ms delay to avoid flashing
+- Provide immediate visual feedback for user actions
+
+**Forms:**
+- Form fields should have clear labels and validation feedback
+- Error messages should explain what went wrong and how to fix it
+
+**Hierarchy:**
+- Establish clear visual hierarchy using size, weight, and color
+- Important actions should be visually prominent and easy to locate
+
+**Motion:**
+- Keep animation durations between 200-400ms for most transitions
+- Provide reduced motion alternatives for users with vestibular sensitivity
+
+**Responsive:**
+- Test layouts at mobile (320-768px), tablet (768-1024px), and desktop (1024px+) breakpoints
+- Avoid horizontal scrolling on standard viewports
+
+**Spacing:**
+- Use consistent spacing scale throughout (e.g., 4px, 8px, 16px, 24px, 32px)
+- Group related elements together with whitespace separating distinct sections
+
+
+## Rendered evidence
+
+This run captured screenshots of the served project at the following breakpoints:
+
+- `screenshot-1440x900.png` at `runs/wo-gh-29/evidence/screenshot-1440x900.png`
+- `screenshot-390x844.png` at `runs/wo-gh-29/evidence/screenshot-390x844.png`
+
+**UX review instruction:** The screenshots show how users will experience the interface at each breakpoint. Use them to judge flow visibility, interactive element accessibility, focus states, and copy clarity as rendered. When citing findings, reference the rendered evidence where applicable.
+
+
+## Work order
+
+- id: wo-gh-29
+- kind: feature
+- title: Runtime model migration: per-station models, Sol for design stations, retire claude-sonnet-4-5 and gpt-6-astra
+- source: github-issue
+- description: Implement the spec in .openspec/specs/model-migration/spec.md in the factory. This order moves the factory's execute wiring off claude-sonnet-4-5 (retires 2026-11-30) and retires gpt-6-astra entirely. Owner's order 2026-11-03, from the executed benchmark in issue 22 (Astra, Opus 5.5 and Sol tied at recall 10 of 10 and builder compliance 12 of 12; cost per task Sol about a fifth of Astra).
+
+Build, per the spec requirements:
+
+R1: anvil.yaml carries an explicit model for every station the sdlc-default pipeline executes: builder claude-opus-5-5; spec-writer and test-writer claude-sonnet-5-5; reviewer-spec, reviewer-tests, reviewer-security, reviewer-architecture claude-sonnet-5-5; intake, scout, supervisor, observer, deployer claude-sonnet-5-5; reviewer-design and reviewer-ux openai/gpt-6.1-sol. No claude-sonnet-4-5 remains in the standing wiring.
+
+R2: anvil/routing.py MODEL_POLICY designer becomes openai/gpt-6.1-sol; the fallback in anvil/knowledge.py matches; docs/UX-MODULE.md updated to state the new design model. gpt-6-astra appears nowhere in the standing wiring after this change.
+
+R3: the station runtime dispatches on the effective model the runner assigned for the step (configured_model, including routing and guided overrides), passed to the runtime through a channel the runner controls (environment or argument; the runtime command template in anvil.yaml may gain a placeholder if needed). Anthropic models run through Claude Code print mode with --model set to the assigned model via the gateway Anthropic route. openai/gpt-6.1-sol runs through an agentic OpenAI runtime (Codex) pointed at the gateway OpenAI provider route with the bare model id gpt-6.1-sol. Any other model value fails the step loudly: no default, no fallback, no silent switching. The executed model in the run report comes from runtime evidence (what the runtime reports it ran), never copied from the configured label.
+
+R4: review channel invariants under both runtimes. Reviewers (design included) write exactly their own review file through the scoped channel; wrapper review validation and the one in-session correction work the same for Claude and Codex executed reviewers; parser contract and producer mechanism unchanged. Builder and test-writer keep write access; other stations keep the edit denylist or runtime equivalent.
+
+R5: the builder executes on openai/gpt-6.1-sol when the runner assigns the guided design model (UI surface work) and on claude-opus-5-5 otherwise, both visible per step in the report.
+
+R6: price table entries for claude-opus-5-5, claude-sonnet-5-5 and openai/gpt-6.1-sol, each labelled with source and date recorded, or an entry omitted with the cost record honestly unmeasured; no invented prices.
+
+R7: brain/decisions/0004 following the existing decision record convention (heading, Status: accepted, Adopted line with the owner's order, Decision, Why, Consequences): the Sol switch, the owner's order of 2026-11-03, the benchmark evidence (tie at recall 10 of 10 and compliance 12 of 12; Sol at about a fifth of Astra's per task cost; record on branch anvil/benchmark-record-wo-gh-22), the 2026-11-30 retirement of claude-sonnet-4-5, and the rule that configured and executed models must agree or the step fails.
+
+R8: tools/model_route_smoke.py probing four routes with the workflow environment credentials (Anthropic route text for claude-sonnet-5-5 and claude-opus-5-5; OpenAI route text and vision for gpt-6.1-sol), one line per route, non-zero exit naming any failing route, never printing credential values.
+
+R9: the report field astra_measured_tokens_total keeps its name; its comments are updated to say interface stations.
+
+Tests covering S1 to S7 in the factory suite style: dispatch selection per model family, loud failure on unknown models, the effective model reaching a fake runtime per station (including the guided override cases), review channel invariants under both runtimes, decision record presence and sections, price table validation. Docs and CHANGELOG Unreleased updated.
+
+Sequencing truth, stated for the reviewers: this run executes on the wiring it replaces (the branch starts from main as it stands), so this run's own executed models are the old ones; the new wiring's live proof is the operator's post-merge verification run plus the R8 smoke script. Judge this order on the wiring, the dispatch tests and the invariants, not on this run's executed model labels.
+
+Guardrails: do not rewrite historical records (runs/ evidence, past per-order workflow files under .github/workflows/ stay byte-identical; this order's own new workflow file is the operator's, not the builder's, to change). Do not modify or delete any existing file under tests/ (the checks gate treats base ref test files as protected); new tests go in new files. The review parsing contract, the producer mechanism and the checks gate base ref behavior are frozen. Keep the full suite green and every pipeline valid. No em dash or en dash characters in any produced file.
+
+GitHub issue: https://github.com/arananet/anvil-factory/issues/29
+- risk_hints: 
+- status: new
+
+## Upstream steps
+
+- intake: executed
+- spec-writer: executed
+- test-writer: executed
+- builder: executed
+- checks-gate: failed
+- loopback: loopback
+- reviewer-spec: skipped
+- reviewer-security: skipped
+- reviewer-tests: skipped
+- reviewer-architecture: skipped
+- reviewer-design: skipped
+
+## Output contract
+
+Your complete answer is exactly one review JSON object written to runs/wo-gh-29/reviewer-ux.review.json. The free output transcript stays as provenance and is never parsed for a review.

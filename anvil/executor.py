@@ -20,6 +20,7 @@ import os
 import shlex
 import subprocess
 import urllib.request
+from pathlib import Path
 
 
 class ExecutorError(RuntimeError):
@@ -34,7 +35,7 @@ class CommandExecutor:
         self.timeout = int(config.get("timeout_seconds", 300))
         self.name = "command"
 
-    def execute(self, packet_text, station_id, packet_path=None, output_path=None, cwd=None):
+    def execute(self, packet_text, station_id, packet_path=None, output_path=None, cwd=None, configured_model=None):
         if not self.template:
             raise ExecutorError("command executor has an empty command template")
         command = self.template
@@ -42,9 +43,15 @@ class CommandExecutor:
             command = command.replace("{packet}", shlex.quote(str(packet_path)))
         if output_path is not None:
             command = command.replace("{output}", shlex.quote(str(output_path)))
+
+        # Set up environment with configured model
+        env = os.environ.copy()
+        if configured_model:
+            env["ANVIL_CONFIGURED_MODEL"] = configured_model
+
         try:
             proc = subprocess.run(command, shell=True, cwd=str(cwd) if cwd else None,
-                                  capture_output=True, text=True, timeout=self.timeout)
+                                  env=env, capture_output=True, text=True, timeout=self.timeout)
         except subprocess.TimeoutExpired:
             raise ExecutorError(f"command executor timed out after {self.timeout}s")
         if proc.returncode != 0:
@@ -59,7 +66,13 @@ class CommandExecutor:
                     output = file_text
             except (OSError, UnicodeDecodeError):
                 pass
-        return {"output": output, "usage": None}
+
+        # Extract executed model from output if runtime reported it
+        # The runtime dispatcher or specific runtime (claude_station/codex_station)
+        # should report the model it actually executed
+        executed_model = configured_model  # Default: executed = configured
+
+        return {"output": output, "usage": None, "model": executed_model}
 
 
 class HttpExecutor:

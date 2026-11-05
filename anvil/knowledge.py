@@ -503,4 +503,4 @@ def get_design_model_from_routing() -> str:
         Design model name from routing policy
     """
     from .routing import MODEL_POLICY
-    return MODEL_POLICY.get("designer", "openai/gpt-6-astra")
+    return MODEL_POLICY.get("designer", "openai/gpt-6.1-sol")
