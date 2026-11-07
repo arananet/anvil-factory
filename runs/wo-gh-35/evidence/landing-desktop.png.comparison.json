@@ -1,0 +1,17 @@
+{
+  "output": "runs/wo-gh-35/evidence/landing-desktop.png",
+  "anchor_cited": null,
+  "criteria_checked": [
+    "materials",
+    "light",
+    "contact",
+    "scale"
+  ],
+  "gaps": [],
+  "statement": "No physical product is depicted: materials, light, physical contact and anatomical scale are inapplicable. No gaps found at charter bar for the applicable interface observations; this is evidence, not approval.",
+  "interface_observations": [
+    "Inspected the rendered page with scripts disabled. Near black panels, orange highlights and light text form a consistent visual hierarchy.",
+    "No clipped content or horizontal scrolling at this viewport. The phone pipeline uses vertical branching for parallel reviewers; desktop uses a horizontal layout.",
+    "No reference anchors were supplied. Browser measurements also cover tablet width."
+  ]
+}

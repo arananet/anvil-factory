@@ -1,0 +1,52 @@
+[
+  {
+    "foreground": "text",
+    "background": "bg",
+    "ratio": 17.66
+  },
+  {
+    "foreground": "text",
+    "background": "surface",
+    "ratio": 16.36
+  },
+  {
+    "foreground": "muted",
+    "background": "bg",
+    "ratio": 9.98
+  },
+  {
+    "foreground": "muted",
+    "background": "surface",
+    "ratio": 9.24
+  },
+  {
+    "foreground": "warm",
+    "background": "bg",
+    "ratio": 9.03
+  },
+  {
+    "foreground": "warm",
+    "background": "surface",
+    "ratio": 8.37
+  },
+  {
+    "foreground": "orange",
+    "background": "bg",
+    "ratio": 6.32
+  },
+  {
+    "foreground": "bg",
+    "background": "orange",
+    "ratio": 6.32
+  },
+  {
+    "foreground": "text",
+    "background": "node",
+    "ratio": 14.92
+  },
+  {
+    "foreground": "text",
+    "background": "gate",
+    "ratio": 15.1
+  }
+]

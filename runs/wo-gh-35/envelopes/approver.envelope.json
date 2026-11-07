@@ -1,0 +1,10 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "approver",
+  "to_station": "triage-human",
+  "work_order_id": "wo-gh-35",
+  "artifact_path": "runs/wo-gh-35/report.json",
+  "status": "completed",
+  "created_at": "2026-11-07T14:18:12.153205+00:00",
+  "configured_model": "claude-sonnet-5-5"
+}

@@ -1,0 +1,143 @@
+[
+  {
+    "width": 1440,
+    "scrollWidth": 1440,
+    "smallTargets": [],
+    "sections": [
+      {
+        "id": "hero",
+        "y": 96
+      },
+      {
+        "id": "problem",
+        "y": 839.078125
+      },
+      {
+        "id": "how-it-works",
+        "y": 1227.671875
+      },
+      {
+        "id": "different",
+        "y": 2275.046875
+      },
+      {
+        "id": "proof",
+        "y": 3196.703125
+      },
+      {
+        "id": "quickstart",
+        "y": 3869.359375
+      },
+      {
+        "id": "not",
+        "y": 4515.78125
+      },
+      {
+        "id": "footer",
+        "y": 5016.171875
+      }
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "requests": [
+      "http://127.0.0.1:43429/"
+    ],
+    "scripts_enabled": false
+  },
+  {
+    "width": 768,
+    "scrollWidth": 768,
+    "smallTargets": [],
+    "sections": [
+      {
+        "id": "hero",
+        "y": 80
+      },
+      {
+        "id": "problem",
+        "y": 779.390625
+      },
+      {
+        "id": "how-it-works",
+        "y": 1242.28125
+      },
+      {
+        "id": "different",
+        "y": 3014.96875
+      },
+      {
+        "id": "proof",
+        "y": 4097.515625
+      },
+      {
+        "id": "quickstart",
+        "y": 4680.25
+      },
+      {
+        "id": "not",
+        "y": 5261.96875
+      },
+      {
+        "id": "footer",
+        "y": 5748.625
+      }
+    ],
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "requests": [
+      "http://127.0.0.1:43429/"
+    ],
+    "scripts_enabled": false
+  },
+  {
+    "width": 360,
+    "scrollWidth": 360,
+    "smallTargets": [],
+    "sections": [
+      {
+        "id": "hero",
+        "y": 80
+      },
+      {
+        "id": "problem",
+        "y": 1029.359375
+      },
+      {
+        "id": "how-it-works",
+        "y": 1576.65625
+      },
+      {
+        "id": "different",
+        "y": 3442.734375
+      },
+      {
+        "id": "proof",
+        "y": 5369.890625
+      },
+      {
+        "id": "quickstart",
+        "y": 6313.140625
+      },
+      {
+        "id": "not",
+        "y": 7071.734375
+      },
+      {
+        "id": "footer",
+        "y": 7652.578125
+      }
+    ],
+    "viewport": {
+      "width": 360,
+      "height": 800
+    },
+    "requests": [
+      "http://127.0.0.1:43429/"
+    ],
+    "scripts_enabled": false
+  }
+]

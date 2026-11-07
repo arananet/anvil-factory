@@ -1,49 +1,52 @@
- .../specs/operator-requirements/scenario-checks.md |  61 +++
- CHANGELOG.md                                       |   1 +
- README.md                                          |   1 +
- docs/OPERATOR-REQUIREMENTS.md                      | 136 +++++++
- runs/wo-gh-32/builder.output.md                    |  18 +
- runs/wo-gh-32/builder.packet.md                    | 236 ++++++++++++
- runs/wo-gh-32/checks-gate.pre-review.output.md     | 132 +++++++
- runs/wo-gh-32/deployer.packet.md                   |  72 ++++
- runs/wo-gh-32/envelopes/approver.envelope.json     |  10 +
- runs/wo-gh-32/envelopes/builder.envelope.json      |  15 +
- runs/wo-gh-32/envelopes/checks-gate.envelope.json  | 116 ++++++
- runs/wo-gh-32/envelopes/deployer.envelope.json     |  10 +
- runs/wo-gh-32/envelopes/intake.envelope.json       |  15 +
- runs/wo-gh-32/envelopes/observer.envelope.json     |  15 +
+ docs/LANDING-PAGE.md                               | 128 +++++++
+ runs/wo-gh-35/builder.output.md                    |   6 +
+ runs/wo-gh-35/builder.packet.md                    | 232 +++++++++++++
+ runs/wo-gh-35/checks-gate.pre-review.output.md     |  86 +++++
+ runs/wo-gh-35/deployer.packet.md                   |  69 ++++
+ runs/wo-gh-35/envelopes/approver.envelope.json     |  10 +
+ runs/wo-gh-35/envelopes/builder.envelope.json      |  15 +
+ runs/wo-gh-35/envelopes/checks-gate.envelope.json  |  72 ++++
+ runs/wo-gh-35/envelopes/deployer.envelope.json     |  10 +
+ runs/wo-gh-35/envelopes/intake.envelope.json       |  15 +
+ runs/wo-gh-35/envelopes/observer.envelope.json     |  15 +
  .../envelopes/reviewer-architecture.envelope.json  |  10 +
  .../envelopes/reviewer-design.envelope.json        |  10 +
  .../envelopes/reviewer-security.envelope.json      |  10 +
- .../wo-gh-32/envelopes/reviewer-spec.envelope.json |  28 ++
- .../envelopes/reviewer-tests.envelope.json         |  28 ++
- runs/wo-gh-32/envelopes/reviewer-ux.envelope.json  |  10 +
- runs/wo-gh-32/envelopes/spec-writer.envelope.json  |  15 +
- runs/wo-gh-32/envelopes/test-writer.envelope.json  |  15 +
- runs/wo-gh-32/envelopes/triage-human.envelope.json |  10 +
- runs/wo-gh-32/evidence/screenshot-1440x900.png     | Bin 0 -> 91380 bytes
- runs/wo-gh-32/evidence/screenshot-390x844.png      | Bin 0 -> 62074 bytes
- runs/wo-gh-32/intake.output.md                     |   4 +
- runs/wo-gh-32/intake.packet.md                     | 109 ++++++
- runs/wo-gh-32/observer.output.md                   |  31 ++
- runs/wo-gh-32/observer.packet.md                   |  73 ++++
- runs/wo-gh-32/report.json                          | 339 +++++++++++++++++
- runs/wo-gh-32/report.md                            |  53 +++
- runs/wo-gh-32/reviewer-architecture.packet.md      |  87 +++++
- runs/wo-gh-32/reviewer-design.packet.md            | 414 +++++++++++++++++++++
- runs/wo-gh-32/reviewer-security.packet.md          |  84 +++++
- runs/wo-gh-32/reviewer-spec.output.md              |   8 +
- runs/wo-gh-32/reviewer-spec.packet.md              |  84 +++++
- runs/wo-gh-32/reviewer-spec.review.json            |  13 +
- runs/wo-gh-32/reviewer-tests.output.md             |   9 +
- runs/wo-gh-32/reviewer-tests.packet.md             |  86 +++++
- runs/wo-gh-32/reviewer-tests.review.json           |  13 +
- runs/wo-gh-32/reviewer-ux.packet.md                | 249 +++++++++++++
- runs/wo-gh-32/routing.json                         |  29 ++
- runs/wo-gh-32/spec-writer.output.md                |   9 +
- runs/wo-gh-32/spec-writer.packet.md                |  61 +++
- runs/wo-gh-32/swimlane.md                          |  28 ++
- runs/wo-gh-32/test-writer.output.md                |  14 +
- runs/wo-gh-32/test-writer.packet.md                |  61 +++
- work_orders/wo-gh-32.json                          |  18 +
- 48 files changed, 2850 insertions(+)
+ .../wo-gh-35/envelopes/reviewer-spec.envelope.json |  10 +
+ .../envelopes/reviewer-tests.envelope.json         |  10 +
+ runs/wo-gh-35/envelopes/reviewer-ux.envelope.json  |  10 +
+ runs/wo-gh-35/envelopes/spec-writer.envelope.json  |  15 +
+ runs/wo-gh-35/envelopes/test-writer.envelope.json  |  15 +
+ runs/wo-gh-35/envelopes/triage-human.envelope.json |  10 +
+ runs/wo-gh-35/evidence/browser-checks.json         | 143 ++++++++
+ runs/wo-gh-35/evidence/build-facts.json            |  18 +
+ runs/wo-gh-35/evidence/contrast-checks.json        |  52 +++
+ runs/wo-gh-35/evidence/landing-desktop.png         | Bin 0 -> 511363 bytes
+ .../evidence/landing-desktop.png.comparison.json   |  17 +
+ runs/wo-gh-35/evidence/landing-mobile.png          | Bin 0 -> 465881 bytes
+ .../evidence/landing-mobile.png.comparison.json    |  17 +
+ runs/wo-gh-35/evidence/screenshot-1440x900.png     | Bin 0 -> 91380 bytes
+ runs/wo-gh-35/evidence/screenshot-390x844.png      | Bin 0 -> 62074 bytes
+ runs/wo-gh-35/evidence/validation.json             |  23 ++
+ runs/wo-gh-35/intake.output.md                     |   8 +
+ runs/wo-gh-35/intake.packet.md                     | 105 ++++++
+ runs/wo-gh-35/observer.output.md                   |  10 +
+ runs/wo-gh-35/observer.packet.md                   |  70 ++++
+ runs/wo-gh-35/report.json                          | 341 +++++++++++++++++++
+ runs/wo-gh-35/report.md                            |  54 +++
+ runs/wo-gh-35/reviewer-architecture.packet.md      |  84 +++++
+ runs/wo-gh-35/reviewer-design.packet.md            | 367 +++++++++++++++++++++
+ runs/wo-gh-35/reviewer-security.packet.md          |  81 +++++
+ runs/wo-gh-35/reviewer-spec.packet.md              |  81 +++++
+ runs/wo-gh-35/reviewer-tests.packet.md             |  83 +++++
+ runs/wo-gh-35/reviewer-ux.packet.md                | 246 ++++++++++++++
+ runs/wo-gh-35/routing.json                         |  25 ++
+ runs/wo-gh-35/spec-writer.output.md                |  14 +
+ runs/wo-gh-35/spec-writer.packet.md                |  57 ++++
+ runs/wo-gh-35/swimlane.md                          |  29 ++
+ runs/wo-gh-35/test-writer.output.md                |  24 ++
+ runs/wo-gh-35/test-writer.packet.md                |  57 ++++
+ site/index.html                                    |  52 +++
+ tests/test_landing_page.py                         | 265 +++++++++++++++
+ work_orders/wo-gh-35.json                          |  19 ++
+ 51 files changed, 3100 insertions(+)
