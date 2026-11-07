@@ -1,0 +1,13 @@
+{
+  "station": "reviewer-tests",
+  "verdict": "pass",
+  "findings": [
+    "tests/test_landing_page.py is real, not a facade: it reads the real site/index.html, README.md, stations/, pipelines/ and pipelines/sdlc-default.json at test time. 19 tests ran, 17 passed, 2 skipped, 0 failed.",
+    "Spec scenarios map to test classes: S1 to TestPageStandsAlone (single document, viewport, title and description, no external assets, inline CSS, English), S2 to TestStoryInOrder (eight anchors in order, CTAs, SVG labels), S3 to TestPrintedCountsEqualTree, S4 to TestQuickstartIsReal, S6 to TestStyleAndFence, S7 hosting to test_hosting_doc.",
+    "Printed counts are computed from the tree, not copied. The page prints 27 stations, 8 pipelines and 6 reviewers. The tree has 27 stations, 8 pipelines and 6 parallel reviewers in sdlc-default. The work order text said five reviewers, but the tree says six and the page follows the tree, which is the correct R3 behavior.",
+    "The quickstart test requires the page's <pre> commands to equal the README Quickstart commands exactly. The dash check covers site/index.html, docs/LANDING-PAGE.md and the test file.",
+    "The full suite (605 tests) passes with 8 skips, so no existing test regressed. The diff to tests/ shows no modification to base ref test files.",
+    "Minor, non-blocking: test_release_tag_exists and test_run_delta_stays_in_fence skipped in this checkout because the v0.1.0 tag and origin/main are not available. Those checks are not exercised here, so the fence and tag checks depend on CI having full history.",
+    "Minor, non-blocking: S5 (rendered evidence for contrast, 44 px targets and no horizontal scroll) is not asserted in the suite. It is covered by evidence/browser-checks.json (scrollWidth equals viewport width, smallTargets empty, scripts disabled), which reviewer-design owns."
+  ]
+}

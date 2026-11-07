@@ -73,8 +73,7 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/35
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
+- checks-gate: passed
 
 ## Output contract
 

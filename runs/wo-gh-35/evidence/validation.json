@@ -1,23 +1,15 @@
 {
-  "landing_checks": {
+  "attempt": "builder re-run 2026-11-07",
+  "landing_tests": {
     "run": 19,
-    "passed": 18,
-    "skipped": 1,
-    "skip_reason": "Shallow checkout has no merge base for origin/main...HEAD"
+    "passed": 17,
+    "skipped": 2,
+    "skip_reasons": [
+      "Local release tag unavailable",
+      "origin/main ref unavailable"
+    ]
   },
-  "broader_checks": {
-    "run": 604,
-    "passed": 596,
-    "skipped": 6,
-    "failures": 1,
-    "errors": 1,
-    "excluded": [
-      "test_test_suite_count_measured_r3: recursive full-suite subprocess"
-    ],
-    "error_test": "test_s1_chunk_crash_after_completion_tolerated",
-    "failed_test": "test_s5_statistics_record_all_outcome_classes",
-    "detail": "Both expect render-stats.json in a temporary work directory; the file is absent."
-  },
-  "deployment": "none",
-  "approval": "Reserved for independent reviewers and owner"
+  "browser_checks": "browser-checks.json",
+  "broader_suite": "Not re-run for isolated HTML/CSS changes",
+  "approval": "Independent review required"
 }

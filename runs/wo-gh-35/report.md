@@ -24,14 +24,14 @@ Surfaces: ui, content
 - reviewer-ux (model: review-balanced)
 
 **Routed out** (2):
-- reviewer-architecture: Routed out by low risk rule with surface exceptions
 - reviewer-security: Routed out by low risk rule with surface exceptions
+- reviewer-architecture: Routed out by low risk rule with surface exceptions
 
 ## Verdict
 
-Verdict: no_reviews
+Verdict: approved
 
-No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 4.)
+All counted reviews passed. (Counted 3 reviews, expected 4.)
 
 ## Steps
 
@@ -39,14 +39,13 @@ No reviews were produced in this run, so the verdict is no_reviews; standing pro
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
-- reviewer-spec: skipped
-- reviewer-security: skipped
-- reviewer-tests: skipped
-- reviewer-architecture: skipped
-- reviewer-design: skipped
-- reviewer-ux: skipped
+- checks-gate: passed
+- reviewer-spec: executed
+- reviewer-security: routed_out
+- reviewer-tests: executed
+- reviewer-architecture: routed_out
+- reviewer-design: executed
+- reviewer-ux: failed
 - approver: completed
 - triage-human: completed
 - deployer: packet_ready

@@ -3,8 +3,18 @@
   "from_station": "reviewer-design",
   "to_station": "reviewer-ux",
   "work_order_id": "wo-gh-35",
-  "artifact_path": "runs/wo-gh-35/reviewer-design.packet.md",
-  "status": "skipped",
-  "created_at": "2026-11-07T14:18:12.151681+00:00",
-  "configured_model": "openai/gpt-6.1-sol"
+  "artifact_path": "runs/wo-gh-35/reviewer-design.output.md",
+  "status": "executed",
+  "created_at": "2026-11-07T14:31:47.708274+00:00",
+  "review": {
+    "station": "reviewer-design",
+    "verdict": "pass",
+    "findings": []
+  },
+  "configured_model": "openai/gpt-6.1-sol",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "openai/gpt-6.1-sol"
 }

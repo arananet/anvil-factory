@@ -42,7 +42,7 @@
       "height": 1000
     },
     "requests": [
-      "http://127.0.0.1:43429/"
+      "http://127.0.0.1:39519/"
     ],
     "scripts_enabled": false
   },
@@ -89,7 +89,7 @@
       "height": 1024
     },
     "requests": [
-      "http://127.0.0.1:43429/"
+      "http://127.0.0.1:39519/"
     ],
     "scripts_enabled": false
   },
@@ -136,7 +136,7 @@
       "height": 800
     },
     "requests": [
-      "http://127.0.0.1:43429/"
+      "http://127.0.0.1:39519/"
     ],
     "scripts_enabled": false
   }

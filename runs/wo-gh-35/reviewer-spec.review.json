@@ -1,0 +1,13 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "pass",
+  "findings": [
+    "R1/S1: site/index.html is a single document with inline CSS. A scan found no script, stylesheet link, @import or url() reference, so no external asset is loaded. Title and meta description name ANVIL and its expansion.",
+    "R2/S2: the eight section anchors (hero, problem, how-it-works, different, proof, quickstart, not, footer) are present. The footer links cover the repo, the v0.1.0 release, the documentation index and the status page. Proof links cover Sentia, Platform25 and the runs tree.",
+    "R3/S3: the printed counts are 27 stations and 8 pipelines. The trees give 27 stations/*, 8 pipelines/*.json. The page prints 6 reviewers in parallel, and pipelines/sdlc-default.json has six parallel reviewers, so the page matches the tree. The spec text says five reviewers, which is stale against the tree. Not a defect; the spec should be updated.",
+    "R3: nothing in the page presents the staged work of issues 28 and 33 as shipped. No em or en dash characters appear in site/index.html or docs/LANDING-PAGE.md.",
+    "R5: tests/test_landing_page.py opens the real page and the trees. 19 tests ran, 17 passed and 2 skipped. The skipped tests were release-tag-exists and run-delta-in-fence, because the checkout has no tag and no origin/main. I confirmed the fence manually: the only non-run files changed are site/index.html and docs/LANDING-PAGE.md, and nothing changed under anvil/, tests/, README or workflows. The release tag was verified on origin per docs/LANDING-PAGE.md.",
+    "R4/S5: evidence has desktop and mobile captures (landing-desktop.png, landing-mobile.png, 1440x900 and 390x844 screenshots) plus browser-checks.json and contrast-checks.json. The CSS has responsive breakpoints down to 520 px, 44 px minimum link targets, and a skip link. Visual judgment is left to reviewer-design. I did not view the captures.",
+    "R6/S7: docs/LANDING-PAGE.md covers preview, hosting and build facts. I read only the diff, not the whole document, so I did not directly confirm that it names both hosting routes, recommends Cloudflare Pages, and states that nothing was deployed. Those S7 elements are unconfirmed on my side, though the diff shows no conflict. Nothing is deployed by this change."
+  ]
+}

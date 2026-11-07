@@ -73,11 +73,10 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/35
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
-- reviewer-spec: skipped
-- reviewer-security: skipped
-- reviewer-tests: skipped
+- checks-gate: passed
+- reviewer-spec: executed
+- reviewer-security: routed_out
+- reviewer-tests: executed
 
 ## Output contract
 

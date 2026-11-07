@@ -1,24 +1,18 @@
-I wrote `tests/test_landing_page.py` with 19 tests. They fail right now, because `site/index.html` and `docs/LANDING-PAGE.md` don't exist yet. The run gives 16 failures, 1 error and 2 skips. That's the intended pre-implementation state.
+I wrote `runs/wo-gh-35/test-writer.output.md`, but I added no new tests. `tests/test_landing_page.py` already exists with 19 tests. It came in with the re-run trigger commit, `7c8c290`.
 
-Every test opens the real page, the `stations/` and `pipelines/` trees, the README or the docs file. Nothing asserts against a copy of the content. It is a new file, so no base-ref test file is touched, and it holds no em or en dash characters.
+I left that file alone because the checks gate protects base ref test files. I also found nothing in the spec that it fails to cover.
 
-The tests cover the spec like this:
+**Run result:** `python3 -m unittest tests.test_landing_page` gives 19 tests, OK, 2 skipped. The tests open the real page, the `stations/` and `pipelines/` trees, the README and the hosting doc, so none of them is a facade test.
 
-- **S1 (stands alone):** One HTML document with a viewport meta. The title and meta description name ANVIL and its expansion. The page is in English with inline CSS. There are no script, stylesheet, iframe or inline-handler elements. Every `url()` must be a `data:` or `#` reference, and `<img>` sources must be empty or `data:`. There are also checks for `@media` rules and the FF5C00 accent.
-- **S2 (story in order):**
-  - The eight anchors appear in order. The builder must use the ids `hero`, `problem`, `how-it-works`, `different`, `proof`, `quickstart`, `not` and `footer`. The spec leaves the ids open, so I fixed them and put them in the file's docstring.
-  - Both calls to action are checked. They are the repo link and `#quickstart`.
-  - Hero and footer text is checked: the expansion, the no-self-approval promise, the Apache 2.0 line, the copyright and developer lines, and `v0.1.0`.
-  - The inline SVG must carry the line labels.
-  - The page must not mention "preflight" or "consolidation", which stand in for the unmerged issues 28 and 33.
-- **S3 (counts):** The "N stations" and "N pipelines" figures on the page must equal the counts computed from the trees at test time. Reviewer counts are checked the same way against `sdlc-default.json`.
-- **S4 (quickstart):** Every command in the page's `<pre>` block inside `#quickstart` must appear in the README Quickstart code blocks. The two sets must also be equal.
-- **S6 and S7:** A dash check on the page, the hosting doc and the test file. The hosting doc must name both routes, recommend one, say nothing is deployed, mention the homepage follow-up and reference `OPERATOR-REQUIREMENTS`. A fence test checks that the diff against `origin/main` stays inside the allowed paths. It skips if `origin/main` isn't available.
+**Skips:** The release tag test skips because this checkout has no `v0.1.0` tag. The fence test (S6) skips because `origin/main` isn't available. S6 is therefore unchecked here, and the reviewer has to check it from the real delta.
 
-Things to know:
+**Counts:** The tree has 27 stations and 8 pipelines. The page prints "27 stations", "8 pipelines" and "6 reviewers", which matches the tree.
 
-- **Reviewer count conflict:** The spec says "five reviewers in parallel", but `pipelines/sdlc-default.json` lists six in its parallel stage (the sixth is `reviewer-ux`). My test checks the page against the tree, as R3 requires, so a page saying "five" will fail. The spec text needs correcting, or the page should say six and the diagram should show all six.
-- **Not covered:** I didn't write tests for S5. It needs the desktop and mobile captures and `reviewer-design` citing them, and that is run evidence rather than a unit test. WCAG contrast and the 44 px target size need a rendered check, so they stay with `reviewer-design` and the captures.
+**Spec conflict:** The spec says "five reviewers in parallel", but `pipelines/sdlc-default.json` has six, including `reviewer-ux`. The spec text should be corrected.
 
-I haven't committed anything.
+**Not covered by tests:**
+- S5: the desktop and mobile captures.
+- WCAG contrast and the 44 px target size. Both need a rendered check by `reviewer-design`.
+
+**State of the run:** The page and hosting doc already exist from an earlier run. The tests pass before any builder work, so they don't show the usual red-then-green order. The builder should re-verify the existing page rather than rebuild it. I committed nothing.
 {"model": "claude-sonnet-5-5"}

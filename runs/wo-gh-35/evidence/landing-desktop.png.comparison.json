@@ -8,10 +8,11 @@
     "scale"
   ],
   "gaps": [],
-  "statement": "No physical product is depicted: materials, light, physical contact and anatomical scale are inapplicable. No gaps found at charter bar for the applicable interface observations; this is evidence, not approval.",
+  "statement": "No gaps found at charter bar. This page depicts no physical product; materials, light, contact and anatomical scale are inapplicable. Interface observations are evidence for independent review, not approval.",
   "interface_observations": [
-    "Inspected the rendered page with scripts disabled. Near black panels, orange highlights and light text form a consistent visual hierarchy.",
-    "No clipped content or horizontal scrolling at this viewport. The phone pipeline uses vertical branching for parallel reviewers; desktop uses a horizontal layout.",
-    "No reference anchors were supplied. Browser measurements also cover tablet width."
-  ]
+    "Inspected the regenerated full-page capture. No reference anchors were provided.",
+    "Oversized headline and orange call to action lead into clearly separated sections. Cards and proof links remain aligned.",
+    "The phone diagram branches vertically with all six reviewer labels visible; the desktop diagram groups reviewers on a parallel row. No clipped content observed."
+  ],
+  "page_sha256": "243ad0bc471f35672ee045c557a67d0d7bef25562a6c8ef4b6119a25323bdbee"
 }

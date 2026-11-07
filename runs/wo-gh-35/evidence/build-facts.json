@@ -14,5 +14,9 @@
   "unmerged_capabilities_omitted": [
     "issue 28 deterministic preflight",
     "issue 33 memory consolidation"
-  ]
+  ],
+  "verified_at": "2026-11-07",
+  "remote_verification": "git ls-remote origin refs/heads/main refs/tags/v0.1.0",
+  "local_head": "7c8c2903e92835fe58d661a9b88e50b29e2c5b9b",
+  "page_sha256": "243ad0bc471f35672ee045c557a67d0d7bef25562a6c8ef4b6119a25323bdbee"
 }

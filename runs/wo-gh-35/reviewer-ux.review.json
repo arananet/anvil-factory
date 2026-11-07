@@ -1,0 +1,20 @@
+{
+  "station": "reviewer-ux",
+  "verdict": "pass",
+  "compliance": {
+    "verdict": "pass",
+    "findings": [
+      "The landing page provides a complete discovery flow: the hero explains ANVIL and offers clearly labeled repository and quickstart links, the pipeline and evidence sections explain the product, and the quickstart identifies prerequisites and gives commands followed by documentation access.",
+      "Source inspection of site/index.html shows native keyboard-accessible links, a skip link, visible focus outlines, labeled navigation and SVG alternatives. The landing captures show coherent desktop and mobile reading order; supplied browser checks report no horizontal overflow or undersized targets at 360px, 768px and 1440px. No significant accessibility or copy issue was identified.",
+      "Evidence limitation: the packet-named screenshot-1440x900.png and screenshot-390x844.png show the run status page, not this landing page. Rendered landing-page assessment instead uses runs/wo-gh-35/evidence/landing-desktop.png and runs/wo-gh-35/evidence/landing-mobile.png, alongside the source. Static captures do not demonstrate keyboard focus interaction."
+    ]
+  },
+  "quality": {
+    "verdict": "pass",
+    "findings": [
+      "Against the applicable experiential floor, the landing captures and source provide clear entry actions, a coherent explanation of the review process, inspectable proof links and an actionable quickstart. The mobile pipeline changes to a vertical presentation while retaining the parallel-review explanation.",
+      "The supplied charter concerns physical materials, lighting, contact and anatomical scale. This software landing page contains no physical-product depiction to which those criteria apply; no physical-product quality defect is asserted."
+    ],
+    "anchor": "charter floor only"
+  }
+}

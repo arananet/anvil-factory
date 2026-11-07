@@ -258,6 +258,31 @@ The factory repo explains itself in pieces: a showcase README for readers who al
 
 ## Diff summary
 
+- docs/LANDING-PAGE.md: +20, -19
+- runs/wo-gh-35/builder.output.md: +2, -4
+- runs/wo-gh-35/checks-gate.pre-review.output.md: +30, -74
+- runs/wo-gh-35/envelopes/builder.envelope.json: +1, -1
+- runs/wo-gh-35/envelopes/checks-gate.envelope.json: +5, -50
+- runs/wo-gh-35/envelopes/intake.envelope.json: +1, -1
+- runs/wo-gh-35/envelopes/reviewer-architecture.envelope.json: +2, -2
+- runs/wo-gh-35/envelopes/reviewer-security.envelope.json: +2, -2
+- runs/wo-gh-35/envelopes/reviewer-spec.envelope.json: +22, -4
+- runs/wo-gh-35/envelopes/reviewer-tests.envelope.json: +22, -4
+- runs/wo-gh-35/envelopes/spec-writer.envelope.json: +1, -1
+- runs/wo-gh-35/envelopes/test-writer.envelope.json: +1, -1
+- runs/wo-gh-35/evidence/browser-checks.json: +3, -3
+- runs/wo-gh-35/evidence/build-facts.json: +5, -1
+- runs/wo-gh-35/evidence/landing-desktop.png.comparison.json: +6, -5
+- runs/wo-gh-35/evidence/landing-mobile.png.comparison.json: +6, -5
+- runs/wo-gh-35/evidence/validation.json: +11, -19
+- runs/wo-gh-35/reviewer-architecture.packet.md: +4, -5
+- runs/wo-gh-35/reviewer-security.packet.md: +2, -3
+- runs/wo-gh-35/reviewer-spec.packet.md: +1, -2
+- runs/wo-gh-35/reviewer-tests.packet.md: +3, -4
+- runs/wo-gh-35/routing.json: +2, -2
+- runs/wo-gh-35/spec-writer.output.md: +11, -9
+- runs/wo-gh-35/test-writer.output.md: +11, -17
+- site/index.html: +3, -0
 
 ## File access allowlist
 
@@ -265,6 +290,31 @@ This packet may only embed content from:
 - design/DESIGN.md
 - design/tokens.json
 - .openspec/specs/landing-page/spec.md
+- docs/LANDING-PAGE.md
+- runs/wo-gh-35/builder.output.md
+- runs/wo-gh-35/checks-gate.pre-review.output.md
+- runs/wo-gh-35/envelopes/builder.envelope.json
+- runs/wo-gh-35/envelopes/checks-gate.envelope.json
+- runs/wo-gh-35/envelopes/intake.envelope.json
+- runs/wo-gh-35/envelopes/reviewer-architecture.envelope.json
+- runs/wo-gh-35/envelopes/reviewer-security.envelope.json
+- runs/wo-gh-35/envelopes/reviewer-spec.envelope.json
+- runs/wo-gh-35/envelopes/reviewer-tests.envelope.json
+- runs/wo-gh-35/envelopes/spec-writer.envelope.json
+- runs/wo-gh-35/envelopes/test-writer.envelope.json
+- runs/wo-gh-35/evidence/browser-checks.json
+- runs/wo-gh-35/evidence/build-facts.json
+- runs/wo-gh-35/evidence/landing-desktop.png.comparison.json
+- runs/wo-gh-35/evidence/landing-mobile.png.comparison.json
+- runs/wo-gh-35/evidence/validation.json
+- runs/wo-gh-35/reviewer-architecture.packet.md
+- runs/wo-gh-35/reviewer-security.packet.md
+- runs/wo-gh-35/reviewer-spec.packet.md
+- runs/wo-gh-35/reviewer-tests.packet.md
+- runs/wo-gh-35/routing.json
+- runs/wo-gh-35/spec-writer.output.md
+- runs/wo-gh-35/test-writer.output.md
+- site/index.html
 
 ## Work order
 

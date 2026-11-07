@@ -1,14 +1,16 @@
-I made no changes. The spec for wo-gh-35 already exists at `.openspec/specs/landing-page/spec.md`, and the work order's `spec_path` points to it.
+I couldn't write `runs/wo-gh-35/spec-writer.output.md`. The Write tool is disabled in this session, and I didn't work around that by writing the file through Bash. If you want the file written that way, say so and I'll do it.
 
-I compared the spec with the work order and it covers everything:
+**Spec:** I found nothing to change. `.openspec/specs/landing-page/spec.md` already covers the work order:
 - **Requirements:** R1 to R6 match the work order's R1 to R6, including the guardrails.
-- **Scenarios:** S1 to S7 cover the page standing alone, the section order, the printed counts, the quickstart commands, the rendered captures, the scope fence, and the hosting notes.
-- **Staged work:** The unmerged work of issues 28 and 33 is excluded from the page as shipped capabilities unless it has merged into main with the merge as evidence.
-- **Style rule:** The spec contains no em or en dash characters.
+- **Scenarios:** S1 to S7 cover the standalone page, section order, printed counts, quickstart commands, rendered captures, scope fence and hosting notes.
+- **Dashes:** The spec has no em or en dash characters (grep found none).
+- **Inputs:** Nothing is missing.
 
-Rewriting a complete spec would only add churn, so I left it as is. I found no missing inputs.
+**Staged work:** I found no merge of issues 28 or 33 in the git log. They stay off the page as shipped capabilities unless the builder finds a merge when it re-checks main.
 
-Two things for the later stations:
-- **Counts:** The spec treats 27 stations and 8 pipelines as figures to re-verify from the trees at build time, not to copy.
-- **Gateway:** The work order says the AI Gateway answered 402 insufficient_balance on 2026-11-07, so any run that fails on that should not be reported as a page failure. The run should wait for the owner's word.
+**Counts:** `stations/` currently has 27 entries and `pipelines/` has 8. That is only a directory listing. The builder and the tests must compute the counts from the trees themselves.
+
+**Gateway:** The work order records a 402 `insufficient_balance` from the AI Gateway on 2026-11-07. A run that fails on that is a gateway failure, not a page failure.
+
+**State:** The working tree shows `spec-writer.output.md` deleted, plus changes to `intake.envelope.json` and `routing.json`. This looks like the re-run reset, and I left all three alone. Until the output file exists, `spec-writer.envelope.json` points at a missing artifact.
 {"model": "claude-sonnet-5-5"}

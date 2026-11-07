@@ -75,8 +75,11 @@ order, and nothing was published.
 
 ## Build facts and spec reconciliation
 
-Verified on 2026-11-07 against the checkout and freshly fetched main at
-`30f8bb1035a4075d61918d3a6ba53edd7cc96f8a`:
+Re-verified on 2026-11-07 against this checkout. A read-only
+`git ls-remote origin refs/heads/main refs/tags/v0.1.0` confirms main remains
+`30f8bb1035a4075d61918d3a6ba53edd7cc96f8a` and the release tag resolves to
+`7e71fc2b3d5bb00af26fcb11f728442a47a6c365`. The local checkout has neither
+that tag nor an origin/main tracking ref; tests requiring those refs skip.
 
 - There are 27 directories with `stations/*/station.json` and 8
   `pipelines/*.json` files.
@@ -86,10 +89,10 @@ Verified on 2026-11-07 against the checkout and freshly fetched main at
   not run before all model stations. The page describes the shipped behavior
   in `docs/CHECKS-GATE.md`, not the staged preflight capability of issue 28.
 - The page describes existing verified memory, not the staged memory work of
-  issue 33. Neither staged capability is advertised as shipped. Fetched main
+  issue 33. Neither staged capability is advertised as shipped. The previously inspected main tree
   contains neither a preflight nor a memory consolidation spec; no merge
   evidence was found to justify including either.
-- Release tag `v0.1.0` exists in the fetched tags. Product URLs and claims come
+- Release tag `v0.1.0` exists on origin (verified by the read-only query). Product URLs and claims come
   from the README showcase. Quickstart commands match its `## Quickstart`
   section exactly. No suite size or example timing is printed on the page.
 - Supporting merged documentation on main: `docs/MEMORY-GATE.md`,
@@ -110,19 +113,17 @@ Approval belongs to the independent reviewers and owner.
 
 ## Validation results
 
-- Landing checks: 19 run, 18 passed, 1 skipped. The run-delta test could not
-  compare `origin/main...HEAD` because this shallow checkout has no merge base.
-  Manual status inspection shows only the new page and this document from the
-  builder, in addition to the upstream new test and work-order files.
-- Browser: scripts disabled, no external asset requests, no horizontal overflow
-  at 360, 768 and 1440 px; visible links have at least 44 px target height.
-  Text color pairings were checked at 4.5:1 minimum contrast.
-- Full discovery was stopped because the existing
-  `test_test_suite_count_measured_r3` recursively launches full discovery.
-  With that one method excluded in an external temporary runner, 604 tests ran:
-  596 passed, 6 skipped, 1 failed, 1 errored. Both failures concern missing
-  `render-stats.json` in the existing render-crash S1 and S5 tests, outside this
-  page's scope. Existing test files were not modified.
+- Landing checks re-run: 19 tests, 17 passed, 2 skipped. The release-tag check
+  lacks a local tag; the run-delta check lacks origin/main. The release was
+  independently verified on origin as recorded above. Existing tests were
+  not modified.
+- The builder retained the existing implementation, added a keyboard skip
+  link, and switches the SVG to its legible vertical layout through tablet
+  widths rather than shrinking desktop labels below readable size.
+- Desktop and mobile captures and browser measurements are regenerated for
+  this attempt. Scripts are disabled during capture. Measurements cover
+  360, 768 and 1440 px viewports, external requests and visible link targets.
+- The broader suite was not re-run for these isolated HTML/CSS changes.
+  Earlier suite results are not presented as validation of this attempt.
 - Build facts, browser measurements, contrast ratios and charter comparisons
-  are recorded alongside the captures. These results are evidence for review,
-  not approval of this work.
+  accompany the captures. They are evidence for independent review.
