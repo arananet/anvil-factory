@@ -1,0 +1,14 @@
+{
+  "work_order_id": "wo-gh-35",
+  "issue": 35,
+  "decision": "approved_for_publication",
+  "decided_by": "owner (Eduardo Arana)",
+  "decided_at": "2026-11-07",
+  "basis": "Line verdict approved, run 42381425146: checks gate green (605 tests OK), counted reviews 3 of 4 all pass (reviewer-spec, reviewer-tests, reviewer-design). Reviewer-ux not counted (executor failure: codex produced empty output); its review file records a pass and was disclosed to the owner before approval.",
+  "scope_approved": [
+    "merge anvil/run-landing-page into main",
+    "deploy site/ to Cloudflare Pages project anvil-landing",
+    "repoint the repository homepage to the verified landing URL"
+  ],
+  "merge_commit": "1ee937998ae64ad92d008910b66102e29cbb2383"
+}
