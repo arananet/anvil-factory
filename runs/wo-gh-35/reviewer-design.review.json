@@ -1,0 +1,15 @@
+{
+  "station": "reviewer-design",
+  "verdict": "pass",
+  "compliance": {
+    "verdict": "pass",
+    "findings": []
+  },
+  "quality": {
+    "verdict": "pass",
+    "findings": [
+      "Reviewed runs/wo-gh-35/evidence/landing-desktop.png and runs/wo-gh-35/evidence/landing-mobile.png: clear headline and action hierarchy, separated sections, aligned cards and a responsive line diagram. The packet-listed screenshot-1440x900.png and screenshot-390x844.png depict the status page rather than this deliverable. Browser evidence in browser-checks.json records no horizontal overflow or undersized interactive targets at 360, 768 and 1440 px. No applicable quality gaps found. The physical-product charter criteria (materials, light, contact and anatomical scale) do not apply to this text-and-diagram landing page."
+    ],
+    "anchor": "charter floor only"
+  }
+}

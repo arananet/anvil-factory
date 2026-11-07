@@ -1,0 +1,18 @@
+{
+  "output": "runs/wo-gh-35/evidence/landing-mobile.png",
+  "anchor_cited": null,
+  "criteria_checked": [
+    "materials",
+    "light",
+    "contact",
+    "scale"
+  ],
+  "gaps": [],
+  "statement": "No gaps found at charter bar. This page depicts no physical product; materials, light, contact and anatomical scale are inapplicable. Interface observations are evidence for independent review, not approval.",
+  "interface_observations": [
+    "Inspected the regenerated full-page capture. No reference anchors were provided.",
+    "Oversized headline and orange call to action lead into clearly separated sections. Cards and proof links remain aligned.",
+    "The phone diagram branches vertically with all six reviewer labels visible; the desktop diagram groups reviewers on a parallel row. No clipped content observed."
+  ],
+  "page_sha256": "243ad0bc471f35672ee045c557a67d0d7bef25562a6c8ef4b6119a25323bdbee"
+}

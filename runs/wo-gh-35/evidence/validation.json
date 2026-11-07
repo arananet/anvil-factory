@@ -1,0 +1,15 @@
+{
+  "attempt": "builder re-run 2026-11-07",
+  "landing_tests": {
+    "run": 19,
+    "passed": 17,
+    "skipped": 2,
+    "skip_reasons": [
+      "Local release tag unavailable",
+      "origin/main ref unavailable"
+    ]
+  },
+  "browser_checks": "browser-checks.json",
+  "broader_suite": "Not re-run for isolated HTML/CSS changes",
+  "approval": "Independent review required"
+}
