@@ -1,0 +1,12 @@
+{
+  "station": "reviewer-tests",
+  "verdict": "pass",
+  "findings": [
+    "Full suite run via unittest discover: 621 tests, OK (8 skipped). No regressions (S5).",
+    "New tests are new files only (tests/test_station_artifact_contract.py, tests/test_station_artifact_wrappers.py); no existing test file is modified. The 16 new tests pass.",
+    "Mapping to scenarios is explicit in test names: S1 (prose channel with artifact counted, missing and empty review fail fast with reason), S2 (abbreviated literal bounces builder before reviewers, full literals proceed, no declared literals unchanged, empty report bounces), S3 (uncounted reviewer never silently approved, all counted still approves, aggregate unit), S4a/b/c (empty captured output with valid review.json, extra .output.md beside review file, builder chat summary lacking literal).",
+    "Wrapper tests cover the codex and claude station tools for the empty-stdout and own-namespace-file modes, so the observed failures are reproduced at the channel layer as well as the spine.",
+    "Minor: S1 assertion that the real executed model is recorded in report.json is not clearly covered by a dedicated test. Not blocking.",
+    "No em dash or en dash characters found in the new test files."
+  ]
+}

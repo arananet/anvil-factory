@@ -1,0 +1,12 @@
+{
+  "station": "reviewer-security",
+  "verdict": "pass",
+  "findings": [
+    "No new dependency, network call, shell invocation or eval was added in the diff of anvil/ and tools/; changes use the standard library only.",
+    "Approver change fails closed: an expected reviewer that failed or was not counted yields human_required with the stations named, and human_required is now a recognised verdict. This removes the silent approve default.",
+    "Builder report validation is strict exact substring containment, refuses a runner-saved transcript as the report when literals are required, and unlinks a stale builder.output.md before each attempt, so a stale file cannot stand in. Residual and accepted: a builder that writes the literal text without doing the work still passes this deterministic check, so reviewers remain the semantic control.",
+    "Reviewer tree guard was widened (own_prefix) to allow runs/<wo>/<station>.* single-level files. The scope is limited to the station's own namespace under runs/, with no subdirectories, and every other changed path still fails the guard. Low risk; note that the wrapper trusts work_order_id and station values for building the prefix, which come from the packet and not from model output.",
+    "Required literals from the work order are written into the builder prompt with control characters sanitized. Work order text can originate from a GitHub issue, so it is untrusted prompt input, but this is the same trust level as the existing description field. No change requested.",
+    "Protected paths (pipelines/, existing tests) are not modified, and the protected-path gate and review parse contract are untouched. No secrets, credentials or unsafe defaults were introduced."
+  ]
+}

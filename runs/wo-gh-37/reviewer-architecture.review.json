@@ -1,0 +1,13 @@
+{
+  "station": "reviewer-architecture",
+  "verdict": "pass",
+  "findings": [
+    "Fit with ADR 0001 (composable stations): the contract lives in the spine (anvil/runner.py, gates.py, approver.py, model.py) and no file under pipelines/ is touched. It stays channel-agnostic because it keys on a writes_artifacts executor attribute and not on a model brand.",
+    "Layering is clean. Deterministic checks (validate_builder_report, review_artifact_state) sit in gates.py. Aggregation honesty sits in approver.py, which keeps the old logic as _counted_explained, so behavior is unchanged when every expected reviewer is counted. The runner only orchestrates.",
+    "required_literals is an optional WorkOrder field validated in model.py and serialized only when set, so existing work orders round-trip unchanged.",
+    "The approver now returns human_required for an uncounted expected reviewer, and the runner extends the needs_human_explained verdict set to match. decision.approver gains reviews_uncounted, which is additive.",
+    "Minor: transcript_path is duplicated in tools/claude_station.py and tools/codex_station.py. The two wrappers already duplicate most of their logic, so this is consistent with the existing structure, but it is a candidate for a shared helper later.",
+    "Minor: the wrappers treat any existing non-empty <station>.output.md as a station-written artifact. The runner removes a stale builder.output.md before each attempt but not a stale reviewer output file, so a reviewer loopback could in theory reuse one. The review.json is still deleted and required, so the verdict path is not affected.",
+    "No em dash or en dash characters were found in anvil/ or tools/ or in the new test files. I did not wait for the full test suite to finish, so I have not confirmed S5 (no regressions) myself."
+  ]
+}
