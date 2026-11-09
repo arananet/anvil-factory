@@ -1,0 +1,14 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "pass",
+  "findings": [
+    "S1 met: runner reads the builder report and reviewer review.json back from the run tree. Chat output never overwrites a station-written builder.output.md and is kept as builder.transcript.md. A missing, empty or unparseable review fails the station with expected_artifact and artifact_state on the step. The executed model is recorded through the existing provenance path.",
+    "S2 met: validate_builder_report in anvil/gates.py runs in the pre-review checks gate. It checks exists, non-empty and exact substring match of every required_literals entry. A failure sets the gate to fail and loops back to the builder with the log attached, so no reviewer is spawned. With literals declared, a runner-saved transcript is rejected as the report. With none declared, only existence and non-emptiness are checked, as the spec says.",
+    "S3 met: aggregate_explained in anvil/approver.py takes expected and uncounted stations. An approved verdict with an uncounted expected reviewer becomes human_required, and the decision text names each station and its reason. When every reviewer is counted the path is unchanged. report.json gets reviews_uncounted. human_required is added to the set that feeds needs_human_explained.",
+    "S4 met: tests/test_station_artifact_contract.py and tests/test_station_artifact_wrappers.py are new files. They cover the empty-output case, the extra .output.md case and the builder summary missing a literal. The codex wrapper now allows a reviewer's own runs/<wo>/<station>.* files and still rejects every other path. Existing tests are untouched.",
+    "S5 met: the full unittest suite ran 621 tests, OK, 8 skipped. Nothing under pipelines/ is modified. The change uses the standard library only and has no brand-specific code. There is no em or en dash in the changed or new files.",
+    "Minor, not blocking: work_orders/wo-gh-37.json was rewritten with risk low to medium, surfaces api to deploy, plus added intake_outcome and evidence_images. This looks like intake output, not implementation. Confirm it is intended, because the 'deploy' surface may change human-gate behavior.",
+    "Minor, not blocking: the spec file has a one-line change in the working tree. Confirm it is an intended status or metadata edit and not a requirement change.",
+    "Minor, not blocking: the gate validates reviewer artifacts at collection time in the runner, not in the checks-gate step, since reviewers run after it. This matches the spec's 'as they are collected' wording."
+  ]
+}

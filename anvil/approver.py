@@ -12,7 +12,37 @@ def _station_verdicts(reviews):
             pairs.append((r.get("station"), r.get("verdict")))
     return pairs
 
-def aggregate_explained(reviews):
+def _counted_explained(counted):
+    """The pre-contract aggregation over the counted reviews only."""
+    failing = [c["station"] for c in counted if c["verdict"] == "fail"]
+    if failing:
+        if len(failing) == 1:
+            return "rejected", f"Reviewer {failing[0]} returned fail."
+        return "rejected", f"Reviewers {', '.join(failing)} returned fail."
+    asking = [c["station"] for c in counted if c["verdict"] == "changes_requested"]
+    if asking:
+        if len(asking) == 1:
+            return "changes_requested", f"Reviewer {asking[0]} requested changes."
+        return "changes_requested", f"Reviewers {', '.join(asking)} requested changes."
+    verdicts = [c["verdict"] for c in counted]
+    if verdicts and all(v == "pass" for v in verdicts):
+        return "approved", "All counted reviews passed."
+    return "changes_requested", "The counted reviews did not all pass, so the verdict is changes_requested."
+
+
+def uncounted_stations(counted, expected, uncounted=None):
+    """Expected stations with no counted review, in expected order, with a reason each."""
+    reasons = dict(uncounted or {})
+    have = {c["station"] for c in counted}
+    missing = []
+    for station in expected or []:
+        if station in have or any(station == m for m, _ in missing):
+            continue
+        missing.append((station, reasons.get(station) or "no countable review artifact was produced"))
+    return missing
+
+
+def aggregate_explained(reviews, expected=None, uncounted=None):
     """Aggregate a run's reviews into (verdict, rule, counted).
 
     counted is the list of {"station": ..., "verdict": ...} that fed the
@@ -20,22 +50,28 @@ def aggregate_explained(reviews):
     produced the verdict. The runner stores all three in the run report's
     decision object, so the explanation is generated from the same values
     the code acted on, at the moment the decision is made.
+
+    Approver honesty (station artifact contract S3): when expected names
+    stations the pipeline expected a review from, any of them missing from
+    the counted set blocks a silent approved. A verdict that would have been
+    approved becomes human_required; a rejected or changes_requested verdict
+    stands. Either way the rule names each uncounted station and the reason
+    it was not counted (taken from uncounted, a station to reason mapping).
+    With every expected station counted, the result is exactly as before.
     """
     counted = [{"station": s, "verdict": v} for s, v in _station_verdicts(reviews)]
-    failing = [c["station"] for c in counted if c["verdict"] == "fail"]
-    if failing:
-        if len(failing) == 1:
-            return "rejected", f"Reviewer {failing[0]} returned fail.", counted
-        return "rejected", f"Reviewers {', '.join(failing)} returned fail.", counted
-    asking = [c["station"] for c in counted if c["verdict"] == "changes_requested"]
-    if asking:
-        if len(asking) == 1:
-            return "changes_requested", f"Reviewer {asking[0]} requested changes.", counted
-        return "changes_requested", f"Reviewers {', '.join(asking)} requested changes.", counted
-    verdicts = [c["verdict"] for c in counted]
-    if verdicts and all(v == "pass" for v in verdicts):
-        return "approved", "All counted reviews passed.", counted
-    return "changes_requested", "The counted reviews did not all pass, so the verdict is changes_requested.", counted
+    verdict, rule = _counted_explained(counted)
+    missing = uncounted_stations(counted, expected, uncounted)
+    if not missing:
+        return verdict, rule, counted
+    names = ", ".join(f"{s} ({why})" for s, why in missing)
+    noun = "reviewer was" if len(missing) == 1 else "reviewers were"
+    honesty = f"Expected {noun} not counted: {names}."
+    if verdict == "approved":
+        verdict = "human_required"
+        return verdict, (f"{honesty} The counted reviews passed, but a verdict is never approved "
+                         f"while an expected reviewer is uncounted, so the verdict is human_required."), counted
+    return verdict, f"{honesty} {rule}", counted
 
 def aggregate(reviews):
     return aggregate_explained(reviews)[0]
