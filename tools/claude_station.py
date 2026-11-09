@@ -163,6 +163,11 @@ def validate_review_file(review_path, station_id):
     return True, ""
 
 
+def transcript_path(output_path, station):
+    """Where the chat reply goes when the station wrote its own output artifact."""
+    return output_path.with_name(f"{station}.transcript.md")
+
+
 def main():
     if len(sys.argv) != 3:
         print("usage: claude_station.py <packet> <output>", file=sys.stderr)
@@ -235,12 +240,27 @@ def main():
             return 2
 
         output = proc.stdout or ""
-        if not output.strip():
+        # Station artifact contract: the result is the artifact the station
+        # wrote, not the chat reply. A station that wrote its own output file
+        # keeps it; the reply is saved beside it as a transcript. Empty chat
+        # output is fatal only when no artifact exists to stand on.
+        station_wrote_output = output_path.is_file() and bool(
+            output_path.read_text(encoding="utf-8", errors="replace").strip())
+        review_written = False
+        if station.startswith("reviewer") and work_order_id:
+            review_written = validate_review_file(
+                repo_root / "runs" / work_order_id / f"{station}.review.json", station)[0]
+        if not output.strip() and not (station_wrote_output or review_written):
             print(f"claude_station: claude produced empty output for station {station}",
                   file=sys.stderr)
             return 3
 
-        output_path.write_text(output, encoding="utf-8")
+        if station_wrote_output:
+            if output.strip():
+                transcript_path(output_path, station).write_text(output, encoding="utf-8")
+            output = output_path.read_text(encoding="utf-8", errors="replace")
+        else:
+            output_path.write_text(output, encoding="utf-8")
 
         # For reviewer stations, validate the review file (S4)
         if station.startswith("reviewer") and work_order_id:

@@ -441,3 +441,88 @@ def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_i
         "basis": basis_str,
         "output": "\n".join(output_lines)
     }
+
+
+def validate_builder_report(report_path, required_literals=None, source="station"):
+    """Deterministic artifact validation for the builder report (station artifact contract S2).
+
+    Runs in the pre-review checks gate, after the builder and before any
+    reviewer is spawned. The report must exist and be non-empty, and every
+    literal the work order declares in required_literals must appear in it
+    in full: exact substring containment, no abbreviation, ellipsis or case
+    folding. With no declared literals only existence and non-emptiness are
+    checked, so work orders that declare nothing behave as before.
+
+    source says who wrote the report: "station" when the station wrote the
+    artifact itself, "transcript" when the runner saved captured channel
+    output because the station wrote nothing. When literals are declared a
+    transcript is never accepted as the report.
+
+    Returns {"passed": bool, "findings": [str], "log": str, "report": str,
+    "required_literals": [str], "missing_literals": [str], "observed": str}.
+    """
+    path = Path(report_path)
+    literals = [lit for lit in (required_literals or []) if isinstance(lit, str) and lit]
+    findings = []
+    missing = []
+    observed = "present"
+    text = None
+    if not path.is_file():
+        observed = "missing"
+        findings.append(f"Builder report artifact {path} is missing.")
+    else:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as exc:
+            observed = "unreadable"
+            findings.append(f"Builder report artifact {path} could not be read: {exc}.")
+        else:
+            if not text.strip():
+                observed = "empty"
+                findings.append(f"Builder report artifact {path} is empty.")
+    if text is not None and text.strip():
+        if literals and source != "station":
+            observed = "transcript_only"
+            findings.append(f"Builder report artifact {path} was not written by the station; captured "
+                            f"channel output is never accepted as the report when literals are required.")
+        for lit in literals:
+            if lit not in text:
+                missing.append(lit)
+                findings.append(f"Required literal not found in full in the builder report: {lit}")
+    elif literals:
+        missing = list(literals)
+        for lit in literals:
+            findings.append(f"Required literal not found in full in the builder report: {lit}")
+    passed = not findings
+    lines = ["## Artifact validation", "",
+             f"- builder report: {path}",
+             f"- observed: {observed}",
+             f"- report source: {source}",
+             f"- required literals declared: {len(literals)}"]
+    for lit in literals:
+        lines.append(f"  - {'present' if (lit not in missing) else 'MISSING'}: {lit}")
+    lines.append(f"- result: {'pass' if passed else 'fail'}")
+    for finding in findings:
+        lines.append(f"- finding: {finding}")
+    return {"passed": passed, "findings": findings, "log": "\n".join(lines) + "\n",
+            "report": str(path), "required_literals": literals,
+            "missing_literals": missing, "observed": observed}
+
+
+def review_artifact_state(review_path):
+    """Observed state of a reviewer's review artifact: (state, text).
+
+    state is one of missing, unreadable, empty, present. Parsing against the
+    review contract stays with runner.parse_review; this only reports what
+    is on disk so a failure can name it.
+    """
+    path = Path(review_path)
+    if not path.is_file():
+        return "missing", None
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return "unreadable", None
+    if not text.strip():
+        return "empty", text
+    return "present", text

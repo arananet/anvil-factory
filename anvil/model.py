@@ -36,6 +36,15 @@ def validate_path_component(component, name):
         raise ValueError(f"{name} looks like an absolute path")
     return component
 
+def _validate_required_literals(value):
+    """required_literals is a list of non-empty strings (station artifact contract)."""
+    if not isinstance(value, list):
+        raise ValueError("required_literals must be a list of non-empty strings")
+    for item in value:
+        if not isinstance(item, str) or not item:
+            raise ValueError("required_literals must be a list of non-empty strings")
+
+
 def validate_relative_path(path, name):
     """Validate that a relative path does not contain traversal attempts.
 
@@ -153,6 +162,10 @@ class WorkOrder:
     identity_reference: str = None
     identity_traits: list = field(default_factory=list)
     deliverable_set: list = field(default_factory=list)
+    # Station artifact contract: literals the builder report must contain in
+    # full (exact substring, no abbreviation). Empty means only existence and
+    # non-emptiness of the report are checked.
+    required_literals: list = field(default_factory=list)
 
     def __post_init__(self):
         if self.kind not in KINDS:
@@ -172,6 +185,7 @@ class WorkOrder:
         for deliverable in self.deliverable_set:
             if deliverable:  # Skip empty strings
                 validate_relative_path(deliverable, "deliverable_set path")
+        _validate_required_literals(self.required_literals)
     
     def __setattr__(self, name, value):
         # Validate fields on assignment to catch runtime modifications
@@ -211,7 +225,8 @@ class WorkOrder:
                    anchors=anchors,
                    identity_reference=identity_reference,
                    identity_traits=list(data.get("identity_traits", [])),
-                   deliverable_set=deliverable_set)
+                   deliverable_set=deliverable_set,
+                   required_literals=data.get("required_literals") or [])
     def to_dict(self):
         result = {"id": self.id, "kind": self.kind, "title": self.title, "source": self.source,
                 "description": self.description, "risk_hints": list(self.risk_hints), "status": self.status,
@@ -232,6 +247,8 @@ class WorkOrder:
             result["identity_traits"] = list(self.identity_traits)
         if self.deliverable_set:
             result["deliverable_set"] = list(self.deliverable_set)
+        if self.required_literals:
+            result["required_literals"] = list(self.required_literals)
         return result
 
 @dataclass

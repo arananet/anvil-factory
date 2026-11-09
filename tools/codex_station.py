@@ -282,14 +282,40 @@ def tree_snapshot(repo_root):
     return snapshot
 
 
-def reviewer_tree_violations(before, after, allowed):
-    """Paths a reviewer changed besides the allowed ones (its own review file)."""
+def reviewer_tree_violations(before, after, allowed, own_prefix=None):
+    """Paths a reviewer changed besides the allowed ones (its own review file).
+
+    own_prefix, when given, also allows the station's own run tree namespace
+    (runs/<wo>/<station>.*: its transcript and working notes). Those are run
+    records, not code under judgment, so they never destroy the review
+    (station artifact contract S4b). Every other path still fails the guard.
+    """
     changed = {path for path in set(before) | set(after) if before.get(path) != after.get(path)}
-    return sorted(changed - set(allowed))
+    leftover = changed - set(allowed)
+    if own_prefix:
+        leftover = {p for p in leftover
+                    if not (p.startswith(own_prefix) and "/" not in p[len(own_prefix):])}
+    return sorted(leftover)
+
+
+def reviewer_allowed_paths(repo_root, work_order_id, station, output_path):
+    """The reviewer's own review file plus the wrapper's own output files, repo relative."""
+    allowed = [f"runs/{work_order_id}/{station}.review.json"]
+    for path in (output_path, transcript_path(output_path, station)):
+        try:
+            allowed.append(Path(path).resolve().relative_to(Path(repo_root).resolve()).as_posix())
+        except ValueError:
+            pass
+    return allowed
 
 
 def _redact(text, token):
     return text.replace(token, "[redacted]") if token else text
+
+
+def transcript_path(output_path, station):
+    """Where the chat reply goes when the station wrote its own output artifact."""
+    return output_path.with_name(f"{station}.transcript.md")
 
 
 def main():
@@ -335,7 +361,6 @@ def main():
     correction_used = False
     reviewer = station.startswith("reviewer") and work_order_id
     if reviewer:
-        own_review = f"runs/{work_order_id}/{station}.review.json"
         try:
             before = tree_snapshot(repo_root)
         except (RuntimeError, OSError, subprocess.TimeoutExpired) as e:
@@ -383,18 +408,35 @@ def main():
             return 2
 
         output = _redact(proc.stdout or "", token)
-        if not output.strip():
+        # Station artifact contract: the result is the artifact the station
+        # wrote, not the chat reply. A station that wrote its own output file
+        # keeps it; the reply is saved beside it as a transcript. Empty chat
+        # output is fatal only when no artifact exists to stand on.
+        station_wrote_output = output_path.is_file() and bool(
+            output_path.read_text(encoding="utf-8", errors="replace").strip())
+        review_written = False
+        if station.startswith("reviewer") and work_order_id:
+            review_written = validate_review_file(
+                repo_root / "runs" / work_order_id / f"{station}.review.json", station)[0]
+        if not output.strip() and not (station_wrote_output or review_written):
             print(f"codex_station: codex produced empty output for station {station}",
                   file=sys.stderr)
             return 3
 
-        output_path.write_text(output, encoding="utf-8")
+        if station_wrote_output:
+            if output.strip():
+                transcript_path(output_path, station).write_text(output, encoding="utf-8")
+            output = output_path.read_text(encoding="utf-8", errors="replace")
+        else:
+            output_path.write_text(output, encoding="utf-8")
 
         if reviewer:
             # Hard guard: a reviewer changes nothing but its own review file.
             try:
                 violations = reviewer_tree_violations(before, tree_snapshot(repo_root),
-                                                      [own_review])
+                                                      reviewer_allowed_paths(repo_root, work_order_id,
+                                                                             station, output_path),
+                                                      own_prefix=f"runs/{work_order_id}/{station}.")
             except (RuntimeError, OSError, subprocess.TimeoutExpired) as e:
                 print(f"codex_station: {e}", file=sys.stderr)
                 return 8

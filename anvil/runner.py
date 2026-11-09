@@ -9,7 +9,7 @@ from .config import default_model, resolve_model, load_anvil_config, health_conf
 from .brain import packet_learnings_section
 from .design import packet_design_section, load_design_system
 from .capture import capture_breakpoints, packet_rendered_evidence_section
-from .gates import human_gate, checks_gate, resolve_base_ref_config, _run_shell
+from .gates import human_gate, checks_gate, resolve_base_ref_config, _run_shell, validate_builder_report, review_artifact_state
 from .approver import aggregate, needs_human, aggregate_explained, needs_human_explained, matched_risk_hints, RISK_SCAN_ORDER
 from .executor import ExecutorError
 from .routing import route_reviewers, write_routing_record, render_routing_section, routing_swimlane_summary
@@ -1025,6 +1025,19 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
                 f"Your complete answer is exactly one review JSON object written to "
                 f"runs/{work_order.id}/{station_id}.review.json. The free output transcript "
                 f"stays as provenance and is never parsed for a review.\n")
+    # Builder output contract (station artifact contract): the report is a
+    # file the station writes; the checks gate validates it before reviewers.
+    if station_id == "builder":
+        text += (f"\n## Output contract\n\n"
+                 f"Write your builder report as a file to runs/{work_order.id}/builder.output.md. "
+                 f"The checks gate reads that file back from the run tree before any reviewer runs; "
+                 f"your chat reply is never accepted as the report.\n")
+        literals = list(getattr(work_order, "required_literals", []) or [])
+        if literals:
+            text += ("\nThe report must contain each of these literals in full, exactly as written "
+                     "(no abbreviation, no ellipsis):\n\n")
+            for lit in literals:
+                text += f"- {_sanitize_control_chars(lit)}\n"
     return text
 
     # Reviewer stations have a specific output contract
@@ -1077,6 +1090,13 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     # same values the code acted on.
     reviews_expected = [sid for sid in order if sid.startswith("reviewer")]
     decision_approver = None
+    # Station artifact contract: why each reviewer was not counted, and the
+    # artifact failure recorded on the failed step.
+    uncounted_reasons = {}
+    artifact_failures = {}
+    # Who wrote the builder report: "station" (the artifact), "transcript"
+    # (captured channel output saved by the runner) or None (builder not run).
+    builder_report_source = None
     # Verified learnings are computed once per run: only non demoted entries
     # from brain/learnings.md, never inbox proposals (see anvil/brain.py).
     learnings_section = packet_learnings_section(project)
@@ -1402,7 +1422,10 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 artifact = str(run_dir / "report.json")
         elif station_id == "approver":
             if run_reviews:
-                verdict, verdict_rule, counted = aggregate_explained(run_reviews)
+                verdict, verdict_rule, counted = aggregate_explained(
+                    run_reviews,
+                    expected=list(reviews_expected) if execute_mode else None,
+                    uncounted=uncounted_reasons)
             else:
                 verdict = "no_reviews"
                 verdict_rule = ("No reviews were produced in this run, so the verdict is no_reviews; "
@@ -1421,6 +1444,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             decision_approver = {"reviews_counted": counted,
                                  "reviews_expected": list(reviews_expected),
                                  "rule": verdict_rule}
+            if execute_mode:
+                have = {c["station"] for c in counted}
+                decision_approver["reviews_uncounted"] = [
+                    {"station": sid, "reason": uncounted_reasons.get(sid) or "no countable review artifact was produced"}
+                    for sid in reviews_expected if sid not in have]
             detail = f"Approver verdict: {verdict}"
             artifact = str(run_dir / "report.json")
         elif station_id == "checks-gate":
@@ -1469,6 +1497,27 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 "basis": gate_result.get("basis", ""),
                 "gate_verdict": gate_result["gate_verdict"]
             }
+
+            # Station artifact contract S2: deterministic artifact validation
+            # after the builder and before any reviewer is spawned.
+            if phase == "pre-review" and execute_mode and builder_report_source is not None:
+                validation = validate_builder_report(run_dir / "builder.output.md",
+                                                     getattr(work_order, "required_literals", []),
+                                                     source=builder_report_source)
+                extra_envelope["artifact_validation"] = {
+                    "passed": validation["passed"], "report": validation["report"],
+                    "observed": validation["observed"], "report_source": builder_report_source,
+                    "required_literals": validation["required_literals"],
+                    "missing_literals": validation["missing_literals"],
+                    "findings": validation["findings"]}
+                gate_output_file.write_text(gate_result["output"].rstrip("\n") + "\n\n" + validation["log"],
+                                            encoding="utf-8")
+                if not validation["passed"]:
+                    gate_result["gate_verdict"] = "fail"
+                    extra_envelope["gate_verdict"] = "fail"
+                    status = "failed"
+                    detail = f"{detail}; artifact validation failed: {' '.join(validation['findings'])}"
+                    extra_envelope["output"] = validation["log"]
 
             # If gate failed and we're in pre-review phase, trigger loopback (S2)
             if gate_result["gate_verdict"] == "fail" and phase == "pre-review":
@@ -1654,6 +1703,14 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 packet_text = packet.read_text(encoding="utf-8")
                 output_file = run_dir / f"{station_id}.output.md"
 
+                # Station artifact contract: the builder report is a file the
+                # station writes; a stale one never stands in for this attempt.
+                if station_id == "builder":
+                    try:
+                        output_file.unlink()
+                    except FileNotFoundError:
+                        pass
+
                 # For reviewer stations, remove any pre-existing review file before execution (S3)
                 if station_id.startswith("reviewer"):
                     review_file = run_dir / f"{station_id}.review.json"
@@ -1669,7 +1726,21 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     output_text = result.get("output", "") if isinstance(result, dict) else str(result)
                     usage = result.get("usage") if isinstance(result, dict) else None
                     executed_model_from_result = result.get("model") if isinstance(result, dict) else None
-                    output_file.write_text(output_text, encoding="utf-8")
+                    if station_id == "builder" and output_file.is_file():
+                        # The station wrote its report artifact: that file is
+                        # the result. Captured channel output differing from it
+                        # is kept beside it as a transcript, never written over it.
+                        builder_report_source = "station"
+                        try:
+                            on_disk = output_file.read_text(encoding="utf-8")
+                        except (OSError, UnicodeDecodeError):
+                            on_disk = None
+                        if output_text.strip() and output_text != on_disk:
+                            (run_dir / f"{station_id}.transcript.md").write_text(output_text, encoding="utf-8")
+                    else:
+                        if station_id == "builder":
+                            builder_report_source = "transcript"
+                        output_file.write_text(output_text, encoding="utf-8")
                     status = "executed"
                     detail = f"Executed by {executor.name}; output written to {output_file}"
                     artifact = str(output_file)
@@ -1695,12 +1766,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                         if correction_meta_path.exists():
                             extra_envelope["correction_used"] = True
 
-                        if review_file.exists():
+                        artifact_state, review_file_text = review_artifact_state(review_file)
+                        if artifact_state == "present":
                             try:
-                                review_file_text = review_file.read_text(encoding="utf-8")
                                 review = parse_review(review_file_text, station_id)
-                            except Exception as e:
-                                # File exists but couldn't be read or parsed
+                            except Exception:
                                 review = None
 
                         # Special handling for reviewer-design when no design system exists
@@ -1724,6 +1794,32 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                             extra_envelope["review_file_missing"] = True
                             detail += "; review file was not written by the station"
 
+                        if review is None:
+                            # Station artifact contract S1: no countable artifact
+                            # fails the station fast, with the reason on record.
+                            state_word = {"present": "did not parse as a valid review",
+                                          "empty": "empty",
+                                          "unreadable": "unreadable",
+                                          "missing": "missing"}.get(artifact_state, artifact_state)
+                            if artifact_state == "present":
+                                artifact_state = "unparseable"
+                            reason = f"review artifact {review_file.name} {state_word}"
+                            if getattr(executor, "writes_artifacts", True):
+                                status = "failed"
+                                detail = (f"Station artifact check failed: expected review artifact "
+                                          f"{review_file} is {state_word}; captured channel output is "
+                                          f"diagnostic only and is never read as the review. {detail}")
+                            else:
+                                # A text-only channel cannot write the artifact;
+                                # the step ran, but nothing is counted from it.
+                                detail = (f"{detail}; expected review artifact {review_file} is "
+                                          f"{state_word} and this channel cannot write artifacts, so no "
+                                          f"review is counted")
+                            artifact_failures[station_id] = {"expected_artifact": str(review_file),
+                                                             "artifact_state": artifact_state,
+                                                             "reason": reason}
+                            uncounted_reasons[station_id] = f"failed: {reason}"
+
                         if review is not None:
                             run_reviews.append(review)
                             run_findings.extend(review.findings)
@@ -1741,6 +1837,21 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     artifact = str(packet)
                     step_executor, step_executed_model = _executor_provenance(executor)
                     extra_envelope = {"error": str(exc)}
+                    if station_id.startswith("reviewer"):
+                        # Station artifact contract S1/S3: a failed reviewer is
+                        # recorded with its expected artifact and never counted
+                        # silently; the approver names it.
+                        review_file = run_dir / f"{station_id}.review.json"
+                        artifact_state, _ = review_artifact_state(review_file)
+                        reason = f"station failed ({exc})"
+                        if artifact_state == "present":
+                            reason += f"; {review_file.name} was written but is not counted from a failed station"
+                        artifact_failures[station_id] = {"expected_artifact": str(review_file),
+                                                         "artifact_state": artifact_state,
+                                                         "reason": reason}
+                        uncounted_reasons[station_id] = f"failed: {reason}"
+                    elif station_id == "builder":
+                        builder_report_source = "station" if output_file.is_file() else "none"
         else:
             packet, measured_tokens, budget, budget_action = prebuilt_packet if prebuilt_packet is not None else packet_step(station, station_id)
             status = "packet_ready"
@@ -1766,10 +1877,14 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     "measured": cost_record["measured"],
                     "reason": cost_record["reason"]
                 }
+        if station_id in artifact_failures:
+            step["expected_artifact"] = artifact_failures[station_id]["expected_artifact"]
+            step["artifact_state"] = artifact_failures[station_id]["artifact_state"]
         # Add extra fields from checks-gate to the step itself
         if station_id == "checks-gate" and extra_envelope:
             for key in ["phase", "commands", "exit_codes", "protected_paths",
-                       "protected_path_verdict", "protected_path_findings", "gate_verdict"]:
+                       "protected_path_verdict", "protected_path_findings", "gate_verdict",
+                       "artifact_validation"]:
                 if key in extra_envelope:
                     step[key] = extra_envelope[key]
         steps.append(step)
@@ -1837,6 +1952,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             loopbacks += 1
             return_to = "builder"
             reason = f"Gate failure: {'; '.join(extra_envelope.get('protected_path_findings', [])[:3])}" if extra_envelope.get('protected_path_findings') else "Gate checks failed"
+            av = extra_envelope.get("artifact_validation") or {}
+            if av and not av.get("passed"):
+                reason += f"; artifact validation: {' '.join(av.get('findings', [])[:3])}"
             steps.append({"station": "loopback", "status": "loopback", "return_to": return_to,
                           "detail": f"Loopback to {return_to}: {reason}", "reason": reason,
                           "duration_ms": 0.0, "cost": None, "artifacts": [],
@@ -1861,7 +1979,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         decision_approver = {"reviews_counted": [{"station": r.station, "verdict": r.verdict} for r in run_reviews],
                              "reviews_expected": list(reviews_expected),
                              "rule": "The pipeline has no approver step, so no reviews were aggregated into a verdict."}
-    if verdict in {"approved", "rejected", "changes_requested", "no_reviews"}:
+    if verdict in {"approved", "rejected", "changes_requested", "no_reviews", "human_required"}:
         human_required, human_rule, hints_matched = needs_human_explained(work_order, verdict)
     else:
         # No approver verdict exists, so the gate looks at risk hints only,

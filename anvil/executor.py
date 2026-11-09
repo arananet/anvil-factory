@@ -29,6 +29,9 @@ class ExecutorError(RuntimeError):
 
 class CommandExecutor:
     kind = "command"
+    # The command runs in the project tree, so a station can write the
+    # artifacts its packet names (station artifact contract).
+    writes_artifacts = True
 
     def __init__(self, config):
         self.template = str(config.get("command", "")).strip()
@@ -75,6 +78,8 @@ class CommandExecutor:
 
 class HttpExecutor:
     kind = "http"
+    # A completion endpoint returns text only; it cannot write a run tree file.
+    writes_artifacts = False
 
     def __init__(self, config):
         self.endpoint = str(config.get("endpoint", "")).strip()
