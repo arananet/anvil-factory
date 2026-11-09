@@ -1,0 +1,12 @@
+{
+  "work_order_id": "wo-gh-37",
+  "issue": 37,
+  "decision": "approved_for_merge",
+  "decided_by": "owner (Eduardo Arana), choice delegated to Soda",
+  "decided_at": "2026-11-09",
+  "basis": "The owner was offered three gate options for this fix (merge and relaunch the Dreamrun loopback on the fixed line with required_literals declared; harden the factory further before merging; park both fronts) and answered 'Dame sorpr\u00e9ndeme' (go ahead, surprise me), delegating the choice to Soda. Soda's recommendation of record is the one executed: merge the fix, relaunch the Dreamrun loopback on the fixed line with required_literals declared, and ship on approval. Line verdict approved, run 42700470762, branch tip fb10e9201b56bb1eb0d4b276424c7ce47279f347: counted reviews 5 of 5 all pass (reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture, reviewer-design), with reviewer-design executed and counted for the first time in this defect family and its executed_model openai/gpt-6.1-sol recorded; factory suite 621 tests OK with 16 new regression tests mapping scenarios S1 to S5. Documented residual, accepted with this merge: without declared required_literals a chat-saved builder report still passes the existence check; a default report-shape check is a noted follow-up, not part of this acceptance.",
+  "scope_approved": [
+    "merge anvil/run-station-artifact-contract into main",
+    "relaunch the Dreamrun 3D wo-gh-6 loopback on the fixed line with required_literals declared, shipping on approval"
+  ]
+}
