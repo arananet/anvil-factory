@@ -8,5 +8,6 @@
   "scope_approved": [
     "merge anvil/run-station-artifact-contract into main",
     "relaunch the Dreamrun 3D wo-gh-6 loopback on the fixed line with required_literals declared, shipping on approval"
-  ]
+  ],
+  "merge_commit": "967963b0db07745f3501517cc0123f1ff99cf3ed"
 }
