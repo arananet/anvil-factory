@@ -1,23 +1,50 @@
 {
   "selected_reviewers": [
     "reviewer-spec",
-    "reviewer-security",
-    "reviewer-tests",
-    "reviewer-architecture",
-    "reviewer-design"
+    "reviewer-tests"
   ],
   "routed_out": [
     {
+      "reviewer": "reviewer-design",
+      "reason": "Routed out by low risk rule (not in reduced panel)"
+    },
+    {
+      "reviewer": "reviewer-security",
+      "reason": "Routed out by low risk rule (not in reduced panel)"
+    },
+    {
       "reviewer": "reviewer-ux",
-      "reason": "Routed out: no UI surface"
+      "reason": "Routed out by low risk rule (not in reduced panel)"
+    },
+    {
+      "reviewer": "reviewer-architecture",
+      "reason": "Routed out by low risk rule (not in reduced panel)"
     }
   ],
   "selected_models": {
-    "reviewer-security": "review-strong",
-    "reviewer-design": "review-balanced",
-    "reviewer-tests": "review-balanced",
-    "reviewer-architecture": "review-balanced",
-    "reviewer-spec": "review-balanced"
+    "reviewer-spec": "review-cheap",
+    "reviewer-tests": "review-cheap"
   },
-  "reason": "Medium risk: full panel at policy models"
+  "reason": "Low risk with no UI and no security surface: reduced panel at cheaper model",
+  "practices": {
+    "resolved": {
+      "intake": [],
+      "spec-writer": [],
+      "test-writer": [],
+      "builder": [],
+      "checks-gate": [],
+      "reviewer-spec": [],
+      "reviewer-security": [],
+      "reviewer-tests": [],
+      "reviewer-architecture": [],
+      "reviewer-design": [],
+      "reviewer-ux": [],
+      "approver": [],
+      "triage-human": [],
+      "deployer": [],
+      "observer": []
+    },
+    "excluded_topics": [],
+    "active_count": 0
+  }
 }

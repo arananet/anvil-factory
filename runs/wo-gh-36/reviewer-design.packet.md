@@ -237,7 +237,7 @@ S6. A gate enforced practice appears in the checks gate pre-review output and in
 
 S7. A project whose anvil.yaml overrides a topic resolves no base practice on that topic, and report.json records the exclusion.
 
-S8. With no practices base present, a run's packets and verdict are unchanged and report.json records an empty practices resolution.
+S8. With no practices base present, a run's packets are unchanged and report.json records an empty practices resolution; the verdict is the honest approver outcome for the reviews the run can count, and is not asserted to be approved.
 
 S9. check-brain fails on a practices.md that was hand edited to hold two active practices with the same topic and overlapping scope.
 
@@ -248,9 +248,33 @@ Python standard library only. No pipeline membership changes, no station prompt 
 
 ## Diff summary
 
-- anvil/brain.py: +377, -1
-- anvil/cli.py: +21, -2
-- anvil/runner.py: +42, -11
+- .openspec/specs/practice-skills/spec.md: +1, -1
+- runs/wo-gh-36/builder.output.md: +34, -55
+- runs/wo-gh-36/builder.packet.md: +11, -0
+- runs/wo-gh-36/builder.transcript.md: +5, -20
+- runs/wo-gh-36/checks-gate.pre-review.output.md: +59, -54
+- runs/wo-gh-36/envelopes/builder.envelope.json: +1, -1
+- runs/wo-gh-36/envelopes/checks-gate.envelope.json: +41, -40
+- runs/wo-gh-36/envelopes/intake.envelope.json: +1, -1
+- runs/wo-gh-36/envelopes/reviewer-architecture.envelope.json: +2, -2
+- runs/wo-gh-36/envelopes/reviewer-security.envelope.json: +2, -2
+- runs/wo-gh-36/envelopes/reviewer-spec.envelope.json: +19, -4
+- runs/wo-gh-36/envelopes/reviewer-tests.envelope.json: +19, -4
+- runs/wo-gh-36/envelopes/spec-writer.envelope.json: +1, -1
+- runs/wo-gh-36/envelopes/test-writer.envelope.json: +1, -1
+- runs/wo-gh-36/intake.output.md: +2, -2
+- runs/wo-gh-36/intake.packet.md: +11, -0
+- runs/wo-gh-36/reviewer-architecture.packet.md: +15, -5
+- runs/wo-gh-36/reviewer-security.packet.md: +13, -3
+- runs/wo-gh-36/reviewer-spec.packet.md: +12, -2
+- runs/wo-gh-36/reviewer-tests.packet.md: +14, -4
+- runs/wo-gh-36/routing.json: +38, -11
+- runs/wo-gh-36/spec-writer.output.md: +2, -10
+- runs/wo-gh-36/spec-writer.packet.md: +11, -0
+- runs/wo-gh-36/test-writer.output.md: +3, -22
+- runs/wo-gh-36/test-writer.packet.md: +11, -0
+- tests/test_practice_skills.py: +1, -1
+- work_orders/wo-gh-36.json: +1, -3
 
 ## File access allowlist
 
@@ -258,9 +282,33 @@ This packet may only embed content from:
 - design/DESIGN.md
 - design/tokens.json
 - .openspec/specs/practice-skills/spec.md
-- anvil/brain.py
-- anvil/cli.py
-- anvil/runner.py
+- .openspec/specs/practice-skills/spec.md
+- runs/wo-gh-36/builder.output.md
+- runs/wo-gh-36/builder.packet.md
+- runs/wo-gh-36/builder.transcript.md
+- runs/wo-gh-36/checks-gate.pre-review.output.md
+- runs/wo-gh-36/envelopes/builder.envelope.json
+- runs/wo-gh-36/envelopes/checks-gate.envelope.json
+- runs/wo-gh-36/envelopes/intake.envelope.json
+- runs/wo-gh-36/envelopes/reviewer-architecture.envelope.json
+- runs/wo-gh-36/envelopes/reviewer-security.envelope.json
+- runs/wo-gh-36/envelopes/reviewer-spec.envelope.json
+- runs/wo-gh-36/envelopes/reviewer-tests.envelope.json
+- runs/wo-gh-36/envelopes/spec-writer.envelope.json
+- runs/wo-gh-36/envelopes/test-writer.envelope.json
+- runs/wo-gh-36/intake.output.md
+- runs/wo-gh-36/intake.packet.md
+- runs/wo-gh-36/reviewer-architecture.packet.md
+- runs/wo-gh-36/reviewer-security.packet.md
+- runs/wo-gh-36/reviewer-spec.packet.md
+- runs/wo-gh-36/reviewer-tests.packet.md
+- runs/wo-gh-36/routing.json
+- runs/wo-gh-36/spec-writer.output.md
+- runs/wo-gh-36/spec-writer.packet.md
+- runs/wo-gh-36/test-writer.output.md
+- runs/wo-gh-36/test-writer.packet.md
+- tests/test_practice_skills.py
+- work_orders/wo-gh-36.json
 
 ## Work order
 
@@ -293,6 +341,17 @@ R8, compatibility and coordination: no practices base means behavior identical t
 Guardrails: Python standard library only; no new dependency. Do not change pipeline membership, station prompts, or the learnings mechanisms' behavior. Do not create, modify, or delete any file under tests/ that exists at the base ref; new tests arrive as new files, and they must exercise the real brain module and runner paths (facade tests that never touch the mechanism fail the order). No em dash or en dash character in any produced file. The reviewer writes its review to the authoritative review file named in its packet; prose outside that file is not a review. Nothing in this order publishes or deploys anything.
 
 GitHub issue: https://github.com/arananet/anvil-factory/issues/36
+
+LOOPBACK ADDENDUM, 2026-11-09 (second execution, branch anvil/run-practice-skills-r2). The owner released this order's execution on 2026-11-09. The first execution (Actions run 42706628025, branch anvil/run-practice-skills) ended verdict no_reviews with 0 of 5 reviews counted: the pre-review checks gate failed on exactly one test of 649 (648 pass, 8 skipped), so the reviewers never ran. This loopback corrects that one stale expectation and nothing else. It stops at the owner's gate; nothing in this loopback merges or publishes.
+
+The defect: tests/test_practice_skills.py, test_no_base_changes_nothing_but_the_report_field_s8, ends with the assertion self.assertEqual(report["verdict"], "approved"). The fixture run it drives produces no countable reviews, and since wo-gh-37 merged into factory main the approver honestly returns no_reviews for such a run. The assertion predates the wo-gh-37 approver honesty fix and can never pass on the fixed line. The mechanism built by the first execution is otherwise correct and its behavior must not change.
+
+Corrections, exhaustive list:
+1. Spec writer: in .openspec/specs/practice-skills/spec.md, correct scenario S8 only, replacing its sentence with exactly this: "S8. With no practices base present, a run's packets are unchanged and report.json records an empty practices resolution; the verdict is the honest approver outcome for the reviews the run can count, and is not asserted to be approved." No other spec text changes.
+2. Test writer: in tests/test_practice_skills.py, in test_no_base_changes_nothing_but_the_report_field_s8 only, replace the final assertion self.assertEqual(report["verdict"], "approved") with self.assertEqual(report["verdict"], "no_reviews"). Every other assertion in that test stays exactly as it is: no Practices section in any packet, active_count 0, excluded_topics empty, every resolved list empty. The fixture dict near the top of the same file that carries "verdict": "approved" is a seed source report for the provenance tests, not this expectation; do not touch it. No other test file changes, and no other change in this file.
+3. Builder: no behavior change is required or permitted. Do not modify or delete any existing file under tests/: the pre-review gate judges the builder delta against the base ref and tests/ is a protected path, so a builder edit there fails the gate even when the edit is correct. If a code change seems necessary, record a blocker in the builder report instead of editing.
+
+Scope limits for this loopback: no practice content is authored. Seeding the practice base with the Dreamrun 3D and ForYou Lab learnings for the review layers stays a follow-up, through propose-practice and promote-practice after this mechanism merges. No pipeline membership changes, no station prompt changes, no changes to the learnings mechanisms. The original guardrail against modifying test files that existed at the original base ref stands; this addendum authorizes exactly the one test correction above, in the file the first execution of this same order created, executed by the test writer.
 - risk_hints: 
 - status: new
 

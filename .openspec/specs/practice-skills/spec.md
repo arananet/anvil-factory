@@ -50,7 +50,7 @@ S6. A gate enforced practice appears in the checks gate pre-review output and in
 
 S7. A project whose anvil.yaml overrides a topic resolves no base practice on that topic, and report.json records the exclusion.
 
-S8. With no practices base present, a run's packets and verdict are unchanged and report.json records an empty practices resolution.
+S8. With no practices base present, a run's packets are unchanged and report.json records an empty practices resolution; the verdict is the honest approver outcome for the reviews the run can count, and is not asserted to be approved.
 
 S9. check-brain fails on a practices.md that was hand edited to hold two active practices with the same topic and overlapping scope.
 

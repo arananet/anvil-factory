@@ -438,7 +438,7 @@ class TestRunnerIntegration(unittest.TestCase):
             self.assertEqual(rec["active_count"], 0)
             self.assertEqual(rec["excluded_topics"], [])
             self.assertTrue(all(v == [] for v in rec["resolved"].values()))
-            self.assertEqual(report["verdict"], "approved")
+            self.assertEqual(report["verdict"], "no_reviews")
 
 
 class TestShippedState(unittest.TestCase):

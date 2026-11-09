@@ -1,0 +1,10 @@
+{
+  "station": "reviewer-spec",
+  "verdict": "pass",
+  "findings": [
+    "Spec S8 in .openspec/specs/practice-skills/spec.md is replaced with exactly the sentence the loopback addendum requires. The diff touches no other spec text.",
+    "tests/test_practice_skills.py changes only the final assertion in test_no_base_changes_nothing_but_the_report_field_s8, from approved to no_reviews. The other S8 assertions and the seed fixture dict are untouched.",
+    "Outside runs/ and work_orders/, the only modified files are the spec and that one test file. No code, no existing tests and no station prompts changed, so the builder correctly made no behavior change.",
+    "The practice test module ran 28 tests and all passed. Neither edited file contains an em dash or en dash."
+  ]
+}
