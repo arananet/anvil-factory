@@ -35,3 +35,12 @@ governance question this commit raises: the curated skills catalog
 (skills/, producer guidance) and the practices base (brain/practices.md,
 review rules) now coexist, and their split of duties is documented but
 not yet governed by a single rule.
+
+## Addendum (2026-11-10, later the same day)
+
+The game now carries its final name end to end: the repository was
+renamed arananet/giana-3d to arananet/dreamrun to arananet/mochi-smash,
+and the game is deployed at its own URL, https://mochi-smash.pages.dev
+(Cloudflare Pages project mochi-smash). The project is referenced in
+project-reports/catalog.json. The earlier URL dreamrun-3d.pages.dev
+still serves the same build as a historical alias of the factory era.

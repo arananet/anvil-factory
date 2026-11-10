@@ -2,6 +2,7 @@
   "projects": [
     {"id": "sentia", "name": "Sentia", "repository": "arananet/sentia"},
     {"id": "platform25", "name": "Platform25", "repository": "arananet/platform25"},
-    {"id": "taskline", "name": "Taskline", "repository": "arananet/anvil-example-taskline"}
+    {"id": "taskline", "name": "Taskline", "repository": "arananet/anvil-example-taskline"},
+    {"id": "mochi-smash", "name": "Mochi Smash", "repository": "arananet/mochi-smash"}
   ]
 }
