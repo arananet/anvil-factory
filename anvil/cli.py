@@ -11,7 +11,7 @@ from .runner import run_pipeline
 from .config import load_anvil_config, apply_overrides, runtime_config, deploy_config, health_config
 from .executor import create_executor
 from .statuspage import generate_status_page
-from .brain import check_brain, promote_learning, demote_learning
+from .brain import check_brain, promote_learning, demote_learning, propose_practice, promote_practice
 from .supervisor import supervise
 
 # Alias for test compatibility
@@ -52,6 +52,8 @@ def main(argv=None):
     p = sub.add_parser("check-brain"); p.add_argument("project")
     p = sub.add_parser("promote-learning"); p.add_argument("project"); p.add_argument("inbox_file")
     p = sub.add_parser("demote-learning"); p.add_argument("project"); p.add_argument("entry_id"); p.add_argument("--reason", required=True)
+    p = sub.add_parser("propose-practice"); p.add_argument("project"); p.add_argument("--topic", required=True); p.add_argument("--rule", required=True); p.add_argument("--enforcement", default="prompt"); p.add_argument("--languages", default=""); p.add_argument("--surfaces", default=""); p.add_argument("--stations", default=""); p.add_argument("--source", required=True); p.add_argument("--supersedes", default=None)
+    p = sub.add_parser("promote-practice"); p.add_argument("project"); p.add_argument("inbox_file")
     p = sub.add_parser("supervise"); p.add_argument("project"); p.add_argument("--execute", action="store_true")
     args = parser.parse_args(argv)
     if args.cmd == "init":
@@ -138,8 +140,10 @@ def main(argv=None):
             print(f"brain: FAIL - {problem}")
         for name in result["quarantined"]:
             print(f"quarantined (inbox, not verified): {name}")
+        practices = result.get("practices", {})
         print(f"brain: {'PASS' if result['ok'] else 'FAIL'} - "
-              f"{len(result['entries'])} verified entries, {len(result['quarantined'])} quarantined proposals")
+              f"{len(result['entries'])} verified entries, {len(result['quarantined'])} quarantined proposals, "
+              f"{practices.get('active', 0)} active practices")
         return 0 if result["ok"] else 1
     if args.cmd == "promote-learning":
         try:
@@ -148,6 +152,21 @@ def main(argv=None):
             print(f"Promotion refused: {exc}")
             return 1
         print(f"Promoted {args.inbox_file} as {entry_id} in brain/learnings.md")
+        return 0
+    if args.cmd == "propose-practice":
+        name = propose_practice(args.project, args.topic, args.rule, enforcement=args.enforcement,
+                                languages=args.languages, surfaces=args.surfaces,
+                                stations=args.stations, source=args.source,
+                                supersedes=args.supersedes)
+        print(f"Proposed practice quarantined at brain/inbox/{name}")
+        return 0
+    if args.cmd == "promote-practice":
+        try:
+            pid = promote_practice(args.project, args.inbox_file)
+        except ValueError as exc:
+            print(f"Promotion refused: {exc}")
+            return 1
+        print(f"Promoted {args.inbox_file} as {pid} in brain/practices.md")
         return 0
     if args.cmd == "demote-learning":
         try:

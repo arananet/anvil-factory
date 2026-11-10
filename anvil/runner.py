@@ -6,7 +6,8 @@ from pathlib import Path
 from urllib.parse import urlparse
 from .model import WorkOrder, Review
 from .config import default_model, resolve_model, load_anvil_config, health_config, CHARS_PER_TOKEN, get_station_budget
-from .brain import packet_learnings_section
+from .brain import (packet_learnings_section, resolve_practices, practices_by_id,
+                    packet_practices_section, gate_practices_section)
 from .design import packet_design_section, load_design_system
 from .capture import capture_breakpoints, packet_rendered_evidence_section
 from .gates import human_gate, checks_gate, resolve_base_ref_config, _run_shell, validate_builder_report, review_artifact_state
@@ -565,7 +566,7 @@ def prepare_reviewer_design_step(project, work_order, files_changed, captures, r
 def prepare_packet(project, station_id, prompt, work_order, steps,
                    learnings_section="", design_section="",
                    rendered_evidence_section="", knowledge_section="",
-                   quality_charter_section="", anchor_section=""):
+                   quality_charter_section="", anchor_section="", practices_section=""):
     """S1: Prepare packet with budget measurement and trimming.
 
     Returns (packet_text, action, measured_tokens, budget) where:
@@ -585,7 +586,7 @@ def prepare_packet(project, station_id, prompt, work_order, steps,
     packet = _packet_text(station_id, prompt, work_order, steps,
                          learnings_section, design_section,
                          rendered_evidence_section, knowledge_section,
-                         quality_charter_section, anchor_section)
+                         quality_charter_section, anchor_section, practices_section)
 
     measured = estimate_tokens(packet)
 
@@ -602,7 +603,7 @@ def prepare_packet(project, station_id, prompt, work_order, steps,
     packet_trimmed = _packet_text(station_id, prompt, work_order, steps,
                                    learnings_section, design_compact,
                          rendered_evidence_section, knowledge_section,
-                         quality_charter_section, anchor_section)
+                         quality_charter_section, anchor_section, practices_section)
     measured = estimate_tokens(packet_trimmed)
 
     if measured <= budget:
@@ -614,7 +615,7 @@ def prepare_packet(project, station_id, prompt, work_order, steps,
     packet_trimmed = _packet_text(station_id, prompt, work_order, steps,
                                    learnings_section, design_reduced,
                          rendered_evidence_section, knowledge_section,
-                         quality_charter_section, anchor_section)
+                         quality_charter_section, anchor_section, practices_section)
     measured = estimate_tokens(packet_trimmed)
 
     if measured <= budget:
@@ -626,7 +627,7 @@ def prepare_packet(project, station_id, prompt, work_order, steps,
     packet_trimmed = _packet_text(station_id, prompt, work_order, steps,
                                    learnings_limited, design_reduced,
                          rendered_evidence_section, knowledge_section,
-                         quality_charter_section, anchor_section)
+                         quality_charter_section, anchor_section, practices_section)
     measured = estimate_tokens(packet_trimmed)
 
     if measured <= budget:
@@ -665,6 +666,9 @@ class RunReport:
     base_ref: str = None
     evidence: list = field(default_factory=list)
     health: dict = field(default_factory=dict)
+    # Practice skills R4: resolved practice ids per station, topics excluded
+    # by project override, and the active base count at run start.
+    practices: dict = field(default_factory=lambda: {"resolved": {}, "excluded_topics": [], "active_count": 0})
     def to_dict(self):
         # Build cost section from steps
         measured_steps = [s for s in self.steps if s.get("cost") is not None]
@@ -684,7 +688,8 @@ class RunReport:
                 "deployment_status": self.deployment_status, "verify_results": self.verify_results,
                 "risk_hints": self.risk_hints, "decision": self.decision, "warnings": self.warnings,
                 "astra_measured_tokens_total": self.astra_measured_tokens_total,
-                "base_ref": self.base_ref, "evidence": self.evidence, "cost": cost_section}
+                "base_ref": self.base_ref, "evidence": self.evidence, "cost": cost_section,
+                "practices": self.practices}
 
         # Add health section if present
         if self.health:
@@ -966,7 +971,7 @@ def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None, b
     return set()
 
 
-def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section="", rendered_evidence_section="", knowledge_section="", quality_charter_section="", anchor_section=""):
+def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section="", rendered_evidence_section="", knowledge_section="", quality_charter_section="", anchor_section="", practices_section=""):
     """Assemble a station packet.
 
     S4 stable prefix layout (design route consumption work): stable material
@@ -987,6 +992,9 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
         text += f"\n{design_section}\n"
     if learnings_section:
         text += f"\n{learnings_section}\n"
+    # Practice skills R6: prompt enforced practices resolved for this station
+    if practices_section:
+        text += f"\n{practices_section}\n"
     if knowledge_section:
         text += f"\n{knowledge_section}\n"
     if quality_charter_section:
@@ -1100,6 +1108,11 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     # Verified learnings are computed once per run: only non demoted entries
     # from brain/learnings.md, never inbox proposals (see anvil/brain.py).
     learnings_section = packet_learnings_section(project)
+    # Practice skills R3: resolve the applicable practices deterministically
+    # before any packet is built, from the work order surfaces, the pipeline
+    # station list and the config language signal. Absent base: empty record.
+    practice_entries = practices_by_id(project)
+    practices_resolution = resolve_practices(project, work_order, order, config)
 
     # Load knowledge pack if provided in work order (S7, S8, S9)
     knowledge_pack = None
@@ -1199,6 +1212,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         # Quality charter and anchor sections for visual runs
         quality_charter_section = packet_quality_charter_section(project, station_id, work_order)
         anchor_section = packet_anchor_section(project, station_id, work_order)
+        practices_section = packet_practices_section(project, practices_resolution, station_id, practice_entries)
 
         # S1: Apply budget for interface stations
         if station_id in budgeted_stations:
@@ -1206,13 +1220,13 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 project, station_id, prompt, work_order, steps,
                 learnings_section, design_section,
                 rendered_evidence_section, knowledge_section,
-                quality_charter_section, anchor_section
+                quality_charter_section, anchor_section, practices_section
             )
             packet.write_text(packet_text, encoding="utf-8")
             return packet, measured, budget, action
 
         # Non-budgeted stations: full packet with every applicable section
-        packet_text = _packet_text(station_id, prompt, work_order, steps, learnings_section, design_section, rendered_evidence_section, knowledge_section, quality_charter_section, anchor_section)
+        packet_text = _packet_text(station_id, prompt, work_order, steps, learnings_section, design_section, rendered_evidence_section, knowledge_section, quality_charter_section, anchor_section, practices_section)
         packet.write_text(packet_text, encoding="utf-8")
         measured = estimate_tokens(packet_text)
         return packet, measured, 0, "none"
@@ -1327,6 +1341,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 f"- status: {_sanitize_control_chars(work_order.status)}\n"
             )
             for extra_section in (
+                packet_practices_section(project, practices_resolution, station_id, practice_entries),
                 packet_rendered_evidence_section(project, work_order.id, station_id),
                 packet_knowledge_section(project, station_id, knowledge_pack),
                 packet_quality_charter_section(project, station_id, work_order),
@@ -1393,6 +1408,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                         work_order.risk = intake_data["risk"]
                     if "surfaces" in intake_data:
                         work_order.surfaces = intake_data["surfaces"]
+                        # Practice skills R3: intake may set the surfaces;
+                        # re-resolve before any downstream packet is built.
+                        practices_resolution = resolve_practices(project, work_order, order, config)
 
                     # Save work order
                     wo_dir = project / "work_orders"
@@ -1406,6 +1424,12 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     if pipeline_reviewers:
                         routing_record = route_reviewers(work_order, pipeline_reviewers, project)
                         write_routing_record(run_dir, routing_record)
+                        # Practice skills R4: the routing record carries the
+                        # same practice resolution as report.json.
+                        routing_path = run_dir / "routing.json"
+                        routing_data = json.loads(routing_path.read_text(encoding="utf-8"))
+                        routing_data["practices"] = practices_resolution
+                        routing_path.write_text(json.dumps(routing_data, indent=2) + "\n", encoding="utf-8")
                         # Update reviews_expected to only include selected reviewers
                         reviews_expected = routing_record.selected_reviewers
 
@@ -1477,6 +1501,12 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             # Run the gate
             gate_result = checks_gate(phase, base_ref_config, gate_changed_files, project, work_order.id,
                                      base_ref=base_ref, basis=gate_basis, attempt=gate_attempt)
+            # Practice skills R6: gate enforced practices are listed by id and
+            # topic in the pre-review output, never injected as prompt text.
+            if phase == "pre-review":
+                gate_listing = gate_practices_section(project, practices_resolution, practice_entries)
+                if gate_listing:
+                    gate_result["output"] = gate_result["output"].rstrip("\n") + "\n\n" + gate_listing + "\n"
             status = gate_result["status"]
             detail = gate_result["detail"]
 
@@ -2015,7 +2045,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                        deployment_status=deployment_status, verify_results=verify_results,
                        risk_hints=list(work_order.risk_hints or []), decision=decision, warnings=warnings,
                        astra_measured_tokens_total=astra_measured_tokens_total,
-                       base_ref=base_ref, evidence=evidence_list, health=health_result)
+                       base_ref=base_ref, evidence=evidence_list, health=health_result,
+                       practices=practices_resolution)
     (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
     # Swimlane
     lines = ["# Swimlane", ""]
