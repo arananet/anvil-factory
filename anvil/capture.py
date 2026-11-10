@@ -41,7 +41,8 @@ def _validate_static_root(project_dir: Path, static_root: str) -> Path:
 
     Security: prevents path traversal attacks like ../../../etc
     """
-    project_dir = project_dir.resolve()
+    given_project_dir = Path(project_dir)
+    project_dir = given_project_dir.resolve()
     static_path = (project_dir / static_root).resolve()
 
     # Ensure the resolved path is within the project directory
@@ -59,7 +60,10 @@ def _validate_static_root(project_dir: Path, static_root: str) -> Path:
     if not static_path.is_dir():
         raise ValueError(f"static_root is not a directory: {static_path}")
 
-    return static_path
+    # Return the path under the project directory as the caller gave it, so a
+    # project reached through a symlink (macOS /var -> /private/var) gets back
+    # a path in its own terms. Containment was checked on the resolved form.
+    return given_project_dir / static_path.relative_to(project_dir)
 
 
 def _validate_page_path(page_path: str) -> str:

@@ -15,6 +15,7 @@ Produce the media the piece needs (images, audio or video) and record how each a
 - Produce the output as a file in the repo, not as chat text.
 - If the inputs are not enough, say what is missing instead of guessing.
 - Never approve your own work. Approval belongs to a different station.
+- Look at or listen to every asset before you forward it. Regenerate or correct what falls short of the bar; record what remains as an open gap. When your packet carries a Craft skills section, hold the assets to it.
 
 ### Visual Output Quality Verification
 
@@ -27,6 +28,7 @@ When your packet includes a Quality Charter section (visual runs only), you must
 3. **Check charter criteria**: Evaluate your output against the observable criteria from the Quality Charter:
    - For physical products: materials, light, contact, scale
    - For games/illustrations: the stated standard from the project design system
+   - For interfaces (web pages, apps, dashboards): hierarchy, typography, layout, color, states, character
 
 4. **Record the comparison**: Document your findings in the run evidence directory (runs/{work_order_id}/evidence/) as a JSON file named `{output_filename}.comparison.json` with this structure:
 

@@ -1,4 +1,4 @@
-import json, os, re, tempfile, unittest, subprocess, urllib.request
+import json, os, re, tempfile, unittest, urllib.request
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -150,32 +150,20 @@ class TestClaimHygiene(unittest.TestCase):
 
     def test_test_suite_count_measured_r3(self):
         """readme-showcase R3: factory suite test count measured from tree"""
-        # Run test discovery to count tests using unittest (the canonical suite command)
-        try:
-            # Use unittest discover with verbose output to count tests
-            result = subprocess.run(
-                [sys.executable, "-m", "unittest", "discover", "-s", str(ROOT / "tests"), "-p", "test_*.py", "-v"],
-                capture_output=True,
-                text=True,
-                timeout=60,
-                cwd=str(ROOT)
-            )
-            # Count test items from output - unittest -v lists each test
-            test_lines = [line for line in result.stderr.split('\n') if line.strip().startswith('test_')]
-            actual_count = len(test_lines)
-
-            if actual_count > 0:
-                # Check if README mentions test count
-                readme_test_pattern = r'(\d+)\s+test'
-                readme_match = re.search(readme_test_pattern, self.content.lower())
-                if readme_match:
-                    claimed_count = int(readme_match.group(1))
-                    # Allow some variance as tests may change
-                    variance = abs(claimed_count - actual_count)
-                    self.assertLess(variance, 10,
-                                  f"Test count significantly off: claimed {claimed_count}, actual ~{actual_count}")
-        except subprocess.TimeoutExpired:
-            self.skipTest("Test count measurement timed out")
+        # Discovery counts without executing this test again recursively.
+        loader = unittest.TestLoader()
+        actual_count = loader.discover(str(ROOT / "tests"), pattern="test_*.py").countTestCases()
+        self.assertFalse(loader.errors, loader.errors)
+        self.assertGreater(actual_count, 0)
+        match = re.search(r'(?:(over|more than|at least)\s+)?(\d+)\s+tests?\b', self.content.lower())
+        if match:
+            claimed_count = int(match.group(2))
+            if match.group(1) in ("over", "more than"):
+                self.assertGreater(actual_count, claimed_count)
+            elif match.group(1) == "at least":
+                self.assertGreaterEqual(actual_count, claimed_count)
+            else:
+                self.assertLess(abs(claimed_count - actual_count), 10)
 
 
 class TestLinkValidation(unittest.TestCase):

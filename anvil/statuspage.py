@@ -5,7 +5,7 @@ contained HTML page: inline CSS, no external assets, so the file can be
 dropped on Cloudflare Pages, GitHub Pages or any static host unchanged.
 
 The page is a snapshot of the reports on disk at generation time. Nothing is
-invented: cost stays null, and missing fields render as a dash. Runs whose
+invented: missing usage is unknown and unpriced cost stays null. Runs whose
 report is missing or unreadable are skipped and the skip is noted in the
 page footer.
 
@@ -17,8 +17,11 @@ REJECTED) and NEEDS HUMAN flags are also shown when applicable.
 
 import html
 import json
+import hashlib
+import re
 from datetime import datetime, timezone
 from pathlib import Path
+from .telemetry import normalize_usage, summarize_steps, public_report
 
 # Lifecycle stage vocabulary in order
 LIFECYCLE_STAGES = ["SPEC", "BUILD", "REVIEW", "APPROVED", "MERGED"]
@@ -87,9 +90,130 @@ footer { color:#8A8A8A; font-size:13px; margin-top:var(--space-32); }
 }
 """.strip()
 
+CSS += """
+* { box-sizing:border-box; }
+body { overflow-wrap:anywhere; }
+a { color:#E8E8E8; text-underline-offset:3px; }
+a:focus-visible, summary:focus-visible { outline:2px solid #FF5C00; outline-offset:4px; }
+.usage-panel { border-top:2px solid #FF5C00; background:#1E1E1E; padding:var(--space-20); margin:0 0 var(--space-24); border-radius:var(--space-8); }
+.usage-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:var(--space-16); margin:var(--space-16) 0; }
+.usage-grid dt { color:#B8B8B8; font-size:12px; margin-bottom:var(--space-4); }
+.usage-grid dd { margin:0; font-family:ui-monospace,monospace; font-size:20px; color:#FFFFFF; }
+.usage-note { color:#B8B8B8; font-size:13px; line-height:1.6; margin:var(--space-8) 0; }
+.usage-details { margin-top:var(--space-8); font-family:system-ui,sans-serif; font-size:12px; }
+.usage-details summary { cursor:pointer; min-height:28px; color:#E8E8E8; }
+.usage-details .usage-grid { grid-template-columns:repeat(2,minmax(100px,1fr)); }
+.usage-details dd { font-size:14px; }
+.usage-attempt { padding:var(--space-8) 0; border-top:1px solid #3A3A3A; }
+.project-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr)); gap:var(--space-16); margin:var(--space-16) 0 var(--space-32); }
+.project-card { background:#1E1E1E; border:1px solid #3A3A3A; border-radius:var(--space-8); padding:var(--space-20); }
+.project-card h3 { margin-top:0; }
+"""
+
 STATUS_CLASS = {"completed": "st-ok", "executed": "st-ok", "approved": "st-ok",
                 "failed": "st-failed", "rejected": "st-failed", "deploy_failed": "st-failed",
-                "deployed_unverified": "st-failed"}
+                "deployed_unverified": "st-failed", "budget_exceeded": "st-failed"}
+
+
+def _number(value):
+    return "Unknown" if value is None else f"{value:,}"
+
+
+def _usage_metrics(usage):
+    total_label = "Measured subtotal" if usage.get("complete") is False and usage.get("total_tokens") is not None else "Total tokens"
+    fields = ((total_label, "total_tokens"), ("Input tokens", "input_tokens"),
+              ("Output tokens", "output_tokens"), ("Cached input", "cached_input_tokens"),
+              ("Cache creation", "cache_creation_input_tokens"), ("Reasoning tokens", "reasoning_tokens"))
+    return '<dl class="usage-grid">' + "".join(
+        f"<div><dt>{label}</dt><dd>{_number(usage.get(key))}</dd></div>" for label, key in fields) + "</dl>"
+
+
+def _usage_panel(steps, title="Token consumption"):
+    usage = summarize_steps(steps)
+    coverage = f"{usage['measured_calls']} of {usage['calls']} agent calls measured"
+    state = "Complete measurement" if usage["complete"] else "Partial measurement"
+    note = "No agent calls recorded yet." if not usage["calls"] else "Reported totals include retries and failed calls with usage evidence."
+    if usage["total_tokens"] is None:
+        state = "Usage unavailable"
+        note = f"{usage['unmeasured_calls']} calls have unknown usage. Totals will appear when runtimes report consumption. Unrecorded historical usage cannot be reconstructed."
+    elif not usage["complete"]:
+        note += f" {usage['unmeasured_calls']} calls have unknown usage; this is a measured subtotal."
+    breakdown = ['<details class="usage-details"><summary>Usage by model and station</summary>']
+    for heading, key in (("Model", "by_model"), ("Station", "by_station")):
+        if usage[key]:
+            breakdown.append(f'<div class="table-container"><table><thead><tr><th>{heading}</th><th>Tokens</th><th>Calls measured</th></tr></thead><tbody>')
+            for label, group in usage[key].items():
+                breakdown.append(f'<tr><td>{_esc(label)}</td><td>{_number(group["total_tokens"])}</td><td>{group["measured_calls"]}/{group["calls"]}</td></tr>')
+            breakdown.append('</tbody></table></div>')
+    breakdown.append('</details>')
+    metrics = _usage_metrics(usage)
+    if usage["total_tokens"] is None:
+        metrics = ('<dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div>'
+                   f'<div><dt>Measured calls</dt><dd>{usage["measured_calls"]}/{usage["calls"]}</dd></div></dl>'
+                   '<details class="usage-details"><summary>Input, output and cache details</summary>' + metrics + '</details>')
+    breakdown.insert(-1, '<p class="usage-note">Cached input is part of input; reasoning is part of output. Each agent call is one station runtime invocation and may include multiple model/tool turns.</p>')
+    return (f'<section class="usage-panel" aria-label="{_esc(title)}"><h2>{_esc(title)}</h2>'
+            f'<p class="usage-note">{state} · {coverage} · {usage["retries"]} recorded retries</p>'
+            + metrics + f'<p class="usage-note">{note}</p>' + "".join(breakdown) + '</section>')
+
+
+def _step_usage(step):
+    if not summarize_steps([step])["calls"]:
+        return ""
+    usage = normalize_usage(step.get("usage"))
+    attempts = step.get("attempts") or []
+    if usage is None and not attempts and step.get("status") not in {"executed", "failed"}:
+        return ""
+    partial = any(normalize_usage(a.get("usage")) is None or not a.get("usage_complete", True) for a in attempts)
+    label = _number(usage["total_tokens"] if usage else None) + " tokens"
+    if partial:
+        label += " (partial)"
+    parts = [f'<details class="usage-details"><summary>{label}</summary>']
+    parts.append(_usage_metrics(usage or {}))
+    if step.get("measured_tokens"):
+        parts.append(f'<p class="usage-note">Initial packet estimate: {_number(step["measured_tokens"])} tokens. This is not runtime consumption.</p>')
+    for index, attempt in enumerate(attempts, 1):
+        parts.append(f'<div class="usage-attempt"><b>Attempt {index}</b> · {_esc(attempt.get("status", "unknown"))}')
+        if attempt.get("runtime"):
+            parts.append(f' · {_esc(attempt["runtime"])}')
+        if attempt.get("turns") is not None:
+            parts.append(f' · {_esc(attempt["turns"])} runtime turns')
+        parts.append(_usage_metrics(normalize_usage(attempt.get("usage")) or {}))
+        if attempt.get("runtime_cost_estimate_usd") is not None:
+            parts.append(f'<p class="usage-note">Runtime cost estimate: ${_esc(attempt["runtime_cost_estimate_usd"])} (not an invoice)</p>')
+        parts.append('</div>')
+    parts.append('</details>')
+    return "".join(parts)
+
+
+def _project_name(project):
+    try:
+        return str(json.loads((Path(project) / "anvil.json").read_text(encoding="utf-8")).get("project", Path(project).name))
+    except (OSError, ValueError, AttributeError):
+        return Path(project).name
+
+
+def _portfolio_entries(projects):
+    entries, seen = [], set()
+    used_slugs = set()
+    for project in projects or []:
+        root = Path(project).resolve()
+        if root in seen:
+            continue
+        seen.add(root)
+        if not root.is_dir():
+            raise ValueError(f"Status project directory does not exist: {root}")
+        base = re.sub(r"[^a-z0-9_-]+", "-", root.name.lower()).strip("-")[:64] or "project"
+        slug, suffix = base, 1
+        while slug in used_slugs:
+            suffix += 1
+            slug = f"{base}-{suffix}"
+        used_slugs.add(slug)
+        runs, _ = collect_runs(root, include_history=True)
+        entries.append({"name": _project_name(root), "page": f"projects/{slug}/index.html",
+                        "runs": len(runs), "token_usage": summarize_steps([s for r in runs for s in r.get("steps", [])]),
+                        "root": root})
+    return entries
 
 
 def _esc(value):
@@ -150,24 +274,45 @@ def _decision_block(report):
             "</div>")
 
 
-def collect_runs(project):
+def collect_runs(project, include_history=False):
     """Return (runs, skipped): parsed report dicts and skipped folder names."""
     runs = []
     skipped = []
+    seen = set()
     runs_dir = Path(project) / "runs"
     if runs_dir.is_dir():
         for folder in sorted(p for p in runs_dir.iterdir() if p.is_dir()):
-            report_file = folder / "report.json"
-            if not report_file.exists():
-                skipped.append(folder.name)
-                continue
-            try:
-                data = json.loads(report_file.read_text(encoding="utf-8"))
-                if not isinstance(data, dict) or "work_order_id" not in data:
-                    raise ValueError("report has no work_order_id")
-                runs.append(data)
-            except Exception:
-                skipped.append(folder.name)
+            files = [folder / "report.json"]
+            if include_history:
+                files += sorted((folder / "history").glob("*.json"))
+            for report_file in files:
+                try:
+                    data = json.loads(report_file.read_text(encoding="utf-8"))
+                    if not isinstance(data, dict) or "work_order_id" not in data:
+                        raise ValueError("report has no work_order_id")
+                    key = str(data.get("run_id") or hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest())
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    if report_file.parent.name == "history":
+                        data = dict(data, _archived=True, _record=report_file.stem)
+                    runs.append(data)
+                except (OSError, ValueError, TypeError):
+                    skipped.append(str(report_file.relative_to(runs_dir)) if report_file.parent.name == "history" else folder.name)
+    runs.sort(key=lambda r: str(r.get("work_order_id", "")))
+    exports = Path(project) / "report_exports.json"
+    if exports.is_file():
+        try:
+            payload = json.loads(exports.read_text(encoding="utf-8"))
+            if payload.get("schema") != "anvil/project-reports@1":
+                raise ValueError("unsupported report export")
+            for data in payload["reports"]:
+                key = str(data.get("run_id") or hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest())
+                if key not in seen:
+                    seen.add(key)
+                    runs.append(data)
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
+            skipped.append("report_exports.json")
     runs.sort(key=lambda r: str(r.get("work_order_id", "")))
     return runs, skipped
 
@@ -332,9 +477,15 @@ def render_lifecycle_board(runs, merge_records):
     return "\n".join(parts)
 
 
-def render_status_page(project, generated_at=None):
+def render_status_page(project, generated_at=None, projects=None):
     project = Path(project)
-    runs, skipped = collect_runs(project)
+    runs, skipped = collect_runs(project, include_history=True)
+    portfolio = [entry for entry in _portfolio_entries(projects) if entry["root"] != project.resolve()]
+    all_steps = [s for r in runs for s in r.get("steps", [])]
+    usage_summary = summarize_steps(all_steps)
+    portfolio_steps = all_steps + [step for entry in portfolio
+                                  for report in collect_runs(entry["root"], include_history=True)[0]
+                                  for step in report.get("steps", [])]
     merge_records = load_merge_records(project)
     generated = generated_at or datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
     name = project.name
@@ -353,16 +504,45 @@ def render_status_page(project, generated_at=None):
              f'<div class="snapshot">Snapshot generated from the run reports on disk at {_esc(generated)}. '
              "This page is a snapshot, not a live feed. Regenerate it with "
              '<span class="mono">anvil status-page &lt;project&gt;</span>.</div>']
+    parts.append(_usage_panel(portfolio_steps, "Factory and project token consumption") if portfolio
+                 else _usage_panel(all_steps, "Project token consumption"))
+    exports = project / "report_exports.json"
+    if exports.is_file():
+        try:
+            metadata = json.loads(exports.read_text(encoding="utf-8"))
+            repository = metadata.get("repository", "")
+            if re.fullmatch(r"[\w.-]+/[\w.-]+", repository):
+                parts.append(f'<p class="usage-note">Reports imported from <a href="https://github.com/{_esc(repository)}">{_esc(repository)}</a> '
+                             f'at {_esc(metadata.get("imported_at", "unknown time"))}. Refresh to include newer runs.</p>')
+        except (OSError, ValueError, TypeError):
+            pass
+    parts.append('<p class="usage-note"><a href="usage.json">Download usage summary (JSON)</a></p>')
+    if portfolio:
+        parts.append('<section aria-label="Projects"><h2>Projects</h2><div class="project-grid">')
+        parts.append(f'<article class="project-card"><h3><a href="#factory-runs">{_esc(name)}</a></h3>'
+                     f'<p>{_number(usage_summary["total_tokens"])} tokens · {len(runs)} runs</p>'
+                     f'<p class="usage-note">{usage_summary["measured_calls"]}/{usage_summary["calls"]} calls measured; '
+                     f'{usage_summary["unmeasured_calls"]} unknown.</p></article>')
+        for entry in portfolio:
+            usage = entry["token_usage"]
+            parts.append(f'<article class="project-card"><h3><a href="{_esc(entry["page"])}">{_esc(entry["name"])}</a></h3>'
+                         f'<p>{_number(usage["total_tokens"])} tokens · {entry["runs"]} runs</p>'
+                         f'<p class="usage-note">{usage["measured_calls"]}/{usage["calls"]} calls measured; {usage["unmeasured_calls"]} unknown.</p></article>')
+        parts.append('</div></section>')
+        parts.append('<h2 id="factory-runs">Factory runs</h2>')
     if not runs:
         parts.append('<div class="run">No readable run reports found under runs/.</div>')
     else:
         # Render lifecycle board
-        parts.append(render_lifecycle_board(runs, merge_records))
+        parts.append(render_lifecycle_board([r for r in runs if not r.get("_archived")], merge_records))
     for report in runs:
         work_order_id = report.get('work_order_id', '-')
-        parts.append(f'<section class="run" id="{_esc(work_order_id)}-detail">')
+        anchor = work_order_id + ("-" + report["_record"] if report.get("_archived") else "")
+        parts.append(f'<section class="run" id="{_esc(anchor)}-detail">')
         parts.append(f"<h2>{_esc(work_order_id)}</h2>")
         parts.append(f'<div>{_dash(report.get("title"))}</div>')
+        if report.get("_archived"):
+            parts.append('<p class="usage-note">Earlier run, preserved in the project consumption total.</p>')
         deployment = report.get("deployment_status")
         meta = [
             ("pipeline", _dash(report.get("pipeline"))),
@@ -373,10 +553,28 @@ def render_status_page(project, generated_at=None):
         ]
         parts.append('<div class="meta">' + "".join(f"<span>{k}: <b>{v}</b></span>" for k, v in meta) + "</div>")
         parts.append(_decision_block(report))
+        parts.append(_usage_panel(report.get("steps", []), "Run token consumption"))
+        efficiency = report.get("efficiency") or {}
+        if efficiency.get("limits"):
+            caps = efficiency["limits"]
+            parts.append(f'<p class="usage-note">Run threshold: {_number(caps.get("max_run_tokens"))} tokens; '
+                         f'agent-call limit: {_number(caps.get("max_agent_calls"))}. '
+                         'Checked between calls; a running call may exceed the threshold.</p>')
+        for stopped in (s for s in report.get("steps", []) if s.get("status") == "budget_exceeded"):
+            parts.append(f'<p class="usage-note">Stopped before {_esc(stopped.get("station"))}: {_esc(stopped.get("detail"))}</p>')
         parts.append('<div class="table-container">')
         parts.append("<table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>")
         for step in report.get("steps", []):
-            artifacts = ", ".join(str(a) for a in step.get("artifacts", [])) or "-"
+            artifact_names = []
+            for artifact in step.get("artifacts", []):
+                path = Path(str(artifact))
+                if path.is_absolute():
+                    try:
+                        path = path.relative_to(project.resolve())
+                    except ValueError:
+                        path = Path(path.name)
+                artifact_names.append(str(path))
+            artifacts = ", ".join(artifact_names) or "-"
             cost = step.get("cost")
             executed_model = step.get("executed_model")
             configured_model = step.get("configured_model")
@@ -387,7 +585,7 @@ def render_status_page(project, generated_at=None):
             else:
                 model_html = ""
             parts.append(
-                f"<tr><td class='mono'>{_esc(step.get('station', '-'))}{model_html}</td>"
+                f"<tr><td class='mono'>{_esc(step.get('station', '-'))}{model_html}{_step_usage(step)}</td>"
                 f"<td>{_status_span(step.get('status', '-'))}</td>"
                 f"<td>{_esc(step.get('duration_ms', '-'))}</td>"
                 f"<td>{'null' if cost is None else _esc(cost)}</td>"
@@ -419,20 +617,36 @@ def render_status_page(project, generated_at=None):
                 parts.append('</div>')  # table-container
             parts.append('</div>')  # decision
         parts.append("</section>")
-    parts.append("<footer>Generated by ANVIL from runs/*/report.json. Cost is null unless a runtime reported it; ANVIL never invents a number.")
+    parts.append("<footer>Generated by ANVIL from run reports. Missing token usage stays unknown. Cost is null without reported usage and sourced prices; runtime cost estimates are labeled separately.")
     if skipped:
         parts.append(f"<br>Skipped run folders with a missing or unreadable report.json: {_esc(', '.join(skipped))}.")
     parts.append("</footer>")
     parts.append("</main></body></html>")
-    return "\n".join(parts) + "\n", {"runs": len(runs), "skipped": skipped}
+    return "\n".join(parts) + "\n", {"runs": len(runs), "skipped": skipped,
+                                          "token_usage": usage_summary, "portfolio_token_usage": summarize_steps(portfolio_steps),
+                                          "generated_at": generated,
+                                          "projects": [{k: v for k, v in e.items() if k != "root"} for e in portfolio]}
 
 
-def generate_status_page(project, out_dir=None):
+def generate_status_page(project, out_dir=None, projects=None):
     project = Path(project)
     out = Path(out_dir) if out_dir else project / "status"
     out.mkdir(parents=True, exist_ok=True)
-    page, summary = render_status_page(project)
+    if projects is None:
+        from .config import load_anvil_config
+        roots = load_anvil_config(project / "anvil.yaml").get("status_projects") or []
+        projects = [project / root for root in roots]
+    entries = _portfolio_entries(projects)
+    page, summary = render_status_page(project, projects=projects)
     target = out / "index.html"
     target.write_text(page, encoding="utf-8")
+    (out / "usage.json").write_text(json.dumps({"project": _project_name(project),
+                                               "generated_at": summary["generated_at"],
+                                               "token_usage": summary["token_usage"],
+                                               "portfolio_token_usage": summary["portfolio_token_usage"],
+                                               "runs": [public_report(r) for r in collect_runs(project, include_history=True)[0]],
+                                               "projects": summary["projects"]}, indent=2) + "\n", encoding="utf-8")
+    for entry in entries:
+        generate_status_page(entry["root"], out / entry["page"].rsplit("/", 1)[0], projects=[])
     summary["path"] = str(target)
     return summary

@@ -1,4 +1,6 @@
 import inspect
+import uuid
+import hashlib
 import json, os, shlex, struct, subprocess, time, zlib
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -27,6 +29,8 @@ from .quality import (
     packet_anchor_section,
     is_visual_run,
 )
+from .skills import resolve_skills, skills_by_id, packet_skills_section, public_resolution
+from .telemetry import summarize_steps, efficiency_config, budget_reason, EFFICIENCY_NOTE
 
 def _sanitize_control_chars(text):
     """Sanitize control characters from text to prevent injection.
@@ -566,7 +570,8 @@ def prepare_reviewer_design_step(project, work_order, files_changed, captures, r
 def prepare_packet(project, station_id, prompt, work_order, steps,
                    learnings_section="", design_section="",
                    rendered_evidence_section="", knowledge_section="",
-                   quality_charter_section="", anchor_section="", practices_section=""):
+                   quality_charter_section="", anchor_section="", practices_section="",
+                   skills_section="", run_context_section=""):
     """S1: Prepare packet with budget measurement and trimming.
 
     Returns (packet_text, action, measured_tokens, budget) where:
@@ -581,12 +586,16 @@ def prepare_packet(project, station_id, prompt, work_order, steps,
 
     # Get budget (factory defaults from config module)
     budget = get_station_budget(config, station_id)
+    packet_cap = efficiency_config(config).get("max_packet_tokens")
+    if packet_cap:
+        budget = min(budget, packet_cap)
 
     # Build initial packet
     packet = _packet_text(station_id, prompt, work_order, steps,
                          learnings_section, design_section,
                          rendered_evidence_section, knowledge_section,
-                         quality_charter_section, anchor_section, practices_section)
+                         quality_charter_section, anchor_section, practices_section,
+                         skills_section, run_context_section)
 
     measured = estimate_tokens(packet)
 
@@ -599,11 +608,12 @@ def prepare_packet(project, station_id, prompt, work_order, steps,
 
     # Try compact tokens (no pretty print)
     from .design import packet_design_section_compact
-    design_compact = packet_design_section_compact(project, station_id)
+    design_compact = packet_design_section_compact(project, station_id) if design_section else ""
     packet_trimmed = _packet_text(station_id, prompt, work_order, steps,
                                    learnings_section, design_compact,
                          rendered_evidence_section, knowledge_section,
-                         quality_charter_section, anchor_section, practices_section)
+                         quality_charter_section, anchor_section, practices_section,
+                         skills_section, run_context_section)
     measured = estimate_tokens(packet_trimmed)
 
     if measured <= budget:
@@ -611,11 +621,12 @@ def prepare_packet(project, station_id, prompt, work_order, steps,
 
     # Try reduced quality bars
     from .design import packet_design_section_reduced
-    design_reduced = packet_design_section_reduced(project, station_id)
+    design_reduced = packet_design_section_reduced(project, station_id) if design_section else ""
     packet_trimmed = _packet_text(station_id, prompt, work_order, steps,
                                    learnings_section, design_reduced,
                          rendered_evidence_section, knowledge_section,
-                         quality_charter_section, anchor_section, practices_section)
+                         quality_charter_section, anchor_section, practices_section,
+                         skills_section, run_context_section)
     measured = estimate_tokens(packet_trimmed)
 
     if measured <= budget:
@@ -627,7 +638,8 @@ def prepare_packet(project, station_id, prompt, work_order, steps,
     packet_trimmed = _packet_text(station_id, prompt, work_order, steps,
                                    learnings_limited, design_reduced,
                          rendered_evidence_section, knowledge_section,
-                         quality_charter_section, anchor_section, practices_section)
+                         quality_charter_section, anchor_section, practices_section,
+                         skills_section, run_context_section)
     measured = estimate_tokens(packet_trimmed)
 
     if measured <= budget:
@@ -669,6 +681,9 @@ class RunReport:
     # Practice skills R4: resolved practice ids per station, topics excluded
     # by project override, and the active base count at run start.
     practices: dict = field(default_factory=lambda: {"resolved": {}, "excluded_topics": [], "active_count": 0})
+    skills: dict = field(default_factory=lambda: {"resolved": {}, "disabled": [], "catalog_count": 0, "signals": {}})
+    efficiency: dict = field(default_factory=dict)
+    run_id: str = ""
     def to_dict(self):
         # Build cost section from steps
         measured_steps = [s for s in self.steps if s.get("cost") is not None]
@@ -689,7 +704,10 @@ class RunReport:
                 "risk_hints": self.risk_hints, "decision": self.decision, "warnings": self.warnings,
                 "astra_measured_tokens_total": self.astra_measured_tokens_total,
                 "base_ref": self.base_ref, "evidence": self.evidence, "cost": cost_section,
-                "practices": self.practices}
+                "practices": self.practices,
+                "skills": self.skills,
+                "token_usage": summarize_steps(self.steps), "efficiency": self.efficiency,
+                "run_id": self.run_id}
 
         # Add health section if present
         if self.health:
@@ -971,7 +989,40 @@ def _get_changed_files(project_dir, initial_files=None, work_output_dirs=None, b
     return set()
 
 
-def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section="", rendered_evidence_section="", knowledge_section="", quality_charter_section="", anchor_section="", practices_section=""):
+CHECK_AWARE_STATIONS = {"test-writer", "builder", "reviewer-tests"}
+
+
+def packet_run_context_section(project, work_order, steps, station_id, checks=None):
+    """Point a station at the work that already exists for this run.
+
+    Lists only what is on disk: the spec the work order names, the output
+    file of each upstream step, and for the stations that write or judge
+    code, the project's own check commands. Returns "" when there is
+    nothing to point at.
+    """
+    project = Path(project)
+    lines = []
+    spec_path = str(getattr(work_order, "spec_path", "") or "")
+    if spec_path and ".." not in spec_path and not spec_path.startswith("/") and (project / spec_path).is_file():
+        lines.append(f"- Spec for this order: {_sanitize_control_chars(spec_path)}")
+    for step in steps:
+        upstream_id = str(step.get("station", ""))
+        if upstream_id and (project / "runs" / work_order.id / f"{upstream_id}.output.md").is_file():
+            lines.append(f"- Output of {upstream_id}: runs/{work_order.id}/{upstream_id}.output.md")
+    if station_id in CHECK_AWARE_STATIONS:
+        for command in checks or []:
+            lines.append(f"- Project check: `{_sanitize_control_chars(str(command))}`")
+    if not lines:
+        return ""
+    header = ["## Run context", "",
+              "Read the upstream work before you start; it is the input your station builds on."]
+    if station_id in CHECK_AWARE_STATIONS and checks:
+        header.append("The checks gate runs the project checks listed here; run them yourself before you hand off.")
+    return "\n".join(header + [""] + lines)
+
+
+def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section="", rendered_evidence_section="", knowledge_section="", quality_charter_section="", anchor_section="", practices_section="",
+                 skills_section="", run_context_section=""):
     """Assemble a station packet.
 
     S4 stable prefix layout (design route consumption work): stable material
@@ -995,6 +1046,9 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
     # Practice skills R6: prompt enforced practices resolved for this station
     if practices_section:
         text += f"\n{practices_section}\n"
+    # Curated craft skills resolved for this station (anvil/skills.py)
+    if skills_section:
+        text += f"\n{skills_section}\n"
     if knowledge_section:
         text += f"\n{knowledge_section}\n"
     if quality_charter_section:
@@ -1026,6 +1080,10 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
         text += "\n"
 
     text += f"## Upstream steps\n\n{upstream}\n"
+
+    # Where the upstream work lives and which checks the project runs
+    if run_context_section:
+        text += f"\n{run_context_section}\n"
 
     # Reviewer stations have a specific output contract
     if station_id.startswith("reviewer"):
@@ -1069,6 +1127,13 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     envelopes_dir = run_dir / "envelopes"
     run_dir.mkdir(parents=True, exist_ok=True)
     envelopes_dir.mkdir(parents=True, exist_ok=True)
+    previous_report = run_dir / "report.json"
+    if previous_report.is_file():
+        raw = previous_report.read_bytes()
+        history = run_dir / "history"
+        history.mkdir(exist_ok=True)
+        (history / (hashlib.sha256(raw).hexdigest() + ".json")).write_bytes(raw)
+    run_id = uuid.uuid4().hex
     steps = []
     verdict = ""
     loopbacks = 0
@@ -1077,6 +1142,13 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
 
     # Load price table for cost measurement
     config = load_anvil_config(project / "anvil.yaml")
+    limits = efficiency_config(config)
+    if getattr(executor, "kind", None) == "command":
+        executor.limits = {}
+        for key, name in (("max_runtime_turns", "ANVIL_MAX_RUNTIME_TURNS"),
+                          ("tool_output_tokens", "ANVIL_TOOL_OUTPUT_TOKENS")):
+            if key in limits:
+                executor.limits[name] = limits[key]
     try:
         price_table = load_price_table(config)
     except ValueError as e:
@@ -1113,6 +1185,10 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
     # station list and the config language signal. Absent base: empty record.
     practice_entries = practices_by_id(project)
     practices_resolution = resolve_practices(project, work_order, order, config)
+    # Curated craft skills: resolved the same way, from the catalog, by
+    # station, surfaces, product type and work order kind.
+    skill_entries = skills_by_id(project)
+    skills_resolution = resolve_skills(project, work_order, order, config)
 
     # Load knowledge pack if provided in work order (S7, S8, S9)
     knowledge_pack = None
@@ -1201,8 +1277,10 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         For non-budgeted stations, measured/budget/action are 0/0/'none'.
         """
         prompt = station.prompt if station and station.prompt else f"Station {station_id}: carry out your role for this work order."
+        if limits:
+            prompt += EFFICIENCY_NOTE
         packet = run_dir / f"{station_id}.packet.md"
-        design_section = packet_design_section(project, station_id)
+        design_section = packet_design_section(project, station_id) if not limits or is_visual_run(work_order) else ""
 
         # Sections every station packet can carry (each builder self-gates
         # to an empty string when the section does not apply)
@@ -1213,20 +1291,25 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         quality_charter_section = packet_quality_charter_section(project, station_id, work_order)
         anchor_section = packet_anchor_section(project, station_id, work_order)
         practices_section = packet_practices_section(project, practices_resolution, station_id, practice_entries)
+        skills_section = packet_skills_section(skills_resolution, station_id, skill_entries)
+        run_context_section = packet_run_context_section(
+            project, work_order, steps, station_id, (base_ref_config or {}).get("checks"))
 
         # S1: Apply budget for interface stations
-        if station_id in budgeted_stations:
+        if station_id in budgeted_stations or limits.get("max_packet_tokens"):
             packet_text, action, measured, budget = prepare_packet(
                 project, station_id, prompt, work_order, steps,
                 learnings_section, design_section,
                 rendered_evidence_section, knowledge_section,
-                quality_charter_section, anchor_section, practices_section
+                quality_charter_section, anchor_section, practices_section,
+                skills_section, run_context_section
             )
             packet.write_text(packet_text, encoding="utf-8")
             return packet, measured, budget, action
 
         # Non-budgeted stations: full packet with every applicable section
-        packet_text = _packet_text(station_id, prompt, work_order, steps, learnings_section, design_section, rendered_evidence_section, knowledge_section, quality_charter_section, anchor_section, practices_section)
+        packet_text = _packet_text(station_id, prompt, work_order, steps, learnings_section, design_section, rendered_evidence_section, knowledge_section, quality_charter_section, anchor_section, practices_section,
+                                   skills_section, run_context_section)
         packet.write_text(packet_text, encoding="utf-8")
         measured = estimate_tokens(packet_text)
         return packet, measured, 0, "none"
@@ -1246,6 +1329,23 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         if registry is not None and station_id in registry:
             station = registry.get(station_id)
         kind = station.kind if station else ("deterministic" if station_id in {"intake", "approver", "triage-human"} else "agent")
+        routed_out = (station_id.startswith("reviewer") and
+                      (gate_failed or (routing_record and station_id not in routing_record.selected_reviewers)))
+        calls_agent = (execute_mode and (station_id == "intake" or kind == "agent") and not routed_out
+                       and not (station_id == "deployer" and deploy_cfg and deploy_cfg.get("command")))
+        if calls_agent:
+            reason = budget_reason(steps, limits)
+            if reason:
+                steps.append({"station": station_id, "status": "budget_exceeded", "detail": reason,
+                              "duration_ms": 0, "cost": None, "artifacts": [], "executor": None})
+                verdict = "budget_exceeded"
+                break
+            if getattr(executor, "kind", None) == "command":
+                totals = summarize_steps(steps)
+                if limits.get("max_run_tokens"):
+                    executor.limits["ANVIL_MAX_STATION_TOKENS"] = max(1, limits["max_run_tokens"] - (totals["total_tokens"] or 0))
+                if limits.get("max_agent_calls"):
+                    executor.limits["ANVIL_MAX_ATTEMPTS"] = max(1, min(2, limits["max_agent_calls"] - totals["calls"]))
         # Model provenance: the configured label is a fact of configuration,
         # recorded in every mode. Executed fields stay null until a runtime
         # actually runs the station (agent-execution S8).
@@ -1282,6 +1382,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         artifact = ""
         extra_envelope = {}
         step_usage = None
+        step_telemetry = {}
         deferred_verifier = None
         deferred_pre_deploy_gate = None
         deferred_health_step = None
@@ -1299,6 +1400,14 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         # rules (wo-gh-24) exactly like every other reviewer: the runner
         # never transcribes executor output into the review file.
         prebuilt_packet = None
+        if calls_agent and station_id != "reviewer-design":
+            try:
+                prebuilt_packet = packet_step(station, station_id)
+            except PacketBudgetError as exc:
+                steps.append({"station": station_id, "status": "budget_exceeded", "detail": str(exc),
+                              "duration_ms": 0, "cost": None, "artifacts": [], "executor": None})
+                verdict = "budget_exceeded"
+                break
         if station_id == "reviewer-design":
             rd_captures = []
             if run_dir.exists():
@@ -1342,6 +1451,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             )
             for extra_section in (
                 packet_practices_section(project, practices_resolution, station_id, practice_entries),
+                packet_skills_section(skills_resolution, station_id, skill_entries),
                 packet_rendered_evidence_section(project, work_order.id, station_id),
                 packet_knowledge_section(project, station_id, knowledge_pack),
                 packet_quality_charter_section(project, station_id, work_order),
@@ -1353,6 +1463,14 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             prebuilt_path.write_text(scoped_text, encoding="utf-8")
             prebuilt_measured = estimate_tokens(scoped_text)
             prebuilt_budget = get_station_budget(load_anvil_config(project / "anvil.yaml"), station_id)
+            if limits.get("max_packet_tokens"):
+                prebuilt_budget = min(prebuilt_budget, limits["max_packet_tokens"])
+                if prebuilt_measured > prebuilt_budget and calls_agent:
+                    steps.append({"station": station_id, "status": "budget_exceeded",
+                                  "detail": f"Scoped design packet exceeds {prebuilt_budget} tokens",
+                                  "duration_ms": 0, "cost": None, "artifacts": [str(prebuilt_path)], "executor": None})
+                    verdict = "budget_exceeded"
+                    break
             prebuilt_action = "sent" if prebuilt_measured <= prebuilt_budget else "trimmed"
             prebuilt_packet = (prebuilt_path, prebuilt_measured, prebuilt_budget, prebuilt_action)
         if station_id == "intake":
@@ -1367,6 +1485,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                                               configured_model=handoff_model)
                     output_text = result.get("output", "") if isinstance(result, dict) else str(result)
                     usage = result.get("usage") if isinstance(result, dict) else None
+                    step_telemetry = result.get("telemetry") or {} if isinstance(result, dict) else {}
                     executed_model_from_result = result.get("model") if isinstance(result, dict) else None
                     output_file.write_text(output_text, encoding="utf-8")
                     step_executor, step_executed_model = _executor_provenance(executor, output_text)
@@ -1411,6 +1530,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                         # Practice skills R3: intake may set the surfaces;
                         # re-resolve before any downstream packet is built.
                         practices_resolution = resolve_practices(project, work_order, order, config)
+                        skills_resolution = resolve_skills(project, work_order, order, config)
 
                     # Save work order
                     wo_dir = project / "work_orders"
@@ -1429,6 +1549,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                         routing_path = run_dir / "routing.json"
                         routing_data = json.loads(routing_path.read_text(encoding="utf-8"))
                         routing_data["practices"] = practices_resolution
+                        routing_data["skills"] = public_resolution(skills_resolution)
                         routing_path.write_text(json.dumps(routing_data, indent=2) + "\n", encoding="utf-8")
                         # Update reviews_expected to only include selected reviewers
                         reviews_expected = routing_record.selected_reviewers
@@ -1441,6 +1562,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     detail = f"Executor failed: {exc}"
                     artifact = str(packet)
                     step_executor, step_executed_model = _executor_provenance(executor)
+                    step_usage = exc.result.get("usage")
+                    step_telemetry = exc.result.get("telemetry") or {}
             else:
                 detail = "Work order normalized"
                 artifact = str(run_dir / "report.json")
@@ -1755,6 +1878,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                                               configured_model=handoff_model)
                     output_text = result.get("output", "") if isinstance(result, dict) else str(result)
                     usage = result.get("usage") if isinstance(result, dict) else None
+                    step_telemetry = result.get("telemetry") or {} if isinstance(result, dict) else {}
                     executed_model_from_result = result.get("model") if isinstance(result, dict) else None
                     if station_id == "builder" and output_file.is_file():
                         # The station wrote its report artifact: that file is
@@ -1866,6 +1990,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     detail = f"Executor failed: {exc}"
                     artifact = str(packet)
                     step_executor, step_executed_model = _executor_provenance(executor)
+                    step_usage = exc.result.get("usage")
+                    step_telemetry = exc.result.get("telemetry") or {}
                     extra_envelope = {"error": str(exc)}
                     if station_id.startswith("reviewer"):
                         # Station artifact contract S1/S3: a failed reviewer is
@@ -1907,6 +2033,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                     "measured": cost_record["measured"],
                     "reason": cost_record["reason"]
                 }
+        if step_telemetry:
+            step["attempts"] = step_telemetry.get("attempts") or []
+            step["usage_complete"] = bool(step_telemetry.get("complete"))
         if station_id in artifact_failures:
             step["expected_artifact"] = artifact_failures[station_id]["expected_artifact"]
             step["artifact_state"] = artifact_failures[station_id]["artifact_state"]
@@ -2046,7 +2175,10 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                        risk_hints=list(work_order.risk_hints or []), decision=decision, warnings=warnings,
                        astra_measured_tokens_total=astra_measured_tokens_total,
                        base_ref=base_ref, evidence=evidence_list, health=health_result,
-                       practices=practices_resolution)
+                       practices=practices_resolution,
+                       skills=public_resolution(skills_resolution),
+                       efficiency={"limits": limits, "stopped": verdict == "budget_exceeded"},
+                       run_id=run_id)
     (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
     # Swimlane
     lines = ["# Swimlane", ""]
@@ -2190,6 +2322,13 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
 
     (run_dir / "report.md").write_text("\n".join(report_lines) + "\n", encoding="utf-8")
 
+    if execute_mode:
+        from .statuspage import generate_status_page
+        try:
+            generate_status_page(project)
+        except OSError as exc:
+            report.warnings.append(f"Status page refresh failed: {exc}")
+            (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
     return report
 
 run = run_pipeline

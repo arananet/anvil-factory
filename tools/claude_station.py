@@ -7,7 +7,7 @@ packet, learns the station id from the packet's first line ("# Task packet:
 <station-id>", the marker the runner writes at the top of every packet),
 and runs Claude Code in print mode with the packet content as the prompt:
 
-    claude -p <packet> --model <configured-model> --output-format text
+    claude -p <packet> --model <configured-model> --output-format json
 
 Claude Code reaches the Cloudflare AI Gateway through the environment
 (ANTHROPIC_BASE_URL, ANTHROPIC_API_KEY, ANTHROPIC_CUSTOM_HEADERS), which
@@ -16,7 +16,9 @@ or prints those values; it only inherits the environment.
 
 Station permissions follow the ANVIL separation of duties:
 
-- builder and test-writer may edit the working tree. Every station runs
+- Producing stations (builder, test-writer, spec-writer, blueprint,
+  brief-writer, researcher, writer, media-producer) may edit the working
+  tree, because each is told to produce its output as a file. Every station runs
   with --dangerously-skip-permissions because headless print mode cannot
   answer permission prompts; the sandbox is the throwaway Actions runner
   plus the tool denylist below.
@@ -42,9 +44,19 @@ import json
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
-WRITE_STATIONS = {"builder", "test-writer"}
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from anvil.telemetry import UsageRecorder
+
+# Stations that produce an artifact in the tree may edit it: each is told to
+# produce its output as a file. Reviewers and the read only stations (scout,
+# observer, supervisor) never get edit tools.
+CODE_WRITE_STATIONS = {"builder", "test-writer"}
+ARTIFACT_WRITE_STATIONS = {"spec-writer", "blueprint", "brief-writer",
+                           "researcher", "writer", "media-producer"}
+WRITE_STATIONS = CODE_WRITE_STATIONS | ARTIFACT_WRITE_STATIONS
 NO_EDIT_TOOLS = "Edit,Write,NotebookEdit"
 TIMEOUT_SECONDS = 1500
 
@@ -189,11 +201,15 @@ def main():
         print(f"claude_station: path validation failed: {e}", file=sys.stderr)
         return 6
 
-    repo_root = Path(__file__).resolve().parent.parent
+    repo_root = Path(os.environ.get("ANVIL_PROJECT_ROOT") or Path(__file__).resolve().parent.parent).resolve()
     correction_used = False
+    usage_recorder = UsageRecorder()
 
     # Run station (with one potential correction attempt for reviewers)
-    for attempt in range(2):
+    for attempt in range(min(2, int(os.environ.get("ANVIL_MAX_ATTEMPTS", "2")))):
+        if attempt and not usage_recorder.within_budget():
+            print("claude_station: token threshold reached before correction", file=sys.stderr)
+            return 8
         prompt = packet_text
         if station.startswith("reviewer") and work_order_id:
             if attempt == 0:
@@ -216,16 +232,21 @@ def main():
         command = [
             "claude", "-p", prompt,
             "--model", model,
-            "--output-format", "text",
+            "--output-format", "json",
             "--dangerously-skip-permissions",
         ]
         if station not in WRITE_STATIONS:
             command += ["--disallowedTools", NO_EDIT_TOOLS]
+        if os.environ.get("ANVIL_MAX_RUNTIME_TURNS"):
+            command += ["--max-turns", os.environ["ANVIL_MAX_RUNTIME_TURNS"]]
 
+        call_started = time.perf_counter()
         try:
             proc = subprocess.run(command, cwd=str(repo_root), capture_output=True,
                                   text=True, timeout=TIMEOUT_SECONDS)
-        except subprocess.TimeoutExpired:
+        except subprocess.TimeoutExpired as exc:
+            usage_recorder.record(exc.stdout, "claude", "timed_out",
+                                  (time.perf_counter() - call_started) * 1000, model)
             print(f"claude_station: station {station} timed out after {TIMEOUT_SECONDS}s",
                   file=sys.stderr)
             return 4
@@ -233,13 +254,16 @@ def main():
             print("claude_station: the claude CLI is not on PATH", file=sys.stderr)
             return 5
 
-        if proc.returncode != 0:
+        parsed = usage_recorder.record(proc.stdout, "claude",
+                                      "succeeded" if proc.returncode == 0 else "failed",
+                                      (time.perf_counter() - call_started) * 1000, model)
+        if proc.returncode != 0 or parsed.get("is_error"):
             detail = (proc.stderr or proc.stdout or "").strip()[:2000]
             print(f"claude_station: claude exited {proc.returncode} for station {station}: {detail}",
                   file=sys.stderr)
             return 2
 
-        output = proc.stdout or ""
+        output = parsed["output"]
         # Station artifact contract: the result is the artifact the station
         # wrote, not the chat reply. A station that wrote its own output file
         # keeps it; the reply is saved beside it as a transcript. Empty chat

@@ -35,9 +35,19 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
-WRITE_STATIONS = {"builder", "test-writer"}
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from anvil.telemetry import UsageRecorder
+
+# Stations that produce an artifact in the tree may edit it: each is told to
+# produce its output as a file. Reviewers and the read only stations (scout,
+# observer, supervisor) never get edit tools.
+CODE_WRITE_STATIONS = {"builder", "test-writer"}
+ARTIFACT_WRITE_STATIONS = {"spec-writer", "blueprint", "brief-writer",
+                           "researcher", "writer", "media-producer"}
+WRITE_STATIONS = CODE_WRITE_STATIONS | ARTIFACT_WRITE_STATIONS
 TIMEOUT_SECONDS = 1500
 CODEX_PROVIDER = "anvil_gateway"
 # Child-only environment variables carrying the gateway credential to Codex.
@@ -221,7 +231,7 @@ def codex_command(prompt, bare_model, route, station):
     provider = CODEX_PROVIDER
     wire_api = os.environ.get("ANVIL_CODEX_WIRE_API", "").strip() or "responses"
     command = [
-        "codex", "exec",
+        "codex", "exec", "--json",
         "--model", bare_model,
         "--skip-git-repo-check",
         "--dangerously-bypass-approvals-and-sandbox",
@@ -232,6 +242,7 @@ def codex_command(prompt, bare_model, route, station):
         "-c", f"model_providers.{provider}.wire_api={json.dumps(wire_api)}",
         "-c", (f"model_providers.{provider}.env_http_headers="
                f"{{\"cf-aig-authorization\" = {json.dumps(AUTH_HEADER_ENV)}}}"),
+        "-c", f"tool_output_token_limit={int(os.environ.get('ANVIL_TOOL_OUTPUT_TOKENS', '2000'))}",
     ]
     if station not in WRITE_STATIONS:
         command += ["-c", f"developer_instructions={json.dumps(NO_EDIT_INSTRUCTIONS)}"]
@@ -357,8 +368,9 @@ def main():
         return 2
     child_env = codex_env(token)
 
-    repo_root = Path(__file__).resolve().parent.parent
+    repo_root = Path(os.environ.get("ANVIL_PROJECT_ROOT") or Path(__file__).resolve().parent.parent).resolve()
     correction_used = False
+    usage_recorder = UsageRecorder()
     reviewer = station.startswith("reviewer") and work_order_id
     if reviewer:
         try:
@@ -368,7 +380,10 @@ def main():
             return 8
 
     # Run station (with one potential correction attempt for reviewers)
-    for attempt in range(2):
+    for attempt in range(min(2, int(os.environ.get("ANVIL_MAX_ATTEMPTS", "2")))):
+        if attempt and not usage_recorder.within_budget():
+            print("codex_station: token threshold reached before correction", file=sys.stderr)
+            return 8
         prompt = packet_text
         if station.startswith("reviewer") and work_order_id:
             if attempt == 0:
@@ -388,12 +403,15 @@ def main():
             pass
 
         command = codex_command(prompt, bare_model, route, station)
+        call_started = time.perf_counter()
         try:
             # stdin closed: codex exec appends piped stdin to the task and would wait on it
             proc = subprocess.run(command, cwd=str(repo_root), env=child_env,
                                   stdin=subprocess.DEVNULL, capture_output=True,
                                   text=True, timeout=TIMEOUT_SECONDS)
-        except subprocess.TimeoutExpired:
+        except subprocess.TimeoutExpired as exc:
+            usage_recorder.record(exc.stdout, "codex", "timed_out",
+                                  (time.perf_counter() - call_started) * 1000, model)
             print(f"codex_station: station {station} timed out after {TIMEOUT_SECONDS}s",
                   file=sys.stderr)
             return 4
@@ -401,13 +419,16 @@ def main():
             print("codex_station: the codex CLI is not on PATH", file=sys.stderr)
             return 5
 
+        parsed = usage_recorder.record(proc.stdout, "codex",
+                                      "succeeded" if proc.returncode == 0 else "failed",
+                                      (time.perf_counter() - call_started) * 1000, model)
         if proc.returncode != 0:
             detail = _redact((proc.stderr or proc.stdout or "").strip()[:2000], token)
             print(f"codex_station: codex exited {proc.returncode} for station {station}: {detail}",
                   file=sys.stderr)
             return 2
 
-        output = _redact(proc.stdout or "", token)
+        output = _redact(parsed["output"], token)
         # Station artifact contract: the result is the artifact the station
         # wrote, not the chat reply. A station that wrote its own output file
         # keeps it; the reply is saved beside it as a transcript. Empty chat

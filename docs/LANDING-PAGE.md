@@ -1,5 +1,14 @@
 # ANVIL landing page
 
+## Consumption update
+
+The token-efficiency change adds a consumption section and a direct link to
+the status board. It describes project/run/attempt breakdowns, measurement
+coverage, context limits and execution thresholds without claiming a measured
+percentage saving. Thresholds are checked between calls; an in-flight call
+may exceed them. Historical consumption without runtime evidence stays unknown.
+The source remains static HTML/CSS with no external assets or JavaScript.
+
 `site/index.html` is the complete English landing page. It has inline CSS and SVG,
 no JavaScript, no external assets and no build step. This order deploys nothing.
 

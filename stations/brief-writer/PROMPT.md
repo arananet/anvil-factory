@@ -15,6 +15,7 @@ Turn an idea or topic into a content brief: audience, angle, the claims the piec
 - Produce the output as a file in the repo, not as chat text.
 - If the inputs are not enough, say what is missing instead of guessing.
 - Never approve your own work. Approval belongs to a different station.
+- A brief is done when it names one reader, one arguable angle, the ordered claims with the evidence each needs, the channel and format constraints, and one call to action. When your packet carries a Craft skills section, hold the brief to it.
 
 ### Visual Output Quality Verification
 

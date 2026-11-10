@@ -1,6 +1,49 @@
 # Cost Measurement
 
-ANVIL measures and prices token usage when reported by runtimes. It never estimates: usage the runtime actually reported gets summed and priced from a labeled price table; usage nobody reported stays unmeasured and is recorded as unmeasured.
+ANVIL records runtime token usage and computes cost from a sourced price table.
+Missing usage stays unknown. A runtime's own dollar estimate is labeled
+separately and is not presented as an invoice.
+
+## Consumption controls
+
+New projects include these adjustable starting settings in `anvil.yaml`:
+
+```json
+{
+  "efficiency": {
+    "max_packet_tokens": 12000,
+    "max_runtime_turns": 16,
+    "tool_output_tokens": 2000,
+    "max_agent_calls": 16,
+    "max_run_tokens": 250000,
+    "require_usage": false
+  }
+}
+```
+
+Packet ceilings apply to every agent station. Initial packet size is a
+character-based estimate, distinct from runtime consumption. Mandatory work
+order and output contracts are not silently truncated: an oversized packet
+stops the run. Backend packets omit interface design context. Stations are
+instructed to read relevant ranges, bound command output, reuse upstream work
+and keep their handoff concise.
+
+The Claude wrapper passes `max_runtime_turns` to the CLI. The Codex wrapper
+sets the retained tool-output limit; this is not a cap on total Codex tokens.
+`max_agent_calls` counts station runtime invocations, including correction
+attempts. A runtime invocation may contain multiple model/tool turns.
+
+The runner checks token and call thresholds before starting another agent
+station; wrappers check remaining allowance before a correction. Exhaustion
+records `budget_exceeded`, retains consumed usage, refreshes the project page
+and stops further agent work. These are thresholds between calls, not a
+provider billing ceiling: an in-flight call can exceed them.
+`require_usage: true` refuses further calls after unknown usage. With `false`,
+execution can continue but totals are clearly marked partial.
+
+Measurement does not prove a saving. Compare total usage across all attempts
+per owner-accepted change, with the same tests and review quality, before
+claiming the factory is cheaper.
 
 ## Configuration
 
@@ -44,12 +87,30 @@ Every price entry must include:
 - `date_recorded`: When this price was recorded (YYYY-MM-DD format)
 
 The loader rejects any entry missing these fields.
+Examples above are illustrative, not current model quotes. Cache usage also
+requires `cached_input_per_million` and/or `cache_creation_per_million` when
+those categories are nonzero. Missing cache rates leave cost unknown rather
+than charging cached tokens at the ordinary input rate.
 
 ## How It Works
 
 ### Transcript Usage (S1)
 
-For stations executed by a runtime that leaves session transcripts with token usage, the executor sums the usage attributable to the step's execution window and attaches it to the step.
+The Claude wrapper reads the JSON result's usage. The Codex wrapper reads
+JSONL turn-completion usage. Each attempt writes scalar-only evidence to
+`<station>.output.md.usage.json`, including failed calls, corrections and
+timeouts. The executor preserves available evidence on errors and never
+reuses a previous invocation's usage file. Missing timeout usage stays unknown.
+
+Canonical input includes ordinary input, cache reads and cache creation.
+Cached input is not added again to the total. Reasoning is a subset of output.
+`token_usage` in each run report sums attempts and includes measurement
+coverage and breakdowns by station and executed model. Unknown executed
+models remain `unreported`; configured labels are not invented execution
+evidence. Archived reports remain in project totals on reruns.
+
+Runtime format references: [Codex non-interactive output](https://developers.openai.com/codex/noninteractive/)
+and [Claude programmatic output](https://code.claude.com/docs/en/headless).
 
 ### Gateway Usage (S2)
 
@@ -83,9 +144,11 @@ The swimlane shows the total with coverage:
 **Cost**: $3.5000 (2 of 8 steps measured)
 ```
 
-### No Impact on Verdicts
+### Measurement and spending policy
 
-Cost measurement never changes a verdict. The approver, the gates, and the human gate read nothing from the cost section. High costs never fail a run.
+Measurement alone does not approve or reject work. The spec, reviewer and
+human gates retain their contracts. Separately configured execution limits
+can stop a run with `budget_exceeded`; a stopped run does not earn approval.
 
 ## Example Step
 

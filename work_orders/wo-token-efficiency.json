@@ -1,0 +1,11 @@
+{
+  "id": "wo-token-efficiency",
+  "kind": "feature",
+  "title": "Measure and control tokens, publish project usage pages",
+  "description": "Owner request: reduce token consumption per interaction; show project totals and per-call details on generated project pages; update both the factory status board and landing page. Follow .openspec/specs/token-efficiency/spec.md.",
+  "source": "owner request in local session, 2026-11-09",
+  "spec_path": ".openspec/specs/token-efficiency/spec.md",
+  "risk": "medium",
+  "surfaces": ["ui", "api"],
+  "risk_hints": []
+}

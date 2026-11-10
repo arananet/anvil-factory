@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "id": "architecture-fundamentals",
+      "domain": "architecture",
+      "stations": [
+        "blueprint",
+        "spec-writer",
+        "builder",
+        "reviewer-architecture"
+      ],
+      "source": "ANVIL curated. Distilled from: John Ousterhout, A Philosophy of Software Design; Michael Nygard, Documenting Architecture Decisions; Simon Brown, the C4 model; the Twelve-Factor App.",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "spec-writing",
+      "domain": "architecture",
+      "stations": [
+        "spec-writer",
+        "blueprint"
+      ],
+      "source": "ANVIL curated. Distilled from: OpenSpec conventions; Gojko Adzic, Specification by Example; EARS requirement syntax (Mavin et al.); INVEST.",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "test-design",
+      "domain": "architecture",
+      "stations": [
+        "test-writer",
+        "reviewer-tests"
+      ],
+      "source": "ANVIL curated. Distilled from: Kent Beck, Test Driven Development by Example and Test Desiderata; Gerard Meszaros, xUnit Test Patterns; this factory's facade test learnings (issue 9).",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "implementation-craft",
+      "domain": "architecture",
+      "stations": [
+        "builder"
+      ],
+      "source": "ANVIL curated. Distilled from: Kernighan and Pike, The Practice of Programming; Ousterhout, A Philosophy of Software Design; this factory's builder report and evidence learnings (decision 0005).",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "security-baseline",
+      "domain": "architecture",
+      "stations": [
+        "builder",
+        "reviewer-security"
+      ],
+      "source": "ANVIL curated. Distilled from: OWASP Top 10, OWASP ASVS and the OWASP Cheat Sheet Series.",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "interface-design",
+      "domain": "design",
+      "stations": [
+        "builder"
+      ],
+      "surfaces": [
+        "ui"
+      ],
+      "product_types": [
+        "interface"
+      ],
+      "source": "ANVIL curated. Distilled from: Wathan and Schoger, Refactoring UI; Robert Bringhurst, The Elements of Typographic Style; Material Design and Apple Human Interface Guidelines on hierarchy, color and motion.",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "web-engineering",
+      "domain": "web",
+      "stations": [
+        "builder"
+      ],
+      "surfaces": [
+        "ui"
+      ],
+      "product_types": [
+        "interface"
+      ],
+      "source": "ANVIL curated. Distilled from: WCAG 2.2; WAI-ARIA Authoring Practices; web.dev Core Web Vitals and Learn Responsive Design; MDN.",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "game-design-feel",
+      "domain": "gaming",
+      "stations": [
+        "spec-writer",
+        "builder"
+      ],
+      "product_types": [
+        "game"
+      ],
+      "source": "ANVIL curated. Distilled from: Steve Swink, Game Feel; Jonasson and Purho, Juice It or Lose It; Jesse Schell, The Art of Game Design; this factory's Dreamrun 3D review learnings (decision 0005).",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "game-engineering",
+      "domain": "gaming",
+      "stations": [
+        "builder",
+        "test-writer"
+      ],
+      "product_types": [
+        "game"
+      ],
+      "source": "ANVIL curated. Distilled from: Glenn Fiedler, Fix Your Timestep; Robert Nystrom, Game Programming Patterns; MDN game development guides.",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "content-briefing",
+      "domain": "content",
+      "stations": [
+        "brief-writer"
+      ],
+      "source": "ANVIL curated. Distilled from: Barbara Minto, The Pyramid Principle; the Content Marketing Institute brief practice; Jobs to Be Done framing.",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "source-research",
+      "domain": "content",
+      "stations": [
+        "researcher"
+      ],
+      "source": "ANVIL curated. Distilled from: Mike Caulfield, SIFT; the SPJ Code of Ethics on sourcing; the CRAAP test.",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "content-writing",
+      "domain": "content",
+      "stations": [
+        "writer"
+      ],
+      "source": "ANVIL curated. Distilled from: William Zinsser, On Writing Well; George Orwell, Politics and the English Language; Joseph Williams, Style; Nielsen Norman Group on how people read online.",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "media-production",
+      "domain": "content",
+      "stations": [
+        "media-producer"
+      ],
+      "source": "ANVIL curated. Distilled from: Bruce Block, The Visual Story; Walter Murch, In the Blink of an Eye; C2PA and platform AI disclosure guidance; this factory's quality charter.",
+      "license": "Apache-2.0"
+    }
+  ]
+}

@@ -48,12 +48,13 @@ def main(argv=None):
     p = sub.add_parser("check"); p.add_argument("project"); p.add_argument("--slug", required=True)
     p = sub.add_parser("check-content"); p.add_argument("project"); p.add_argument("--slug", required=True)
     p = sub.add_parser("run"); p.add_argument("project"); p.add_argument("--pipeline", required=True); p.add_argument("--work-order", required=True); p.add_argument("--execute", action="store_true"); p.add_argument("--base-ref", default=None, help="Base ref for checks gate (overrides automatic derivation)")
-    p = sub.add_parser("status-page"); p.add_argument("project"); p.add_argument("--out", default=None)
+    p = sub.add_parser("status-page"); p.add_argument("project"); p.add_argument("--out", default=None); p.add_argument("--include-project", action="append", default=None)
     p = sub.add_parser("check-brain"); p.add_argument("project")
     p = sub.add_parser("promote-learning"); p.add_argument("project"); p.add_argument("inbox_file")
     p = sub.add_parser("demote-learning"); p.add_argument("project"); p.add_argument("entry_id"); p.add_argument("--reason", required=True)
     p = sub.add_parser("propose-practice"); p.add_argument("project"); p.add_argument("--topic", required=True); p.add_argument("--rule", required=True); p.add_argument("--enforcement", default="prompt"); p.add_argument("--languages", default=""); p.add_argument("--surfaces", default=""); p.add_argument("--stations", default=""); p.add_argument("--source", required=True); p.add_argument("--supersedes", default=None)
     p = sub.add_parser("promote-practice"); p.add_argument("project"); p.add_argument("inbox_file")
+    p = sub.add_parser("check-skills"); p.add_argument("project"); p.add_argument("--work-order", default=None); p.add_argument("--pipeline", default=None)
     p = sub.add_parser("supervise"); p.add_argument("project"); p.add_argument("--execute", action="store_true")
     args = parser.parse_args(argv)
     if args.cmd == "init":
@@ -129,7 +130,7 @@ def main(argv=None):
         print(f"Report: {Path(args.project) / 'runs' / wo.id / 'report.json'}")
         return 0
     if args.cmd == "status-page":
-        summary = generate_status_page(args.project, args.out)
+        summary = generate_status_page(args.project, args.out, projects=args.include_project)
         print(f"Status page: {summary['path']} ({summary['runs']} runs, skipped: {', '.join(summary['skipped']) or 'none'})")
         return 0
     if args.cmd == "check-brain":
@@ -145,6 +146,25 @@ def main(argv=None):
               f"{len(result['entries'])} verified entries, {len(result['quarantined'])} quarantined proposals, "
               f"{practices.get('active', 0)} active practices")
         return 0 if result["ok"] else 1
+    if args.cmd == "check-skills":
+        from .skills import load_catalog, resolve_skills
+        entries, problems = load_catalog(args.project)
+        for e in entries:
+            scope = "; ".join(f"{dim}: {', '.join(e[dim])}" for dim in ("stations", "surfaces", "product_types", "kinds") if e[dim])
+            print(f"{e['id']} [{e['domain'] or 'general'}, {e['origin']}] {scope}")
+        for problem in problems:
+            print(f"skills: FAIL - {problem}")
+        if args.work_order and args.pipeline:
+            wo = WorkOrder.from_dict(json.loads(Path(args.work_order).read_text(encoding="utf-8")))
+            order = load_pipeline(args.pipeline).topological_order()
+            config = load_anvil_config(Path(args.project) / "anvil.yaml")
+            resolution = resolve_skills(args.project, wo, order, config)
+            print(f"signals: {json.dumps(resolution['signals'])}")
+            for station in order:
+                if resolution["resolved"].get(station):
+                    print(f"{station}: {', '.join(resolution['resolved'][station])}")
+        print(f"skills: {'PASS' if not problems else 'FAIL'} - {len(entries)} curated skills in the catalog")
+        return 0 if not problems else 1
     if args.cmd == "promote-learning":
         try:
             entry_id = promote_learning(args.project, args.inbox_file)

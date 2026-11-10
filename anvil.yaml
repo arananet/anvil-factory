@@ -1,5 +1,18 @@
 {
   "version": 1,
+  "efficiency": {
+    "max_packet_tokens": 12000,
+    "max_runtime_turns": 16,
+    "tool_output_tokens": 2000,
+    "max_agent_calls": 16,
+    "max_run_tokens": 250000,
+    "require_usage": false
+  },
+  "status_projects": [
+    "project-reports/sentia",
+    "project-reports/platform25",
+    "project-reports/taskline"
+  ],
   "servable": {
     "static_root": "status",
     "page_path": "/index.html"

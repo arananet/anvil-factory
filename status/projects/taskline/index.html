@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANVIL run status: Taskline</title>
+<style>:root {
+  color-scheme: dark;
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+}
+body { background:#0C0C0C; color:#E8E8E8; font-family:Inter, system-ui, sans-serif; margin:0; padding:var(--space-32) var(--space-20) var(--space-64); }
+main { max-width:1080px; margin:0 auto; }
+h1 { font-size:28px; letter-spacing:.02em; margin:0 0 var(--space-4); }
+h1 .accent { color:#FF5C00; }
+h2 { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:17px; margin:0 0 var(--space-8); }
+.mono { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.muted { color:#9A9A9A; }
+.snapshot { border-left:3px solid #FF5C00; background:#1E1E1E; padding:var(--space-12) var(--space-16); margin:var(--space-20) 0 var(--space-32); font-size:14px; }
+.run { background:#1E1E1E; border:1px solid #2A2A2A; border-radius:var(--space-8); padding:var(--space-20); margin:0 0 var(--space-24); }
+.meta { display:flex; flex-wrap:wrap; gap:var(--space-8) var(--space-24); font-size:13px; color:#C9C9C9; margin:var(--space-8) 0 var(--space-16); }
+.meta b { color:#FFFFFF; font-weight:600; }
+.decision { border-left:3px solid #3A3A3A; padding:var(--space-8) var(--space-12); margin:0 0 var(--space-16); font-size:13.5px; }
+.decision div { margin:var(--space-4) 0; }
+.table-container { overflow-x: auto; margin:0 0 var(--space-16); -webkit-overflow-scrolling: touch; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { text-align:left; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight:600; color:#9A9A9A; border-bottom:1px solid #3A3A3A; padding:var(--space-8); }
+td { border-bottom:1px solid #2A2A2A; padding:var(--space-8); vertical-align:top; }
+.status { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space:nowrap; }
+.st-ok { color:#FFFFFF; }
+.st-failed { color:#FF5C00; }
+.st-idle { color:#8A8A8A; }
+.artifacts { color:#9A9A9A; word-break:break-all; }
+@media (max-width: 768px) {
+  th, td { padding:var(--space-4) var(--space-8); font-size:12px; }
+  th:nth-child(4), td:nth-child(4), th:nth-child(5), td:nth-child(5) { display:none; }
+}
+.lifecycle-board { background:#1E1E1E; border:1px solid #2A2A2A; border-radius:var(--space-8); padding:var(--space-20); margin:0 0 var(--space-32); }
+.board-title { font-size:20px; margin:0 0 var(--space-8); color:#FFFFFF; }
+.board-description { font-size:13px; color:#9A9A9A; margin:0 0 var(--space-20); }
+.board-row { background:#0C0C0C; border:1px solid #2A2A2A; border-radius:var(--space-8); padding:var(--space-16); margin:0 0 var(--space-12); }
+.board-row:last-child { margin-bottom:0; }
+.board-row-header { margin:0 0 var(--space-12); }
+.board-wo-id { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:15px; font-weight:600; margin:0 0 var(--space-4); color:#FFFFFF; text-decoration:none; }
+.board-wo-id:hover { text-decoration:underline; }
+.board-wo-title { font-size:14px; color:#C9C9C9; }
+.board-stages { display:flex; flex-wrap:wrap; gap:var(--space-8); align-items:center; margin:0 0 var(--space-8); }
+.board-stage { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; padding:var(--space-4) var(--space-12); border-radius:var(--space-4); background:#2A2A2A; color:#8A8A8A; white-space:nowrap; }
+.board-stage.stage-reached { background:#3A3A3A; color:#C9C9C9; }
+.board-stage.stage-current { background:#FF5C00; color:#FFFFFF; font-weight:600; }
+.board-badge { display:inline-block; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:11px; font-weight:700; padding:var(--space-4) var(--space-8); border-radius:var(--space-4); text-transform:uppercase; letter-spacing:.03em; }
+.board-badge.needs-human { background:#FFD700; color:#0C0C0C; }
+.board-intake-state { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:13px; font-weight:600; padding:var(--space-8) var(--space-12); border-radius:var(--space-4); display:inline-block; }
+.board-intake-state.state-parked { background:#5A5A2A; color:#FFD700; }
+.board-intake-state.state-rejected { background:#5A2A2A; color:#FF5C00; }
+footer { color:#8A8A8A; font-size:13px; margin-top:var(--space-32); }
+@media (max-width: 400px) {
+  .board-stages { gap:var(--space-4); }
+  .board-stage { font-size:11px; padding:var(--space-4) var(--space-8); }
+}
+* { box-sizing:border-box; }
+body { overflow-wrap:anywhere; }
+a { color:#E8E8E8; text-underline-offset:3px; }
+a:focus-visible, summary:focus-visible { outline:2px solid #FF5C00; outline-offset:4px; }
+.usage-panel { border-top:2px solid #FF5C00; background:#1E1E1E; padding:var(--space-20); margin:0 0 var(--space-24); border-radius:var(--space-8); }
+.usage-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:var(--space-16); margin:var(--space-16) 0; }
+.usage-grid dt { color:#B8B8B8; font-size:12px; margin-bottom:var(--space-4); }
+.usage-grid dd { margin:0; font-family:ui-monospace,monospace; font-size:20px; color:#FFFFFF; }
+.usage-note { color:#B8B8B8; font-size:13px; line-height:1.6; margin:var(--space-8) 0; }
+.usage-details { margin-top:var(--space-8); font-family:system-ui,sans-serif; font-size:12px; }
+.usage-details summary { cursor:pointer; min-height:28px; color:#E8E8E8; }
+.usage-details .usage-grid { grid-template-columns:repeat(2,minmax(100px,1fr)); }
+.usage-details dd { font-size:14px; }
+.usage-attempt { padding:var(--space-8) 0; border-top:1px solid #3A3A3A; }
+.project-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr)); gap:var(--space-16); margin:var(--space-16) 0 var(--space-32); }
+.project-card { background:#1E1E1E; border:1px solid #3A3A3A; border-radius:var(--space-8); padding:var(--space-20); }
+.project-card h3 { margin-top:0; }
+</style>
+</head>
+<body>
+<main>
+<h1>ANVIL <span class="accent">run status</span></h1>
+<div class="muted mono">project: Taskline</div>
+<div class="snapshot">Snapshot generated from the run reports on disk at 2026-11-10 05:16:12 UTC. This page is a snapshot, not a live feed. Regenerate it with <span class="mono">anvil status-page &lt;project&gt;</span>.</div>
+<section class="usage-panel" aria-label="Project token consumption"><h2>Project token consumption</h2><p class="usage-note">Usage unavailable · 0 of 9 agent calls measured · 0 recorded retries</p><dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div><div><dt>Measured calls</dt><dd>0/9</dd></div></dl><details class="usage-details"><summary>Input, output and cache details</summary><dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div><div><dt>Input tokens</dt><dd>Unknown</dd></div><div><dt>Output tokens</dt><dd>Unknown</dd></div><div><dt>Cached input</dt><dd>Unknown</dd></div><div><dt>Cache creation</dt><dd>Unknown</dd></div><div><dt>Reasoning tokens</dt><dd>Unknown</dd></div></dl></details><p class="usage-note">9 calls have unknown usage. Totals will appear when runtimes report consumption. Unrecorded historical usage cannot be reconstructed.</p><details class="usage-details"><summary>Usage by model and station</summary><div class="table-container"><table><thead><tr><th>Model</th><th>Tokens</th><th>Calls measured</th></tr></thead><tbody><tr><td>unreported</td><td>Unknown</td><td>0/9</td></tr></tbody></table></div><div class="table-container"><table><thead><tr><th>Station</th><th>Tokens</th><th>Calls measured</th></tr></thead><tbody><tr><td>spec-writer</td><td>Unknown</td><td>0/1</td></tr><tr><td>test-writer</td><td>Unknown</td><td>0/1</td></tr><tr><td>builder</td><td>Unknown</td><td>0/1</td></tr><tr><td>reviewer-spec</td><td>Unknown</td><td>0/1</td></tr><tr><td>reviewer-security</td><td>Unknown</td><td>0/1</td></tr><tr><td>reviewer-tests</td><td>Unknown</td><td>0/1</td></tr><tr><td>reviewer-architecture</td><td>Unknown</td><td>0/1</td></tr><tr><td>deployer</td><td>Unknown</td><td>0/1</td></tr><tr><td>observer</td><td>Unknown</td><td>0/1</td></tr></tbody></table></div><p class="usage-note">Cached input is part of input; reasoning is part of output. Each agent call is one station runtime invocation and may include multiple model/tool turns.</p></details></section>
+<p class="usage-note">Reports imported from <a href="https://github.com/arananet/anvil-example-taskline">arananet/anvil-example-taskline</a> at 2026-11-10T04:55:17.288012+00:00. Refresh to include newer runs.</p>
+<p class="usage-note"><a href="usage.json">Download usage summary (JSON)</a></p>
+<section class="lifecycle-board">
+<h2 class="board-title">Lifecycle Board</h2>
+<div class="board-description">Stage progression for each work order. Stages: SPEC → BUILD → REVIEW → APPROVED → MERGED.</div>
+<div class="board-row">
+<div class="board-row-header">
+<h3 class="board-wo-id"><a href="#wo-demo-deploy-001-detail" class="board-wo-id">wo-demo-deploy-001</a></h3>
+<div class="board-wo-title">Demonstrate automatic deploy and post deploy verification</div>
+</div>
+<div class="board-stages">
+<span class="board-stage stage-reached">SPEC</span>
+<span class="board-stage stage-reached">BUILD</span>
+<span class="board-stage stage-reached">REVIEW</span>
+<span class="board-stage stage-reached stage-current">APPROVED</span>
+<span class="board-stage">MERGED</span>
+</div>
+</div>
+<div class="board-row">
+<div class="board-row-header">
+<h3 class="board-wo-id"><a href="#wo-taskline-001-detail" class="board-wo-id">wo-taskline-001</a></h3>
+<div class="board-wo-title">-</div>
+</div>
+<div class="board-stages">
+<span class="board-stage">SPEC</span>
+<span class="board-stage">BUILD</span>
+<span class="board-stage">REVIEW</span>
+<span class="board-stage stage-reached stage-current">APPROVED</span>
+<span class="board-stage">MERGED</span>
+</div>
+</div>
+</section>
+<section class="run" id="wo-demo-deploy-001-detail">
+<h2>wo-demo-deploy-001</h2>
+<div>Demonstrate automatic deploy and post deploy verification</div>
+<div class="meta"><span>pipeline: <b>sdlc-default</b></span><span>verdict: <b><span class="status st-ok">approved</span></b></span><span>human review required: <b>False</b></span><span>deployment: <b><span class="status st-idle">deployed_verified</span></b></span><span>loopbacks: <b>0</b></span></div>
+<div class="decision"><div class='mono muted'>decision, derived from the run record:</div><div>Approver: verdict approved from the reviews produced by the executed reviewer steps in this run.</div><div>Human gate: no human was required for this run (verdict approved).</div></div>
+<section class="usage-panel" aria-label="Run token consumption"><h2>Run token consumption</h2><p class="usage-note">Usage unavailable · 0 of 9 agent calls measured · 0 recorded retries</p><dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div><div><dt>Measured calls</dt><dd>0/9</dd></div></dl><details class="usage-details"><summary>Input, output and cache details</summary><dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div><div><dt>Input tokens</dt><dd>Unknown</dd></div><div><dt>Output tokens</dt><dd>Unknown</dd></div><div><dt>Cached input</dt><dd>Unknown</dd></div><div><dt>Cache creation</dt><dd>Unknown</dd></div><div><dt>Reasoning tokens</dt><dd>Unknown</dd></div></dl></details><p class="usage-note">9 calls have unknown usage. Totals will appear when runtimes report consumption. Unrecorded historical usage cannot be reconstructed.</p><details class="usage-details"><summary>Usage by model and station</summary><div class="table-container"><table><thead><tr><th>Model</th><th>Tokens</th><th>Calls measured</th></tr></thead><tbody><tr><td>unreported</td><td>Unknown</td><td>0/9</td></tr></tbody></table></div><div class="table-container"><table><thead><tr><th>Station</th><th>Tokens</th><th>Calls measured</th></tr></thead><tbody><tr><td>spec-writer</td><td>Unknown</td><td>0/1</td></tr><tr><td>test-writer</td><td>Unknown</td><td>0/1</td></tr><tr><td>builder</td><td>Unknown</td><td>0/1</td></tr><tr><td>reviewer-spec</td><td>Unknown</td><td>0/1</td></tr><tr><td>reviewer-security</td><td>Unknown</td><td>0/1</td></tr><tr><td>reviewer-tests</td><td>Unknown</td><td>0/1</td></tr><tr><td>reviewer-architecture</td><td>Unknown</td><td>0/1</td></tr><tr><td>deployer</td><td>Unknown</td><td>0/1</td></tr><tr><td>observer</td><td>Unknown</td><td>0/1</td></tr></tbody></table></div><p class="usage-note">Cached input is part of input; reasoning is part of output. Each agent call is one station runtime invocation and may include multiple model/tool turns.</p></details></section>
+<div class="table-container">
+<table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>
+<tr><td class='mono'>intake</td><td><span class="status st-ok">completed</span></td><td>0.021</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>spec-writer<details class="usage-details"><summary>Unknown tokens</summary><dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div><div><dt>Input tokens</dt><dd>Unknown</dd></div><div><dt>Output tokens</dt><dd>Unknown</dd></div><div><dt>Cached input</dt><dd>Unknown</dd></div><div><dt>Cache creation</dt><dd>Unknown</dd></div><div><dt>Reasoning tokens</dt><dd>Unknown</dd></div></dl></details></td><td><span class="status st-ok">executed</span></td><td>48.017</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>test-writer<details class="usage-details"><summary>Unknown tokens</summary><dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div><div><dt>Input tokens</dt><dd>Unknown</dd></div><div><dt>Output tokens</dt><dd>Unknown</dd></div><div><dt>Cached input</dt><dd>Unknown</dd></div><div><dt>Cache creation</dt><dd>Unknown</dd></div><div><dt>Reasoning tokens</dt><dd>Unknown</dd></div></dl></details></td><td><span class="status st-ok">executed</span></td><td>45.558</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>builder<details class="usage-details"><summary>Unknown tokens</summary><dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div><div><dt>Input tokens</dt><dd>Unknown</dd></div><div><dt>Output tokens</dt><dd>Unknown</dd></div><div><dt>Cached input</dt><dd>Unknown</dd></div><div><dt>Cache creation</dt><dd>Unknown</dd></div><div><dt>Reasoning tokens</dt><dd>Unknown</dd></div></dl></details></td><td><span class="status st-ok">executed</span></td><td>44.374</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>reviewer-spec<details class="usage-details"><summary>Unknown tokens</summary><dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div><div><dt>Input tokens</dt><dd>Unknown</dd></div><div><dt>Output tokens</dt><dd>Unknown</dd></div><div><dt>Cached input</dt><dd>Unknown</dd></div><div><dt>Cache creation</dt><dd>Unknown</dd></div><div><dt>Reasoning tokens</dt><dd>Unknown</dd></div></dl></details></td><td><span class="status st-ok">executed</span></td><td>44.632</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>reviewer-security<details class="usage-details"><summary>Unknown tokens</summary><dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div><div><dt>Input tokens</dt><dd>Unknown</dd></div><div><dt>Output tokens</dt><dd>Unknown</dd></div><div><dt>Cached input</dt><dd>Unknown</dd></div><div><dt>Cache creation</dt><dd>Unknown</dd></div><div><dt>Reasoning tokens</dt><dd>Unknown</dd></div></dl></details></td><td><span class="status st-ok">executed</span></td><td>46.834</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>reviewer-tests<details class="usage-details"><summary>Unknown tokens</summary><dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div><div><dt>Input tokens</dt><dd>Unknown</dd></div><div><dt>Output tokens</dt><dd>Unknown</dd></div><div><dt>Cached input</dt><dd>Unknown</dd></div><div><dt>Cache creation</dt><dd>Unknown</dd></div><div><dt>Reasoning tokens</dt><dd>Unknown</dd></div></dl></details></td><td><span class="status st-ok">executed</span></td><td>77.666</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>reviewer-architecture<details class="usage-details"><summary>Unknown tokens</summary><dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div><div><dt>Input tokens</dt><dd>Unknown</dd></div><div><dt>Output tokens</dt><dd>Unknown</dd></div><div><dt>Cached input</dt><dd>Unknown</dd></div><div><dt>Cache creation</dt><dd>Unknown</dd></div><div><dt>Reasoning tokens</dt><dd>Unknown</dd></div></dl></details></td><td><span class="status st-ok">executed</span></td><td>82.752</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>approver</td><td><span class="status st-ok">completed</span></td><td>0.044</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>triage-human</td><td><span class="status st-ok">completed</span></td><td>0.014</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>deployer<details class="usage-details"><summary>Unknown tokens</summary><dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div><div><dt>Input tokens</dt><dd>Unknown</dd></div><div><dt>Output tokens</dt><dd>Unknown</dd></div><div><dt>Cached input</dt><dd>Unknown</dd></div><div><dt>Cache creation</dt><dd>Unknown</dd></div><div><dt>Reasoning tokens</dt><dd>Unknown</dd></div></dl></details></td><td><span class="status st-ok">executed</span></td><td>165.27</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>verifier</td><td><span class="status st-ok">executed</span></td><td>90.331</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>observer<details class="usage-details"><summary>Unknown tokens</summary><dl class="usage-grid"><div><dt>Total tokens</dt><dd>Unknown</dd></div><div><dt>Input tokens</dt><dd>Unknown</dd></div><div><dt>Output tokens</dt><dd>Unknown</dd></div><div><dt>Cached input</dt><dd>Unknown</dd></div><div><dt>Cache creation</dt><dd>Unknown</dd></div><div><dt>Reasoning tokens</dt><dd>Unknown</dd></div></dl></details></td><td><span class="status st-ok">executed</span></td><td>44.99</td><td>null</td><td class='artifacts'>-</td></tr>
+</tbody></table>
+</div>
+</section>
+<section class="run" id="wo-taskline-001-detail">
+<h2>wo-taskline-001</h2>
+<div>-</div>
+<div class="meta"><span>pipeline: <b>sdlc-default</b></span><span>verdict: <b><span class="status st-ok">approved</span></b></span><span>human review required: <b>False</b></span><span>deployment: <b>-</b></span><span>loopbacks: <b>0</b></span></div>
+<div class="decision"><div class='mono muted'>decision, derived from the run record:</div><div>Approver: verdict approved is on record, but this report does not itemize the reviews behind it.</div><div>Human gate: no human was required for this run (verdict approved).</div></div>
+<section class="usage-panel" aria-label="Run token consumption"><h2>Run token consumption</h2><p class="usage-note">Complete measurement · 0 of 0 agent calls measured · 0 recorded retries</p><dl class="usage-grid"><div><dt>Total tokens</dt><dd>0</dd></div><div><dt>Input tokens</dt><dd>0</dd></div><div><dt>Output tokens</dt><dd>0</dd></div><div><dt>Cached input</dt><dd>0</dd></div><div><dt>Cache creation</dt><dd>0</dd></div><div><dt>Reasoning tokens</dt><dd>0</dd></div></dl><p class="usage-note">No agent calls recorded yet.</p><details class="usage-details"><summary>Usage by model and station</summary><p class="usage-note">Cached input is part of input; reasoning is part of output. Each agent call is one station runtime invocation and may include multiple model/tool turns.</p></details></section>
+<div class="table-container">
+<table><thead><tr><th>Station</th><th>Status</th><th>Duration ms</th><th>Cost</th><th>Artifacts</th></tr></thead><tbody>
+<tr><td class='mono'>intake</td><td><span class="status st-ok">completed</span></td><td>0.022</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>spec-writer</td><td><span class="status st-idle">packet_ready</span></td><td>0.077</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>test-writer</td><td><span class="status st-idle">packet_ready</span></td><td>0.063</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>builder</td><td><span class="status st-idle">packet_ready</span></td><td>0.054</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>reviewer-spec</td><td><span class="status st-idle">packet_ready</span></td><td>0.324</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>reviewer-security</td><td><span class="status st-idle">packet_ready</span></td><td>0.13</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>reviewer-tests</td><td><span class="status st-idle">packet_ready</span></td><td>0.048</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>reviewer-architecture</td><td><span class="status st-idle">packet_ready</span></td><td>0.053</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>approver</td><td><span class="status st-ok">completed</span></td><td>0.022</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>triage-human</td><td><span class="status st-ok">completed</span></td><td>0.009</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>deployer</td><td><span class="status st-idle">packet_ready</span></td><td>0.049</td><td>null</td><td class='artifacts'>-</td></tr>
+<tr><td class='mono'>observer</td><td><span class="status st-idle">packet_ready</span></td><td>0.063</td><td>null</td><td class='artifacts'>-</td></tr>
+</tbody></table>
+</div>
+</section>
+<footer>Generated by ANVIL from run reports. Missing token usage stays unknown. Cost is null without reported usage and sourced prices; runtime cost estimates are labeled separately.
+</footer>
+</main></body></html>

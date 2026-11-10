@@ -52,9 +52,12 @@ prompt, work order, upstream step summary) and sent to the executor:
   The wrapper validates the review file at station exit and allows one
   in-session correction attempt when the file is missing or malformed; a second
   failure stands as recorded.
-- Cost stays null unless the executor reports usage. When usage is reported,
-  token counts are recorded on the step and the envelope; a numeric cost in
-  the usage object is the only way a step cost becomes non null.
+- Usage and cost are separate. The supplied wrappers capture runtime usage
+  for every attempt, including failed calls and review corrections. The
+  command executor hands them `ANVIL_USAGE_PATH` and reads the versioned
+  usage artifact even when the command fails. Token counts remain available
+  without a price table; cost requires recorded prices. Claude's own dollar
+  figure is labeled a runtime estimate. See [COST-MEASUREMENT.md](COST-MEASUREMENT.md).
 
 The approver only ever aggregates reviews produced during the same run.
 Standing reviews under `reviews/<slug>/` are the project record that
@@ -76,6 +79,12 @@ station output; if the command writes a non empty `{output}` file, that file
 wins. These two examples are shapes, not endorsements: wire the CLI you
 already operate, with the flags that CLI actually accepts.
 
+The executor resolves packet/output paths before changing directories and
+hands off `ANVIL_PROJECT_ROOT` explicitly. Both wrappers use that target as
+their working tree, including review-file checks, even when the factory code
+lives in a separate checkout. A project run does not write reviews into the
+factory's own run folder.
+
 The factory itself wires `python3 tools/dispatch_station.py {packet} {output}`.
 The dispatcher reads the step's effective model from `ANVIL_CONFIGURED_MODEL`
 and runs Anthropic models through `tools/claude_station.py` (Claude Code
@@ -83,10 +92,23 @@ print mode) and `openai/gpt-6.1-sol` through `tools/codex_station.py`, which
 runs the Codex CLI headlessly (`codex exec`) in the repo tree with the packet
 as the task, against the gateway OpenAI route with the bare id `gpt-6.1-sol`.
 The gateway credential reaches Codex only through its child environment.
-Builder and test-writer may write; other stations get no-edit instructions,
+Producing stations may write; reviewing and observing stations get no-edit instructions,
 and a reviewer that changes anything besides its own review file fails. Any
 other model, a missing `codex` CLI, or a missing gateway environment fails
 the step; there is no fallback runtime.
+
+Claude uses JSON result output; Codex uses JSONL events. The wrappers extract
+the answer for the existing artifact contract and keep scalar token evidence
+in `<station>.output.md.usage.json`. Raw runtime JSON, prompts and environment
+variables are not exported to the public usage pages. Each invocation of a
+station is an agent call; its runtime may perform several model/tool turns.
+
+The `efficiency` settings bound packet context for all agent stations and
+stop new calls after run thresholds are reached. The final report records
+`budget_exceeded` when further work is prevented; it does not grant approval.
+Executed runs refresh `status/index.html`. Rerunning the same work order
+archives its previous report under `runs/<id>/history/`, so earlier tokens
+are still counted.
 
 ### http
 

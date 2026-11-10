@@ -442,11 +442,22 @@ class TestRunnerIntegration(unittest.TestCase):
 
 
 class TestShippedState(unittest.TestCase):
-    def test_factory_ships_no_practices_r7(self):
-        """practice-skills R7: the mechanism ships with no promoted practices in the factory brain"""
+    def test_factory_practices_entered_through_the_gate_r7(self):
+        """practice-skills R7: the mechanism shipped empty; every practice now in the
+        factory brain is follow-on seeding that entered through the promotion gate.
+        The base was seeded on 2026-11-09 under decision 0005, so the shipped state
+        is no longer empty: each entry must be well formed, cite a source that
+        exists, and the base must be free of conflicts."""
         path = ROOT / "brain" / "practices.md"
         if path.exists():
-            self.assertEqual(parse_practices(ROOT), [])
+            from anvil.brain import check_practices
+            entries, problems = check_practices(ROOT)
+            self.assertEqual(problems, [])
+            for entry in entries:
+                source = entry["source"]
+                self.assertTrue(source, entry["id"])
+                if source.startswith("decision "):
+                    self.assertTrue((ROOT / source.split(" ", 1)[1]).is_file(), entry["id"])
 
     def test_no_dash_characters_in_produced_files_r8(self):
         """practice-skills scope limit: no em dash or en dash in the practice code or this test file"""

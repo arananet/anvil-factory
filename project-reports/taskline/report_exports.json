@@ -1,0 +1,286 @@
+{
+  "schema": "anvil/project-reports@1",
+  "repository": "arananet/anvil-example-taskline",
+  "source_tree": "9ee781b4a06dd0fa1b26280ced9455df2cf03fd5",
+  "imported_at": "2026-11-10T04:55:17.288012+00:00",
+  "reports": [
+    {
+      "work_order_id": "wo-demo-deploy-001",
+      "title": "Demonstrate automatic deploy and post deploy verification",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": "deployed_verified",
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "completed",
+          "duration_ms": 0.021,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 48.017,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 45.558,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 44.374,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 44.632,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 46.834,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 77.666,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "executed",
+          "duration_ms": 82.752,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.044,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.014,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "executed",
+          "duration_ms": 165.27,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "verifier",
+          "status": "executed",
+          "duration_ms": 90.331,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 44.99,
+          "cost": null,
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 9,
+        "calls": 9,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "deployer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 9,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-taskline-001",
+      "pipeline": "sdlc-default",
+      "verdict": "approved",
+      "human_required": false,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "completed",
+          "duration_ms": 0.022,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "packet_ready",
+          "duration_ms": 0.077,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "packet_ready",
+          "duration_ms": 0.063,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "packet_ready",
+          "duration_ms": 0.054,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "packet_ready",
+          "duration_ms": 0.324,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "packet_ready",
+          "duration_ms": 0.13,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "packet_ready",
+          "duration_ms": 0.048,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "packet_ready",
+          "duration_ms": 0.053,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.022,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.009,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.049,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "packet_ready",
+          "duration_ms": 0.063,
+          "cost": null,
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "reasoning_tokens": 0,
+        "total_tokens": 0,
+        "measured_calls": 0,
+        "unmeasured_calls": 0,
+        "calls": 0,
+        "retries": 0,
+        "complete": true,
+        "by_station": {},
+        "by_model": {}
+      }
+    }
+  ]
+}

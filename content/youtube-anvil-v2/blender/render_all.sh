@@ -42,7 +42,13 @@ run_chunk() {
 
   # Run blender and capture exit code
   set +e
-  xvfb-run -a "$BLENDER" -b -P blender/film.py -- "$s" "$n" "$out" 100 "$a" "$b" > "$log" 2>&1
+  # xvfb-run gives headless Linux a display; where it is absent (macOS, a
+  # desktop session) blender runs directly.
+  if command -v xvfb-run >/dev/null 2>&1; then
+    xvfb-run -a "$BLENDER" -b -P blender/film.py -- "$s" "$n" "$out" 100 "$a" "$b" > "$log" 2>&1
+  else
+    "$BLENDER" -b -P blender/film.py -- "$s" "$n" "$out" 100 "$a" "$b" > "$log" 2>&1
+  fi
   exit_code=$?
   set -e
 

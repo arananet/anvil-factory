@@ -124,17 +124,23 @@ def load_knowledge_pack(pack_path: Path) -> Dict[str, Any]:
 
     sensitive_prefixes = ["/etc", "/sys", "/proc", "/dev", "/boot"]
     for prefix in sensitive_prefixes:
-        prefix_path = Path(prefix).resolve()
-        try:
-            resolved_path.relative_to(prefix_path)
-            # If relative_to succeeds, the path is under the sensitive prefix
+        # Compare against the literal prefix and its resolved form (on macOS
+        # /etc resolves to /private/etc). KnowledgeValidationError is a
+        # ValueError, so the rejection is raised outside the try block: raised
+        # inside, the except below swallowed it and the check never fired.
+        under_prefix = False
+        for prefix_path in {Path(prefix), Path(prefix).resolve()}:
+            for candidate in (resolved_path, pack_path):
+                try:
+                    candidate.relative_to(prefix_path)
+                    under_prefix = True
+                except ValueError:
+                    pass
+        if under_prefix:
             raise KnowledgeValidationError(
                 f"Knowledge pack path rejected: {resolved_path} resolves into sensitive "
                 f"system location {prefix}. Pack paths must be outside system directories."
             )
-        except ValueError:
-            # relative_to raises ValueError if not a subpath - this is what we want
-            pass
 
     if not pack_path.exists():
         raise FileNotFoundError(f"Knowledge pack path does not exist: {pack_path}")

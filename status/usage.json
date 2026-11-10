@@ -1,0 +1,5896 @@
+{
+  "project": "anvil-factory",
+  "generated_at": "2026-11-10 05:16:12 UTC",
+  "token_usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cached_input_tokens": null,
+    "cache_creation_input_tokens": null,
+    "reasoning_tokens": null,
+    "total_tokens": null,
+    "measured_calls": 0,
+    "unmeasured_calls": 188,
+    "calls": 188,
+    "retries": 0,
+    "complete": false,
+    "by_station": {
+      "spec-writer": {
+        "calls": 22,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "test-writer": {
+        "calls": 22,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "builder": {
+        "calls": 22,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "reviewer-spec": {
+        "calls": 22,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "reviewer-security": {
+        "calls": 13,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "reviewer-tests": {
+        "calls": 22,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "reviewer-architecture": {
+        "calls": 12,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "observer": {
+        "calls": 22,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "intake": {
+        "calls": 16,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "reviewer-design": {
+        "calls": 13,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "reviewer-ux": {
+        "calls": 2,
+        "measured_calls": 0,
+        "total_tokens": null
+      }
+    },
+    "by_model": {
+      "unreported": {
+        "calls": 139,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "claude-sonnet-5-5": {
+        "calls": 39,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "openai/gpt-6.1-sol": {
+        "calls": 5,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "claude-opus-5-5": {
+        "calls": 5,
+        "measured_calls": 0,
+        "total_tokens": null
+      }
+    }
+  },
+  "portfolio_token_usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cached_input_tokens": null,
+    "cache_creation_input_tokens": null,
+    "reasoning_tokens": null,
+    "total_tokens": null,
+    "measured_calls": 0,
+    "unmeasured_calls": 341,
+    "calls": 341,
+    "retries": 0,
+    "complete": false,
+    "by_station": {
+      "spec-writer": {
+        "calls": 39,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "test-writer": {
+        "calls": 39,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "builder": {
+        "calls": 39,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "reviewer-spec": {
+        "calls": 39,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "reviewer-security": {
+        "calls": 30,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "reviewer-tests": {
+        "calls": 39,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "reviewer-architecture": {
+        "calls": 29,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "observer": {
+        "calls": 39,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "intake": {
+        "calls": 16,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "reviewer-design": {
+        "calls": 29,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "reviewer-ux": {
+        "calls": 2,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "deployer": {
+        "calls": 1,
+        "measured_calls": 0,
+        "total_tokens": null
+      }
+    },
+    "by_model": {
+      "unreported": {
+        "calls": 148,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "claude-sonnet-5-5": {
+        "calls": 151,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "openai/gpt-6.1-sol": {
+        "calls": 5,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "claude-opus-5-5": {
+        "calls": 5,
+        "measured_calls": 0,
+        "total_tokens": null
+      },
+      "gpt-6-astra": {
+        "calls": 32,
+        "measured_calls": 0,
+        "total_tokens": null
+      }
+    }
+  },
+  "runs": [
+    {
+      "work_order_id": "wo-gh-1",
+      "title": "Add per project design systems to ANVIL (design scaffold, packet injection, reviewer-design)",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "completed",
+          "duration_ms": 0.013,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 23475.336,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 140522.921,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 390238.902,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 104513.235,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 115634.53,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 67835.5,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "executed",
+          "duration_ms": 154133.642,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.035,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.012,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.045,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 162127.099,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 8,
+        "calls": 8,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 8,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-10",
+      "title": "Per job cost measurement in run reports",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 41499.34,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 87115.681,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 90755.46,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 161744.692,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 25109.232,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 66334.658,
+          "configured_model": "review-cheap",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "routed_out",
+          "duration_ms": 0.252,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 54739.478,
+          "configured_model": "review-cheap",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "routed_out",
+          "duration_ms": 0.238,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "routed_out",
+          "duration_ms": 0.416,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.033,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.015,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.208,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 64017.94,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 7,
+        "calls": 7,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 7,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-11",
+      "title": "Design knowledge base for the design stations",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 37203.87,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 212981.341,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 134252.734,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 396514.66,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 24120.823,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 95565.2,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 90706.094,
+          "configured_model": "review-strong",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 110300.136,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "executed",
+          "duration_ms": 152866.077,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "executed",
+          "duration_ms": 48943.525,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.039,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.014,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.062,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 16121.683,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 10,
+        "calls": 10,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 10,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-12",
+      "title": "A dedicated UX reviewer station (reviewer-ux), separate from reviewer-design",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 38606.985,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 71350.873,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 121444.721,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 156597.158,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 28999.928,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 141169.805,
+          "configured_model": "review-cheap",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "routed_out",
+          "duration_ms": 0.399,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 110975.277,
+          "configured_model": "review-cheap",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "routed_out",
+          "duration_ms": 0.408,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "routed_out",
+          "duration_ms": 1.387,
+          "configured_model": "openai/gpt-6-astra",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-ux",
+          "status": "routed_out",
+          "duration_ms": 0.958,
+          "configured_model": "openai/gpt-6-astra",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.042,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.015,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.302,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 75201.082,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 7,
+        "calls": 7,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 7,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-13",
+      "title": "Status dashboard shows the lifecycle stage per work order",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 27381.079,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 21672.558,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 340161.983,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 217136.856,
+          "configured_model": "openai/gpt-6-astra",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 35122.175,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 77050.346,
+          "configured_model": "review-cheap",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "routed_out",
+          "duration_ms": 0.225,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 151198.786,
+          "configured_model": "review-cheap",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "routed_out",
+          "duration_ms": 0.223,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "executed",
+          "duration_ms": 90760.743,
+          "configured_model": "openai/gpt-6-astra",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-ux",
+          "status": "executed",
+          "duration_ms": 203710.871,
+          "configured_model": "openai/gpt-6-astra",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.06,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.018,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.21,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 122553.817,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 9,
+        "calls": 9,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-ux": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 9,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-14",
+      "title": "Application metrics and post-deploy health verification",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": true,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 26643.272,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 169079.292,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 209626.026,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 197477.031,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 30764.815,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 221666.534,
+          "configured_model": "review-cheap",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "routed_out",
+          "duration_ms": 0.3,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 100739.783,
+          "configured_model": "review-cheap",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "routed_out",
+          "duration_ms": 0.256,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "routed_out",
+          "duration_ms": 1.221,
+          "configured_model": "openai/gpt-6-astra",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-ux",
+          "status": "routed_out",
+          "duration_ms": 0.861,
+          "configured_model": "openai/gpt-6-astra",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.037,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.018,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.208,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 121374.065,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 7,
+        "calls": 7,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 7,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-15",
+      "title": "A standing quality standard for visual deliverables",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 98961.18,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 112680.427,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 246167.93,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 676512.262,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 32149.709,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 79181.83,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 109259.496,
+          "configured_model": "review-strong",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 147326.813,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "executed",
+          "duration_ms": 48952.99,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "executed",
+          "duration_ms": 97815.394,
+          "configured_model": "openai/gpt-6-astra",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-ux",
+          "status": "routed_out",
+          "duration_ms": 1.323,
+          "configured_model": "openai/gpt-6-astra",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.05,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.016,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.417,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 42150.534,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 10,
+        "calls": 10,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 10,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-16",
+      "title": "Review parsing integrity: one authoritative review channel, counted fail closed",
+      "pipeline": "sdlc-default",
+      "kind": "bug",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "completed",
+          "duration_ms": 0.023,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 66198.453,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 222151.938,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 251332.159,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 169009.604,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 214645.94,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 89140.793,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "executed",
+          "duration_ms": 90109.723,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "executed",
+          "duration_ms": 40794.117,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.042,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.013,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.194,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 194024.984,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 9,
+        "calls": 9,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 9,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-20",
+      "title": "Community files by default in every project ANVIL generates",
+      "pipeline": "sdlc-default",
+      "kind": "task",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "completed",
+          "duration_ms": 0.009,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 218806.987,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 112461.873,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 123756.852,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 169762.386,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 143818.533,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 84601.088,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "executed",
+          "duration_ms": 152497.216,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "executed",
+          "duration_ms": 72924.375,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.027,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.011,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.204,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 40420.084,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 9,
+        "calls": 9,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 9,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-21",
+      "title": "Fix the excessive Astra route consumption",
+      "pipeline": "sdlc-default",
+      "kind": "task",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "completed",
+          "duration_ms": 0.012,
+          "configured_model": "default",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 629445.678,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 5779,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 221077.287,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 5785,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 231487.561,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 6317,
+          "budget": 50000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 332574.348,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 5982,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 216822.993,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 5993,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 121931.93,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 5995,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "executed",
+          "duration_ms": 125810.25,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 6019,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "executed",
+          "duration_ms": 49362.653,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "measured_tokens": 2140,
+          "budget": 50000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.04,
+          "configured_model": "default",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.01,
+          "configured_model": "default",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.23,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 5857,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 81604.672,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 5864,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 9,
+        "calls": 9,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 9,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-23",
+      "title": "Showcase README: first screen demo, Built by ANVIL, quickstart, trust section",
+      "pipeline": "sdlc-default",
+      "kind": "task",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 100866.516,
+          "configured_model": "default",
+          "executed_model": null,
+          "measured_tokens": 3612,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 132140.381,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 2890,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 58051.741,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 2896,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 215198.096,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 4668,
+          "budget": 50000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 114292.64,
+          "configured_model": "default",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 99790.141,
+          "configured_model": "review-cheap",
+          "executed_model": null,
+          "measured_tokens": 3099,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "routed_out",
+          "duration_ms": 0.368,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 86190.59,
+          "configured_model": "review-cheap",
+          "executed_model": null,
+          "measured_tokens": 3113,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "routed_out",
+          "duration_ms": 0.415,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "routed_out",
+          "duration_ms": 165.164,
+          "configured_model": "openai/gpt-6-astra",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-ux",
+          "status": "routed_out",
+          "duration_ms": 1.469,
+          "configured_model": "openai/gpt-6-astra",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.058,
+          "configured_model": "default",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.021,
+          "configured_model": "default",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.329,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 2984,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 71890.28,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "measured_tokens": 2990,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 7,
+        "calls": 7,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 7,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-25",
+      "title": "Render crash tolerance: judge chunks by their outputs, sweep the missing ranges",
+      "pipeline": "sdlc-default",
+      "kind": "bug",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "completed",
+          "duration_ms": 0.014,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 343143.259,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 501608.961,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 378053.87,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 147070.308,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 129792.756,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 159121.752,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "executed",
+          "duration_ms": 100262.605,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "executed",
+          "duration_ms": 49060.298,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.038,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.011,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.243,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "failed",
+          "duration_ms": 25308.734,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 9,
+        "calls": 9,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 9,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-29",
+      "title": "Runtime model migration: per-station models, Sol for design stations, retire claude-sonnet-4-5 and gpt-6-astra",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 3122.593,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 6290,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 17703.026,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 5567,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 129409.088,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "openai/gpt-6.1-sol",
+          "measured_tokens": 5573,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 843271.216,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": "claude-opus-5-5",
+          "measured_tokens": 7346,
+          "budget": 50000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 62191.531,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 83250.906,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 5777,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 19581.018,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 5788,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 73488.215,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 5790,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "executed",
+          "duration_ms": 18120.293,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 5814,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "executed",
+          "duration_ms": 14611.782,
+          "configured_model": "openai/gpt-6.1-sol",
+          "executed_model": "openai/gpt-6.1-sol",
+          "measured_tokens": 13421,
+          "budget": 50000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-ux",
+          "status": "routed_out",
+          "duration_ms": 1.366,
+          "configured_model": "openai/gpt-6.1-sol",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.064,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.017,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.329,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 5659,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 23256.736,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 5666,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 10,
+        "calls": 10,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "claude-sonnet-5-5": {
+            "calls": 7,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "openai/gpt-6.1-sol": {
+            "calls": 2,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "claude-opus-5-5": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-31",
+      "title": "Tier map totality: resolve review-cheap",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 2709.854,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1676,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 11784.42,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 953,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 123654.4,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 959,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 138030.6,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": "claude-opus-5-5",
+          "measured_tokens": 2732,
+          "budget": 50000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 123594.551,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 142125.658,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1163,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "routed_out",
+          "duration_ms": 0.291,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 30895.141,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1177,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "routed_out",
+          "duration_ms": 0.28,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "routed_out",
+          "duration_ms": 8.774,
+          "configured_model": "openai/gpt-6.1-sol",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-ux",
+          "status": "routed_out",
+          "duration_ms": 1.191,
+          "configured_model": "openai/gpt-6.1-sol",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.049,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.019,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.229,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 1047,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 17733.744,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1054,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 7,
+        "calls": 7,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "claude-sonnet-5-5": {
+            "calls": 6,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "claude-opus-5-5": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-32",
+      "title": "Document the operator credential and permission requirements (GitHub, Cloudflare, vault)",
+      "pipeline": "sdlc-default",
+      "kind": "task",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 2492.76,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 2445,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 9589.896,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1722,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 23738.923,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1728,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 165385.33,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": "claude-opus-5-5",
+          "measured_tokens": 3501,
+          "budget": 50000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 105477.316,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 15834.453,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1932,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "routed_out",
+          "duration_ms": 0.133,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 133335.018,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1946,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "routed_out",
+          "duration_ms": 0.175,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "routed_out",
+          "duration_ms": 7.795,
+          "configured_model": "openai/gpt-6.1-sol",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-ux",
+          "status": "routed_out",
+          "duration_ms": 1.216,
+          "configured_model": "openai/gpt-6.1-sol",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.047,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.019,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.12,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 1816,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 29735.218,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1823,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 7,
+        "calls": 7,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "claude-sonnet-5-5": {
+            "calls": 6,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "claude-opus-5-5": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-35",
+      "title": "ANVIL landing page in the factory repo: a designed page that explains what ANVIL is",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 3805.005,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 2410,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 20442.196,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1687,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 27060.445,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1693,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 89371.132,
+          "configured_model": "openai/gpt-6.1-sol",
+          "executed_model": "openai/gpt-6.1-sol",
+          "measured_tokens": 3466,
+          "budget": 50000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 105335.064,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 23978.061,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1896,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "routed_out",
+          "duration_ms": 0.446,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 126108.424,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1910,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "routed_out",
+          "duration_ms": 0.543,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "executed",
+          "duration_ms": 19568.251,
+          "configured_model": "openai/gpt-6.1-sol",
+          "executed_model": "openai/gpt-6.1-sol",
+          "measured_tokens": 8118,
+          "budget": 50000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-ux",
+          "status": "failed",
+          "duration_ms": 21983.592,
+          "configured_model": "openai/gpt-6.1-sol",
+          "executed_model": null,
+          "measured_tokens": 4613,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.092,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.042,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.506,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 1779,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 19407.586,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1786,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 9,
+        "calls": 9,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-ux": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "claude-sonnet-5-5": {
+            "calls": 6,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "openai/gpt-6.1-sol": {
+            "calls": 2,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "unreported": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-36",
+      "title": "Practice skills base: quarantined best practices with scoped, deterministic resolution",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 3628.086,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 2923,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 6132.548,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 2200,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 7776.885,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 2206,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 134028.348,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": "claude-opus-5-5",
+          "measured_tokens": 4043,
+          "budget": 50000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 116677.062,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 12795.927,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 2410,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "routed_out",
+          "duration_ms": 0.499,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 11624.839,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 2424,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "routed_out",
+          "duration_ms": 0.585,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "routed_out",
+          "duration_ms": 11.677,
+          "configured_model": "openai/gpt-6.1-sol",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-ux",
+          "status": "routed_out",
+          "duration_ms": 1.623,
+          "configured_model": "openai/gpt-6.1-sol",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.072,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.023,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.417,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 2294,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 12386.855,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 2301,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 7,
+        "calls": 7,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "claude-sonnet-5-5": {
+            "calls": 6,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "claude-opus-5-5": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-37",
+      "title": "Station artifact contract: station results are artifacts, validated deterministically, and failed reviewers are never silently dropped",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 4678.693,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1884,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 13766.001,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1161,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 85508.246,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1167,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 807514.702,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": "claude-opus-5-5",
+          "measured_tokens": 2786,
+          "budget": 50000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 124060.408,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 151572.626,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1371,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 17791.406,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1382,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 145171.635,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1384,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "executed",
+          "duration_ms": 144731.769,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1408,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "executed",
+          "duration_ms": 12754.386,
+          "configured_model": "openai/gpt-6.1-sol",
+          "executed_model": "openai/gpt-6.1-sol",
+          "measured_tokens": 5904,
+          "budget": 50000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-ux",
+          "status": "routed_out",
+          "duration_ms": 1.588,
+          "configured_model": "openai/gpt-6.1-sol",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.072,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.018,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.189,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": null,
+          "measured_tokens": 1253,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 16900.652,
+          "configured_model": "claude-sonnet-5-5",
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 1260,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 10,
+        "calls": 10,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "claude-sonnet-5-5": {
+            "calls": 8,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "claude-opus-5-5": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "openai/gpt-6.1-sol": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-6",
+      "title": "Deterministic checks gate with protected paths",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "completed",
+          "duration_ms": 0.019,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 76046.596,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 116170.182,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 156550.487,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 7682.744,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 185573.361,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 150210.81,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 90696.925,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "executed",
+          "duration_ms": 119272.743,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "executed",
+          "duration_ms": 56277.328,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.051,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.015,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.165,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 54043.233,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 9,
+        "calls": 9,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 9,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-7",
+      "title": "Intake outcomes: reject, rescope, needs-info parking, risk and surfaces",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 103914.965,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 110486.031,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 90027.826,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 99415.889,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 13332.799,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 126281.658,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 75145.332,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 73181.308,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "executed",
+          "duration_ms": 135442.202,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "executed",
+          "duration_ms": 105313.022,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.046,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.014,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.178,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 53974.747,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 10,
+        "calls": 10,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 10,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-8",
+      "title": "Risk and surface routing of reviewer sets and station models",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 58122.054,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 41732.765,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 57920.584,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 122546.205,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 16050.852,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 86496.514,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 79090.264,
+          "configured_model": "review-strong",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 68396.702,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "executed",
+          "duration_ms": 94995.096,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "executed",
+          "duration_ms": 66899.006,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.047,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.013,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.238,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 209924.054,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 10,
+        "calls": 10,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 10,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-9",
+      "title": "Rendered design review: reviewer-design judges screenshots of the built page",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "approved",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 23207.514,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 164992.219,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "test-writer",
+          "status": "executed",
+          "duration_ms": 108797.038,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "executed",
+          "duration_ms": 107757.897,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "checks-gate",
+          "status": "passed",
+          "duration_ms": 29912.239,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "executed",
+          "duration_ms": 103036.086,
+          "configured_model": "review-cheap",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "executed",
+          "duration_ms": 100858.999,
+          "configured_model": "review-strong",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "executed",
+          "duration_ms": 64662.531,
+          "configured_model": "review-cheap",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "routed_out",
+          "duration_ms": 0.227,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "routed_out",
+          "duration_ms": 0.991,
+          "configured_model": "review-balanced",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.044,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.016,
+          "configured_model": "default",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.206,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "executed",
+          "duration_ms": 196019.243,
+          "configured_model": "claude-sonnet-4-5",
+          "executed_model": null,
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 8,
+        "calls": 8,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 8,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    }
+  ],
+  "projects": [
+    {
+      "name": "Sentia",
+      "page": "projects/sentia/index.html",
+      "runs": 15,
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 126,
+        "calls": 126,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "spec-writer": {
+            "calls": 14,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 14,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 14,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 14,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 14,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 14,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 14,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 14,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 14,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "claude-sonnet-5-5": {
+            "calls": 98,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "gpt-6-astra": {
+            "calls": 28,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "name": "Platform25",
+      "page": "projects/platform25/index.html",
+      "runs": 2,
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 18,
+        "calls": 18,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "spec-writer": {
+            "calls": 2,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 2,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 2,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 2,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 2,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 2,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 2,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-design": {
+            "calls": 2,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 2,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "claude-sonnet-5-5": {
+            "calls": 14,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "gpt-6-astra": {
+            "calls": 4,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "name": "Taskline",
+      "page": "projects/taskline/index.html",
+      "runs": 2,
+      "token_usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_input_tokens": null,
+        "cache_creation_input_tokens": null,
+        "reasoning_tokens": null,
+        "total_tokens": null,
+        "measured_calls": 0,
+        "unmeasured_calls": 9,
+        "calls": 9,
+        "retries": 0,
+        "complete": false,
+        "by_station": {
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "builder": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-spec": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-security": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-tests": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "reviewer-architecture": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "deployer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 9,
+            "measured_calls": 0,
+            "total_tokens": null
+          }
+        }
+      }
+    }
+  ]
+}

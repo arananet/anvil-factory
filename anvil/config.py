@@ -134,6 +134,7 @@ def health_config(config):
     return health if isinstance(health, dict) else None
 
 def build_default_config(station_ids):
+    from .telemetry import DEFAULT_EFFICIENCY
     stations = {}
     for sid in station_ids:
         stations[sid] = {
@@ -142,7 +143,7 @@ def build_default_config(station_ids):
             "prompt": f"stations/{sid}/PROMPT.md",
             "tools": [],
         }
-    return {"version": 1, "stations": stations}
+    return {"version": 1, "efficiency": dict(DEFAULT_EFFICIENCY), "stations": stations}
 
 def render_anvil_yaml(station_ids):
     # JSON is valid YAML, so this file is both machine simple and YAML legal.

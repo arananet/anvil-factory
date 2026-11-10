@@ -30,7 +30,27 @@ PRODUCT_TYPES = {
     "physical_product",  # Consumer products with photorealism criteria
     "game",             # Games with stated standard per project
     "illustration",     # Illustrations with stated standard per project
+    "interface",        # Web pages, apps and dashboards: interface craft criteria
 }
+
+# Project declared product types (brain/project.md, design system) that are
+# interfaces. The design knowledge base names its slices this way.
+INTERFACE_PROJECT_TYPES = {
+    "interface", "dashboard", "mobile-app", "marketing-site", "landing-page",
+    "website", "web-app", "webapp", "web", "saas", "docs-site", "portfolio",
+}
+
+# Phrases in a work order title or description that mark interface work.
+INTERFACE_KEYWORDS = (
+    "landing page", "web page", "webpage", "website", "web site", "web app",
+    "dashboard", "frontend", "front end", "user interface", "html", "css",
+    "status page", "homepage", "home page", "single page",
+)
+
+# Phrases that mark imagery of a physical product.
+PHYSICAL_KEYWORDS = (
+    "product render", "product shot", "packshot", "photoreal", "product photo",
+)
 
 
 def load_quality_charter():
@@ -56,6 +76,14 @@ def load_quality_charter():
             "illustration": {
                 "stated_standard": "Project must state observable criteria in design system",
             },
+            "interface": {
+                "hierarchy": "One clear focal point per view; size, weight and space rank everything else beneath it",
+                "typography": "A deliberate type scale and measure; body text reads comfortably and headings carry the voice",
+                "layout": "A consistent spacing scale and alignment grid; nothing overflows or collides from 360 px to wide desktop",
+                "color": "A restrained palette used with intent; text contrast of at least 4.5:1 and one accent that means something",
+                "states": "Interactive elements show hover, focus, active and disabled states; empty, loading and error views are designed",
+                "character": "The page has a point of view that fits its subject; it does not read as an unstyled template",
+            },
         },
     }
 
@@ -76,25 +104,81 @@ def is_visual_run(work_order):
     return bool(set(surfaces) & visual_surfaces)
 
 
-def get_product_type(work_order):
-    """Extract product type from work order description or default.
+def _declared_in_text(text):
+    """An explicit "Product type: X" declaration, when X is a charter type."""
+    match = re.search(r"product type:\s*([a-z_\-]+)", text)
+    if match:
+        declared = match.group(1).replace("-", "_")
+        if declared in PRODUCT_TYPES:
+            return declared
+    return None
 
-    Returns one of PRODUCT_TYPES. Defaults to 'physical_product' for
-    visual UI work.
+
+def detect_product_type(work_order, project=None, keywords=True):
+    """The product type the evidence supports, or None when nothing says.
+
+    Order: an explicit "Product type: X" in the work order, the type the
+    project itself declares (brain/project.md or its design system), the
+    game and illustration keywords, the physical imagery phrases, then
+    interface phrases in the work order. No default is applied here.
+    With keywords=False only the two declarations count, which is the
+    strict signal skill resolution uses when the surfaces do not say the
+    work is visual.
+    """
+    description = getattr(work_order, "description", "")
+    title = getattr(work_order, "title", "")
+    description_lower = description.lower() if isinstance(description, str) else ""
+    text = description_lower + "\n" + (title.lower() if isinstance(title, str) else "")
+
+    declared = _declared_in_text(description_lower)
+    if declared:
+        return declared
+    if project is not None:
+        from .knowledge import get_project_product_type
+        try:
+            project_type = get_project_product_type(Path(project))
+        except OSError:
+            project_type = None
+        if project_type:
+            normalized = project_type.strip().lower().strip(".,;")
+            if normalized.replace("-", "_") in PRODUCT_TYPES:
+                return normalized.replace("-", "_")
+            if normalized in INTERFACE_PROJECT_TYPES:
+                return "interface"
+
+    if not keywords:
+        return None
+    if "game" in description_lower:
+        return "game"
+    if "illustration" in description_lower:
+        return "illustration"
+    if any(phrase in text for phrase in PHYSICAL_KEYWORDS):
+        return "physical_product"
+    if any(phrase in text for phrase in INTERFACE_KEYWORDS):
+        return "interface"
+    return None
+
+
+def get_product_type(work_order, project=None):
+    """Product type for the quality charter. Returns one of PRODUCT_TYPES.
+
+    Uses detect_product_type. When nothing is detected and the project is
+    known, a run on the ui surface alone is interface work; anything else
+    keeps the historical default of 'physical_product'.
     """
     # Defensive: handle missing or invalid description attribute
     if not hasattr(work_order, "description"):
         return "physical_product"
-    description = work_order.description
-    if not isinstance(description, str):
+    if not isinstance(work_order.description, str):
         return "physical_product"
-    description_lower = description.lower()
-    if "game" in description_lower:
-        return "game"
-    elif "illustration" in description_lower:
-        return "illustration"
-    else:
-        return "physical_product"
+    detected = detect_product_type(work_order, project)
+    if detected:
+        return detected
+    if project is not None:
+        surfaces = getattr(work_order, "surfaces", None) or []
+        if "ui" in surfaces and "content" not in surfaces:
+            return "interface"
+    return "physical_product"
 
 
 def packet_quality_charter_section(project, station_id, work_order):
@@ -127,7 +211,7 @@ def packet_quality_charter_section(project, station_id, work_order):
     if not charter:
         return ""
 
-    product_type = get_product_type(work_order)
+    product_type = get_product_type(work_order, project)
     criteria = charter["criteria"].get(product_type, {})
 
     lines = ["## Quality Charter", ""]

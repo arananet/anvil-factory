@@ -17,6 +17,8 @@ Price table format in anvil.yaml:
   }
 }
 """
+import math
+from .telemetry import normalize_usage
 
 
 def validate_price_table(price_table):
@@ -44,9 +46,11 @@ def validate_price_table(price_table):
                 errors.append(f"Price entry for '{model_name}' missing required field '{field}'")
 
         # Validate numeric fields
-        for field in ["input_per_million", "output_per_million"]:
-            if field in entry and not isinstance(entry[field], (int, float)):
-                errors.append(f"Price entry for '{model_name}' field '{field}' must be numeric")
+        for field in ("input_per_million", "output_per_million", "cached_input_per_million", "cache_creation_per_million"):
+            if field in entry:
+                value = entry[field]
+                if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+                    errors.append(f"Price entry for '{model_name}' field '{field}' must be finite and nonnegative")
 
     return errors
 
@@ -93,7 +97,8 @@ def calculate_cost(usage, model, price_table):
         - usage: dict with normalized token counts
         - model: str model name
     """
-    if not usage or not isinstance(usage, dict):
+    normalized = normalize_usage(usage)
+    if normalized is None:
         return {
             "cost": None,
             "measured": False,
@@ -104,8 +109,8 @@ def calculate_cost(usage, model, price_table):
 
     # Normalize usage keys - support both transcript format (input_tokens/output_tokens)
     # and gateway format (prompt_tokens/completion_tokens)
-    input_tokens = usage.get("input_tokens") or usage.get("prompt_tokens") or 0
-    output_tokens = usage.get("output_tokens") or usage.get("completion_tokens") or 0
+    input_tokens = normalized["input_tokens"]
+    output_tokens = normalized["output_tokens"]
 
     # If both are 0 or None, but usage dict exists, it's measured as 0 cost
     if input_tokens == 0 and output_tokens == 0:
@@ -128,11 +133,19 @@ def calculate_cost(usage, model, price_table):
         }
 
     price_entry = price_table[model]
+    cached = normalized["cached_input_tokens"]
+    created = normalized["cache_creation_input_tokens"]
+    for count, rate in ((cached, "cached_input_per_million"), (created, "cache_creation_per_million")):
+        if count and rate not in price_entry:
+            return {"cost": None, "measured": False, "reason": f"no {rate} recorded for model '{model}'",
+                    "usage": normalized, "model": model}
     input_price = price_entry["input_per_million"]
     output_price = price_entry["output_per_million"]
 
     # Calculate cost: (tokens * price_per_million) / 1_000_000
-    cost = (input_tokens * input_price + output_tokens * output_price) / 1_000_000
+    cost = ((input_tokens - cached - created) * input_price + output_tokens * output_price
+            + cached * price_entry.get("cached_input_per_million", 0)
+            + created * price_entry.get("cache_creation_per_million", 0)) / 1_000_000
 
     return {
         "cost": cost,

@@ -11,8 +11,9 @@ runtime output as plain text. ANVIL ships two kinds:
   from the config file and is never logged.
 
 An executor result is a dict: {"output": str, "usage": dict or None}.
-Usage is whatever the runtime reported; ANVIL records token counts when
-present and keeps cost null unless a numeric cost is reported.
+Usage is runtime evidence. Command wrappers record a versioned attempt
+ledger; HTTP executors return response usage. The runner calculates cost
+only when the corresponding sourced prices are configured.
 """
 
 import json
@@ -21,10 +22,13 @@ import shlex
 import subprocess
 import urllib.request
 from pathlib import Path
+from .telemetry import normalize_usage
 
 
 class ExecutorError(RuntimeError):
-    pass
+    def __init__(self, message, result=None):
+        super().__init__(message)
+        self.result = result or {}
 
 
 class CommandExecutor:
@@ -41,6 +45,8 @@ class CommandExecutor:
     def execute(self, packet_text, station_id, packet_path=None, output_path=None, cwd=None, configured_model=None):
         if not self.template:
             raise ExecutorError("command executor has an empty command template")
+        packet_path = Path(packet_path).resolve() if packet_path is not None else None
+        output_path = Path(output_path).resolve() if output_path is not None else None
         command = self.template
         if packet_path is not None:
             command = command.replace("{packet}", shlex.quote(str(packet_path)))
@@ -49,17 +55,38 @@ class CommandExecutor:
 
         # Set up environment with configured model
         env = os.environ.copy()
+        env["ANVIL_PROJECT_ROOT"] = str(Path(cwd).resolve() if cwd else Path.cwd())
         if configured_model:
             env["ANVIL_CONFIGURED_MODEL"] = configured_model
+
+        usage_path = Path(str(output_path) + ".usage.json").resolve() if output_path is not None else None
+        if usage_path:
+            usage_path.unlink(missing_ok=True)
+            env["ANVIL_USAGE_PATH"] = str(usage_path)
+        else:
+            env.pop("ANVIL_USAGE_PATH", None)
+        # Runtime controls are explicit handoffs from the current run config.
+        for name, value in getattr(self, "limits", {}).items():
+            env[name] = str(value)
+
+        def evidence():
+            if usage_path:
+                try:
+                    data = json.loads(usage_path.read_text(encoding="utf-8"))
+                    if isinstance(data, dict) and data.get("schema") == "anvil/usage@1":
+                        return {"usage": normalize_usage(data.get("usage")), "telemetry": data}
+                except (OSError, ValueError):
+                    pass
+            return {"usage": None}
 
         try:
             proc = subprocess.run(command, shell=True, cwd=str(cwd) if cwd else None,
                                   env=env, capture_output=True, text=True, timeout=self.timeout)
         except subprocess.TimeoutExpired:
-            raise ExecutorError(f"command executor timed out after {self.timeout}s")
+            raise ExecutorError(f"command executor timed out after {self.timeout}s", evidence())
         if proc.returncode != 0:
             detail = (proc.stderr or proc.stdout or "").strip()[:500]
-            raise ExecutorError(f"command executor exited {proc.returncode}: {detail}")
+            raise ExecutorError(f"command executor exited {proc.returncode}: {detail}", evidence())
         output = proc.stdout or ""
         # A template may redirect into {output} itself; prefer the file then.
         if output_path is not None:
@@ -73,7 +100,7 @@ class CommandExecutor:
         # The executed model is recorded only from runtime self-report evidence
         # found in the output (see runner._reported_model). configured_model is
         # a hand-off to the runtime, never a record of what ran.
-        return {"output": output, "usage": None}
+        return {"output": output, **evidence()}
 
 
 class HttpExecutor:

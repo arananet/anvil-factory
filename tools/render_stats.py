@@ -51,12 +51,28 @@ def find_piece_dir():
         return prod_path
 
     # Search for test environment: look for directories with durations.json and frames/logs
-    for base in [ROOT, Path("/tmp")]:
+    # The platform temp directory is searched too: on macOS tempfile does not
+    # use /tmp, so a test environment created there was never found.
+    # macOS keeps the per user temp directory outside /tmp and names it only
+    # through confstr when TMPDIR is not in the environment.
+    import tempfile
+    bases = [ROOT, Path("/tmp"), Path(tempfile.gettempdir())]
+    if sys.platform == "darwin":
+        try:
+            darwin_tmp = os.confstr(65537)  # _CS_DARWIN_USER_TEMP_DIR
+            if darwin_tmp:
+                bases.append(Path(darwin_tmp))
+        except (ValueError, OSError, AttributeError):
+            pass
+    for base in bases:
         if not base.exists():
             continue
-        for candidate in base.rglob("durations.json"):
-            candidate_dir = candidate.parent
-            if (candidate_dir / "frames" / "logs").exists():
+        # Other processes can remove temporary directories during discovery.
+        # os.walk tolerates those races instead of aborting the entire scan.
+        for folder, directories, files in os.walk(base):
+            directories[:] = [d for d in directories if d not in {".git", "node_modules", ".venv", "__pycache__"}]
+            candidate_dir = Path(folder)
+            if "durations.json" in files and (candidate_dir / "frames" / "logs").is_dir():
                 # Found a directory with both durations.json and frames/logs
                 return candidate_dir
 

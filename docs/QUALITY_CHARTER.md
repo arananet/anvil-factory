@@ -37,6 +37,30 @@ Objects meet skin, surfaces and each other the way physical things do, with weig
 #### Scale
 The object's size reads true against its context and against human anatomy where anatomy is in frame. A phone in a hand reads phone-sized, not tablet-sized. A chair next to a table has the right height relationship. An object on a desk doesn't look miniaturized or giant.
 
+### Interfaces
+
+For interfaces (web pages, web apps, dashboards, mobile screens), the physical criteria above do not apply. The criteria are:
+
+#### Hierarchy
+One clear focal point per view; size, weight and space rank everything else beneath it.
+
+#### Typography
+A deliberate type scale and measure; body text reads comfortably and headings carry the voice.
+
+#### Layout
+A consistent spacing scale and alignment grid; nothing overflows or collides from 360 px to wide desktop.
+
+#### Color
+A restrained palette used with intent; text contrast of at least 4.5:1 and one accent that means something.
+
+#### States
+Interactive elements show hover, focus, active and disabled states; empty, loading and error views are designed.
+
+#### Character
+The page has a point of view that fits its subject; it does not read as an unstyled template.
+
+A run is an interface run when the work order or the project declares it ("Product type: interface", or an interface kind such as dashboard or marketing-site), when the work order describes a page or site, or when the run is on the ui surface with nothing declared.
+
 ### Game and Illustration Products
 
 For games and illustrations, the charter does not impose the physical product criteria above. Instead:

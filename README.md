@@ -135,6 +135,37 @@ A pipeline is a small JSON file. Order stations, or group them in parallel. Stat
 }
 ```
 
+## Curated skills
+
+Stations do not start from a bare prompt. A curated catalog of craft skills ([skills/](skills/README.md)) covers architecture, design, web, gaming and content. Before any model runs, the runner resolves which skills match each station, the work order surfaces and the product type, and writes them into that station's packet. A landing page order gives the builder the interface design and web engineering skills; a game order gives it game feel and game engineering; a content order gives the writer the writing skill. Resolution is deterministic code, recorded in report.json, and a project can replace or switch off any skill.
+
+## Token consumption and limits
+
+Each station runtime records input, output, cached input and retry usage in
+the run report. Failed calls count too. Project status pages show totals,
+measurement coverage and expandable details for every station attempt;
+earlier runs remain in the total when a work order is rerun. Missing usage
+stays unknown, including historical reports.
+
+New projects include `status/index.html` and consumption controls in
+`anvil.yaml`: a 12,000 token packet ceiling, 16 agent calls per run, a 250,000
+token run threshold, up to 16 Claude runtime turns and 2,000 retained tokens
+per Codex tool result. These are adjustable starting settings. Run thresholds
+are checked between calls; a running call can exceed them. An agent call is
+one station runtime invocation, which may contain several model/tool turns.
+
+```bash
+python3 -m anvil.cli status-page .
+python3 -m anvil.cli status-page . --include-project ../my-project
+python3 tools/sync_project_usage.py
+```
+
+The last command refreshes public report snapshots for Sentia, Platform25
+and Taskline and generates their linked pages in the factory status site.
+It uses authenticated GitHub CLI reads and makes no model calls.
+See [consumption controls](docs/COST-MEASUREMENT.md) and
+[project pages](docs/STATUS-PAGE.md).
+
 ## Quick start
 
 ```bash
@@ -147,6 +178,7 @@ python3 -m anvil.cli run ../my-project --pipeline pipelines/sdlc-default.json --
 python3 -m anvil.cli check ../my-project --slug my-feature
 python3 -m anvil.cli check-content ../my-channel --slug my-post
 python3 -m anvil.cli check-brain ../my-project
+python3 -m anvil.cli check-skills ../my-project
 python3 -m anvil.cli supervise ../my-project
 ```
 

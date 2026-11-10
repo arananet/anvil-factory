@@ -1,5 +1,44 @@
 # Run status page
 
+## Token consumption
+
+Each project page leads with input, output, cached input, cache creation,
+reasoning and total tokens. It states measurement coverage beside the totals.
+Unknown usage stays unknown; a partial subtotal is labeled partial. Cached
+input is already part of input and reasoning is already part of output.
+
+Expand a station row to see each runtime attempt, its success or failure,
+reported tokens, runtime turns and any separately labeled cost estimate.
+Corrections and failed calls contribute to consumption. An agent call is a
+station runtime invocation, which can contain multiple model/tool turns.
+The initial packet estimate is shown separately from actual runtime usage.
+The page also groups usage by station and executed model.
+
+New projects receive `status/index.html` automatically. Executed runs refresh
+it. Rerunning a work order archives the previous report under
+`runs/<id>/history/`; earlier attempts stay in the project total while the
+lifecycle board shows the latest run. `usage.json` exports the same totals
+and per-run/attempt data without raw prompts, environment values or local paths.
+
+## Factory and project pages
+
+```bash
+python3 -m anvil.cli status-page . --include-project ../project-one --include-project ../project-two
+python3 tools/sync_project_usage.py
+```
+
+The first command writes the factory page and a linked page per project
+under `status/projects/`. Project paths can also be configured as
+`status_projects` in the factory's `anvil.yaml`. Included projects are read;
+their working trees are not modified by portfolio generation.
+
+The refresh tool reads `project-reports/catalog.json`, imports sanitized
+public GitHub reports for Sentia, Platform25 and Taskline, and regenerates
+their pages. Snapshot metadata records the source tree and import time.
+Private repositories are refused. The tool requires `gh` access, makes no
+model calls and does not alter the source repositories. Historical reports
+that never captured tokens cannot be backfilled accurately and show unknown.
+
 Every ANVIL run leaves a `report.json` behind. The status page turns all of
 them into one page anyone can open: each run with its work order, verdict,
 human gate flag, deployment status, and a per station table showing exactly
@@ -54,11 +93,11 @@ python3 -m anvil.cli status-page path/to/project --out path/to/output-dir
 ```
 
 Without `--out`, the page lands in `<project>/status/index.html`. The output
-is a single self contained HTML file: inline CSS in the Arananet palette, no
+uses self contained HTML files: inline CSS in the Arananet palette, no
 external assets, no JavaScript, no build step. Runs whose report.json is
 missing or corrupt are skipped and the skip is noted in the page footer.
-Missing fields render as a dash and cost stays null: the page shows what the
-reports say, nothing more.
+Missing fields render as a dash or Unknown. Cost remains null without usage
+and sourced prices: the page shows the recorded evidence.
 
 ## Host it in the project itself (recommended default)
 
@@ -77,14 +116,12 @@ The Taskline example does exactly this; its page is the `docs/` folder of
 for its Cloudflare Pages deployment, regenerated from the same reports so
 the content matches.
 
-Efficiency, measured on the Taskline example: the whole dashboard is one
-self contained HTML file of 8,857 bytes (two runs, decision blocks
-included). Generation is a local read of the run reports on disk, no
-network, no build step. Hosting is static and free on both GitHub Pages and
-Cloudflare Pages. The only recurring cost is one small commit per
-regeneration on the GitHub Pages route, or one small deploy on the
-Cloudflare route. Regenerating in CI after each run (see the honest note
-below) keeps it current for that same small cost.
+Generation reads local reports and snapshots without model calls, network
+requests or a build step. Refreshing imported GitHub snapshots is a separate
+read-only command. The factory overview includes its own consumption and
+the included projects, with individual totals on each project card. Hosting
+serves static HTML and JSON. Regenerate and publish after runs to keep the
+public snapshot current.
 
 ## Publish to Cloudflare Pages (alternative)
 
