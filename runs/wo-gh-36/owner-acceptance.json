@@ -1,0 +1,12 @@
+{
+  "work_order_id": "wo-gh-36",
+  "issue": 36,
+  "decision": "approved_for_merge",
+  "decided_by": "owner (Eduardo Arana)",
+  "decided_at": "2026-11-09",
+  "basis": "The owner was offered three gate options for this order (merge the mechanism and seed the review layer learnings; merge without seeding yet; park wo-gh-36) and chose 'Fusionar wo-gh-36 y sembrar los learnings' (merge wo-gh-36 and seed the learnings). Line verdict on the loopback branch anvil/run-practice-skills-r2, run 42709811215, branch tip 2b427c9a804bb29a53eb70d4a0694fb91278e514: approved, human_required false, checks gate green with the full factory suite at 649 tests and 0 failures (641 pass, 8 skipped). Counted reviews: reviewer-spec pass and reviewer-tests pass, both executed on claude-sonnet-5-5; reviewer-security, reviewer-architecture, reviewer-design and reviewer-ux were routed out after intake re-scored the loopback risk to low, so the approved verdict rests on the two counted reviews, over a mechanism whose first run had already passed the full gate design review in substance before its single stale test failed. The loopback correction was one line in the practice-skills spec (scenario S8) and one line in its test, aligning the empty base expectation with the wo-gh-37 approver semantics (an empty run ends no_reviews, not approved); no mechanism code changed in the loopback. report.json on the branch records the practices field with an empty per-station resolution, the mechanism working as specified, and the builder report is the station's own file with the gate artifact validation recording report source: station.",
+  "scope_approved": [
+    "merge anvil/run-practice-skills-r2 into main",
+    "seed the Dreamrun 3D and ForYou Lab learnings recorded in the issue 36 amendment (comment 6752428728), plus the two practices earned after that comment (cross-order spec conflict detection; filing completeness for protected surfaces), through propose-practice and promote-practice into the review layers"
+  ]
+}
