@@ -8,5 +8,6 @@
   "scope_approved": [
     "merge anvil/run-practice-skills-r2 into main",
     "seed the Dreamrun 3D and ForYou Lab learnings recorded in the issue 36 amendment (comment 6752428728), plus the two practices earned after that comment (cross-order spec conflict detection; filing completeness for protected surfaces), through propose-practice and promote-practice into the review layers"
-  ]
+  ],
+  "merge_commit": "38cd490b596047235d5533176381e2cc20551867"
 }
