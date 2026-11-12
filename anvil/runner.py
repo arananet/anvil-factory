@@ -1021,6 +1021,32 @@ def packet_run_context_section(project, work_order, steps, station_id, checks=No
     return "\n".join(header + [""] + lines)
 
 
+def packet_loopback_section(note, station_id):
+    """Feedback for the stations of a loopback attempt (autonomous line S1).
+
+    note is the record the runner keeps when a loopback sends the work back:
+    which station sent it, why, and the findings. Returns "" on a first
+    attempt. Findings are reviewer or gate text, so they are sanitized and
+    bounded before they reach a packet.
+    """
+    if not note:
+        return ""
+    lines = [f"## Loopback feedback (attempt {note['attempt']} of {note['max_attempts']})", ""]
+    if station_id.startswith("reviewer"):
+        lines.append(f"This is a re-review. The previous attempt was sent back by {note['from_station']} "
+                     f"to {note['return_to']}. Judge the work as it is now, and check that each finding "
+                     f"below is resolved; do not pass a finding that is still open.")
+    else:
+        lines.append(f"The previous attempt was sent back by {note['from_station']} to {note['return_to']}. "
+                     f"Resolve every finding below. Keep what already passed; do not start over.")
+    lines += ["", f"Reason: {_sanitize_control_chars(str(note.get('reason', '')))[:1000]}", ""]
+    for finding in list(note.get("findings") or [])[:20]:
+        text = _sanitize_control_chars(str(finding)).strip()[:1500]
+        if text:
+            lines.append("- " + text.replace("\n", "\n  "))
+    return "\n".join(lines).rstrip()
+
+
 def _packet_text(station_id, prompt, work_order, steps, learnings_section="", design_section="", rendered_evidence_section="", knowledge_section="", quality_charter_section="", anchor_section="", practices_section="",
                  skills_section="", run_context_section=""):
     """Assemble a station packet.
@@ -1115,7 +1141,7 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
     return text
 
 def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks=2,
-                 executor=None, deploy_cfg=None, health_cfg=None, base_ref=None):
+                 executor=None, deploy_cfg=None, health_cfg=None, base_ref=None, resume=None):
     project = Path(project_dir)
     if isinstance(work_order, dict):
         work_order = WorkOrder.from_dict(work_order)
@@ -1294,6 +1320,13 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         skills_section = packet_skills_section(skills_resolution, station_id, skill_entries)
         run_context_section = packet_run_context_section(
             project, work_order, steps, station_id, (base_ref_config or {}).get("checks"))
+        feedback_section = packet_loopback_section(loopback_note, station_id)
+        if station_id == "reviewer-tests" and tdd_red is False:
+            feedback_section = ("## TDD red check\n\nThe project checks passed before the builder ran: the new "
+                                "tests did not fail first. Verify that the tests exercise the new behavior and "
+                                "would fail without the change.\n\n" + feedback_section).strip()
+        if feedback_section:
+            run_context_section = (run_context_section + "\n\n" + feedback_section).strip()
 
         # S1: Apply budget for interface stations
         if station_id in budgeted_stations or limits.get("max_packet_tokens"):
@@ -1314,7 +1347,38 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         measured = estimate_tokens(packet_text)
         return packet, measured, 0, "none"
 
-    for idx, station_id in enumerate(order):
+    # Autonomous line: the line is walked with a position pointer so a
+    # loopback can really send the work back (S1), and a resumed run can
+    # re-enter after the human gate (S4).
+    pos = 0
+    tdd_red = None         # True/False once the red check ran, None when it did not
+    loopback_note = None   # feedback handed to the stations of the next attempt
+    approval = None        # human approval applied to this (resumed) run
+    approval_original_verdict = None
+    if resume:
+        prev = resume.get("report") or {}
+        gate_station = next((s for s in ("triage-human", "approver") if s in order), None)
+        prev_steps = list(prev.get("steps") or [])
+        cut = max((i for i, s in enumerate(prev_steps) if s.get("station") == gate_station), default=-1)
+        if gate_station is None or cut < 0:
+            raise ValueError("Cannot resume: the previous run never reached its approval gate")
+        steps = prev_steps[:cut + 1]
+        pos = order.index(gate_station) + 1
+        run_id = prev.get("run_id") or run_id
+        verdict = prev.get("verdict") or ""
+        loopbacks = int(prev.get("loopbacks") or 0)
+        decision_approver = (prev.get("decision") or {}).get("approver")
+        human_blocked = bool(prev.get("human_required"))
+        approval = resume.get("approval")
+        if approval:
+            approval_original_verdict = verdict
+            verdict = "approved"
+            human_blocked = False
+
+    while pos < len(order):
+        idx = pos
+        station_id = order[idx]
+        pos += 1
         started = time.perf_counter()
 
         # S9: Pack loading failure stops the run at intake
@@ -1393,6 +1457,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         budget = 0
         budget_action = "none"
         terminal_outcome = False  # Track if intake outcome is terminal
+        rewind = None  # (return_to, reason, from_station, findings) when this step loops back
+        gate_result = {}
         # reviewer-design pre-step: build the scoped packet (wo-gh-21 S3,
         # contact sheet and provenance allowlist) plus the standard work
         # order block and the capability sections, then let the generic
@@ -1450,6 +1516,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 f"- status: {_sanitize_control_chars(work_order.status)}\n"
             )
             for extra_section in (
+                packet_loopback_section(loopback_note, station_id),
                 packet_practices_section(project, practices_resolution, station_id, practice_entries),
                 packet_skills_section(skills_resolution, station_id, skill_entries),
                 packet_rendered_evidence_section(project, work_order.id, station_id),
@@ -1832,6 +1899,18 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             status = "packet_ready"
             detail = f"Packet written to {packet}"
             artifact = str(packet)
+        elif (station_id == "publisher" and execute_mode
+              and (verdict != "approved"
+                   or (human_blocked if human_blocked is not None else needs_human(work_order, verdict)))):
+            # Autonomous line S5: publishing is held exactly like deploying.
+            # The publisher never runs on an unapproved run or behind a
+            # closed human gate; it runs on resume after a recorded approval.
+            packet, measured_tokens, budget, budget_action = prebuilt_packet if prebuilt_packet is not None else packet_step(station, station_id)
+            status = "packet_ready"
+            detail = (f"Publish held (verdict: {verdict or 'pending'}, human gate "
+                      f"{'blocks' if verdict == 'approved' else 'not reached with an approved verdict'}); "
+                      f"packet written to {packet}")
+            artifact = str(packet)
         elif execute_mode:
             # Skip reviewers if gate failed (S2)
             if gate_failed and station_id.startswith("reviewer"):
@@ -2036,6 +2115,27 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         if step_telemetry:
             step["attempts"] = step_telemetry.get("attempts") or []
             step["usage_complete"] = bool(step_telemetry.get("complete"))
+        if (station_id == "test-writer" and status == "executed" and "builder" in order[idx:]
+                and (base_ref_config or {}).get("checks")):
+            # Autonomous line S8: red before green is evidence, not a claim.
+            # The project checks run once before the builder; they are
+            # expected to fail because the new tests have nothing to pass on.
+            red_codes = [_run_shell(str(cmd), project, work_order.id, 300)[0]
+                         for cmd in base_ref_config["checks"]]
+            red = any(code != 0 for code in red_codes)
+            step["red_check"] = {"commands": [str(c) for c in base_ref_config["checks"]],
+                                 "exit_codes": red_codes, "red": red}
+            tdd_red = red
+            if not red:
+                warnings.append("TDD red check: the project checks passed before the builder ran, so the "
+                                "new tests did not fail first. reviewer-tests is told to verify that the "
+                                "tests exercise the new behavior.")
+        if loopback_note:
+            step["attempt"] = loopback_note["attempt"]
+            if station_id == loopback_note["return_to"]:
+                step["feedback"] = {"from_station": loopback_note["from_station"],
+                                    "reason": loopback_note["reason"],
+                                    "findings": list(loopback_note["findings"])[:20]}
         if station_id in artifact_failures:
             step["expected_artifact"] = artifact_failures[station_id]["expected_artifact"]
             step["artifact_state"] = artifact_failures[station_id]["artifact_state"]
@@ -2120,6 +2220,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                           "configured_model": None, "executed_model": None, "executor": None,
                           "feedback": extra_envelope.get("output", ""),
                           "from_station": "checks-gate"})
+            rewind = (return_to, reason, "checks-gate",
+                      [gate_result.get("output", "")[-3000:]] if gate_result.get("output") else [])
         # Loopback right after approver when aggregation fails
         elif station_id == "approver" and verdict in {"rejected", "changes_requested"} and loopbacks < max_loopbacks:
             loopbacks += 1
@@ -2130,6 +2232,47 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                           "detail": f"Loopback to {return_to}: {reason}", "reason": reason,
                           "duration_ms": 0.0, "cost": None, "artifacts": [],
                           "configured_model": None, "executed_model": None, "executor": None})
+            rewind = (return_to, reason, "approver", list(run_findings))
+        # Autonomous line S1: a loopback really sends the work back. The
+        # line re-enters at the return station with the findings in the
+        # packets of the next attempt; the attempt being replaced is archived.
+        if rewind is not None and execute_mode:
+            target = rewind[0] if rewind[0] in order[:idx] else ("builder" if "builder" in order[:idx] else None)
+            # Another attempt is started only when the run thresholds leave
+            # room for it; otherwise the verdict stands and the step says why.
+            if target is not None:
+                held = budget_reason(steps, limits)
+                if not held and limits.get("max_agent_calls"):
+                    needed = 0
+                    for sid in order[order.index(target):idx]:
+                        st = registry.get(sid) if registry is not None and sid in registry else None
+                        is_agent = (st.kind == "agent") if st else sid not in {"intake", "approver", "triage-human"}
+                        if is_agent and not (sid.startswith("reviewer") and routing_record
+                                             and sid not in routing_record.selected_reviewers):
+                            needed += 1
+                    if summarize_steps(steps)["calls"] + needed > limits["max_agent_calls"]:
+                        held = "Agent call limit leaves no room for another attempt"
+                if held:
+                    steps[-1]["detail"] += f"; not re-executed: {held}"
+                    steps[-1]["not_reexecuted"] = held
+                    target = None
+            if target is not None:
+                attempt_dir = run_dir / "attempts" / str(loopbacks)
+                attempt_dir.mkdir(parents=True, exist_ok=True)
+                for pattern in ("*.output.md", "*.review.json"):
+                    for old in run_dir.glob(pattern):
+                        (attempt_dir / old.name).write_bytes(old.read_bytes())
+                steps[-1]["return_to"] = target
+                steps[-1]["attempt_archive"] = str(attempt_dir)
+                loopback_note = {"attempt": loopbacks + 1, "max_attempts": max_loopbacks + 1,
+                                 "from_station": rewind[2], "return_to": target,
+                                 "reason": rewind[1], "findings": rewind[3]}
+                pos = order.index(target)
+                gate_failed = False
+                run_reviews, run_findings = [], []
+                uncounted_reasons, artifact_failures = {}, {}
+                verdict = ""
+                decision_approver = None
     if not verdict:
         verdict = "packet_ready"
     if decision_approver is None:
@@ -2166,8 +2309,29 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             # Already required, add health reason
             human_rule = f"{human_rule} Additionally, health verification found the deployment unhealthy ({health_reason})."
 
+    approval_record = None
+    if approval:
+        # Autonomous line S4: a recorded human approval opens the gate for
+        # this run only, and the record says what the approver had decided.
+        approval_record = {"approved_by": approval.get("approved_by"), "approved_at": approval.get("approved_at"),
+                           "note": approval.get("note", ""), "override": bool(approval.get("override")),
+                           "approver_verdict": approval_original_verdict}
+        if not (health_result.get("outcome") == "unhealthy" and health_result.get("requires_human_gate")):
+            human_required = False
+        human_rule = (f"A human approved this run: {approval_record['approved_by']} at "
+                      f"{approval_record['approved_at']} (approver verdict was {approval_original_verdict}"
+                      f"{', recorded as an override' if approval_record['override'] else ''}). {human_rule}")
+
     decision = {"approver": decision_approver,
                 "human_gate": {"required": human_required, "rule": human_rule, "hints_matched": hints_matched}}
+    if approval_record:
+        decision["human_gate"]["approval"] = approval_record
+        if approval_record["override"] and verdict == "approved":
+            # The human opened the gate; the line's own verdict stays on record.
+            verdict = approval_original_verdict
+    if resume:
+        decision["resumed"] = {"from_station": order[order.index(gate_station) + 1] if order.index(gate_station) + 1 < len(order) else None,
+                               "at": datetime.now(timezone.utc).isoformat()}
     report = RunReport(work_order_id=work_order.id, pipeline=pipeline.name, steps=steps, verdict=verdict,
                        title=work_order.title, kind=work_order.kind,
                        human_required=human_required, max_loopbacks=max_loopbacks, loopbacks=loopbacks,

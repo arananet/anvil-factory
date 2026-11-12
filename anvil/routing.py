@@ -339,6 +339,19 @@ def route_reviewers(
                 models[reviewer] = config["models"]["standard"]
         reasons.append(f"Unknown risk level '{risk}': defaulting to full panel at policy models")
 
+    # Autonomous line: the routing policy only reduces panels it knows. A
+    # reviewer the pipeline names that is in neither configured panel (the
+    # content reviewers, or a project's own) is never routed out by omission,
+    # which used to leave content runs with no countable review at all.
+    unknown_to_policy = available_reviewers - (full_panel | reduced_panel)
+    if unknown_to_policy:
+        selected = set(selected) | unknown_to_policy
+        routed_out = [r for r in routed_out if r["reviewer"] not in unknown_to_policy]
+        for reviewer in sorted(unknown_to_policy):
+            models.setdefault(reviewer, config["models"]["standard"])
+        reasons.append("Reviewers outside the routing policy panels are always kept: "
+                       + ", ".join(sorted(unknown_to_policy)))
+
     # S2: Always ensure security reviewer is at strong model if selected
     if "security" in surfaces and "reviewer-security" in selected:
         models["reviewer-security"] = config["models"]["strong"]

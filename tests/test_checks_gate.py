@@ -97,7 +97,8 @@ class TestChecksGateFailingChecks(unittest.TestCase):
 
             # Gate should fail
             gate_steps = [s for s in report.steps if s.get("station") == "checks-gate"]
-            self.assertEqual(len(gate_steps), 1)
+            # autonomous-line S1: each loopback re-runs the builder and the gate
+            self.assertEqual(len(gate_steps), 1 + report.loopbacks)
             gate_step = gate_steps[0]
             self.assertEqual(gate_step["status"], "failed")
 
@@ -154,7 +155,8 @@ class TestChecksGateProtectedPaths(unittest.TestCase):
 
             # Gate should fail with protected path finding
             gate_steps = [s for s in report.steps if s.get("station") == "checks-gate"]
-            self.assertEqual(len(gate_steps), 1)
+            # autonomous-line S1: each loopback re-runs the builder and the gate
+            self.assertEqual(len(gate_steps), 1 + report.loopbacks)
             gate_step = gate_steps[0]
             self.assertEqual(gate_step["status"], "failed")
 

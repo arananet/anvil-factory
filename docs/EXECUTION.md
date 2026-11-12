@@ -285,3 +285,120 @@ The model runtime is the operator's choice and the operator's credentials:
 a local agent CLI, an HTTP model endpoint, or a human following the packet by
 hand all satisfy the same contract. If no runtime is configured, ANVIL says
 so by producing packets, and it never claims a model ran when one did not.
+
+## The autonomous line
+
+Spec: `.openspec/specs/autonomous-line/spec.md`. Tests: `tests/test_autonomous_line.py`, `intake-worker/dispatch.test.js`.
+
+### Loopbacks are real
+
+In execute mode a loopback sends the work back. When the approver verdict is
+rejected or changes_requested, or the pre-review checks gate fails, the runner
+re-enters the line at the return station (the builder, or the spec-writer for
+a missing spec) and runs every station from there again, up to `max_loopbacks`
+times (2).
+
+- The stations of the new attempt get a `Loopback feedback` section in their
+  packet: who sent the work back, why, and the findings. Reviewers are told it
+  is a re-review.
+- Reviews of the replaced attempt never count. Its outputs and review files
+  are archived under `runs/<id>/attempts/<n>/`.
+- Re-executed steps carry `attempt`; the return station's step carries
+  `feedback`.
+- A new attempt starts only when the run thresholds leave room for all of it.
+  Otherwise the verdict stands and the loopback step records `not_reexecuted`
+  with the reason. The default `max_agent_calls` is 32 so the default line can
+  afford one full correction; the token threshold is unchanged.
+- Packet mode (no `--execute`) records the loopback and re-executes nothing,
+  as before: there is no runtime to run again.
+
+### Exit codes
+
+`anvil run` and `anvil resume` exit with the outcome:
+
+| Code | Meaning |
+|---|---|
+| 0 | Approved with the human gate open, or a packet-only run (which judges nothing) |
+| 1 | Not approved, a failed step, a failed or unverified deploy |
+| 2 | Usage error, or a resume that has nothing to resume |
+| 3 | A human must act: approve, then resume |
+| 4 | Intake stopped the order (rejected or waiting for information) |
+
+### The human gate: approve and resume
+
+```bash
+python3 -m anvil.cli approve . wo-gh-12 --by "Ana" --note "ok to ship"
+python3 -m anvil.cli resume . wo-gh-12 --execute
+```
+
+`approve` writes `runs/<id>/human-approval.json`, bound to the `run_id` it
+approves: running the line again voids it. A verdict the line did not approve
+(rejected, changes_requested, no_reviews) needs `--override`, which is
+recorded, and the report keeps the line's own verdict. A run that did not
+finish (failed, budget_exceeded, gate_failed) cannot be approved.
+
+`resume` re-enters the line after the gate. The steps up to the gate are kept
+from the previous report and no earlier station runs again; the deployer runs
+its pre-deploy gate, deploy and verification, and the publisher publishes.
+The decision record gains `human_gate.approval` and `resumed`.
+
+In execute mode the publisher is held exactly like the deployer: it never runs
+on an unapproved run or behind a closed human gate.
+
+### One workflow for every order
+
+`.github/workflows/anvil-line.yml` replaces the per order workflows.
+
+| Trigger | Effect |
+|---|---|
+| An issue is labeled `anvil` | The issue becomes work order `wo-gh-<number>` and the line runs |
+| `repository_dispatch`, type `anvil-work-order` | The work order in `client_payload.work_order` runs (sent by the intake worker) |
+| A comment `/anvil approve` by an owner, member or collaborator | The approval is recorded and the line resumes (`/anvil approve --override` for a verdict the line did not approve) |
+| `workflow_dispatch` with an issue number | Manual run or resume |
+
+Labels on the issue carry the structured part: a kind (`bug`, `feature`,
+`task`, `incident`, `idea`, `content`; default feature), risk hints (`auth`
+or `risk:auth`, and so on) and `pipeline:<name>` (default: the project's
+`anvil.json` pipeline).
+
+The job pushes branch `anvil/<work-order-id>`, opens a draft pull request,
+marks it ready when the line approves, comments the report on the issue, and
+fails when the line did not approve. Setup, once per repository:
+
+- Create the `anvil` label.
+- Secret `CF_AIG_TOKEN` (the gateway credential), as before.
+- Settings, Actions, General: allow GitHub Actions to create pull requests.
+  Or set secret `ANVIL_PAT` (contents and pull requests write): GitHub does
+  not start workflows for what `GITHUB_TOKEN` pushes, so only with the PAT
+  does the repository CI run on the line's pull request.
+- Optional variable `ANVIL_AUTO_MERGE=true` to squash merge an approved pull
+  request. Off by default: merging stays the owner's act.
+
+Applying the `anvil` label needs triage rights, and that is the access
+control: the text of an arbitrary issue never starts a run. Issue text is read
+from the event file and reaches stations through the sanitized packet, never
+through a shell.
+
+### Isolation
+
+`--isolate` (on `run`, `approve` and `resume`) gives the order branch
+`anvil/<work-order-id>` in a git worktree beside the project
+(`../.anvil-worktrees/<project>/<id>`) and commits the result there with the
+run evidence. The checkout you work in is not edited, and uncommitted changes
+in it are not carried over. This is a branch and a worktree, not a sandbox:
+the station runtimes still run with their permission prompts bypassed, so run
+executed lines on a machine you can throw away, as the workflow does.
+
+### Red before green
+
+With project `checks` configured, the checks run once after the test-writer
+and before the builder. The result is recorded on the test-writer step as
+`red_check`. When the checks pass there, the new tests did not fail first: the
+report warns and reviewer-tests is told to verify they exercise the new
+behavior.
+
+### Not done here
+
+Reviewers still run one after another. The reviewer tree guard compares the
+whole working tree, so concurrent reviewers in one tree would fail each other;
+parallel execution needs a tree per reviewer first.

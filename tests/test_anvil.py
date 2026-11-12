@@ -190,7 +190,11 @@ class TestRunner(unittest.TestCase):
             self.assertNotEqual(report.verdict, "approved")
             self.assertEqual(report.verdict, "rejected")
             loopbacks = [s for s in report.steps if s["status"] == "loopback"]
-            self.assertEqual(len(loopbacks), 1)
+            # autonomous-line S1: the loopback is real, so the builder runs
+            # again for every loopback consumed (one first attempt plus two).
+            self.assertEqual(len(loopbacks), report.max_loopbacks)
+            builders = [s for s in report.steps if s["station"] == "builder" and s["status"] == "executed"]
+            self.assertEqual(len(builders), report.max_loopbacks + 1)
             self.assertEqual(loopbacks[0]["return_to"], "builder")
             self.assertIn("misses", loopbacks[0]["detail"])
 

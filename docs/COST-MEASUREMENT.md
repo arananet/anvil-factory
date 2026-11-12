@@ -14,7 +14,7 @@ New projects include these adjustable starting settings in `anvil.yaml`:
     "max_packet_tokens": 12000,
     "max_runtime_turns": 16,
     "tool_output_tokens": 2000,
-    "max_agent_calls": 16,
+    "max_agent_calls": 32,
     "max_run_tokens": 250000,
     "require_usage": false
   }

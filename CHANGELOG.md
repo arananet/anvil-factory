@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Autonomous line: real loopbacks, a resumable human gate, one workflow
+
+Owner-authored outside the line (decision 0006, record 0007). The line neither produced nor reviewed this change.
+
+- Loopbacks re-execute. In execute mode a rejected or changes_requested verdict, or a failed pre-review checks gate, sends the work back to the return station with the findings in the packets of the next attempt. The replaced attempt is archived under runs/<id>/attempts/ and its reviews never count. Before this the report recorded a loopback and no station ran again.
+- A new attempt starts only when the call and token thresholds leave room for it; otherwise the verdict stands and the step says why. Default max_agent_calls rises from 16 to 32.
+- `anvil run` exits 0, 1, 3 or 4 by outcome instead of always 0.
+- New commands: `anvil approve` (a recorded approval bound to one run, `--override` explicit and recorded), `anvil resume` (re-enters after the gate, earlier stations never run again), `anvil work-order-from-issue`, and `--isolate` (branch anvil/<id> in its own worktree, committed by the engine).
+- The publisher is held behind the human gate in execute mode. It used to run regardless of the gate.
+- Routing no longer drops reviewers it does not know. Every content run in execute mode used to end no_reviews because the content reviewers were in neither routing panel.
+- The intake worker forwards work orders as repository_dispatch (type anvil-work-order) for verified deliveries labeled anvil, and for POST /work-orders with the INTAKE_TOKEN bearer. Issue work orders are now wo-gh-<number> with kind and risk hints from labels (default kind feature, was bug).
+- One workflow, .github/workflows/anvil-line.yml, serves every work order (label, dispatch, `/anvil approve` comment, manual). The 24 per order anvil-execute-*.yml workflows are removed.
+- The project checks run once before the builder and the result is recorded on the test-writer step (red_check); a green result warns and is flagged to reviewer-tests.
+- `anvil check` review gate: a reviewer file on record beyond the core four must pass too.
+- Spec: .openspec/specs/autonomous-line/spec.md. Tests: tests/test_autonomous_line.py, intake-worker/dispatch.test.js. Docs: docs/EXECUTION.md, The autonomous line.
+
 ### Token consumption and project pages
 
 - Capture Claude JSON and Codex JSONL usage per attempt, including corrections, errors and timeouts; preserve usage through command executor failures. Cache and reasoning counts are not added twice, and missing usage stays unknown.

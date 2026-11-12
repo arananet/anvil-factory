@@ -7,7 +7,7 @@ from pathlib import Path
 TOKEN_FIELDS = ("input_tokens", "output_tokens", "cached_input_tokens",
                 "cache_creation_input_tokens", "reasoning_tokens", "total_tokens")
 DEFAULT_EFFICIENCY = {"max_packet_tokens": 12000, "max_runtime_turns": 16,
-                      "tool_output_tokens": 2000, "max_agent_calls": 16,
+                      "tool_output_tokens": 2000, "max_agent_calls": 32,
                       "max_run_tokens": 250000, "require_usage": False}
 EFFICIENCY_NOTE = (
     "\n## Consumption discipline\n\n"

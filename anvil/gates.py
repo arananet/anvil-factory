@@ -54,7 +54,17 @@ def review_gate(project_dir, slug):
         data = json.loads(f.read_text(encoding="utf-8"))
         if data.get("verdict") != "pass":
             return (False, f"Review {station} verdict is {data.get('verdict')}, not pass")
-    return (True, "All 4 reviews present and passing")
+    # Reviews beyond the core panel (for example reviewer-design, reviewer-ux)
+    # are not required to exist, but one that is on record must pass too.
+    extra = sorted(f for f in base.glob("reviewer-*.json") if f.stem not in REVIEWER_STATIONS)
+    for f in extra:
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+        except ValueError:
+            return (False, f"Review {f.stem} is not valid JSON")
+        if not isinstance(data, dict) or data.get("verdict") != "pass":
+            return (False, f"Review {f.stem} verdict is {data.get('verdict') if isinstance(data, dict) else None}, not pass")
+    return (True, f"All {len(REVIEWER_STATIONS) + len(extra)} reviews present and passing")
 
 def human_gate(work_order):
     hints = set(getattr(work_order, "risk_hints", []) or [])
