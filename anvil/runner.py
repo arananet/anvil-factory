@@ -1274,7 +1274,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
 
     # S5: Track interface stations' measured tokens for report total
     # Interface stations (builder, writer, media-producer, brief-writer, reviewer-design)
-    # use the design model from routing policy (currently openai/gpt-6.1-sol)
+    # use the design model from routing policy (currently claude-opus-5-5)
     astra_bound_stations = interface_stations  # Field name kept for continuity
     astra_measured_tokens_total = 0  # Field name kept for continuity
     # S2: Add warning for visual runs with no reference anchors

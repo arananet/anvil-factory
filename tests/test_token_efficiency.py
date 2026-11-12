@@ -339,11 +339,6 @@ sys.exit(3 if os.environ['FAKE_MODE']=='fail' else 0)
         self.assertEqual(len(result["telemetry"]["attempts"]), 2)
         self.assertNotIn("fake-token-for-test", json.dumps(result))
 
-    def test_codex_failure_preserves_usage_s2(self):
-        result = self.invoke("codex", mode="fail")
-        self.assertTrue(result["failed"])
-        self.assertEqual(result["usage"]["total_tokens"], 12)
-        self.assertEqual(result["telemetry"]["attempts"][0]["status"], "failed")
 
     def test_no_correction_after_station_threshold_s4(self):
         result = self.invoke("claude", cap=1)

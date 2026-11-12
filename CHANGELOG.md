@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Single runtime: Codex and the OpenAI route removed
+
+Owner's order 2026-11-12 ("Quitemos codex de la ecuación"). Decision 0008, which supersedes the OpenAI part of decision 0004.
+
+- Every station runs on the Claude runtime. reviewer-design, reviewer-ux and the builder on UI surfaces use claude-opus-5-5 (was openai/gpt-6.1-sol through Codex). The benchmark recorded in decision 0004 measured Opus 5.5 level with Sol on design quality, at a higher cost per task (0.137 against 0.038 USD).
+- Removed tools/codex_station.py and its tests; tools/dispatch_station.py fails loudly on any non Anthropic model; CONCRETE_MODELS is the two Anthropic models.
+- tools/model_route_smoke.py probes the Anthropic route only: text for both models and vision for the design model, sending the gateway headers from ANTHROPIC_CUSTOM_HEADERS.
+- The anvil-line workflow no longer installs Codex.
+- efficiency.tool_output_tokens stays a valid key but the supplied wrapper does not apply it.
+- tests/test_landing_page.py: the wo-gh-35 fence test now binds only its own run branch; it failed on any later branch with full history.
+
 ### Autonomous line: real loopbacks, a resumable human gate, one workflow
 
 Owner-authored outside the line (decision 0006, record 0007). The line neither produced nor reviewed this change.

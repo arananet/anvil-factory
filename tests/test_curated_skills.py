@@ -303,7 +303,7 @@ class WriteAccessTests(unittest.TestCase):
 
     def test_producing_stations_may_write_and_reviewers_may_not(self):
         registry = load_registry(ROOT / "stations")
-        for name in ("claude_station", "codex_station"):
+        for name in ("claude_station",):
             write_stations = self.load(name).WRITE_STATIONS
             self.assertEqual(write_stations, self.PRODUCERS, name)
             for station in registry.ids():

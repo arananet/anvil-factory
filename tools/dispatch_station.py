@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Runtime dispatcher that routes to Claude or Codex based on configured model.
+"""Runtime dispatcher: runs a station on the Claude runtime for its configured model.
 
 This dispatcher reads ANVIL_CONFIGURED_MODEL from the environment (set by the
 runner) and dispatches to the appropriate runtime:
 
 - Anthropic models (claude-opus-5-5, claude-sonnet-5-5): claude_station.py
-- OpenAI models (openai/gpt-6.1-sol): codex_station.py
 - Any other model: fails loudly with no fallback
 
 The configured model and executed model are the same by construction because
@@ -83,36 +82,10 @@ def dispatch_runtime(packet_path, output_path, configured_model):
             print(f"dispatch_station: failed to invoke Claude runtime: {e}", file=sys.stderr)
             return 2
 
-    elif configured_model == "openai/gpt-6.1-sol":
-        # OpenAI models -> Codex runtime
-        runtime = tools_dir / "codex_station.py"
-        env = os.environ.copy()
-        env["ANVIL_CONFIGURED_MODEL"] = configured_model
-
-        try:
-            proc = subprocess.run(
-                [sys.executable, str(runtime), str(packet_path), str(output_path)],
-                env=env,
-                capture_output=True,
-                text=True
-            )
-            # Forward output
-            if proc.stdout:
-                print(proc.stdout, end="")
-            if proc.stderr:
-                print(proc.stderr, end="", file=sys.stderr)
-            if proc.returncode == 0:
-                _self_report(output_path, configured_model)
-            return proc.returncode
-
-        except Exception as e:
-            print(f"dispatch_station: failed to invoke Codex runtime: {e}", file=sys.stderr)
-            return 2
-
     else:
         # Unknown model - loud failure, no fallback
         print(f"dispatch_station: unknown model '{configured_model}'. " +
-              f"Known models: claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol",
+              f"Known models: claude-opus-5-5, claude-sonnet-5-5",
               file=sys.stderr)
         return 1
 

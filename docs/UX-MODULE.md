@@ -111,11 +111,11 @@ The stations that apply the knowledge base are **guided design stations**, marke
 {
   "guided": true,
   "designation": "guided design station",
-  "design_model": "openai/gpt-6.1-sol"
+  "design_model": "claude-opus-5-5"
 }
 ```
 
-The designated model is the **design model from the factory's routing policy** (currently `openai/gpt-6.1-sol`, as catalogued in Cloudflare AI Gateway).
+The designated model is the **design model from the factory's routing policy** (currently `claude-opus-5-5`).
 
 **Guided design stations**:
 - **Design authoring stations**: stations whose work order targets design/DESIGN.md

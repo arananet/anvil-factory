@@ -16,7 +16,7 @@ from anvil.scaffold import init_project, scaffold_spec
 from anvil.stations import load_registry
 
 ROOT = Path(__file__).resolve().parent.parent
-CONCRETE = {"claude-opus-5-5", "claude-sonnet-5-5", "openai/gpt-6.1-sol"}
+CONCRETE = {"claude-opus-5-5", "claude-sonnet-5-5"}
 TIER_LABELS = {"review-balanced", "review-strong", "fast-builder", "reasoning-strong",
                "writing-strong", "fast-reader", "media-gen", "default"}
 
@@ -134,11 +134,11 @@ class TestTierResolutionOnRoutedPath(unittest.TestCase):
         """R10: a concrete routed model passes through unchanged"""
         routing = tier_routing()
         routing.selected_reviewers.append("reviewer-design")
-        routing.selected_models["reviewer-design"] = "openai/gpt-6.1-sol"
+        routing.selected_models["reviewer-design"] = "claude-opus-5-5"
         with tempfile.TemporaryDirectory() as tmp:
             report, handed = drive(tmp, "wo-r4-concrete", routing=routing)
             if "reviewer-design" in handed:
-                self.assertEqual(handed["reviewer-design"], "openai/gpt-6.1-sol")
+                self.assertEqual(handed["reviewer-design"], "claude-opus-5-5")
 
     def test_executed_model_still_null_without_self_report_s10(self):
         """S10: resolution at hand-off does not create executed_model evidence"""
@@ -147,106 +147,6 @@ class TestTierResolutionOnRoutedPath(unittest.TestCase):
             for step in report.steps:
                 if step["station"] in ("reviewer-spec", "reviewer-security", "builder", "intake"):
                     self.assertIsNone(step["executed_model"], step["station"])
-
-
-class _FakeResp(io.BytesIO):
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *a):
-        return False
-
-
-GATEWAY = "https://gateway.example.test/v1/acct123/gw-name/anthropic"
-SECRET = "hdr-secret-token-abc123"
-HEADERS = (f"cf-aig-authorization: Bearer {SECRET}\n"
-           "cf-aig-metadata: {\"run\": \"wo-gh-29\"}")
-
-
-class TestCodexCredentialFromHeaders(unittest.TestCase):
-    def _clean(self, env):
-        base = {k: v for k, v in os.environ.items()
-                if not k.startswith("OPENAI_") and k not in
-                ("CF_AIG_TOKEN", "ANTHROPIC_BASE_URL", "ANTHROPIC_CUSTOM_HEADERS",
-                 "ANVIL_GATEWAY_OPENAI_URL")}
-        base.update(env)
-        return base
-
-    def _call(self, env):
-        import codex_station
-        cap = {}
-
-        def fake_urlopen(req, timeout=None):
-            cap["url"] = req.full_url
-            cap["auth"] = req.get_header("Authorization")
-            cap["body"] = json.loads(req.data.decode("utf-8"))
-            return _FakeResp(json.dumps({"choices": [{"message": {"content": "hi"}}]}).encode())
-
-        with mock.patch.dict(os.environ, self._clean(env), clear=True), \
-             mock.patch("urllib.request.urlopen", fake_urlopen):
-            out = codex_station.call_openai_api("hello", "openai/gpt-6.1-sol")
-        return out, cap
-
-    def _config(self, env):
-        import codex_station
-        with mock.patch.dict(os.environ, self._clean(env), clear=True):
-            return codex_station.gateway_openai_config()
-
-    def test_credential_parsed_from_custom_headers_when_token_unset_s9(self):
-        endpoint, token = self._config({"ANTHROPIC_BASE_URL": GATEWAY,
-                                        "ANTHROPIC_CUSTOM_HEADERS": HEADERS})
-        self.assertEqual(token, SECRET)
-        self.assertTrue(endpoint.endswith("/openai"))
-
-    def test_request_authorised_from_header_credential_s9(self):
-        out, cap = self._call({"ANTHROPIC_BASE_URL": GATEWAY,
-                               "ANTHROPIC_CUSTOM_HEADERS": HEADERS})
-        self.assertEqual(out, "hi")
-        self.assertIn(SECRET, cap["auth"])
-        self.assertEqual(cap["body"]["model"], "gpt-6.1-sol")
-
-    def test_header_name_match_is_case_insensitive_and_tolerates_crlf_s9(self):
-        hdr = f"X-Other: 1\r\nCF-AIG-Authorization:   Bearer {SECRET}\r\n"
-        _, token = self._config({"ANTHROPIC_BASE_URL": GATEWAY, "ANTHROPIC_CUSTOM_HEADERS": hdr})
-        self.assertEqual(token, SECRET)
-
-    def test_direct_variable_path_used_when_set_s9(self):
-        _, token = self._config({"ANTHROPIC_BASE_URL": GATEWAY, "CF_AIG_TOKEN": "direct-tok"})
-        self.assertEqual(token, "direct-tok")
-
-    def test_direct_variable_wins_over_header_s9(self):
-        _, token = self._config({"ANTHROPIC_BASE_URL": GATEWAY, "CF_AIG_TOKEN": "direct-tok",
-                                 "ANTHROPIC_CUSTOM_HEADERS": HEADERS})
-        self.assertEqual(token, "direct-tok")
-
-    def test_fails_loudly_when_neither_source_present_without_leaking_s9(self):
-        for headers in (None, "cf-aig-metadata: {}", "X-Other: Bearer nothing-here"):
-            env = {"ANTHROPIC_BASE_URL": GATEWAY}
-            if headers is not None:
-                env["ANTHROPIC_CUSTOM_HEADERS"] = headers
-            with self.subTest(headers=headers):
-                with self.assertRaises(RuntimeError) as ctx:
-                    self._config(env)
-                msg = str(ctx.exception)
-                self.assertIn("CF_AIG_TOKEN", msg)
-                self.assertNotIn("nothing-here", msg)
-
-    def test_credential_never_printed_or_in_errors_s9(self):
-        import contextlib
-        out, err = io.StringIO(), io.StringIO()
-        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-            self._call({"ANTHROPIC_BASE_URL": GATEWAY, "ANTHROPIC_CUSTOM_HEADERS": HEADERS})
-            with self.assertRaises(RuntimeError) as ctx:
-                self._config({"ANTHROPIC_CUSTOM_HEADERS": HEADERS})
-        self.assertNotIn(SECRET, out.getvalue() + err.getvalue() + str(ctx.exception))
-
-    def test_explicit_openai_url_still_honoured_with_header_credential_s9(self):
-        explicit = "https://other.example.test/custom/openai"
-        endpoint, token = self._config({"ANVIL_GATEWAY_OPENAI_URL": explicit,
-                                        "ANTHROPIC_BASE_URL": GATEWAY,
-                                        "ANTHROPIC_CUSTOM_HEADERS": HEADERS})
-        self.assertEqual(endpoint, explicit)
-        self.assertEqual(token, SECRET)
 
 
 if __name__ == "__main__":

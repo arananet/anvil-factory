@@ -5,7 +5,7 @@ runtime output as plain text. ANVIL ships two kinds:
 
 - command: a shell command template with {packet} and {output} placeholders.
   This is how local agent CLIs are plugged in (for example `claude -p` or
-  `codex exec` style commands prepared by the operator).
+  any other agent CLI the operator prepares).
 - http: an OpenAI style chat completions endpoint. The API key is read from
   the environment variable named by api_key_env at call time. It never comes
   from the config file and is never logged.

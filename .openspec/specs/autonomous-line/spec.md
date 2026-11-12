@@ -31,7 +31,7 @@ Provenance: this change is owner-authored work outside the line (decision 0006).
 - R11, the standing review gate counts every review on record: the four core reviews are required, and any other reviewer file present must pass too.
 - R12, routing never empties a panel by omission. A reviewer the pipeline names that is in neither configured routing panel (the content reviewers, or a project's own) is always selected; the policy reduces only the panels it knows. Before this, every content run in execute mode ended no_reviews.
 
-Guardrails: Python standard library only. Parallel reviewer execution is out of scope: the reviewer tree guard compares the whole working tree, so concurrent reviewers in one tree would fail each other. The station runtimes still run without their own sandbox; isolation here is a branch and a worktree, not a jail.
+Guardrails: Python standard library only. Parallel reviewer execution is out of scope: the runner checks the run thresholds between calls and hands per call limits through shared executor state. The station runtimes still run without their own sandbox; isolation here is a branch and a worktree, not a jail.
 
 ## Scenarios
 

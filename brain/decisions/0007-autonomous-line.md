@@ -33,5 +33,6 @@ GitHub Actions at the time of this record.
 
 - The 24 anvil-execute-*.yml workflows are removed; their runs remain in runs/.
 - Default max_agent_calls is 32 (was 16) so one full correction fits.
-- Reviewers still run sequentially; parallel reviewers need a tree per
-  reviewer because of the reviewer tree guard.
+- Reviewers still run sequentially. The reviewer tree guard that blocked
+  parallel reviewers left with the Codex runtime (decision 0008); the runner's
+  between-call budget checks are what remains.

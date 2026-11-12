@@ -161,9 +161,8 @@ jobs:
 
       - name: Install the station runtimes
         run: |
-          npm install -g @anthropic-ai/claude-code @openai/codex
+          npm install -g @anthropic-ai/claude-code
           claude --version
-          codex --version
           pip install playwright
           playwright install --with-deps chromium
 

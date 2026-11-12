@@ -89,11 +89,14 @@ class TestRuntimeDispatch(unittest.TestCase):
             # Validate that these are recognized Anthropic models
             self.assertTrue(model.startswith("claude-"))
 
-    def test_openai_sol_selects_openai_runtime_s2(self):
-        """model-migration S2: openai/gpt-6.1-sol selects OpenAI runtime"""
-        # This test validates that openai/gpt-6.1-sol is recognized as OpenAI model
-        model = "openai/gpt-6.1-sol"
-        self.assertTrue(model.startswith("openai/"))
+    def test_openai_model_is_rejected_by_the_dispatcher_s2(self):
+        """single-runtime S1: the OpenAI route is gone; the dispatcher fails loudly on it"""
+        import subprocess, sys, os
+        env = dict(os.environ, ANVIL_CONFIGURED_MODEL="openai/gpt-6.1-sol")
+        proc = subprocess.run([sys.executable, str(ROOT / "tools" / "dispatch_station.py"), "packet.md", "out.md"],
+                              env=env, capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 1)
+        self.assertIn("unknown model", proc.stderr)
 
     def test_unknown_model_fails_loudly_s2(self):
         """model-migration S2: Unknown model value fails the step loudly"""
@@ -465,9 +468,9 @@ class TestModelRouteSmokeScript(unittest.TestCase):
         self.assertIn("claude-opus-5-5", content,
                      "Should test claude-opus-5-5 on Anthropic route")
 
-        # Should check OpenAI route
-        self.assertIn("gpt-6.1-sol", content,
-                     "Should test gpt-6.1-sol on OpenAI route")
+        # single-runtime S1: no OpenAI route is probed any more
+        self.assertNotIn("gpt-6.1-sol", content)
+        self.assertNotIn("openai", content.lower())
 
         # Should handle vision
         self.assertIn("vision", content.lower(),
@@ -567,8 +570,8 @@ class TestPerStationModels(unittest.TestCase):
             "reviewer-security": "claude-sonnet-5-5",
             "reviewer-tests": "claude-sonnet-5-5",
             "reviewer-architecture": "claude-sonnet-5-5",
-            "reviewer-design": "openai/gpt-6.1-sol",
-            "reviewer-ux": "openai/gpt-6.1-sol",
+            "reviewer-design": "claude-opus-5-5",
+            "reviewer-ux": "claude-opus-5-5",
             "intake": "claude-sonnet-5-5",
         }
 
@@ -584,22 +587,19 @@ class TestPerStationModels(unittest.TestCase):
 class TestRoutingPolicy(unittest.TestCase):
     """R2: Routing policy updated for Sol"""
 
-    def test_designer_model_is_sol_r2(self):
-        """model-migration R2: MODEL_POLICY designer entry is openai/gpt-6.1-sol"""
-        routing_path = ROOT / "anvil" / "routing.py"
-        if not routing_path.exists():
-            self.skipTest("routing.py not found")
-
-        content = routing_path.read_text()
-
-        # Check that MODEL_POLICY has designer entry
-        self.assertIn('MODEL_POLICY', content)
-        self.assertIn('"designer"', content)
-
-        # After implementation, should be openai/gpt-6.1-sol, not gpt-6-astra
-        if "gpt-6.1-sol" in content:
-            # Implementation done - verify it's in the right place
-            self.assertIn('"designer": "openai/gpt-6.1-sol"', content)
+    def test_designer_model_is_opus_r2(self):
+        """single-runtime S1: the design model is claude-opus-5-5, an Anthropic model"""
+        from anvil.routing import MODEL_POLICY
+        from anvil.config import CONCRETE_MODELS, load_anvil_config
+        self.assertEqual(MODEL_POLICY["designer"], "claude-opus-5-5")
+        self.assertEqual(CONCRETE_MODELS, ("claude-opus-5-5", "claude-sonnet-5-5"))
+        stations = load_anvil_config(ROOT / "anvil.yaml")["stations"]
+        for station_id, cfg in stations.items():
+            self.assertTrue(str(cfg.get("model", "default")).startswith(("claude-", "default")) or
+                            "/" not in str(cfg.get("model")), station_id)
+        self.assertEqual(stations["reviewer-design"]["model"], "claude-opus-5-5")
+        self.assertEqual(stations["reviewer-ux"]["model"], "claude-opus-5-5")
+        self.assertFalse((ROOT / "tools" / "codex_station.py").exists())
 
     def test_no_gpt_6_astra_in_routing_policy_r2(self):
         """model-migration R2: gpt-6-astra removed from MODEL_POLICY"""

@@ -69,7 +69,7 @@ Standing reviews under `reviews/<slug>/` are the project record that
 
 ```json
 {"runtime": {"kind": "command", "command": "claude -p \"$(cat {packet})\"", "timeout_seconds": 900}}
-{"runtime": {"kind": "command", "command": "codex exec --packet {packet} --out {output}", "timeout_seconds": 900}}
+{"runtime": {"kind": "command", "command": "my-agent --packet {packet} --out {output}", "timeout_seconds": 900}}
 ```
 
 The template supports two placeholders: `{packet}` (path of the rendered
@@ -87,17 +87,14 @@ factory's own run folder.
 
 The factory itself wires `python3 tools/dispatch_station.py {packet} {output}`.
 The dispatcher reads the step's effective model from `ANVIL_CONFIGURED_MODEL`
-and runs Anthropic models through `tools/claude_station.py` (Claude Code
-print mode) and `openai/gpt-6.1-sol` through `tools/codex_station.py`, which
-runs the Codex CLI headlessly (`codex exec`) in the repo tree with the packet
-as the task, against the gateway OpenAI route with the bare id `gpt-6.1-sol`.
-The gateway credential reaches Codex only through its child environment.
-Producing stations may write; reviewing and observing stations get no-edit instructions,
-and a reviewer that changes anything besides its own review file fails. Any
-other model, a missing `codex` CLI, or a missing gateway environment fails
-the step; there is no fallback runtime.
+and runs it through `tools/claude_station.py` (Claude Code print mode). There
+is one runtime: every station, the design stations included, runs an Anthropic
+model (`claude-sonnet-5-5` or `claude-opus-5-5`); the OpenAI route and the
+Codex wrapper were removed (decision 0008). Producing stations may write;
+reviewing and observing stations run without edit tools. Any other model
+fails the step; there is no fallback runtime.
 
-Claude uses JSON result output; Codex uses JSONL events. The wrappers extract
+Claude returns a JSON result. The wrapper extracts
 the answer for the existing artifact contract and keep scalar token evidence
 in `<station>.output.md.usage.json`. Raw runtime JSON, prompts and environment
 variables are not exported to the public usage pages. Each invocation of a
@@ -399,6 +396,7 @@ behavior.
 
 ### Not done here
 
-Reviewers still run one after another. The reviewer tree guard compares the
-whole working tree, so concurrent reviewers in one tree would fail each other;
-parallel execution needs a tree per reviewer first.
+Reviewers still run one after another. With a single runtime nothing in the
+wrappers prevents concurrent reviewers any more; what remains is in the
+runner, which checks the run thresholds between calls and hands per call
+limits through shared executor state.

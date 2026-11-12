@@ -15,7 +15,7 @@ from anvil.scaffold import init_project
 from anvil.stations import load_registry
 
 ROOT = Path(__file__).resolve().parent.parent
-CONCRETE = {"claude-opus-5-5", "claude-sonnet-5-5", "openai/gpt-6.1-sol"}
+CONCRETE = {"claude-opus-5-5", "claude-sonnet-5-5"}
 TIER_MAP = {
     "review-balanced": "claude-sonnet-5-5",
     "review-strong": "claude-sonnet-5-5",
@@ -133,90 +133,6 @@ class TestTierResolutionAtHandoff(unittest.TestCase):
                                   env=env, capture_output=True, text=True, timeout=60)
             self.assertNotEqual(proc.returncode, 0)
             self.assertIn("review-balanced", proc.stderr + proc.stdout)
-
-
-class _FakeResp(io.BytesIO):
-    def __enter__(self):
-        return self
-    def __exit__(self, *a):
-        return False
-
-
-GATEWAY = "https://gateway.example.test/v1/acct123/gw-name/anthropic"
-TOKEN = "tok-secret-value-xyz"
-
-
-class TestOpenAIRuntimeGatewayEnv(unittest.TestCase):
-    def _call(self, env):
-        import codex_station
-        captured = {}
-
-        def fake_urlopen(req, timeout=None):
-            captured["url"] = req.full_url
-            captured["auth"] = req.get_header("Authorization")
-            captured["body"] = json.loads(req.data.decode("utf-8"))
-            return _FakeResp(json.dumps({"choices": [{"message": {"content": "hello"}}]}).encode())
-
-        clean = {k: v for k, v in os.environ.items()
-                 if not k.startswith("OPENAI_") and k not in
-                 ("CF_AIG_TOKEN", "ANTHROPIC_BASE_URL", "ANVIL_GATEWAY_OPENAI_URL",
-                                  "ANTHROPIC_CUSTOM_HEADERS")}
-        clean.update(env)
-        with mock.patch.dict(os.environ, clean, clear=True), \
-             mock.patch("urllib.request.urlopen", fake_urlopen):
-            out = codex_station.call_openai_api("hi", "openai/gpt-6.1-sol")
-        return out, captured
-
-    def test_config_built_from_cf_aig_token_and_anthropic_base_url_alone_s9(self):
-        out, cap = self._call({"CF_AIG_TOKEN": TOKEN, "ANTHROPIC_BASE_URL": GATEWAY})
-        self.assertEqual(out, "hello")
-        self.assertTrue(cap["url"].startswith("https://gateway.example.test/v1/acct123/gw-name/"))
-        self.assertIn("/openai", cap["url"])
-        self.assertNotIn("anthropic", cap["url"])
-        self.assertIn(TOKEN, cap["auth"])
-        self.assertEqual(cap["body"]["model"], "gpt-6.1-sol")
-
-    def test_explicit_gateway_openai_url_is_honoured_s9(self):
-        explicit = "https://other.example.test/custom/openai"
-        _, cap = self._call({"CF_AIG_TOKEN": TOKEN, "ANTHROPIC_BASE_URL": GATEWAY,
-                             "ANVIL_GATEWAY_OPENAI_URL": explicit})
-        self.assertTrue(cap["url"].startswith(explicit))
-        self.assertNotIn("gateway.example.test", cap["url"])
-
-    def test_missing_gateway_env_fails_loudly_without_values_s9(self):
-        # Error naming follows the credential sources actually checked (R11, R13).
-        for env, missing in (({}, "CF_AIG_TOKEN"),
-                             ({}, "ANTHROPIC_CUSTOM_HEADERS"),
-                             ({"ANTHROPIC_BASE_URL": GATEWAY}, "CF_AIG_TOKEN"),
-                             ({"ANTHROPIC_BASE_URL": GATEWAY}, "cf-aig-authorization"),
-                             ({"CF_AIG_TOKEN": TOKEN}, "ANTHROPIC_BASE_URL")):
-            with self.subTest(env=sorted(env), missing=missing):
-                with self.assertRaises(RuntimeError) as ctx:
-                    self._call(env)
-                msg = str(ctx.exception)
-                self.assertIn(missing, msg)
-                self.assertNotIn(TOKEN, msg)
-                self.assertNotIn("OPENAI_API_KEY", msg)
-
-    def test_credential_from_custom_headers_when_token_unset_s9(self):
-        headers = "x-other: 1\ncf-aig-authorization: Bearer " + TOKEN + "\n"
-        out, cap = self._call({"ANTHROPIC_BASE_URL": GATEWAY, "ANTHROPIC_CUSTOM_HEADERS": headers})
-        self.assertEqual(out, "hello")
-        self.assertIn(TOKEN, cap["auth"])
-
-    def test_direct_token_wins_over_headers_s9(self):
-        headers = "cf-aig-authorization: Bearer header-token-abc"
-        _, cap = self._call({"CF_AIG_TOKEN": TOKEN, "ANTHROPIC_BASE_URL": GATEWAY,
-                             "ANTHROPIC_CUSTOM_HEADERS": headers})
-        self.assertIn(TOKEN, cap["auth"])
-        self.assertNotIn("header-token-abc", cap["auth"])
-
-    def test_openai_env_variables_are_not_required_s9(self):
-        with mock.patch.dict(os.environ, {}, clear=False):
-            for k in [k for k in os.environ if k.startswith("OPENAI_")]:
-                os.environ.pop(k)
-            out, _ = self._call({"CF_AIG_TOKEN": TOKEN, "ANTHROPIC_BASE_URL": GATEWAY})
-        self.assertEqual(out, "hello")
 
 
 if __name__ == "__main__":

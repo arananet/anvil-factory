@@ -149,8 +149,8 @@ stays unknown, including historical reports.
 
 New projects include `status/index.html` and consumption controls in
 `anvil.yaml`: a 12,000 token packet ceiling, 32 agent calls per run, a 250,000
-token run threshold, up to 16 Claude runtime turns and 2,000 retained tokens
-per Codex tool result. These are adjustable starting settings. Run thresholds
+token run threshold and up to 16 Claude runtime turns. These are adjustable
+starting settings. Run thresholds
 are checked between calls; a running call can exceed them. An agent call is
 one station runtime invocation, which may contain several model/tool turns.
 
