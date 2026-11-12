@@ -42,7 +42,7 @@ STATION_ENV_DENY = ("GH_TOKEN", "GITHUB_TOKEN", "ANVIL_PAT", "GH_ENTERPRISE_TOKE
                     "NPM_TOKEN", "NODE_AUTH_TOKEN", "AZURE_CLIENT_SECRET", "AWS_SECRET_ACCESS_KEY",
                     "AWS_SESSION_TOKEN", "ANVIL_EVENTS_TOKEN", "ANVIL_OTLP_HEADERS", "INTAKE_TOKEN")
 SANDBOX_ENV_PASS = ("ANTHROPIC_BASE_URL", "ANTHROPIC_API_KEY", "ANTHROPIC_CUSTOM_HEADERS",
-                    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC")
+                    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC", "COPILOT_GITHUB_TOKEN")
 
 
 def station_env(base, config):
@@ -111,6 +111,12 @@ class CommandExecutor:
         env["ANVIL_PROJECT_ROOT"] = str(Path(cwd).resolve() if cwd else Path.cwd())
         if configured_model:
             env["ANVIL_CONFIGURED_MODEL"] = configured_model
+        # Which runtime reaches the model. The ANVIL_RUNTIME variable wins;
+        # runtime.provider in anvil.yaml is the project's default.
+        if self.config.get("provider") and not env.get("ANVIL_RUNTIME"):
+            env["ANVIL_RUNTIME"] = str(self.config["provider"])
+        if isinstance(self.config.get("copilot_models"), dict) and not env.get("ANVIL_COPILOT_MODELS"):
+            env["ANVIL_COPILOT_MODELS"] = json.dumps(self.config["copilot_models"])
 
         usage_path = Path(str(output_path) + ".usage.json").resolve() if output_path is not None else None
         if usage_path:

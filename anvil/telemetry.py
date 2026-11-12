@@ -85,6 +85,19 @@ def parse_runtime_output(raw, provider):
             result["turns"] = turns
         result["is_error"] = bool(data.get("is_error"))
         return result
+    if provider == "copilot":
+        # Envelope built by tools/copilot_runtime.py from the reply and the
+        # usage statistics file; Copilot reports no turn count.
+        try:
+            data = json.loads(raw)
+        except (ValueError, TypeError):
+            return result
+        if not isinstance(data, dict) or data.get("type") != "copilot_result":
+            return result
+        result["output"] = str(data.get("result") or "")
+        result["usage"] = normalize_usage(data.get("usage"))
+        result["usage_complete"] = result["usage"] is not None
+        return result
     messages, usages, events = [], [], 0
     for line in raw.splitlines():
         try:

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Smoke test for the model routes through Cloudflare AI Gateway.
 
-Probes the Anthropic route with the models the factory uses, using only the
-environment credentials the workflow supplies. Never prints credential
-values.
+Probes the models the factory uses on the runtime ANVIL_RUNTIME selects:
+the Anthropic route of the gateway (claude-gateway, the default) or GitHub
+Copilot CLI (copilot). Uses only the environment credentials the workflow
+supplies and never prints credential values.
 
 Routes tested:
 - claude-sonnet-5-5 (text)
@@ -80,7 +81,43 @@ def probe_anthropic_vision(model, description):
     return probe_anthropic(model, description, content)
 
 
+def probe_copilot(model, description):
+    """Probe one model through GitHub Copilot CLI. Returns (ok, message)."""
+    import subprocess
+    from copilot_runtime import copilot_model
+    name = copilot_model(model)
+    try:
+        proc = subprocess.run(["copilot", "-p", "Reply with exactly: ok", "--model", name, "--silent", "--no-color",
+                               "--no-ask-user", "--no-auto-update", "--disable-builtin-mcps"],
+                              capture_output=True, text=True, timeout=180)
+    except FileNotFoundError:
+        return False, f"{description}: the copilot CLI is not on PATH"
+    except subprocess.TimeoutExpired:
+        return False, f"{description}: timed out"
+    if proc.returncode == 0 and proc.stdout.strip():
+        return True, f"{description} ({name}): ok"
+    detail = (proc.stderr or proc.stdout or "").strip()[:200]
+    for secret in (os.environ.get("COPILOT_GITHUB_TOKEN"), os.environ.get("GH_TOKEN")):
+        if secret:
+            detail = detail.replace(secret, "[redacted]")
+    return False, f"{description} ({name}): exit {proc.returncode}: {detail}"
+
+
 def main():
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from copilot_runtime import selected_runtime
+    try:
+        runtime = selected_runtime()
+    except ValueError as exc:
+        print(f"FAIL {exc}")
+        return 1
+    if runtime == "copilot":
+        failed = False
+        for model in TEXT_MODELS:
+            ok, message = probe_copilot(model, f"Copilot CLI, {model}")
+            print(("PASS " if ok else "FAIL ") + message)
+            failed = failed or not ok
+        return 1 if failed else 0
     probes = [(probe_anthropic, model, f"Anthropic route, {model}, text") for model in TEXT_MODELS]
     probes.append((probe_anthropic_vision, VISION_MODEL, f"Anthropic route, {VISION_MODEL}, vision"))
     failed = False

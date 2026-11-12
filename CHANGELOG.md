@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Runtime selection: Claude Code through the gateway, or GitHub Copilot CLI
+
+- New variable ANVIL_RUNTIME: claude-gateway (default, unchanged) or copilot (GitHub Copilot CLI with the Anthropic models of a GitHub account, credential COPILOT_GITHUB_TOKEN). runtime.provider in anvil.yaml sets a project default; the variable wins.
+- tools/copilot_runtime.py builds the Copilot command per station (producers every tool; other stations read, shell and writes only inside their run directory; built-in MCP servers off; credentials withheld from agent shells), maps model names (claude-opus-5-5 to claude-opus-5.5, overridable) and reads token usage from the --usage-output-file statistics.
+- The station wrapper keeps one contract over both runtimes: review file check, one correction, usage ledger, loud failures.
+- The workflow installs and smoke tests only the selected runtime; the sandbox image carries both CLIs.
+- Spec: .openspec/specs/runtime-selection/spec.md. Tests: tests/test_runtime_selection.py. Decision 0010.
+- Checked against the real Copilot CLI 1.0.109 for argument parsing; not yet run authenticated.
+
 ### Governed delivery: live state, events, verified approvals, contained stations, previews
 
 Owner-authored outside the line (decision 0006, record 0009).

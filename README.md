@@ -194,6 +194,8 @@ Installed as a package, the same commands are available as `anvil new-project`, 
 
 Project station settings live in `anvil.yaml` at the project root: context, model, prompt and tools per station. See docs/ARCHITECTURE.md for the Core Four.
 
+The factory's own stations run on Anthropic models, reached one of two ways chosen by the `ANVIL_RUNTIME` variable: Claude Code through the Cloudflare AI Gateway (`claude-gateway`, the default) or GitHub Copilot CLI with a GitHub account (`copilot`).
+
 Agent runtimes are pluggable: add a `runtime` object to anvil.yaml and run with `--execute` to have a command or HTTP executor run the station packets, with reviewer output feeding the approver of the same run. A `deploy` object in the same file lets an approved, unblocked run deploy automatically and pass a deterministic verification gate. Every step records which model was configured and, for executed steps, which model actually ran. See docs/EXECUTION.md.
 
 Memory is gated like code: agent written learnings wait in a quarantined inbox and reach the verified store only when deterministic code verifies their provenance against the run record. See docs/MEMORY-GATE.md.

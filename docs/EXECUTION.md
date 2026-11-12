@@ -283,6 +283,49 @@ a local agent CLI, an HTTP model endpoint, or a human following the packet by
 hand all satisfy the same contract. If no runtime is configured, ANVIL says
 so by producing packets, and it never claims a model ran when one did not.
 
+## Choosing the runtime: the gateway or GitHub Copilot
+
+Spec: `.openspec/specs/runtime-selection/spec.md`. Tests: `tests/test_runtime_selection.py`.
+
+One variable, `ANVIL_RUNTIME`, chooses how the stations reach their models:
+
+| Value | Runtime | Credential |
+|---|---|---|
+| `claude-gateway` (default) | Claude Code print mode through the Cloudflare AI Gateway | `CF_AIG_TOKEN`, as before |
+| `copilot` | GitHub Copilot CLI with the Anthropic models of a GitHub account | `COPILOT_GITHUB_TOKEN` |
+
+```bash
+ANVIL_RUNTIME=copilot python3 -m anvil.cli run . --pipeline pipelines/sdlc-default.json --work-order work-order.json --execute
+```
+
+- In the workflow, set the repository variable `ANVIL_RUNTIME`. For `copilot`
+  add the secret `COPILOT_GITHUB_TOKEN`: a fine-grained personal access token
+  of an account with a Copilot plan, with the Copilot Requests permission and
+  nothing else. On a workstation a stored `copilot login` works without it.
+- A project can set its default in `anvil.yaml` with `"provider": "copilot"`
+  inside `runtime`; the variable wins over it.
+- The models are the same Anthropic models. Copilot writes versions with a
+  dot, so `claude-opus-5-5` is requested as `claude-opus-5.5`. If your plan
+  lists a model under another name, state it:
+  `"copilot_models": {"claude-opus-5-5": "<name in copilot /model>"}` inside
+  `runtime`, or the variable `ANVIL_COPILOT_MODELS` with the same JSON.
+- The station contract does not change: producing stations may use every
+  tool; reviewers and observers may read, run commands and write only inside
+  their run directory; the review file is checked and corrected once; a
+  missing CLI or a failing run fails the station.
+- Token usage comes from the statistics file Copilot writes
+  (`--usage-output-file`), kept beside the station output as
+  `<station>.output.md.copilot-usage.json`. If that file is missing or not in
+  a shape the wrapper recognizes, usage is recorded as unknown.
+- `max_runtime_turns` has no Copilot equivalent. Set
+  `ANVIL_COPILOT_MAX_AI_CREDITS` to cap a station's session in AI credits.
+
+What was verified and what was not: the command line was checked against
+the real Copilot CLI (version 1.0.109), which accepted every flag and stopped
+at authentication. No authenticated run was made, so two things wait for your
+first run: that your plan serves the two models under the dotted names, and
+that the usage file has the per model shape the wrapper reads.
+
 ## The autonomous line
 
 Spec: `.openspec/specs/autonomous-line/spec.md`. Tests: `tests/test_autonomous_line.py`, `intake-worker/dispatch.test.js`.

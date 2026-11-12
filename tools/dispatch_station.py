@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Runtime dispatcher: runs a station on the Claude runtime for its configured model.
+"""Runtime dispatcher: runs a station on the station wrapper for its configured model.
+
+The wrapper (claude_station.py) reaches the model through the runtime the
+ANVIL_RUNTIME variable names: claude-gateway (Claude Code through the
+Cloudflare AI Gateway, the default) or copilot (GitHub Copilot CLI with the
+GitHub account). Either way the model is one of the Anthropic models below.
 
 This dispatcher reads ANVIL_CONFIGURED_MODEL from the environment (set by the
 runner) and dispatches to the appropriate runtime:

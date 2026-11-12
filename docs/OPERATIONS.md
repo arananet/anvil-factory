@@ -200,6 +200,12 @@ placeholders need your values: `SUBDOMAIN` in the Worker preview URL and
 - No extra secret: `tools/deploy_github_pages.py` pushes with the workflow's
   token, handed to git through its environment.
 
+## Which runtime runs the stations
+
+`ANVIL_RUNTIME` chooses between Claude Code through the Cloudflare AI Gateway
+(the default) and GitHub Copilot CLI with the GitHub account. See
+[EXECUTION.md](EXECUTION.md), Choosing the runtime.
+
 ## Not done here
 
 - The status page still lists finished runs only; `anvil runs` is where runs
