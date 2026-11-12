@@ -14,7 +14,7 @@ New projects include these adjustable starting settings in `anvil.yaml`:
     "max_packet_tokens": 12000,
     "max_runtime_turns": 16,
     "tool_output_tokens": 2000,
-    "max_agent_calls": 16,
+    "max_agent_calls": 32,
     "max_run_tokens": 250000,
     "require_usage": false
   }
@@ -28,8 +28,10 @@ stops the run. Backend packets omit interface design context. Stations are
 instructed to read relevant ranges, bound command output, reuse upstream work
 and keep their handoff concise.
 
-The Claude wrapper passes `max_runtime_turns` to the CLI. The Codex wrapper
-sets the retained tool-output limit; this is not a cap on total Codex tokens.
+The Claude wrapper passes `max_runtime_turns` to the CLI. `tool_output_tokens`
+is still accepted and handed to the runtime as `ANVIL_TOOL_OUTPUT_TOKENS`, but
+the supplied Claude wrapper does not apply it; it was the Codex wrapper's
+setting, and that runtime was removed (decision 0008).
 `max_agent_calls` counts station runtime invocations, including correction
 attempts. A runtime invocation may contain multiple model/tool turns.
 
@@ -96,8 +98,7 @@ than charging cached tokens at the ordinary input rate.
 
 ### Transcript Usage (S1)
 
-The Claude wrapper reads the JSON result's usage. The Codex wrapper reads
-JSONL turn-completion usage. Each attempt writes scalar-only evidence to
+The Claude wrapper reads the JSON result's usage. Each attempt writes scalar-only evidence to
 `<station>.output.md.usage.json`, including failed calls, corrections and
 timeouts. The executor preserves available evidence on errors and never
 reuses a previous invocation's usage file. Missing timeout usage stays unknown.
@@ -109,8 +110,7 @@ coverage and breakdowns by station and executed model. Unknown executed
 models remain `unreported`; configured labels are not invented execution
 evidence. Archived reports remain in project totals on reruns.
 
-Runtime format references: [Codex non-interactive output](https://developers.openai.com/codex/noninteractive/)
-and [Claude programmatic output](https://code.claude.com/docs/en/headless).
+Runtime format reference: [Claude programmatic output](https://code.claude.com/docs/en/headless).
 
 ### Gateway Usage (S2)
 

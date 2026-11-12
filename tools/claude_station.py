@@ -49,6 +49,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from anvil.telemetry import UsageRecorder
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import copilot_runtime
 
 # Stations that produce an artifact in the tree may edit it: each is told to
 # produce its output as a file. Reviewers and the read only stations (scout,
@@ -201,6 +203,18 @@ def main():
         print(f"claude_station: path validation failed: {e}", file=sys.stderr)
         return 6
 
+    # Which runtime reaches the model: Claude Code through the Cloudflare AI
+    # Gateway (the default), or GitHub Copilot CLI with the GitHub account.
+    try:
+        runtime = copilot_runtime.selected_runtime()
+        if runtime == "copilot":
+            copilot_runtime.copilot_model(model)
+    except ValueError as e:
+        print(f"claude_station: {e}", file=sys.stderr)
+        return 9
+    provider = "copilot" if runtime == "copilot" else "claude"
+    cli = "copilot" if runtime == "copilot" else "claude"
+
     repo_root = Path(os.environ.get("ANVIL_PROJECT_ROOT") or Path(__file__).resolve().parent.parent).resolve()
     correction_used = False
     usage_recorder = UsageRecorder()
@@ -240,26 +254,38 @@ def main():
         if os.environ.get("ANVIL_MAX_RUNTIME_TURNS"):
             command += ["--max-turns", os.environ["ANVIL_MAX_RUNTIME_TURNS"]]
 
+        copilot_usage = Path(str(output_path) + ".copilot-usage.json")
+        if runtime == "copilot":
+            # Same station, same permissions, reached through the GitHub
+            # account: a producing station may use every tool, any other may
+            # only read, run commands and write inside its run directory.
+            copilot_usage.unlink(missing_ok=True)
+            command = copilot_runtime.copilot_command(
+                prompt, model, station in WRITE_STATIONS, packet_path.resolve().parent, copilot_usage)
+
+        def raw_result(stdout):
+            return copilot_runtime.result_envelope(stdout, copilot_usage) if runtime == "copilot" else stdout
+
         call_started = time.perf_counter()
         try:
             proc = subprocess.run(command, cwd=str(repo_root), capture_output=True,
                                   text=True, timeout=TIMEOUT_SECONDS)
         except subprocess.TimeoutExpired as exc:
-            usage_recorder.record(exc.stdout, "claude", "timed_out",
+            usage_recorder.record(raw_result(exc.stdout), provider, "timed_out",
                                   (time.perf_counter() - call_started) * 1000, model)
             print(f"claude_station: station {station} timed out after {TIMEOUT_SECONDS}s",
                   file=sys.stderr)
             return 4
         except FileNotFoundError:
-            print("claude_station: the claude CLI is not on PATH", file=sys.stderr)
+            print(f"claude_station: the {cli} CLI is not on PATH", file=sys.stderr)
             return 5
 
-        parsed = usage_recorder.record(proc.stdout, "claude",
+        parsed = usage_recorder.record(raw_result(proc.stdout), provider,
                                       "succeeded" if proc.returncode == 0 else "failed",
                                       (time.perf_counter() - call_started) * 1000, model)
         if proc.returncode != 0 or parsed.get("is_error"):
             detail = (proc.stderr or proc.stdout or "").strip()[:2000]
-            print(f"claude_station: claude exited {proc.returncode} for station {station}: {detail}",
+            print(f"claude_station: {cli} exited {proc.returncode} for station {station}: {detail}",
                   file=sys.stderr)
             return 2
 
@@ -275,7 +301,7 @@ def main():
             review_written = validate_review_file(
                 repo_root / "runs" / work_order_id / f"{station}.review.json", station)[0]
         if not output.strip() and not (station_wrote_output or review_written):
-            print(f"claude_station: claude produced empty output for station {station}",
+            print(f"claude_station: {cli} produced empty output for station {station}",
                   file=sys.stderr)
             return 3
 

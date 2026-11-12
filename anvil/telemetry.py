@@ -7,7 +7,7 @@ from pathlib import Path
 TOKEN_FIELDS = ("input_tokens", "output_tokens", "cached_input_tokens",
                 "cache_creation_input_tokens", "reasoning_tokens", "total_tokens")
 DEFAULT_EFFICIENCY = {"max_packet_tokens": 12000, "max_runtime_turns": 16,
-                      "tool_output_tokens": 2000, "max_agent_calls": 16,
+                      "tool_output_tokens": 2000, "max_agent_calls": 32,
                       "max_run_tokens": 250000, "require_usage": False}
 EFFICIENCY_NOTE = (
     "\n## Consumption discipline\n\n"
@@ -84,6 +84,19 @@ def parse_runtime_output(raw, provider):
         if isinstance(turns, int) and not isinstance(turns, bool) and turns >= 0:
             result["turns"] = turns
         result["is_error"] = bool(data.get("is_error"))
+        return result
+    if provider == "copilot":
+        # Envelope built by tools/copilot_runtime.py from the reply and the
+        # usage statistics file; Copilot reports no turn count.
+        try:
+            data = json.loads(raw)
+        except (ValueError, TypeError):
+            return result
+        if not isinstance(data, dict) or data.get("type") != "copilot_result":
+            return result
+        result["output"] = str(data.get("result") or "")
+        result["usage"] = normalize_usage(data.get("usage"))
+        result["usage_complete"] = result["usage"] is not None
         return result
     messages, usages, events = [], [], 0
     for line in raw.splitlines():

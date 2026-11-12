@@ -2,6 +2,57 @@
 
 ## Unreleased
 
+### Runtime selection: Claude Code through the gateway, or GitHub Copilot CLI
+
+- New variable ANVIL_RUNTIME: claude-gateway (default, unchanged) or copilot (GitHub Copilot CLI with the Anthropic models of a GitHub account, credential COPILOT_GITHUB_TOKEN). runtime.provider in anvil.yaml sets a project default; the variable wins.
+- tools/copilot_runtime.py builds the Copilot command per station (producers every tool; other stations read, shell and writes only inside their run directory; built-in MCP servers off; credentials withheld from agent shells), maps model names (claude-opus-5-5 to claude-opus-5.5, overridable) and reads token usage from the --usage-output-file statistics.
+- The station wrapper keeps one contract over both runtimes: review file check, one correction, usage ledger, loud failures.
+- The workflow installs and smoke tests only the selected runtime; the sandbox image carries both CLIs.
+- Spec: .openspec/specs/runtime-selection/spec.md. Tests: tests/test_runtime_selection.py. Decision 0010.
+- Checked against the real Copilot CLI 1.0.109 for argument parsing; not yet run authenticated.
+
+### Governed delivery: live state, events, verified approvals, contained stations, previews
+
+Owner-authored outside the line (decision 0006, record 0009).
+
+- Live state: runs/<id>/state.json is rewritten before every station (running, finished, crashed; stalled when abandoned). A run that dies halfway no longer leaves nothing behind.
+- Events: runs/<id>/events.jsonl, one structured line per run boundary, step and loopback, scalar facts only.
+- Export: each event to a webhook (observability.events_url) and the finished run as one OpenTelemetry trace (observability.otlp_endpoint). A failed export never changes a run.
+- `anvil runs`: every run's state plus approval rate, loopbacks, reviewer rejections, tokens and cost across runs.
+- Approvals carry an identity (verified inside GitHub Actions) and obey an approvals policy in anvil.yaml: approvers, per risk hint lists, who may override, verified identity required. The policy is read from the operator's checkout.
+- Stations and project checks no longer receive repository, deploy or workflow identity tokens. Optional container sandbox for stations (runtime.sandbox, kind docker; image in tools/sandbox). The workflow persists no credentials and sets no token at job level.
+- A preview deployment per work order, once per attempt before review (deploy.preview), with `anvil preview-cleanup` and `anvil provision`. The workflow removes the preview when the order's pull request closes.
+- Blueprints carry deploy targets: `anvil new-project --deploy-target cloudflare|github`. New tool tools/deploy_github_pages.py (production at the root, previews under previews/<name>/).
+- Spec: .openspec/specs/governed-delivery/spec.md. Tests: tests/test_governed_delivery.py. Docs: docs/OPERATIONS.md.
+- Not verified against real services: the Cloudflare commands and the Docker sandbox (no Cloudflare account or Docker daemon was available where this was built).
+
+### Single runtime: Codex and the OpenAI route removed
+
+Owner's order 2026-11-12 ("Quitemos codex de la ecuación"). Decision 0008, which supersedes the OpenAI part of decision 0004.
+
+- Every station runs on the Claude runtime. reviewer-design, reviewer-ux and the builder on UI surfaces use claude-opus-5-5 (was openai/gpt-6.1-sol through Codex). The benchmark recorded in decision 0004 measured Opus 5.5 level with Sol on design quality, at a higher cost per task (0.137 against 0.038 USD).
+- Removed tools/codex_station.py and its tests; tools/dispatch_station.py fails loudly on any non Anthropic model; CONCRETE_MODELS is the two Anthropic models.
+- tools/model_route_smoke.py probes the Anthropic route only: text for both models and vision for the design model, sending the gateway headers from ANTHROPIC_CUSTOM_HEADERS.
+- The anvil-line workflow no longer installs Codex.
+- efficiency.tool_output_tokens stays a valid key but the supplied wrapper does not apply it.
+- tests/test_landing_page.py: the wo-gh-35 fence test now binds only its own run branch; it failed on any later branch with full history.
+
+### Autonomous line: real loopbacks, a resumable human gate, one workflow
+
+Owner-authored outside the line (decision 0006, record 0007). The line neither produced nor reviewed this change.
+
+- Loopbacks re-execute. In execute mode a rejected or changes_requested verdict, or a failed pre-review checks gate, sends the work back to the return station with the findings in the packets of the next attempt. The replaced attempt is archived under runs/<id>/attempts/ and its reviews never count. Before this the report recorded a loopback and no station ran again.
+- A new attempt starts only when the call and token thresholds leave room for it; otherwise the verdict stands and the step says why. Default max_agent_calls rises from 16 to 32.
+- `anvil run` exits 0, 1, 3 or 4 by outcome instead of always 0.
+- New commands: `anvil approve` (a recorded approval bound to one run, `--override` explicit and recorded), `anvil resume` (re-enters after the gate, earlier stations never run again), `anvil work-order-from-issue`, and `--isolate` (branch anvil/<id> in its own worktree, committed by the engine).
+- The publisher is held behind the human gate in execute mode. It used to run regardless of the gate.
+- Routing no longer drops reviewers it does not know. Every content run in execute mode used to end no_reviews because the content reviewers were in neither routing panel.
+- The intake worker forwards work orders as repository_dispatch (type anvil-work-order) for verified deliveries labeled anvil, and for POST /work-orders with the INTAKE_TOKEN bearer. Issue work orders are now wo-gh-<number> with kind and risk hints from labels (default kind feature, was bug).
+- One workflow, .github/workflows/anvil-line.yml, serves every work order (label, dispatch, `/anvil approve` comment, manual). The 24 per order anvil-execute-*.yml workflows are removed.
+- The project checks run once before the builder and the result is recorded on the test-writer step (red_check); a green result warns and is flagged to reviewer-tests.
+- `anvil check` review gate: a reviewer file on record beyond the core four must pass too.
+- Spec: .openspec/specs/autonomous-line/spec.md. Tests: tests/test_autonomous_line.py, intake-worker/dispatch.test.js. Docs: docs/EXECUTION.md, The autonomous line.
+
 ### Token consumption and project pages
 
 - Capture Claude JSON and Codex JSONL usage per attempt, including corrections, errors and timeouts; preserve usage through command executor failures. Cache and reasoning counts are not added twice, and missing usage stays unknown.

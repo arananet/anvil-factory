@@ -37,17 +37,62 @@ async function validSignature(secret, rawBody, signatureHeader) {
   return constantTimeEqual(new Uint8Array(mac), hexToBytes(expectedHex));
 }
 
+const KINDS = ["idea", "feature", "bug", "incident", "task", "content"];
+const RISK_HINTS = ["auth", "payments", "data-deletion", "production-deploy", "secrets", "publishing"];
+
+// Same mapping as anvil/line.py work_order_from_issue: labels carry the kind
+// (first match, default feature) and the risk hints (bare or risk:<hint>).
 function issueToWorkOrder(issue) {
   const labels = Array.isArray(issue.labels)
     ? issue.labels.map((l) => (typeof l === "string" ? l : l && l.name)).filter(Boolean)
+        .map((l) => String(l).trim().toLowerCase())
     : [];
   const description = [issue.body || "", "", `GitHub issue: ${issue.html_url || ""}`].join("\n").trim();
-  return normalize({
-    kind: labels.includes("task") ? "task" : "bug",
+  const hints = [];
+  for (const label of labels) {
+    const hint = label.startsWith("risk:") ? label.slice(5) : label;
+    if (RISK_HINTS.includes(hint) && !hints.includes(hint)) hints.push(hint);
+  }
+  const body = {
+    kind: labels.find((l) => KINDS.includes(l)) || "feature",
     title: issue.title || "GitHub issue",
     source: "github-issue",
     description,
-  });
+    risk_hints: hints,
+  };
+  if (Number.isInteger(issue.number)) body.id = `wo-gh-${issue.number}`;
+  return normalize(body);
+}
+
+// Forward a work order to the line: a repository_dispatch event of type
+// anvil-work-order on env.GITHUB_REPO, which the anvil-line workflow runs.
+// Both values come from the Worker environment; no secret lives in this file.
+// Returns {dispatched, status?, reason?} and never throws: intake still
+// answers with the normalized work order when the forward fails.
+async function dispatch(env, workOrder) {
+  if (!env.GITHUB_REPO || !env.GITHUB_TOKEN) {
+    return { dispatched: false, reason: "not_configured" };
+  }
+  if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(env.GITHUB_REPO)) {
+    return { dispatched: false, reason: "invalid_repo" };
+  }
+  try {
+    const response = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/dispatches`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json",
+        "User-Agent": "anvil-intake-worker",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+      body: JSON.stringify({ event_type: "anvil-work-order", client_payload: { work_order: workOrder } }),
+    });
+    if (response.status === 204) return { dispatched: true, status: 204 };
+    return { dispatched: false, status: response.status, reason: "github_refused" };
+  } catch {
+    return { dispatched: false, reason: "network_error" };
+  }
 }
 
 export default {
@@ -65,11 +110,21 @@ export default {
       if (!body || !body.kind || !body.title) {
         return Response.json({ error: "Body must include kind and title" }, { status: 400 });
       }
+      // With an intake token configured, only its holder can file work orders.
+      if (env.INTAKE_TOKEN) {
+        const given = new TextEncoder().encode(request.headers.get("authorization") || "");
+        const expected = new TextEncoder().encode(`Bearer ${env.INTAKE_TOKEN}`);
+        if (!constantTimeEqual(given, expected)) {
+          return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
+      }
       const wo = normalize(body);
-      // Optional GitHub dispatch: if env.GITHUB_REPO and env.GITHUB_TOKEN are set,
-      // a deployment can forward the work order to a repository dispatch event.
-      // No secrets live in this file; both values come from the Worker environment.
-      return Response.json(wo, { status: 201 });
+      // Forwarding to the line needs the intake token: an open endpoint
+      // must never be able to start runs.
+      const forwarded = env.INTAKE_TOKEN
+        ? await dispatch(env, wo)
+        : { dispatched: false, reason: "intake_token_required" };
+      return Response.json({ ...wo, dispatch: forwarded }, { status: 201 });
     }
     if (request.method === "POST" && url.pathname === "/github") {
       const raw = await request.text();
@@ -93,7 +148,15 @@ export default {
       if (!shouldMap) {
         return Response.json({ ok: true, ignored: true }, { status: 202 });
       }
-      return Response.json(issueToWorkOrder(payload.issue), { status: 202 });
+      const wo = issueToWorkOrder(payload.issue);
+      // Only a verified delivery carrying the anvil label starts a run: the
+      // label is applied by someone with triage rights, never by the author
+      // of an arbitrary issue.
+      const labeled = action === "labeled" && labelName === "anvil";
+      const forwarded = env.GITHUB_WEBHOOK_SECRET && labeled
+        ? await dispatch(env, wo)
+        : { dispatched: false, reason: labeled ? "unsigned_delivery" : "not_labeled_anvil" };
+      return Response.json({ ...wo, dispatch: forwarded }, { status: 202 });
     }
     return Response.json({ error: "Not found" }, { status: 404 });
   },

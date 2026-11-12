@@ -148,9 +148,9 @@ earlier runs remain in the total when a work order is rerun. Missing usage
 stays unknown, including historical reports.
 
 New projects include `status/index.html` and consumption controls in
-`anvil.yaml`: a 12,000 token packet ceiling, 16 agent calls per run, a 250,000
-token run threshold, up to 16 Claude runtime turns and 2,000 retained tokens
-per Codex tool result. These are adjustable starting settings. Run thresholds
+`anvil.yaml`: a 12,000 token packet ceiling, 32 agent calls per run, a 250,000
+token run threshold and up to 16 Claude runtime turns. These are adjustable
+starting settings. Run thresholds
 are checked between calls; a running call can exceed them. An agent call is
 one station runtime invocation, which may contain several model/tool turns.
 
@@ -180,11 +180,21 @@ python3 -m anvil.cli check-content ../my-channel --slug my-post
 python3 -m anvil.cli check-brain ../my-project
 python3 -m anvil.cli check-skills ../my-project
 python3 -m anvil.cli supervise ../my-project
+python3 -m anvil.cli run ../my-project --pipeline pipelines/sdlc-default.json --work-order work-order.json --execute --isolate
+python3 -m anvil.cli approve ../my-project wo-gh-12 --by "Your Name"
+python3 -m anvil.cli resume ../my-project wo-gh-12 --execute
+python3 -m anvil.cli work-order-from-issue issue.json
 ```
+
+## From issue to pull request, unattended
+
+One workflow, [.github/workflows/anvil-line.yml](.github/workflows/anvil-line.yml), runs the line for any work order. Label an issue `anvil` and the line runs on its own branch (`anvil/wo-gh-<number>`), corrects itself through real loopbacks (a failed review or a failed checks gate sends the work back to the builder with the findings, up to two times), opens a pull request and reports on the issue. When a human must decide, a maintainer comments `/anvil approve` on the issue: the approval is recorded against that run and the line resumes after the gate to deploy or publish. `anvil run --execute` exits 0 when approved, 1 when not, 3 when a human must act and 4 when intake stopped the order, so any CI can gate on it. See [docs/EXECUTION.md](docs/EXECUTION.md).
 
 Installed as a package, the same commands are available as `anvil new-project`, `anvil onboard`, `anvil init`, `anvil new-spec`, `anvil validate-pipeline`, `anvil run`, `anvil check`, `anvil check-brain` and `anvil supervise`.
 
 Project station settings live in `anvil.yaml` at the project root: context, model, prompt and tools per station. See docs/ARCHITECTURE.md for the Core Four.
+
+The factory's own stations run on Anthropic models, reached one of two ways chosen by the `ANVIL_RUNTIME` variable: Claude Code through the Cloudflare AI Gateway (`claude-gateway`, the default) or GitHub Copilot CLI with a GitHub account (`copilot`).
 
 Agent runtimes are pluggable: add a `runtime` object to anvil.yaml and run with `--execute` to have a command or HTTP executor run the station packets, with reviewer output feeding the approver of the same run. A `deploy` object in the same file lets an approved, unblocked run deploy automatically and pass a deterministic verification gate. Every step records which model was configured and, for executed steps, which model actually ran. See docs/EXECUTION.md.
 
@@ -211,7 +221,7 @@ The brain/ folder holds project.md (what the project is and its principles), glo
 
 intake-worker/ is a Cloudflare Worker in plain JavaScript with no dependencies. POST /work-orders validates and normalizes a work order and returns 201. GET /health returns ok. POST /github accepts GitHub webhook deliveries: set GITHUB_WEBHOOK_SECRET on the Worker to require a valid X-Hub-Signature-256 HMAC (invalid signature returns 401), and issues opened, or labeled with the label anvil, are mapped to a work order (kind task when the issue carries the task label) and returned with 202; other events are acknowledged and ignored. Tests run with `node --test "intake-worker/*.test.js"`.
 
-Optional GitHub dispatch: set GITHUB_REPO and GITHUB_TOKEN in the Worker environment to forward work orders to a repository dispatch event in your own deployment code. No secrets live in the repo.
+GitHub dispatch: set GITHUB_REPO and GITHUB_TOKEN in the Worker environment and the worker forwards work orders to the line as a repository_dispatch event of type anvil-work-order, which the anvil-line workflow runs. Only a signature verified issue delivery labeled anvil is forwarded, and POST /work-orders forwards only with the INTAKE_TOKEN bearer; the response reports whether the forward happened. No secrets live in the repo.
 
 ## Contributing
 
@@ -224,6 +234,7 @@ Every change starts with a spec under .openspec/specs/ (OpenSpec). Write the spe
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Layers, artifact flow, gates, risk triage, Core Four, model stack, loopback, envelopes, observability |
 | [docs/SDLC.md](docs/SDLC.md) | How the default pipeline maps to SDLC phases |
 | [docs/EXECUTION.md](docs/EXECUTION.md) | Agent runtime executors, the runtime contract, automatic deploy and post deploy verification |
+| [docs/OPERATIONS.md](docs/OPERATIONS.md) | Operating the line: live run state and events, export to a webhook or OpenTelemetry, the approvals policy, what a station can reach, and a preview per work order on Cloudflare or GitHub Pages |
 | [docs/STATUS-PAGE.md](docs/STATUS-PAGE.md) | The run status page: generation, publishing to Cloudflare Pages or GitHub Pages, and the snapshot note |
 | [docs/MEMORY-GATE.md](docs/MEMORY-GATE.md) | Verified learnings: the inbox flow, the provenance format, and why memory writes are gated |
 | [docs/SUPERVISOR.md](docs/SUPERVISOR.md) | The bounded supervisor: stall signals, the constitution, the proposal lifecycle, and what it can never do |

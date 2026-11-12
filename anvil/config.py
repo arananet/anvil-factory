@@ -35,7 +35,7 @@ MODEL_TIER_MAP = {
     "default": "claude-sonnet-5-5",
 }
 
-CONCRETE_MODELS = ("claude-opus-5-5", "claude-sonnet-5-5", "openai/gpt-6.1-sol")
+CONCRETE_MODELS = ("claude-opus-5-5", "claude-sonnet-5-5")
 
 
 def resolve_model(label):

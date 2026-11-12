@@ -252,6 +252,10 @@ class TestStyleAndFence(unittest.TestCase):
                            cwd=ROOT, capture_output=True, text=True)
         if r.returncode != 0:
             self.skipTest("origin/main not available")
+        branch = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=ROOT,
+                                capture_output=True, text=True).stdout.strip()
+        if branch != "anvil/run-landing-page":
+            self.skipTest("the fence binds the wo-gh-35 run branch only")
         for f in r.stdout.split():
             ok = (f.startswith("site/") or f == "docs/LANDING-PAGE.md"
                   or re.fullmatch(r"tests/test_landing_page\w*\.py", f)

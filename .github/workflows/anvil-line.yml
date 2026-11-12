@@ -1,0 +1,312 @@
+name: anvil-line
+
+# The one workflow that runs the ANVIL line for any work order. It replaces
+# the per order anvil-execute-*.yml files: nothing here names an issue, a
+# branch or a work order file.
+#
+# How an order enters:
+# - A maintainer labels an issue `anvil`. Labels need triage rights, so the
+#   author of an arbitrary issue cannot start a run.
+# - The intake worker forwards a work order as a repository_dispatch event
+#   of type anvil-work-order.
+# - workflow_dispatch, with an issue number, for a manual start or resume.
+#
+# How the human gate is answered:
+# - An owner, member or collaborator comments `/anvil approve` on the issue.
+#   The approval is recorded against the run it approves and the line
+#   resumes after the gate (deploy, publish, observe).
+#
+# What the engine does, not this file: the branch (anvil/<work-order-id>),
+# the isolated worktree, the loopbacks, the commit, and the exit code that
+# decides this job's outcome (anvil/line.py). Issue text never reaches a
+# shell: event fields are read from the event file or passed through env.
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+  repository_dispatch:
+    types: [anvil-work-order]
+  pull_request:
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: Issue number of the work order
+        required: true
+        type: string
+      mode:
+        description: run the line, or resume it after an approval already recorded with the CLI
+        required: true
+        default: run
+        type: choice
+        options: [run, resume]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: anvil-line-${{ github.event.issue.number || github.event.inputs.issue || github.event.client_payload.work_order.id || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  line:
+    name: Run the ANVIL line
+    if: >-
+      github.event_name != 'pull_request' && (
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'repository_dispatch' ||
+      (github.event_name == 'issues' && github.event.label.name == 'anvil') ||
+      (github.event_name == 'issue_comment' && !github.event.issue.pull_request &&
+       startsWith(github.event.comment.body, '/anvil approve') &&
+       contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)))
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      ANTHROPIC_BASE_URL: ${{ vars.ANVIL_ANTHROPIC_BASE_URL || 'https://gateway.ai.cloudflare.com/v1/693ae9c587f1f2c34328bb47447366b0/arananet-ai-gateway/anthropic' }}
+      ANTHROPIC_API_KEY: ${{ secrets.CF_AIG_TOKEN }}
+      ANTHROPIC_CUSTOM_HEADERS: "cf-aig-authorization: Bearer ${{ secrets.CF_AIG_TOKEN }}"
+      CF_AIG_TOKEN: ${{ secrets.CF_AIG_TOKEN }}
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+      # Which runtime reaches the models: claude-gateway (Claude Code through
+      # the Cloudflare AI Gateway, the default) or copilot (GitHub Copilot
+      # CLI with the Anthropic models of the GitHub account). Repository
+      # variable ANVIL_RUNTIME; the copilot runtime needs the secret
+      # COPILOT_GITHUB_TOKEN, a token with the Copilot Requests permission.
+      ANVIL_RUNTIME: ${{ vars.ANVIL_RUNTIME || 'claude-gateway' }}
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+      # No repository or deploy token lives at job level: the stations run
+      # model written commands, so each token is given only to the step
+      # that needs it, and the engine strips them from station environments.
+      EVENT_NAME: ${{ github.event_name }}
+      INPUT_ISSUE: ${{ github.event.inputs.issue }}
+      INPUT_MODE: ${{ github.event.inputs.mode }}
+      ACTOR: ${{ github.actor }}
+      RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      BASE_BRANCH: ${{ github.event.repository.default_branch }}
+      AUTO_MERGE: ${{ vars.ANVIL_AUTO_MERGE }}
+    steps:
+      - name: Check out the default branch with history
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+          # Nothing is left in .git/config for a station to push with.
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Resolve the work order
+        id: order
+        env:
+          GH_TOKEN: ${{ secrets.ANVIL_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          MODE=run
+          OVERRIDE=""
+          case "${EVENT_NAME}" in
+            issues)
+              python3 -m anvil.cli work-order-from-issue "${GITHUB_EVENT_PATH}" --out-dir work-orders > order.json
+              ;;
+            workflow_dispatch)
+              case "${INPUT_ISSUE}" in ''|*[!0-9]*) echo "issue must be a number"; exit 2;; esac
+              MODE="${INPUT_MODE:-run}"
+              gh api "repos/${GITHUB_REPOSITORY}/issues/${INPUT_ISSUE}" > issue.json
+              python3 -m anvil.cli work-order-from-issue issue.json --out-dir work-orders > order.json
+              ;;
+            issue_comment)
+              MODE=approve
+              python3 - <<'PYEOF'
+          import json, os
+          event = json.load(open(os.environ["GITHUB_EVENT_PATH"]))
+          words = event["comment"]["body"].split()
+          json.dump({"id": f"wo-gh-{int(event['issue']['number'])}", "work_order": "", "pipeline": None,
+                     "override": words[:3] == ["/anvil", "approve", "--override"]}, open("order.json", "w"))
+          PYEOF
+              ;;
+            repository_dispatch)
+              python3 - <<'PYEOF'
+          import json, os
+          from pathlib import Path
+          from anvil.model import WorkOrder
+          event = json.load(open(os.environ["GITHUB_EVENT_PATH"]))
+          data = event["client_payload"]["work_order"]
+          order = WorkOrder.from_dict(data)  # validates the id and the shape
+          path = Path("work-orders") / f"{order.id}.json"
+          path.parent.mkdir(exist_ok=True)
+          path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
+          json.dump({"id": order.id, "work_order": str(path), "pipeline": None}, open("order.json", "w"))
+          PYEOF
+              ;;
+          esac
+          python3 - <<'PYEOF' >> "${GITHUB_OUTPUT}"
+          import json, re
+          order = json.load(open("order.json"))
+          config = json.load(open("anvil.json"))
+          pipeline = order.get("pipeline") or config.get("pipeline") or "sdlc-default"
+          assert re.fullmatch(r"[a-z0-9][a-z0-9-]*", pipeline), "invalid pipeline name"
+          assert re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", order["id"]), "invalid work order id"
+          issue = re.fullmatch(r"wo-gh-(\d+)", order["id"])
+          print(f"id={order['id']}")
+          print(f"work_order={order.get('work_order') or ''}")
+          print(f"pipeline={pipeline}")
+          print(f"issue={issue.group(1) if issue else ''}")
+          print(f"override={'--override' if order.get('override') else ''}")
+          PYEOF
+          echo "mode=${MODE}" >> "${GITHUB_OUTPUT}"
+          # A branch from an earlier run of this order is continued, not replaced.
+          WO_ID=$(python3 -c "import json; print(json.load(open('order.json'))['id'])")
+          git fetch "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/heads/anvil/${WO_ID}:refs/heads/anvil/${WO_ID}" 2>/dev/null || true
+          rm -f order.json issue.json
+
+      - name: Install the station runtime
+        run: |
+          case "${ANVIL_RUNTIME}" in
+            claude-gateway) npm install -g @anthropic-ai/claude-code; claude --version ;;
+            copilot) npm install -g @github/copilot; copilot --version ;;
+            *) echo "Unknown ANVIL_RUNTIME '${ANVIL_RUNTIME}': use claude-gateway or copilot"; exit 2 ;;
+          esac
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: Runtime smoke test
+        run: python3 tools/model_route_smoke.py
+
+      - name: Run, approve or resume the line
+        id: line
+        env:
+          WO_ID: ${{ steps.order.outputs.id }}
+          WO_FILE: ${{ steps.order.outputs.work_order }}
+          PIPELINE: ${{ steps.order.outputs.pipeline }}
+          MODE: ${{ steps.order.outputs.mode }}
+          OVERRIDE: ${{ steps.order.outputs.override }}
+          # For the deploy, preview and verify commands the spine runs. The
+          # engine removes these from every station and check environment.
+          GH_TOKEN: ${{ secrets.ANVIL_PAT || secrets.GITHUB_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -uo pipefail
+          CODE=0
+          if [ "${MODE}" = "approve" ]; then
+            python3 -m anvil.cli approve . "${WO_ID}" --by "${ACTOR}" --note "Approved from ${RUN_URL}" ${OVERRIDE} --isolate || CODE=$?
+          fi
+          if [ "${CODE}" = "0" ]; then
+            if [ "${MODE}" = "run" ]; then
+              python3 -m anvil.cli run . --pipeline "pipelines/${PIPELINE}.json" --work-order "${WO_FILE}" --execute --isolate > line.log || CODE=$?
+            else
+              python3 -m anvil.cli resume . "${WO_ID}" --execute --isolate > line.log || CODE=$?
+            fi
+            tail -n 5 line.log || true
+          fi
+          echo "code=${CODE}" >> "${GITHUB_OUTPUT}"
+          echo "worktree=../.anvil-worktrees/$(basename "${PWD}")/${WO_ID}" >> "${GITHUB_OUTPUT}"
+
+      - name: Push the run branch and open or update the pull request
+        id: pr
+        env:
+          WO_ID: ${{ steps.order.outputs.id }}
+          ISSUE: ${{ steps.order.outputs.issue }}
+          CODE: ${{ steps.line.outputs.code }}
+          WORKTREE: ${{ steps.line.outputs.worktree }}
+          # A personal access token (secret ANVIL_PAT) lets the pushed branch
+          # and the pull request trigger the repository's own CI; GITHUB_TOKEN
+          # works too, but GitHub does not start workflows for what it pushes.
+          GH_TOKEN: ${{ secrets.ANVIL_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          BRANCH="anvil/${WO_ID}"
+          python3 tools/line_comment.py "${WORKTREE}/runs/${WO_ID}/report.json" "${CODE}" "${RUN_URL}" "${BRANCH}" > comment.md
+          if ! git rev-parse --verify --quiet "refs/heads/${BRANCH}" >/dev/null; then
+            echo "The line produced no branch; nothing to push."
+            exit 0
+          fi
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "${BRANCH}"
+          if [ "$(git rev-list --count "origin/${BASE_BRANCH}..${BRANCH}")" = "0" ]; then
+            echo "The branch carries no commits beyond ${BASE_BRANCH}; no pull request."
+            exit 0
+          fi
+          if ! gh pr view "${BRANCH}" --json number >/dev/null 2>&1; then
+            TITLE=$(python3 -c "import json,sys; print('ANVIL ' + sys.argv[2] + ': ' + json.load(open(sys.argv[1])).get('title','')[:120])" "${WORKTREE}/runs/${WO_ID}/report.json" "${WO_ID}" 2>/dev/null || echo "ANVIL ${WO_ID}")
+            { cat comment.md; if [ -n "${ISSUE}" ]; then echo; echo "Closes #${ISSUE}"; fi; } > pr-body.md
+            gh pr create --draft --base "${BASE_BRANCH}" --head "${BRANCH}" --title "${TITLE}" --body-file pr-body.md
+          fi
+          if [ "${CODE}" = "0" ]; then
+            gh pr ready "${BRANCH}" || true
+            if [ "${AUTO_MERGE}" = "true" ]; then
+              gh pr merge "${BRANCH}" --squash --auto || gh pr merge "${BRANCH}" --squash
+            fi
+          fi
+
+      - name: Report on the issue
+        if: always() && steps.order.outputs.issue != ''
+        env:
+          ISSUE: ${{ steps.order.outputs.issue }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          [ -s comment.md ] || printf '## ANVIL line report\n\nThe workflow stopped before the line produced a report. See %s\n' "${RUN_URL}" > comment.md
+          gh issue comment "${ISSUE}" --body-file comment.md
+
+      - name: Upload the run directory
+        if: always() && steps.line.outputs.worktree != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: anvil-run-${{ steps.order.outputs.id }}
+          path: ${{ steps.line.outputs.worktree }}/runs/${{ steps.order.outputs.id }}
+          if-no-files-found: ignore
+
+      - name: Job outcome follows the line
+        env:
+          CODE: ${{ steps.line.outputs.code }}
+        run: |
+          case "${CODE}" in
+            0) echo "Approved." ;;
+            3) echo "Waiting at the human gate: comment /anvil approve on the issue." ;;
+            4) echo "Intake stopped the order." ;;
+            *) echo "The line did not approve this work (exit ${CODE})."; exit 1 ;;
+          esac
+
+  cleanup:
+    name: Remove the preview of a closed order
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.event.pull_request.head.ref, 'anvil/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run the project's preview cleanup command
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          GH_TOKEN: ${{ secrets.ANVIL_PAT || secrets.GITHUB_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: python3 -m anvil.cli preview-cleanup . "${HEAD_REF#anvil/}"

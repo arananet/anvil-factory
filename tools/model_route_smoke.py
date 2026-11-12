@@ -1,227 +1,131 @@
 #!/usr/bin/env python3
-"""Smoke test for model routes through Cloudflare AI Gateway.
+"""Smoke test for the model routes through Cloudflare AI Gateway.
 
-Probes the Anthropic and OpenAI routes with the models the factory uses,
-using only environment credentials that the workflows supply. Never prints
-credential values.
+Probes the models the factory uses on the runtime ANVIL_RUNTIME selects:
+the Anthropic route of the gateway (claude-gateway, the default) or GitHub
+Copilot CLI (copilot). Uses only the environment credentials the workflow
+supplies and never prints credential values.
 
 Routes tested:
-- Anthropic route: claude-sonnet-5-5 (text)
-- Anthropic route: claude-opus-5-5 (text)
-- OpenAI route: gpt-6.1-sol (text)
-- OpenAI route: gpt-6.1-sol (vision: small image)
+- claude-sonnet-5-5 (text)
+- claude-opus-5-5 (text)
+- claude-opus-5-5 (vision: small image; the design stations judge captures)
 
-Exits 0 if all routes pass, non-zero if any route fails with the failing
-route named.
+Exits 0 if every route passes, non-zero if any fails, naming the route.
 """
 
 import base64
 import json
 import os
+import struct
 import sys
 import urllib.error
 import urllib.request
-from pathlib import Path
+import zlib
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from codex_station import gateway_openai_config  # noqa: E402
+TEXT_MODELS = ("claude-sonnet-5-5", "claude-opus-5-5")
+VISION_MODEL = "claude-opus-5-5"
 
 
-def probe_anthropic(model, description):
-    """Probe Anthropic route through AI Gateway."""
+def _tiny_png():
+    def chunk(kind, data):
+        body = kind + data
+        return struct.pack(">I", len(data)) + body + struct.pack(">I", zlib.crc32(body) & 0xFFFFFFFF)
+    raw = b"\x00\xff\x00\x00\x00\xff\x00\x00"
+    png = (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 2, 1, 8, 2, 0, 0, 0))
+           + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
+    return base64.b64encode(png).decode("ascii")
+
+
+def _gateway_headers():
+    """Extra headers from ANTHROPIC_CUSTOM_HEADERS ("name: value" per line)."""
+    headers = {}
+    for line in os.environ.get("ANTHROPIC_CUSTOM_HEADERS", "").splitlines():
+        name, sep, value = line.partition(":")
+        if sep and name.strip():
+            headers[name.strip()] = value.strip()
+    return headers
+
+
+def probe_anthropic(model, description, content="Say 'ok'"):
+    """Probe one model on the Anthropic route. Returns (ok, message)."""
     base_url = os.environ.get("ANTHROPIC_BASE_URL")
     api_key = os.environ.get("ANTHROPIC_API_KEY")
-
     if not base_url or not api_key:
         return False, "Missing ANTHROPIC_BASE_URL or ANTHROPIC_API_KEY environment variables"
-
-    # Simple text probe
-    payload = {
-        "model": model,
-        "max_tokens": 10,
-        "messages": [{"role": "user", "content": "Say 'ok'"}]
-    }
-
+    payload = {"model": model, "max_tokens": 10, "messages": [{"role": "user", "content": content}]}
+    secrets = [api_key] + [v for v in _gateway_headers().values() if v]
     try:
-        req = urllib.request.Request(
-            f"{base_url}/v1/messages",
-            data=json.dumps(payload).encode("utf-8"),
-            method="POST"
-        )
+        req = urllib.request.Request(f"{base_url.rstrip('/')}/v1/messages",
+                                     data=json.dumps(payload).encode("utf-8"), method="POST")
         req.add_header("Content-Type", "application/json")
         req.add_header("x-api-key", api_key)
         req.add_header("anthropic-version", "2023-06-01")
-
+        for name, value in _gateway_headers().items():
+            req.add_header(name, value)
         with urllib.request.urlopen(req, timeout=30) as resp:
             body = json.loads(resp.read().decode("utf-8"))
-
-        # Check for valid response structure
-        if "content" in body and len(body["content"]) > 0:
+        if body.get("content"):
             return True, f"{description}: ok"
-        else:
-            return False, f"{description}: unexpected response structure"
+        return False, f"{description}: unexpected response structure"
+    except Exception as exc:
+        detail = str(exc)[:200]
+        for secret in secrets:
+            detail = detail.replace(secret, "[redacted]")
+        return False, f"{description}: {detail}"
 
-    except Exception as e:
-        return False, f"{description}: {str(e)[:200]}"
+
+def probe_anthropic_vision(model, description):
+    content = [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": _tiny_png()}},
+               {"type": "text", "text": "You were given an image. Say 'ok'"}]
+    return probe_anthropic(model, description, content)
 
 
-def route_completion(prompt, model, max_tokens=4000, timeout=30):
-    """Plain completion against the gateway OpenAI route: a probe, not a runtime.
-
-    This is the only place a bare completion lives (model-migration R12).
-    Station execution for openai/* models runs the agentic Codex CLI in
-    tools/codex_station.py and never calls this. Returns the reply text;
-    raises RuntimeError without ever including the credential.
-    """
-    base_url, token = gateway_openai_config()
-    bare_model = model.split("/")[-1] if "/" in model else model
-    payload = {
-        "model": bare_model,
-        "max_tokens": max_tokens,
-        "messages": [{"role": "user", "content": prompt}]
-    }
+def probe_copilot(model, description):
+    """Probe one model through GitHub Copilot CLI. Returns (ok, message)."""
+    import subprocess
+    from copilot_runtime import copilot_model
+    name = copilot_model(model)
     try:
-        req = urllib.request.Request(
-            f"{base_url}/chat/completions",
-            data=json.dumps(payload).encode("utf-8"),
-            method="POST"
-        )
-        req.add_header("Content-Type", "application/json")
-        req.add_header("Authorization", f"Bearer {token}")
-        req.add_header("cf-aig-authorization", f"Bearer {token}")
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            body = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        detail = e.read().decode("utf-8", errors="replace")[:500].replace(token, "[redacted]")
-        raise RuntimeError(f"OpenAI route HTTP error {e.code}: {detail}")
-    except Exception as e:
-        raise RuntimeError(f"OpenAI route call failed: {str(e)[:500].replace(token, '[redacted]')}")
-    if not body.get("choices"):
-        raise RuntimeError("OpenAI route returned unexpected response structure")
-    output = body["choices"][0].get("message", {}).get("content", "")
-    if not output.strip():
-        raise RuntimeError("OpenAI route returned empty response")
-    return output
-
-
-def probe_openai_text(model, description):
-    """Probe OpenAI route through AI Gateway with text."""
-    # R11: same gateway environment as the OpenAI runtime (no OPENAI_* variables)
-    try:
-        base_url, api_key = gateway_openai_config()
-    except RuntimeError as e:
-        return False, f"{description}: {e}"
-
-    # Use bare model id for OpenAI
-    bare_model = model.split("/")[-1] if "/" in model else model
-
-    payload = {
-        "model": bare_model,
-        "max_tokens": 10,
-        "messages": [{"role": "user", "content": "Say 'ok'"}]
-    }
-
-    try:
-        req = urllib.request.Request(
-            f"{base_url}/chat/completions",
-            data=json.dumps(payload).encode("utf-8"),
-            method="POST"
-        )
-        req.add_header("Content-Type", "application/json")
-        req.add_header("Authorization", f"Bearer {api_key}")
-        req.add_header("cf-aig-authorization", f"Bearer {api_key}")
-
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            body = json.loads(resp.read().decode("utf-8"))
-
-        # Check for valid response structure
-        if "choices" in body and len(body["choices"]) > 0:
-            return True, f"{description}: ok"
-        else:
-            return False, f"{description}: unexpected response structure"
-
-    except Exception as e:
-        return False, f"{description}: {str(e)[:200]}"
-
-
-def probe_openai_vision(model, description):
-    """Probe OpenAI route through AI Gateway with vision (small image)."""
-    # R11: same gateway environment as the OpenAI runtime (no OPENAI_* variables)
-    try:
-        base_url, api_key = gateway_openai_config()
-    except RuntimeError as e:
-        return False, f"{description}: {e}"
-
-    # Generate a tiny 1x1 red PNG
-    # PNG signature + IHDR + IDAT + IEND
-    tiny_png = base64.b64encode(
-        b'\x89PNG\r\n\x1a\n'
-        b'\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde'
-        b'\x00\x00\x00\x0cIDATx\x9cc\xf8\xcf\xc0\x00\x00\x00\x03\x00\x01\x00\x18\xdd\x8d\xb4'
-        b'\x00\x00\x00\x00IEND\xaeB`\x82'
-    ).decode('ascii')
-
-    # Use bare model id for OpenAI
-    bare_model = model.split("/")[-1] if "/" in model else model
-
-    payload = {
-        "model": bare_model,
-        "max_tokens": 20,
-        "messages": [{
-            "role": "user",
-            "content": [
-                {"type": "text", "text": "What color is this image?"},
-                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{tiny_png}"}}
-            ]
-        }]
-    }
-
-    try:
-        req = urllib.request.Request(
-            f"{base_url}/chat/completions",
-            data=json.dumps(payload).encode("utf-8"),
-            method="POST"
-        )
-        req.add_header("Content-Type", "application/json")
-        req.add_header("Authorization", f"Bearer {api_key}")
-        req.add_header("cf-aig-authorization", f"Bearer {api_key}")
-
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            body = json.loads(resp.read().decode("utf-8"))
-
-        # Check for valid response structure
-        if "choices" in body and len(body["choices"]) > 0:
-            return True, f"{description}: ok"
-        else:
-            return False, f"{description}: unexpected response structure"
-
-    except Exception as e:
-        return False, f"{description}: {str(e)[:200]}"
+        proc = subprocess.run(["copilot", "-p", "Reply with exactly: ok", "--model", name, "--silent", "--no-color",
+                               "--no-ask-user", "--no-auto-update", "--disable-builtin-mcps"],
+                              capture_output=True, text=True, timeout=180)
+    except FileNotFoundError:
+        return False, f"{description}: the copilot CLI is not on PATH"
+    except subprocess.TimeoutExpired:
+        return False, f"{description}: timed out"
+    if proc.returncode == 0 and proc.stdout.strip():
+        return True, f"{description} ({name}): ok"
+    detail = (proc.stderr or proc.stdout or "").strip()[:200]
+    for secret in (os.environ.get("COPILOT_GITHUB_TOKEN"), os.environ.get("GH_TOKEN")):
+        if secret:
+            detail = detail.replace(secret, "[redacted]")
+    return False, f"{description} ({name}): exit {proc.returncode}: {detail}"
 
 
 def main():
-    """Run smoke tests on all model routes."""
-    tests = [
-        ("anthropic", "claude-sonnet-5-5", "Anthropic route claude-sonnet-5-5 text", probe_anthropic),
-        ("anthropic", "claude-opus-5-5", "Anthropic route claude-opus-5-5 text", probe_anthropic),
-        ("openai-text", "gpt-6.1-sol", "OpenAI route gpt-6.1-sol text", probe_openai_text),
-        ("openai-vision", "gpt-6.1-sol", "OpenAI route gpt-6.1-sol vision", probe_openai_vision),
-    ]
-
-    failed = []
-
-    for test_type, model, description, probe_func in tests:
-        success, message = probe_func(model, description)
-        print(message)
-
-        if not success:
-            failed.append(description)
-
-    if failed:
-        print(f"\nFailed routes: {', '.join(failed)}", file=sys.stderr)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from copilot_runtime import selected_runtime
+    try:
+        runtime = selected_runtime()
+    except ValueError as exc:
+        print(f"FAIL {exc}")
         return 1
-
-    return 0
+    if runtime == "copilot":
+        failed = False
+        for model in TEXT_MODELS:
+            ok, message = probe_copilot(model, f"Copilot CLI, {model}")
+            print(("PASS " if ok else "FAIL ") + message)
+            failed = failed or not ok
+        return 1 if failed else 0
+    probes = [(probe_anthropic, model, f"Anthropic route, {model}, text") for model in TEXT_MODELS]
+    probes.append((probe_anthropic_vision, VISION_MODEL, f"Anthropic route, {VISION_MODEL}, vision"))
+    failed = False
+    for probe, model, description in probes:
+        ok, message = probe(model, description)
+        print(("PASS " if ok else "FAIL ") + message)
+        failed = failed or not ok
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

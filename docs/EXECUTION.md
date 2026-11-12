@@ -69,7 +69,7 @@ Standing reviews under `reviews/<slug>/` are the project record that
 
 ```json
 {"runtime": {"kind": "command", "command": "claude -p \"$(cat {packet})\"", "timeout_seconds": 900}}
-{"runtime": {"kind": "command", "command": "codex exec --packet {packet} --out {output}", "timeout_seconds": 900}}
+{"runtime": {"kind": "command", "command": "my-agent --packet {packet} --out {output}", "timeout_seconds": 900}}
 ```
 
 The template supports two placeholders: `{packet}` (path of the rendered
@@ -87,17 +87,14 @@ factory's own run folder.
 
 The factory itself wires `python3 tools/dispatch_station.py {packet} {output}`.
 The dispatcher reads the step's effective model from `ANVIL_CONFIGURED_MODEL`
-and runs Anthropic models through `tools/claude_station.py` (Claude Code
-print mode) and `openai/gpt-6.1-sol` through `tools/codex_station.py`, which
-runs the Codex CLI headlessly (`codex exec`) in the repo tree with the packet
-as the task, against the gateway OpenAI route with the bare id `gpt-6.1-sol`.
-The gateway credential reaches Codex only through its child environment.
-Producing stations may write; reviewing and observing stations get no-edit instructions,
-and a reviewer that changes anything besides its own review file fails. Any
-other model, a missing `codex` CLI, or a missing gateway environment fails
-the step; there is no fallback runtime.
+and runs it through `tools/claude_station.py` (Claude Code print mode). There
+is one runtime: every station, the design stations included, runs an Anthropic
+model (`claude-sonnet-5-5` or `claude-opus-5-5`); the OpenAI route and the
+Codex wrapper were removed (decision 0008). Producing stations may write;
+reviewing and observing stations run without edit tools. Any other model
+fails the step; there is no fallback runtime.
 
-Claude uses JSON result output; Codex uses JSONL events. The wrappers extract
+Claude returns a JSON result. The wrapper extracts
 the answer for the existing artifact contract and keep scalar token evidence
 in `<station>.output.md.usage.json`. Raw runtime JSON, prompts and environment
 variables are not exported to the public usage pages. Each invocation of a
@@ -285,3 +282,164 @@ The model runtime is the operator's choice and the operator's credentials:
 a local agent CLI, an HTTP model endpoint, or a human following the packet by
 hand all satisfy the same contract. If no runtime is configured, ANVIL says
 so by producing packets, and it never claims a model ran when one did not.
+
+## Choosing the runtime: the gateway or GitHub Copilot
+
+Spec: `.openspec/specs/runtime-selection/spec.md`. Tests: `tests/test_runtime_selection.py`.
+
+One variable, `ANVIL_RUNTIME`, chooses how the stations reach their models:
+
+| Value | Runtime | Credential |
+|---|---|---|
+| `claude-gateway` (default) | Claude Code print mode through the Cloudflare AI Gateway | `CF_AIG_TOKEN`, as before |
+| `copilot` | GitHub Copilot CLI with the Anthropic models of a GitHub account | `COPILOT_GITHUB_TOKEN` |
+
+```bash
+ANVIL_RUNTIME=copilot python3 -m anvil.cli run . --pipeline pipelines/sdlc-default.json --work-order work-order.json --execute
+```
+
+- In the workflow, set the repository variable `ANVIL_RUNTIME`. For `copilot`
+  add the secret `COPILOT_GITHUB_TOKEN`: a fine-grained personal access token
+  of an account with a Copilot plan, with the Copilot Requests permission and
+  nothing else. On a workstation a stored `copilot login` works without it.
+- A project can set its default in `anvil.yaml` with `"provider": "copilot"`
+  inside `runtime`; the variable wins over it.
+- The models are the same Anthropic models. Copilot writes versions with a
+  dot, so `claude-opus-5-5` is requested as `claude-opus-5.5`. If your plan
+  lists a model under another name, state it:
+  `"copilot_models": {"claude-opus-5-5": "<name in copilot /model>"}` inside
+  `runtime`, or the variable `ANVIL_COPILOT_MODELS` with the same JSON.
+- The station contract does not change: producing stations may use every
+  tool; reviewers and observers may read, run commands and write only inside
+  their run directory; the review file is checked and corrected once; a
+  missing CLI or a failing run fails the station.
+- Token usage comes from the statistics file Copilot writes
+  (`--usage-output-file`), kept beside the station output as
+  `<station>.output.md.copilot-usage.json`. If that file is missing or not in
+  a shape the wrapper recognizes, usage is recorded as unknown.
+- `max_runtime_turns` has no Copilot equivalent. Set
+  `ANVIL_COPILOT_MAX_AI_CREDITS` to cap a station's session in AI credits.
+
+What was verified and what was not: the command line was checked against
+the real Copilot CLI (version 1.0.109), which accepted every flag and stopped
+at authentication. No authenticated run was made, so two things wait for your
+first run: that your plan serves the two models under the dotted names, and
+that the usage file has the per model shape the wrapper reads.
+
+## The autonomous line
+
+Spec: `.openspec/specs/autonomous-line/spec.md`. Tests: `tests/test_autonomous_line.py`, `intake-worker/dispatch.test.js`.
+
+### Loopbacks are real
+
+In execute mode a loopback sends the work back. When the approver verdict is
+rejected or changes_requested, or the pre-review checks gate fails, the runner
+re-enters the line at the return station (the builder, or the spec-writer for
+a missing spec) and runs every station from there again, up to `max_loopbacks`
+times (2).
+
+- The stations of the new attempt get a `Loopback feedback` section in their
+  packet: who sent the work back, why, and the findings. Reviewers are told it
+  is a re-review.
+- Reviews of the replaced attempt never count. Its outputs and review files
+  are archived under `runs/<id>/attempts/<n>/`.
+- Re-executed steps carry `attempt`; the return station's step carries
+  `feedback`.
+- A new attempt starts only when the run thresholds leave room for all of it.
+  Otherwise the verdict stands and the loopback step records `not_reexecuted`
+  with the reason. The default `max_agent_calls` is 32 so the default line can
+  afford one full correction; the token threshold is unchanged.
+- Packet mode (no `--execute`) records the loopback and re-executes nothing,
+  as before: there is no runtime to run again.
+
+### Exit codes
+
+`anvil run` and `anvil resume` exit with the outcome:
+
+| Code | Meaning |
+|---|---|
+| 0 | Approved with the human gate open, or a packet-only run (which judges nothing) |
+| 1 | Not approved, a failed step, a failed or unverified deploy |
+| 2 | Usage error, or a resume that has nothing to resume |
+| 3 | A human must act: approve, then resume |
+| 4 | Intake stopped the order (rejected or waiting for information) |
+
+### The human gate: approve and resume
+
+```bash
+python3 -m anvil.cli approve . wo-gh-12 --by "Ana" --note "ok to ship"
+python3 -m anvil.cli resume . wo-gh-12 --execute
+```
+
+`approve` writes `runs/<id>/human-approval.json`, bound to the `run_id` it
+approves: running the line again voids it. A verdict the line did not approve
+(rejected, changes_requested, no_reviews) needs `--override`, which is
+recorded, and the report keeps the line's own verdict. A run that did not
+finish (failed, budget_exceeded, gate_failed) cannot be approved.
+
+`resume` re-enters the line after the gate. The steps up to the gate are kept
+from the previous report and no earlier station runs again; the deployer runs
+its pre-deploy gate, deploy and verification, and the publisher publishes.
+The decision record gains `human_gate.approval` and `resumed`.
+
+In execute mode the publisher is held exactly like the deployer: it never runs
+on an unapproved run or behind a closed human gate.
+
+### One workflow for every order
+
+`.github/workflows/anvil-line.yml` replaces the per order workflows.
+
+| Trigger | Effect |
+|---|---|
+| An issue is labeled `anvil` | The issue becomes work order `wo-gh-<number>` and the line runs |
+| `repository_dispatch`, type `anvil-work-order` | The work order in `client_payload.work_order` runs (sent by the intake worker) |
+| A comment `/anvil approve` by an owner, member or collaborator | The approval is recorded and the line resumes (`/anvil approve --override` for a verdict the line did not approve) |
+| `workflow_dispatch` with an issue number | Manual run or resume |
+
+Labels on the issue carry the structured part: a kind (`bug`, `feature`,
+`task`, `incident`, `idea`, `content`; default feature), risk hints (`auth`
+or `risk:auth`, and so on) and `pipeline:<name>` (default: the project's
+`anvil.json` pipeline).
+
+The job pushes branch `anvil/<work-order-id>`, opens a draft pull request,
+marks it ready when the line approves, comments the report on the issue, and
+fails when the line did not approve. Setup, once per repository:
+
+- Create the `anvil` label.
+- Secret `CF_AIG_TOKEN` (the gateway credential), as before.
+- Settings, Actions, General: allow GitHub Actions to create pull requests.
+  Or set secret `ANVIL_PAT` (contents and pull requests write): GitHub does
+  not start workflows for what `GITHUB_TOKEN` pushes, so only with the PAT
+  does the repository CI run on the line's pull request.
+- Optional variable `ANVIL_AUTO_MERGE=true` to squash merge an approved pull
+  request. Off by default: merging stays the owner's act.
+
+Applying the `anvil` label needs triage rights, and that is the access
+control: the text of an arbitrary issue never starts a run. Issue text is read
+from the event file and reaches stations through the sanitized packet, never
+through a shell.
+
+### Isolation
+
+`--isolate` (on `run`, `approve` and `resume`) gives the order branch
+`anvil/<work-order-id>` in a git worktree beside the project
+(`../.anvil-worktrees/<project>/<id>`) and commits the result there with the
+run evidence. The checkout you work in is not edited, and uncommitted changes
+in it are not carried over. This is a branch and a worktree, not a sandbox:
+the station runtimes still run with their permission prompts bypassed, so run
+executed lines on a machine you can throw away, as the workflow does.
+
+### Red before green
+
+With project `checks` configured, the checks run once after the test-writer
+and before the builder. The result is recorded on the test-writer step as
+`red_check`. When the checks pass there, the new tests did not fail first: the
+report warns and reviewer-tests is told to verify they exercise the new
+behavior.
+
+### Not done here
+
+Reviewers still run one after another. With a single runtime nothing in the
+wrappers prevents concurrent reviewers any more; what remains is in the
+runner, which checks the run thresholds between calls and hands per call
+limits through shared executor state.
