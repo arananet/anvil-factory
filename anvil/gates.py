@@ -93,9 +93,17 @@ def disclosure_gate(project_dir, slug):
     return (True, "Draft carries an AI generated disclosure")
 
 
-def _run_shell(command, cwd, work_order_id, timeout):
-    """Execute a shell command with timeout."""
+def _run_shell(command, cwd, work_order_id, timeout, scrub=False):
+    """Execute a shell command with timeout.
+
+    scrub=True removes deploy and repository credentials from the command's
+    environment. Project checks run code the line itself just wrote, so they
+    get the same reduced environment as a station; deploy commands do not.
+    """
     env = dict(os.environ)
+    if scrub:
+        from .executor import station_env
+        env = station_env(env, {})
     env["ANVIL_WORK_ORDER_ID"] = work_order_id
     try:
         proc = subprocess.run(command, shell=True, cwd=str(cwd), env=env,
@@ -392,7 +400,7 @@ def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_i
 
     for check_cmd in checks:
         commands.append(check_cmd)
-        code, out = _run_shell(str(check_cmd), project_dir, work_order_id, timeout)
+        code, out = _run_shell(str(check_cmd), project_dir, work_order_id, timeout, scrub=True)
         exit_codes.append(code if code is not None else -1)
         outputs.append(out)
 

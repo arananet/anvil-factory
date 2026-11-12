@@ -27,6 +27,8 @@ on:
     types: [created]
   repository_dispatch:
     types: [anvil-work-order]
+  pull_request:
+    types: [closed]
   workflow_dispatch:
     inputs:
       issue:
@@ -53,12 +55,13 @@ jobs:
   line:
     name: Run the ANVIL line
     if: >-
+      github.event_name != 'pull_request' && (
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'repository_dispatch' ||
       (github.event_name == 'issues' && github.event.label.name == 'anvil') ||
       (github.event_name == 'issue_comment' && !github.event.issue.pull_request &&
        startsWith(github.event.comment.body, '/anvil approve') &&
-       contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))
+       contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)))
     runs-on: ubuntu-latest
     timeout-minutes: 180
     env:
@@ -67,10 +70,9 @@ jobs:
       ANTHROPIC_CUSTOM_HEADERS: "cf-aig-authorization: Bearer ${{ secrets.CF_AIG_TOKEN }}"
       CF_AIG_TOKEN: ${{ secrets.CF_AIG_TOKEN }}
       CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
-      # A personal access token (secret ANVIL_PAT) lets the pushed branch and
-      # the pull request trigger the repository's own CI; GITHUB_TOKEN works
-      # too, but GitHub does not start workflows for what it pushes.
-      GH_TOKEN: ${{ secrets.ANVIL_PAT || secrets.GITHUB_TOKEN }}
+      # No repository or deploy token lives at job level: the stations run
+      # model written commands, so each token is given only to the step
+      # that needs it, and the engine strips them from station environments.
       EVENT_NAME: ${{ github.event_name }}
       INPUT_ISSUE: ${{ github.event.inputs.issue }}
       INPUT_MODE: ${{ github.event.inputs.mode }}
@@ -84,7 +86,8 @@ jobs:
         with:
           ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
-          token: ${{ secrets.ANVIL_PAT || secrets.GITHUB_TOKEN }}
+          # Nothing is left in .git/config for a station to push with.
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -98,6 +101,8 @@ jobs:
 
       - name: Resolve the work order
         id: order
+        env:
+          GH_TOKEN: ${{ secrets.ANVIL_PAT || secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -156,7 +161,7 @@ jobs:
           echo "mode=${MODE}" >> "${GITHUB_OUTPUT}"
           # A branch from an earlier run of this order is continued, not replaced.
           WO_ID=$(python3 -c "import json; print(json.load(open('order.json'))['id'])")
-          git fetch origin "refs/heads/anvil/${WO_ID}:refs/heads/anvil/${WO_ID}" 2>/dev/null || true
+          git fetch "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/heads/anvil/${WO_ID}:refs/heads/anvil/${WO_ID}" 2>/dev/null || true
           rm -f order.json issue.json
 
       - name: Install the station runtimes
@@ -177,6 +182,11 @@ jobs:
           PIPELINE: ${{ steps.order.outputs.pipeline }}
           MODE: ${{ steps.order.outputs.mode }}
           OVERRIDE: ${{ steps.order.outputs.override }}
+          # For the deploy, preview and verify commands the spine runs. The
+          # engine removes these from every station and check environment.
+          GH_TOKEN: ${{ secrets.ANVIL_PAT || secrets.GITHUB_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -uo pipefail
           CODE=0
@@ -201,6 +211,10 @@ jobs:
           ISSUE: ${{ steps.order.outputs.issue }}
           CODE: ${{ steps.line.outputs.code }}
           WORKTREE: ${{ steps.line.outputs.worktree }}
+          # A personal access token (secret ANVIL_PAT) lets the pushed branch
+          # and the pull request trigger the repository's own CI; GITHUB_TOKEN
+          # works too, but GitHub does not start workflows for what it pushes.
+          GH_TOKEN: ${{ secrets.ANVIL_PAT || secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           BRANCH="anvil/${WO_ID}"
@@ -209,7 +223,7 @@ jobs:
             echo "The line produced no branch; nothing to push."
             exit 0
           fi
-          git push origin "${BRANCH}"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "${BRANCH}"
           if [ "$(git rev-list --count "origin/${BASE_BRANCH}..${BRANCH}")" = "0" ]; then
             echo "The branch carries no commits beyond ${BASE_BRANCH}; no pull request."
             exit 0
@@ -230,6 +244,7 @@ jobs:
         if: always() && steps.order.outputs.issue != ''
         env:
           ISSUE: ${{ steps.order.outputs.issue }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           [ -s comment.md ] || printf '## ANVIL line report\n\nThe workflow stopped before the line produced a report. See %s\n' "${RUN_URL}" > comment.md
           gh issue comment "${ISSUE}" --body-file comment.md
@@ -252,3 +267,36 @@ jobs:
             4) echo "Intake stopped the order." ;;
             *) echo "The line did not approve this work (exit ${CODE})."; exit 1 ;;
           esac
+
+  cleanup:
+    name: Remove the preview of a closed order
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.event.pull_request.head.ref, 'anvil/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run the project's preview cleanup command
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          GH_TOKEN: ${{ secrets.ANVIL_PAT || secrets.GITHUB_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: python3 -m anvil.cli preview-cleanup . "${HEAD_REF#anvil/}"

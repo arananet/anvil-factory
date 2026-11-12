@@ -46,6 +46,8 @@ def _sanitize_control_chars(text):
     sanitized = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]', '', text)
     return sanitized
 from .health import verify_health
+from .observe import RunRecorder, mark_crashed
+from . import line as _line
 
 def _escape_markdown(text):
     """Escape markdown special characters to prevent content injection.
@@ -1142,6 +1144,24 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
 
 def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks=2,
                  executor=None, deploy_cfg=None, health_cfg=None, base_ref=None, resume=None):
+    """Run the line. A run that raises leaves its state marked crashed
+    (governed-delivery S1) instead of looking like it is still running."""
+    try:
+        return _run_pipeline(project_dir, pipeline, work_order, registry=registry, max_loopbacks=max_loopbacks,
+                             executor=executor, deploy_cfg=deploy_cfg, health_cfg=health_cfg,
+                             base_ref=base_ref, resume=resume)
+    except BaseException as exc:
+        wo_id = work_order.get("id") if isinstance(work_order, dict) else getattr(work_order, "id", None)
+        if wo_id:
+            try:
+                mark_crashed(Path(project_dir) / "runs" / str(wo_id), exc)
+            except Exception:
+                pass
+        raise
+
+
+def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks=2,
+                  executor=None, deploy_cfg=None, health_cfg=None, base_ref=None, resume=None):
     project = Path(project_dir)
     if isinstance(work_order, dict):
         work_order = WorkOrder.from_dict(work_order)
@@ -1321,6 +1341,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         run_context_section = packet_run_context_section(
             project, work_order, steps, station_id, (base_ref_config or {}).get("checks"))
         feedback_section = packet_loopback_section(loopback_note, station_id)
+        if preview_url and station_id.startswith("reviewer"):
+            feedback_section = (f"## Preview deployment\n\nThis attempt is deployed for review at "
+                                f"{_sanitize_control_chars(preview_url)}\n\n" + feedback_section).strip()
         if station_id == "reviewer-tests" and tdd_red is False:
             feedback_section = ("## TDD red check\n\nThe project checks passed before the builder ran: the new "
                                 "tests did not fail first. Verify that the tests exercise the new behavior and "
@@ -1375,10 +1398,46 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             verdict = "approved"
             human_blocked = False
 
+    # Governed delivery S1/S2: state and events exist while the run is going.
+    try:
+        project_name = json.loads((project / "anvil.json").read_text(encoding="utf-8")).get("project")
+    except (OSError, ValueError, AttributeError):
+        project_name = None
+    recorder = RunRecorder(run_dir, run_id, work_order.id, str(project_name or project.resolve().name),
+                           pipeline.name, config)
+    recorder.emitted = len(steps)  # a resumed run does not re-emit kept steps
+    recorder.event("run.resumed" if resume else "run.started", work_order_kind=work_order.kind,
+                   risk_hints=list(work_order.risk_hints or []), executed=execute_mode)
+    # Governed delivery S6: one preview deployment per attempt, before review.
+    preview_cfg = (deploy_cfg or {}).get("preview") if execute_mode and isinstance(deploy_cfg, dict) else None
+    preview_at = None
+    if isinstance(preview_cfg, dict) and preview_cfg.get("command") and "builder" in order:
+        preview_at = next((sid for sid in order[order.index("builder") + 1:]
+                           if sid.startswith("reviewer") or sid == "approver"), None)
+    preview_done = False
+    preview_url = None
+
     while pos < len(order):
         idx = pos
         station_id = order[idx]
         pos += 1
+        recorder.flush(steps, current_station=station_id, verdict=verdict, loopbacks=loopbacks)
+        if station_id == preview_at and not preview_done and not gate_failed and builder_attempt > 0:
+            preview_done = True
+            p_started = time.perf_counter()
+            p_result = _line.run_preview(project, preview_cfg, work_order.id)
+            p_out = run_dir / "preview.output.md"
+            p_out.write_text(p_result["output"], encoding="utf-8")
+            preview_url = p_result["url"] if p_result["ok"] else None
+            p_step = {"station": "preview", "status": "completed" if p_result["ok"] else "failed",
+                      "detail": p_result["detail"], "duration_ms": round((time.perf_counter() - p_started) * 1000, 3),
+                      "cost": None, "artifacts": [str(p_out)], "configured_model": None, "executed_model": None,
+                      "executor": None, "url": p_result["url"], "preview_name": p_result["name"]}
+            if loopback_note:
+                p_step["attempt"] = loopback_note["attempt"]
+            steps.append(p_step)
+            if not p_result["ok"]:
+                warnings.append(f"Preview deployment failed: {p_result['detail']}. Review proceeds without a preview.")
         started = time.perf_counter()
 
         # S9: Pack loading failure stops the run at intake
@@ -2120,7 +2179,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
             # Autonomous line S8: red before green is evidence, not a claim.
             # The project checks run once before the builder; they are
             # expected to fail because the new tests have nothing to pass on.
-            red_codes = [_run_shell(str(cmd), project, work_order.id, 300)[0]
+            red_codes = [_run_shell(str(cmd), project, work_order.id, 300, scrub=True)[0]
                          for cmd in base_ref_config["checks"]]
             red = any(code != 0 for code in red_codes)
             step["red_check"] = {"commands": [str(c) for c in base_ref_config["checks"]],
@@ -2273,6 +2332,8 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                 uncounted_reasons, artifact_failures = {}, {}
                 verdict = ""
                 decision_approver = None
+                preview_done = False
+    recorder.flush(steps, verdict=verdict, loopbacks=loopbacks)
     if not verdict:
         verdict = "packet_ready"
     if decision_approver is None:
@@ -2315,7 +2376,9 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
         # this run only, and the record says what the approver had decided.
         approval_record = {"approved_by": approval.get("approved_by"), "approved_at": approval.get("approved_at"),
                            "note": approval.get("note", ""), "override": bool(approval.get("override")),
-                           "approver_verdict": approval_original_verdict}
+                           "approver_verdict": approval_original_verdict,
+                           "identity": approval.get("identity"),
+                           "policy_checked": approval.get("policy_checked", [])}
         if not (health_result.get("outcome") == "unhealthy" and health_result.get("requires_human_gate")):
             human_required = False
         human_rule = (f"A human approved this run: {approval_record['approved_by']} at "
@@ -2344,6 +2407,7 @@ def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks
                        efficiency={"limits": limits, "stopped": verdict == "budget_exceeded"},
                        run_id=run_id)
     (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
+    recorder.finish(steps, report.to_dict())
     # Swimlane
     lines = ["# Swimlane", ""]
 

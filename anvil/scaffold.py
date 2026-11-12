@@ -85,7 +85,7 @@ def scaffold_spec(project, slug, title):
     return spec_file
 
 
-def new_project(path, name, blueprint, idea="", description=None, contact=None):
+def new_project(path, name, blueprint, idea="", description=None, contact=None, deploy_target=None):
     """Greenfield entry: scaffold a project from zero around a blueprint.
 
     blueprint is a catalog dict (see anvil/blueprints.py). The idea brief
@@ -120,6 +120,24 @@ def new_project(path, name, blueprint, idea="", description=None, contact=None):
         }
     }
     (root / "anvil.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
+    if deploy_target:
+        # Governed delivery S7: the blueprint carries its deploy targets. The
+        # project gets a production deploy, a preview per work order and the
+        # one time provisioning commands, with its own name filled in.
+        targets = blueprint.get("deploy_targets") or {}
+        if deploy_target not in targets:
+            raise ValueError(f"blueprint {blueprint['id']} has no deploy target {deploy_target}; "
+                             f"available: {', '.join(sorted(targets)) or 'none'}")
+        from .model import slugify
+        rendered = json.loads(json.dumps(targets[deploy_target]).replace("{slug}", slugify(name)))
+        yaml_path = root / "anvil.yaml"
+        yaml_cfg = json.loads(yaml_path.read_text(encoding="utf-8"))
+        yaml_cfg["deploy"] = rendered["deploy"]
+        if "health" in rendered:
+            yaml_cfg["health"] = rendered["health"]
+        yaml_path.write_text(json.dumps(yaml_cfg, indent=2) + "\n", encoding="utf-8")
+        config["deploy_target"] = deploy_target
+        (root / "anvil.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
     scaffold_design_system(root)
     for slug in blueprint["first_specs"]:
         scaffold_spec(root, slug, slug.replace("-", " ").title())

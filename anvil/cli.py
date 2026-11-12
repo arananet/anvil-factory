@@ -42,7 +42,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog="anvil")
     sub = parser.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("init"); p.add_argument("path"); p.add_argument("--name", required=True)
-    p = sub.add_parser("new-project"); p.add_argument("path"); p.add_argument("--name", required=True); p.add_argument("--blueprint", required=True); p.add_argument("--idea", default="")
+    p = sub.add_parser("new-project"); p.add_argument("path"); p.add_argument("--name", required=True); p.add_argument("--blueprint", required=True); p.add_argument("--idea", default=""); p.add_argument("--deploy-target", default=None, choices=["cloudflare", "github"], help="Write deploy, preview and provision config for this platform into anvil.yaml")
     p = sub.add_parser("onboard"); p.add_argument("path"); p.add_argument("--name", default=None)
     p = sub.add_parser("new-spec"); p.add_argument("project"); p.add_argument("slug"); p.add_argument("--title", required=True)
     p = sub.add_parser("validate-pipeline"); p.add_argument("file")
@@ -51,6 +51,9 @@ def main(argv=None):
     p = sub.add_parser("run"); p.add_argument("project"); p.add_argument("--pipeline", required=True); p.add_argument("--work-order", required=True); p.add_argument("--execute", action="store_true"); p.add_argument("--base-ref", default=None, help="Base ref for checks gate (overrides automatic derivation)"); p.add_argument("--isolate", action="store_true", help="Run on branch anvil/<work-order-id> in its own git worktree and commit the result there")
     p = sub.add_parser("resume"); p.add_argument("project"); p.add_argument("work_order_id"); p.add_argument("--pipeline", default=None); p.add_argument("--execute", action="store_true"); p.add_argument("--base-ref", default=None); p.add_argument("--isolate", action="store_true")
     p = sub.add_parser("approve"); p.add_argument("project"); p.add_argument("work_order_id"); p.add_argument("--by", required=True); p.add_argument("--note", default=""); p.add_argument("--override", action="store_true", help="Approve a run the line did not approve; recorded as an override"); p.add_argument("--isolate", action="store_true")
+    p = sub.add_parser("runs"); p.add_argument("project"); p.add_argument("--json", action="store_true")
+    p = sub.add_parser("preview-cleanup"); p.add_argument("project"); p.add_argument("work_order_id")
+    p = sub.add_parser("provision"); p.add_argument("project")
     p = sub.add_parser("work-order-from-issue"); p.add_argument("issue_json", help="Path to a GitHub issue JSON object, or to an event payload with an issue key"); p.add_argument("--out-dir", default="work-orders")
     p = sub.add_parser("status-page"); p.add_argument("project"); p.add_argument("--out", default=None); p.add_argument("--include-project", action="append", default=None)
     p = sub.add_parser("check-brain"); p.add_argument("project")
@@ -61,11 +64,18 @@ def main(argv=None):
     p = sub.add_parser("check-skills"); p.add_argument("project"); p.add_argument("--work-order", default=None); p.add_argument("--pipeline", default=None)
     p = sub.add_parser("supervise"); p.add_argument("project"); p.add_argument("--execute", action="store_true")
     args = parser.parse_args(argv)
+    # Deploy and preview commands may call the factory's own tools.
+    import os
+    os.environ.setdefault("ANVIL_FACTORY_ROOT", str(_factory_root()))
     if args.cmd == "init":
         init_project(args.path, args.name); print(f"Created project at {args.path}"); return 0
     if args.cmd == "new-project":
         bp = get_blueprint(_factory_root() / "blueprints", args.blueprint)
-        new_project(args.path, args.name, bp, idea=args.idea); print(f"Created greenfield project at {args.path} from blueprint {bp['id']}"); return 0
+        try:
+            new_project(args.path, args.name, bp, idea=args.idea, deploy_target=args.deploy_target)
+        except ValueError as exc:
+            print(f"Cannot create the project: {exc}", file=sys.stderr); return 2
+        print(f"Created greenfield project at {args.path} from blueprint {bp['id']}"); return 0
     if args.cmd == "onboard":
         try:
             result = onboard_project(args.path, name=args.name)
@@ -95,6 +105,54 @@ def main(argv=None):
             print(f"{name}: {'PASS' if passed else 'FAIL'} - {detail}")
             ok = ok and passed
         return 0 if ok else 1
+    if args.cmd == "runs":
+        from .observe import fleet_summary, run_states
+        summary = fleet_summary(args.project)
+        states = run_states(args.project)
+        if args.json:
+            print(json.dumps({"summary": summary, "runs": states}, indent=2))
+            return 0
+        for st in states:
+            tokens = (st.get("token_usage") or {}).get("total_tokens")
+            print(f"{st['work_order_id']}: {st['state']}"
+                  + (f" at {st['current_station']}" if st["state"] != "finished" and st.get("current_station") else "")
+                  + f", verdict {st.get('verdict') or 'none'}, loopbacks {st.get('loopbacks', 0)}"
+                  + f", tokens {tokens if tokens is not None else 'unmeasured'}"
+                  + (f", cost {st['cost']}" if st.get("cost") is not None else ""))
+        for name, group in sorted(summary["by_pipeline"].items()):
+            print(f"pipeline {name}: {group['runs']} runs, approval rate {group['approval_rate']}, loopbacks {group['loopbacks']}")
+        print(f"runs: {summary['runs']} reported, {len(summary['in_progress'])} in progress, "
+              f"{len(summary['interrupted'])} interrupted")
+        return 0
+    if args.cmd in {"preview-cleanup", "provision"}:
+        deploy = deploy_config(load_anvil_config(Path(args.project) / "anvil.yaml")) or {}
+        if args.cmd == "preview-cleanup":
+            preview = deploy.get("preview") if isinstance(deploy.get("preview"), dict) else {}
+            if not preview.get("cleanup"):
+                print("No preview cleanup command is configured; nothing to do.")
+                return 0
+            try:
+                result = line.run_preview(args.project, preview, args.work_order_id, action="cleanup")
+            except ValueError as exc:
+                print(f"Cannot clean up: {exc}", file=sys.stderr)
+                return 2
+            print(result["detail"])
+            if not result["ok"]:
+                print(result["output"], file=sys.stderr)
+            return 0 if result["ok"] else 1
+        commands = [str(c) for c in deploy.get("provision") or []]
+        if not commands:
+            print("No provision commands are configured; nothing to do.")
+            return 0
+        import subprocess
+        for command in commands:
+            print(f"$ {command}")
+            code = subprocess.run(command, shell=True, cwd=str(args.project)).returncode
+            if code != 0:
+                print(f"Provision stopped: exit code {code}", file=sys.stderr)
+                return 1
+        print(f"Provisioned: {len(commands)} commands ran.")
+        return 0
     if args.cmd == "work-order-from-issue":
         try:
             payload = json.loads(Path(args.issue_json).read_text(encoding="utf-8"))
@@ -114,7 +172,11 @@ def main(argv=None):
         try:
             if args.isolate:
                 project, branch = line.isolate(args.project, args.work_order_id)
-            record = line.record_approval(project, args.work_order_id, args.by, note=args.note, override=args.override)
+            # The policy is read from the checkout the operator controls, never
+            # from the run's worktree, which the builder can edit.
+            policy = load_anvil_config(Path(args.project) / "anvil.yaml").get("approvals")
+            record = line.record_approval(project, args.work_order_id, args.by, note=args.note,
+                                          override=args.override, policy=policy)
             if args.isolate:
                 line.commit_run(project, args.work_order_id, f"Record human approval for {args.work_order_id} by {record['approved_by']}")
         except ValueError as exc:

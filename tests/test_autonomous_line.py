@@ -104,7 +104,8 @@ class Line:
         pipe = load_pipeline(self.pipeline, known_stations=set(reg.ids()))
         cfg = json.loads((self.proj / "anvil.yaml").read_text())
         report = run_pipeline(self.proj, pipe, {"id": wo_id, "kind": "feature", "title": "Line test", **extra},
-                              registry=reg, executor=create_executor(cfg["runtime"]))
+                              registry=reg, executor=create_executor(cfg["runtime"]),
+                              deploy_cfg=cfg.get("deploy"))
         return report.to_dict()
 
     def cli(self, *argv):

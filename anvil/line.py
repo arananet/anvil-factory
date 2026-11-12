@@ -15,6 +15,7 @@ See .openspec/specs/autonomous-line/spec.md.
 """
 
 import json
+import os
 import re
 import subprocess
 from datetime import datetime, timezone
@@ -138,14 +139,73 @@ def _load_report(project, work_order_id):
     return report
 
 
-def record_approval(project, work_order_id, approved_by, note="", override=False):
+def approver_identity(approved_by):
+    """Who is approving, and whether that is verified.
+
+    Inside GitHub Actions the identity is the actor GitHub authenticated for
+    the triggering event, and --by must name that same login: nobody
+    approves under someone else's name. Anywhere else the name is what the
+    operator typed, recorded as unverified.
+    """
+    name = str(approved_by or "").strip()
+    actor = os.environ.get("GITHUB_ACTOR", "").strip()
+    if os.environ.get("GITHUB_ACTIONS") == "true" and actor:
+        if name and name.lower() != actor.lower():
+            raise ValueError(f"--by {name} does not match the authenticated GitHub actor {actor}")
+        return {"login": actor, "source": "github-actions", "verified": True,
+                "workflow_run": os.environ.get("GITHUB_RUN_ID") or None}
+    return {"login": name, "source": "cli", "verified": False, "workflow_run": None}
+
+
+def check_approval_policy(policy, identity, risk_hints, override):
+    """Enforce the project's approvals policy; raise ValueError when it says no.
+
+    policy is the approvals object of anvil.yaml:
+      require_verified_identity: only an identity an authenticator vouched for
+      approvers: logins allowed to approve (empty or absent: anyone)
+      by_risk_hint: {hint: [logins]}, the narrower list for a risk hint
+      override: logins allowed to approve what the line did not approve
+    Returns the list of rule names that were checked, for the record.
+    """
+    if not isinstance(policy, dict) or not policy:
+        return []
+    login = str(identity.get("login") or "").lower()
+    checked = []
+
+    def allowed(names):
+        return login in {str(n).lower() for n in names or []}
+
+    if policy.get("require_verified_identity"):
+        checked.append("require_verified_identity")
+        if not identity.get("verified"):
+            raise ValueError("the approvals policy requires a verified identity; approve from the "
+                             "workflow (comment /anvil approve on the issue), not from a local shell")
+    if policy.get("approvers"):
+        checked.append("approvers")
+        if not allowed(policy["approvers"]):
+            raise ValueError(f"{identity.get('login')} is not in the approvers list of the approvals policy")
+    by_hint = policy.get("by_risk_hint") or {}
+    for hint in risk_hints or []:
+        if hint in by_hint:
+            checked.append(f"by_risk_hint:{hint}")
+            if not allowed(by_hint[hint]):
+                raise ValueError(f"{identity.get('login')} may not approve work carrying the risk hint {hint}")
+    if override and "override" in policy:
+        checked.append("override")
+        if not allowed(policy["override"]):
+            raise ValueError(f"{identity.get('login')} may not override the line's verdict")
+    return checked
+
+
+def record_approval(project, work_order_id, approved_by, note="", override=False, policy=None):
     """Record a human approval for the current run of a work order.
 
     The approval names the run it approves (run_id), so a rerun of the line
     voids it. Returns the approval record. Raises ValueError when there is
     nothing a human can approve.
     """
-    approved_by = str(approved_by or "").strip()
+    identity = approver_identity(approved_by)
+    approved_by = identity["login"]
     if not approved_by:
         raise ValueError("an approval needs a name (--by)")
     report = _load_report(project, work_order_id)
@@ -159,6 +219,8 @@ def record_approval(project, work_order_id, approved_by, note="", override=False
     if verdict not in APPROVABLE and verdict not in APPROVABLE_WITH_OVERRIDE:
         raise ValueError(f"the run ended {verdict}, which is not a decision a human can approve; "
                          f"fix the cause and run the line again")
+    is_override = bool(override) and verdict in APPROVABLE_WITH_OVERRIDE
+    policy_checked = check_approval_policy(policy, identity, report.get("risk_hints") or [], is_override)
     record = {
         "schema": "anvil/approval@1",
         "work_order_id": work_order_id,
@@ -167,7 +229,9 @@ def record_approval(project, work_order_id, approved_by, note="", override=False
         "approved_by": approved_by,
         "approved_at": datetime.now(timezone.utc).isoformat(),
         "note": str(note or ""),
-        "override": bool(override) and verdict in APPROVABLE_WITH_OVERRIDE,
+        "override": is_override,
+        "identity": identity,
+        "policy_checked": policy_checked,
     }
     path = _run_dir(project, work_order_id) / APPROVAL_FILE
     path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
@@ -266,3 +330,51 @@ def commit_run(worktree, work_order_id, message):
         identity = ["-c", "user.name=anvil", "-c", "user.email=anvil@localhost"]
     _git(identity + ["commit", "-q", "-m", message], worktree)
     return _git(["rev-parse", "HEAD"], worktree).stdout.strip()
+
+
+def preview_name(work_order_id):
+    """A work order id as a deployment-safe name: lowercase letters, digits
+    and hyphens, at most 28 characters (the limit of a Pages branch alias)."""
+    name = re.sub(r"[^a-z0-9]+", "-", str(work_order_id).lower()).strip("-")[:28].strip("-")
+    if not name:
+        raise ValueError("work order id has no characters usable in a preview name")
+    return name
+
+
+def run_preview(project, preview_cfg, work_order_id, action="command"):
+    """Run a preview command (deploy, or cleanup) for one work order.
+
+    The command gets ANVIL_WORK_ORDER_ID, ANVIL_PREVIEW_NAME and, when the
+    config has a url template, ANVIL_PREVIEW_URL. For a deploy, the verify
+    commands run after it. Returns {"ok", "detail", "output", "url", "name"}.
+    """
+    name = preview_name(work_order_id)
+    template = str((preview_cfg or {}).get("url") or "")
+    url = template.replace("{preview_name}", name).replace("{work_order_id}", str(work_order_id)) or None
+    result = {"ok": False, "detail": "", "output": "", "url": url, "name": name}
+    command = str((preview_cfg or {}).get(action) or "").strip()
+    if not command:
+        result["detail"] = f"no preview {action} configured"
+        return result
+    env = dict(os.environ, ANVIL_WORK_ORDER_ID=str(work_order_id), ANVIL_PREVIEW_NAME=name)
+    if url:
+        env["ANVIL_PREVIEW_URL"] = url
+    timeout = int((preview_cfg or {}).get("timeout_seconds", 600))
+    commands = [command] + ([str(c) for c in (preview_cfg.get("verify") or [])] if action == "command" else [])
+    chunks = []
+    for cmd in commands:
+        try:
+            proc = subprocess.run(cmd, shell=True, cwd=str(project), env=env, capture_output=True,
+                                  text=True, timeout=timeout)
+            code, out = proc.returncode, (proc.stdout or "") + (proc.stderr or "")
+        except subprocess.TimeoutExpired:
+            code, out = 124, f"timed out after {timeout}s"
+        chunks.append(f"$ {cmd}\n{out[-4000:]}\n(exit {code})\n")
+        if code != 0:
+            result["output"] = "\n".join(chunks)
+            result["detail"] = f"preview {action} failed with exit code {code}: {cmd[:120]}"
+            return result
+    result.update(ok=True, output="\n".join(chunks),
+                  detail=f"Preview {'deployed' if action == 'command' else 'cleaned up'} as {name}"
+                         + (f" at {url}" if url and action == "command" else ""))
+    return result

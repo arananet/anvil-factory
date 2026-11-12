@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Governed delivery: live state, events, verified approvals, contained stations, previews
+
+Owner-authored outside the line (decision 0006, record 0009).
+
+- Live state: runs/<id>/state.json is rewritten before every station (running, finished, crashed; stalled when abandoned). A run that dies halfway no longer leaves nothing behind.
+- Events: runs/<id>/events.jsonl, one structured line per run boundary, step and loopback, scalar facts only.
+- Export: each event to a webhook (observability.events_url) and the finished run as one OpenTelemetry trace (observability.otlp_endpoint). A failed export never changes a run.
+- `anvil runs`: every run's state plus approval rate, loopbacks, reviewer rejections, tokens and cost across runs.
+- Approvals carry an identity (verified inside GitHub Actions) and obey an approvals policy in anvil.yaml: approvers, per risk hint lists, who may override, verified identity required. The policy is read from the operator's checkout.
+- Stations and project checks no longer receive repository, deploy or workflow identity tokens. Optional container sandbox for stations (runtime.sandbox, kind docker; image in tools/sandbox). The workflow persists no credentials and sets no token at job level.
+- A preview deployment per work order, once per attempt before review (deploy.preview), with `anvil preview-cleanup` and `anvil provision`. The workflow removes the preview when the order's pull request closes.
+- Blueprints carry deploy targets: `anvil new-project --deploy-target cloudflare|github`. New tool tools/deploy_github_pages.py (production at the root, previews under previews/<name>/).
+- Spec: .openspec/specs/governed-delivery/spec.md. Tests: tests/test_governed_delivery.py. Docs: docs/OPERATIONS.md.
+- Not verified against real services: the Cloudflare commands and the Docker sandbox (no Cloudflare account or Docker daemon was available where this was built).
+
 ### Single runtime: Codex and the OpenAI route removed
 
 Owner's order 2026-11-12 ("Quitemos codex de la ecuación"). Decision 0008, which supersedes the OpenAI part of decision 0004.

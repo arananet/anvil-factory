@@ -232,6 +232,7 @@ Every change starts with a spec under .openspec/specs/ (OpenSpec). Write the spe
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Layers, artifact flow, gates, risk triage, Core Four, model stack, loopback, envelopes, observability |
 | [docs/SDLC.md](docs/SDLC.md) | How the default pipeline maps to SDLC phases |
 | [docs/EXECUTION.md](docs/EXECUTION.md) | Agent runtime executors, the runtime contract, automatic deploy and post deploy verification |
+| [docs/OPERATIONS.md](docs/OPERATIONS.md) | Operating the line: live run state and events, export to a webhook or OpenTelemetry, the approvals policy, what a station can reach, and a preview per work order on Cloudflare or GitHub Pages |
 | [docs/STATUS-PAGE.md](docs/STATUS-PAGE.md) | The run status page: generation, publishing to Cloudflare Pages or GitHub Pages, and the snapshot note |
 | [docs/MEMORY-GATE.md](docs/MEMORY-GATE.md) | Verified learnings: the inbox flow, the provenance format, and why memory writes are gated |
 | [docs/SUPERVISOR.md](docs/SUPERVISOR.md) | The bounded supervisor: stall signals, the constitution, the proposal lifecycle, and what it can never do |

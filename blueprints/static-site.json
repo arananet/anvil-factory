@@ -1,8 +1,54 @@
 {
   "id": "static-site",
   "name": "Static site",
-  "stack": ["HTML, CSS and vanilla JavaScript", "Cloudflare Pages"],
-  "structure": ["public/ with the site files", "no build step until a spec needs one", ".openspec/specs/ with one spec per section or feature", "brain/ seeded from the idea brief"],
-  "first_specs": ["site-shell"],
-  "notes": "Default for sites and landing pages. Keep it build free as long as possible."
+  "stack": [
+    "HTML, CSS and vanilla JavaScript",
+    "Cloudflare Pages"
+  ],
+  "structure": [
+    "public/ with the site files",
+    "no build step until a spec needs one",
+    ".openspec/specs/ with one spec per section or feature",
+    "brain/ seeded from the idea brief"
+  ],
+  "first_specs": [
+    "site-shell"
+  ],
+  "notes": "Default for sites and landing pages. Keep it build free as long as possible.",
+  "deploy_targets": {
+    "cloudflare": {
+      "deploy": {
+        "command": "npx wrangler pages deploy public --project-name {slug} --branch main",
+        "verify": [
+          "curl -fsS https://{slug}.pages.dev/"
+        ],
+        "preview": {
+          "command": "npx wrangler pages deploy public --project-name {slug} --branch \"$ANVIL_PREVIEW_NAME\"",
+          "url": "https://{preview_name}.{slug}.pages.dev"
+        },
+        "provision": [
+          "npx wrangler pages project create {slug} --production-branch main"
+        ]
+      },
+      "health": {
+        "base_url": "https://{slug}.pages.dev",
+        "routes": [
+          {
+            "path": "/",
+            "expected_status": 200
+          }
+        ]
+      }
+    },
+    "github": {
+      "deploy": {
+        "command": "python3 \"$ANVIL_FACTORY_ROOT/tools/deploy_github_pages.py\" public",
+        "preview": {
+          "command": "python3 \"$ANVIL_FACTORY_ROOT/tools/deploy_github_pages.py\" public --preview \"$ANVIL_PREVIEW_NAME\"",
+          "cleanup": "python3 \"$ANVIL_FACTORY_ROOT/tools/deploy_github_pages.py\" --cleanup \"$ANVIL_PREVIEW_NAME\"",
+          "url": "https://OWNER.github.io/REPO/previews/{preview_name}/"
+        }
+      }
+    }
+  }
 }

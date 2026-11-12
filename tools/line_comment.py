@@ -39,6 +39,10 @@ def render(report, code, run_url="", branch=""):
         f"- Human review required: {report.get('human_required')}",
         f"- Deployment status: {cell(report.get('deployment_status'))}",
     ]
+    previews = [s for s in report.get("steps") or [] if s.get("station") == "preview" and s.get("url")]
+    if previews:
+        last = previews[-1]
+        lines.append(f"- Preview: {cell(last['url'])}" + ("" if last.get("status") == "completed" else " (deploy failed)"))
     if branch:
         lines.append(f"- Branch: `{cell(branch)}`")
     if run_url:
