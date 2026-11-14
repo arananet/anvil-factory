@@ -13,9 +13,9 @@
     }
   ],
   "selected_models": {
-    "reviewer-architecture": "review-balanced",
     "reviewer-design": "review-balanced",
     "reviewer-security": "review-strong",
+    "reviewer-architecture": "review-balanced",
     "reviewer-spec": "review-balanced",
     "reviewer-tests": "review-balanced"
   },
@@ -102,7 +102,6 @@
     "catalog_count": 13,
     "signals": {
       "surfaces": [
-        "api",
         "content",
         "deploy"
       ],

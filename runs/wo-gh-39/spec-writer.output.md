@@ -1,19 +1,26 @@
-# Spec writer handoff: wo-gh-39
+The spec for this order already exists at `.openspec/specs/station-timeout/spec.md`, so I made no changes to it. It is marked `Status: approved`, and I found no gap against the work order.
 
-Spec file: .openspec/specs/station-timeout/spec.md (already present at the run base, status approved). I re-read the work order line by line against it and changed nothing, because nothing in the order is missing from it.
+I re-read the work order line by line against it. Each of S1 to S5 in the order is covered by a requirement and a scenario:
 
-Checks run against the tree:
-- git show 93ae03fc: tools/claude_station.py line 61 and tools/codex_station.py line 51 both read `TIMEOUT_SECONDS = 1500`. Matches R1.
-- Current tree: tools/claude_station.py line 63 `TIMEOUT_SECONDS = 1500`, used at the subprocess call (line 272) and in the timeout message (line 276). Matches R1.
-- anvil/executor.py line 93 defaults timeout_seconds to 300; anvil.yaml line 23 sets 1800; .github/workflows/anvil-line.yml line 66 has timeout-minutes: 180. Matches R5 and R6.
-- The spec contains no em dash or en dash.
+| Work order item | Requirement | Scenario |
+|---|---|---|
+| S1 diagnosis with file and line | R1 | S1 |
+| S2 configuration, resolution order, defaults, ceiling, executor coordination, job timeout | R2, R3, R4, R5, R6 | S2 to S6 |
+| S3 honest timeout records | R7 | S7 |
+| S4 regression evidence | R9 | S9 |
+| S5 decision record, changelog, docs | R10 | S10 |
 
-Requirement ids covering the order: R1 (S1) diagnosis, R2 (S2) configurable resolution, R3 (S3) defaults, R4 (S4) 7200 ceiling, R5 (S5) executor coordination, R6 (S6) job timeout 360, R7 (S7) honest timeout record, R8 (S8) healthy behaviour unchanged, R9 (S9) scaled regression evidence, R10 (S10) decision and docs, R11 (S11) builder report literals.
+R8 and S8 additionally require that a station finishing within its cap records exactly what it did before. R11 and S11 cover the required literals in the builder report.
 
-Out of scope and the allowed write set are stated in the spec, including the protected paths (anvil.json, pipelines/, existing tests/ files).
+Every requirement has at least one scenario that names it. Scenario S4 covers the 7200 ceiling and the bad-value cases, and S9 uses the scaled cap values (2 s of work against a 1 s legacy cap).
 
-Left open for the owner:
-- R4 allows clamping or rejecting above 7200. The builder picks one; the spec accepts either.
-- R5 allows either raising anvil.yaml runtime.timeout_seconds to at least 7200 or deriving the executor timeout from station configuration. The builder picks one.
-- Line numbers cited in S1 and S6 are as of the run base and shift once edits land.
+The spec also states what is out of scope. Its allowed write set matches the order's guardrails:
+- `anvil.json`, everything under `pipelines/`, and existing test files are not edited.
+- New tests arrive as new files.
+
+The order leaves two things open for the owner:
+- **Ceiling behaviour (R4):** the order allows either clamping a value above 7200 to 7200 or rejecting it with 7200 named. The spec accepts both, so the builder will pick one and record it in decision 0011.
+- **Per-station override (R2):** the spec allows one "in addition" to the environment and `anvil.yaml` values but does not require it.
+
+I did not write `runs/wo-gh-39/spec-writer.output.md`. That file shows as deleted in git status, and the spec file is the output this station owes.
 {"model": "claude-sonnet-5-5"}

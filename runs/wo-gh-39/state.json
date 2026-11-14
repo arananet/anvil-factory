@@ -1,15 +1,15 @@
 {
   "schema": "anvil/run-state@1",
-  "run_id": "1bb8ef647eba4b2ca5144bdf2a83aee6",
+  "run_id": "480bf2772c404055a829f6802c4ebf56",
   "work_order_id": "wo-gh-39",
   "project": "anvil-factory",
   "pipeline": "sdlc-default",
   "state": "finished",
   "current_station": null,
-  "verdict": "budget_exceeded",
-  "loopbacks": 0,
-  "started_at": "2026-11-14T14:53:22.015579+00:00",
-  "updated_at": "2026-11-14T15:01:38.448639+00:00",
+  "verdict": "no_reviews",
+  "loopbacks": 2,
+  "started_at": "2026-11-14T17:30:36.278316+00:00",
+  "updated_at": "2026-11-14T17:59:24.639387+00:00",
   "steps": [
     {
       "station": "intake",
@@ -21,21 +21,103 @@
     },
     {
       "station": "test-writer",
-      "status": "failed"
+      "status": "executed"
     },
     {
       "station": "builder",
-      "status": "budget_exceeded"
+      "status": "failed"
+    },
+    {
+      "station": "checks-gate",
+      "status": "failed"
+    },
+    {
+      "station": "loopback",
+      "status": "loopback"
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "checks-gate",
+      "status": "failed",
+      "attempt": 2
+    },
+    {
+      "station": "loopback",
+      "status": "loopback"
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "attempt": 3
+    },
+    {
+      "station": "checks-gate",
+      "status": "failed",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "skipped",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-security",
+      "status": "skipped",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "skipped",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "skipped",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-design",
+      "status": "skipped",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-ux",
+      "status": "skipped",
+      "attempt": 3
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "attempt": 3
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "attempt": 3
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "attempt": 3
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "attempt": 3
     }
   ],
   "token_usage": {
-    "calls": 3,
-    "total_tokens": 1021695,
-    "measured_calls": 3,
+    "calls": 7,
+    "total_tokens": 5041451,
+    "measured_calls": 7,
     "unmeasured_calls": 0
   },
   "cost": null,
   "export_errors": [],
-  "human_required": false,
+  "human_required": true,
   "deployment_status": null
 }

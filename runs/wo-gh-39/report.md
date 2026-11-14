@@ -11,7 +11,7 @@ Outcome: accepted
 
 Risk: medium
 
-Surfaces: deploy, api, content
+Surfaces: deploy, content
 
 ## Routing
 
@@ -29,14 +29,31 @@ Surfaces: deploy, api, content
 
 ## Verdict
 
-Verdict: budget_exceeded
+Verdict: no_reviews
 
-The pipeline has no approver step, so no reviews were aggregated into a verdict.
+No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)
 
 ## Steps
 
 - intake: executed
 - spec-writer: executed
-- test-writer: failed
-- builder: budget_exceeded
+- test-writer: executed
+- builder: failed
+- checks-gate: failed
+- loopback: loopback
+- builder: executed
+- checks-gate: failed
+- loopback: loopback
+- builder: executed
+- checks-gate: failed
+- reviewer-spec: skipped
+- reviewer-security: skipped
+- reviewer-tests: skipped
+- reviewer-architecture: skipped
+- reviewer-design: skipped
+- reviewer-ux: skipped
+- approver: completed
+- triage-human: completed
+- deployer: packet_ready
+- observer: executed
 

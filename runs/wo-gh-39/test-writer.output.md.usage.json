@@ -3,31 +3,31 @@
   "attempts": [
     {
       "attempt": 1,
-      "status": "failed",
+      "status": "succeeded",
       "runtime": "claude",
       "configured_model": "claude-sonnet-5-5",
-      "duration_ms": 471782.531,
+      "duration_ms": 288485.068,
       "usage": {
-        "input_tokens": 836553,
-        "output_tokens": 13870,
-        "cached_input_tokens": 779894,
-        "cache_creation_input_tokens": 56627,
+        "input_tokens": 357778,
+        "output_tokens": 4311,
+        "cached_input_tokens": 326347,
+        "cache_creation_input_tokens": 31411,
         "reasoning_tokens": 0,
-        "total_tokens": 850423,
+        "total_tokens": 362089,
         "input_tokens_includes_cache": true
       },
-      "runtime_cost_estimate_usd": 0.3583209,
-      "turns": 17,
+      "runtime_cost_estimate_usd": 0.1543122,
+      "turns": 10,
       "usage_complete": true
     }
   ],
   "usage": {
-    "input_tokens": 836553,
-    "output_tokens": 13870,
-    "cached_input_tokens": 779894,
-    "cache_creation_input_tokens": 56627,
+    "input_tokens": 357778,
+    "output_tokens": 4311,
+    "cached_input_tokens": 326347,
+    "cache_creation_input_tokens": 31411,
     "reasoning_tokens": 0,
-    "total_tokens": 850423,
+    "total_tokens": 362089,
     "input_tokens_includes_cache": true
   },
   "measured_attempts": 1,

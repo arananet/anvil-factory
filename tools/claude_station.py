@@ -49,6 +49,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from anvil.telemetry import UsageRecorder
+from anvil.config import resolve_station_timeout, STATION_TIMEOUT_CEILING
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import copilot_runtime
 
@@ -60,7 +61,10 @@ ARTIFACT_WRITE_STATIONS = {"spec-writer", "blueprint", "brief-writer",
                            "researcher", "writer", "media-producer"}
 WRITE_STATIONS = CODE_WRITE_STATIONS | ARTIFACT_WRITE_STATIONS
 NO_EDIT_TOOLS = "Edit,Write,NotebookEdit"
-TIMEOUT_SECONDS = 1500
+# The station timeout is configuration (station-timeout, decision 0011): see
+# anvil.config.resolve_station_timeout for the resolution order, the class
+# defaults and the ceiling. It bounds the whole invocation, correction
+# attempt included, so the executor margin above it always holds.
 
 
 def validate_path_component(component, name):
@@ -203,6 +207,17 @@ def main():
         print(f"claude_station: path validation failed: {e}", file=sys.stderr)
         return 6
 
+    try:
+        timeout = resolve_station_timeout(station, os.environ)
+    except ValueError as e:
+        print(f"claude_station: {e}", file=sys.stderr)
+        return 10
+    timeout_seconds = timeout["seconds"]
+    if timeout["requested"] != timeout_seconds:
+        print(f"claude_station: {timeout['source']} {timeout['requested']}s is above the ceiling of "
+              f"{STATION_TIMEOUT_CEILING}s; station {station} runs with {timeout_seconds}s",
+              file=sys.stderr)
+
     # Which runtime reaches the model: Claude Code through the Cloudflare AI
     # Gateway (the default), or GitHub Copilot CLI with the GitHub account.
     try:
@@ -218,6 +233,16 @@ def main():
     repo_root = Path(os.environ.get("ANVIL_PROJECT_ROOT") or Path(__file__).resolve().parent.parent).resolve()
     correction_used = False
     usage_recorder = UsageRecorder()
+    station_started = time.perf_counter()
+
+    def timed_out(raw, call_started):
+        """Record what is knowable about a station killed at its timeout."""
+        reason = f"station timeout of {timeout_seconds}s reached ({timeout['source']})"
+        usage_recorder.record(
+            raw, provider, "timed_out", (time.perf_counter() - call_started) * 1000, model,
+            {"station": station, "timeout_seconds": timeout_seconds, "reason": reason})
+        print(f"claude_station: station {station} timed out after {timeout_seconds}s", file=sys.stderr)
+        return 4
 
     # Run station (with one potential correction attempt for reviewers)
     for attempt in range(min(2, int(os.environ.get("ANVIL_MAX_ATTEMPTS", "2")))):
@@ -267,15 +292,18 @@ def main():
             return copilot_runtime.result_envelope(stdout, copilot_usage) if runtime == "copilot" else stdout
 
         call_started = time.perf_counter()
+        remaining = timeout_seconds - (call_started - station_started)
+        if remaining <= 0:
+            return timed_out(None, call_started)
         try:
             proc = subprocess.run(command, cwd=str(repo_root), capture_output=True,
-                                  text=True, timeout=TIMEOUT_SECONDS)
+                                  text=True, timeout=remaining)
         except subprocess.TimeoutExpired as exc:
-            usage_recorder.record(raw_result(exc.stdout), provider, "timed_out",
-                                  (time.perf_counter() - call_started) * 1000, model)
-            print(f"claude_station: station {station} timed out after {TIMEOUT_SECONDS}s",
-                  file=sys.stderr)
-            return 4
+            # On POSIX the partial stdout arrives as bytes even in text mode.
+            partial = exc.stdout
+            if isinstance(partial, bytes):
+                partial = partial.decode("utf-8", errors="replace")
+            return timed_out(raw_result(partial), call_started)
         except FileNotFoundError:
             print(f"claude_station: the {cli} CLI is not on PATH", file=sys.stderr)
             return 5

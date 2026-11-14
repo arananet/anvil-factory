@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 # anvil.yaml is written as JSON, which is valid YAML 1.2. That choice keeps the
@@ -58,6 +59,82 @@ DEFAULT_STATION_BUDGETS = {
 
 # S2: Factory default for contact sheet max width
 DEFAULT_CONTACT_SHEET_MAX_WIDTH = 1600
+
+# station-timeout (decision 0011): the wall clock one station invocation may
+# use before the wrapper kills it. Resolution order: the environment variable
+# ANVIL_STATION_TIMEOUT_SECONDS, then runtime.station_timeout_seconds in
+# anvil.yaml (the executor hands it to the wrapper through that same
+# variable), then the station class default below. No path exceeds the
+# ceiling: a larger value is clamped to it so a runaway station still dies.
+STATION_TIMEOUT_ENV = "ANVIL_STATION_TIMEOUT_SECONDS"
+STATION_TIMEOUT_CEILING = 7200
+PRODUCING_STATION_TIMEOUT = 3600
+DEFAULT_STATION_TIMEOUT = 1500
+# Margin the command executor keeps above the station timeout, so the wrapper
+# is the binding cap and writes its timeout record before the executor kills it.
+EXECUTOR_TIMEOUT_MARGIN = 60
+DEFAULT_EXECUTOR_TIMEOUT = 300
+# SYNC: the same eight ids as WRITE_STATIONS in tools/claude_station.py
+# (tests/test_station_timeout_config.py checks that the two agree).
+PRODUCING_STATIONS = frozenset({"builder", "test-writer", "spec-writer", "blueprint",
+                                "brief-writer", "researcher", "writer", "media-producer"})
+
+
+def parse_station_timeout(raw, source):
+    """Validate one configured timeout value; returns (seconds, requested).
+
+    seconds is clamped to STATION_TIMEOUT_CEILING; requested is the value as
+    configured. A non integer or non positive value raises ValueError naming
+    the value and where it came from.
+    """
+    if isinstance(raw, bool):
+        raise ValueError(f"{source} must be a positive integer number of seconds, got {raw!r}")
+    try:
+        requested = int(str(raw).strip())
+    except ValueError:
+        raise ValueError(f"{source} must be a positive integer number of seconds, got {raw!r}") from None
+    if requested <= 0:
+        raise ValueError(f"{source} must be a positive integer number of seconds, got {raw!r}")
+    return min(requested, STATION_TIMEOUT_CEILING), requested
+
+
+def station_class_default(station):
+    return PRODUCING_STATION_TIMEOUT if station in PRODUCING_STATIONS else DEFAULT_STATION_TIMEOUT
+
+
+def resolve_station_timeout(station, environ=None, configured=None):
+    """Resolve the timeout for one station: {"seconds", "requested", "source"}."""
+    environ = os.environ if environ is None else environ
+    raw = environ.get(STATION_TIMEOUT_ENV)
+    if raw is not None and str(raw).strip() != "":
+        seconds, requested = parse_station_timeout(raw, STATION_TIMEOUT_ENV)
+        return {"seconds": seconds, "requested": requested, "source": STATION_TIMEOUT_ENV}
+    if configured is not None:
+        seconds, requested = parse_station_timeout(configured, "runtime.station_timeout_seconds")
+        return {"seconds": seconds, "requested": requested, "source": "runtime.station_timeout_seconds"}
+    default = station_class_default(station)
+    return {"seconds": default, "requested": default, "source": "class default"}
+
+
+def station_timeout_seconds(station, environ=None, configured=None):
+    """The effective timeout in seconds for one station (see resolve_station_timeout)."""
+    return resolve_station_timeout(station, environ, configured)["seconds"]
+
+
+def effective_executor_timeout(configured, environ=None, station_configured=None):
+    """The command executor timeout: never lower than the largest station
+    timeout in effect plus EXECUTOR_TIMEOUT_MARGIN.
+
+    configured is runtime.timeout_seconds (None when unset); station_configured
+    is runtime.station_timeout_seconds.
+    """
+    base = DEFAULT_EXECUTOR_TIMEOUT if configured is None else int(configured)
+    # An override applies to every station alike, and without one the
+    # producing default is the larger class default, so a producing station
+    # always resolves to the largest timeout in effect.
+    largest = station_timeout_seconds("builder", environ, station_configured)
+    return max(base, largest + EXECUTOR_TIMEOUT_MARGIN)
+
 
 def default_model(station_id):
     if station_id in DEFAULT_MODELS:

@@ -127,18 +127,25 @@ class UsageRecorder:
         self.path = Path(path) if path else None
         self.attempts = []
 
-    def record(self, raw, provider, status, duration_ms, model):
+    def record(self, raw, provider, status, duration_ms, model, extra=None):
+        """Append one attempt; extra adds fields (a timed out attempt carries
+        station, timeout_seconds and reason) without changing the others."""
         parsed = parse_runtime_output(raw, provider)
         if parsed.get("is_error"):
             status = "failed"
-        self.attempts.append({
+        attempt = {
             "attempt": len(self.attempts) + 1, "status": status,
             "runtime": provider, "configured_model": model,
             "duration_ms": round(duration_ms, 3), "usage": parsed["usage"],
             "runtime_cost_estimate_usd": parsed["runtime_cost_estimate_usd"],
             "turns": parsed["turns"],
             "usage_complete": parsed["usage_complete"],
-        })
+        }
+        attempt.update(extra or {})
+        if status == "timed_out" and not attempt["usage_complete"]:
+            # station-timeout R7: unmeasured, with the reason, never a bare null.
+            attempt.setdefault("usage_reason", "the runtime exposed no usage before the timeout")
+        self.attempts.append(attempt)
         if self.path:
             self.path.parent.mkdir(parents=True, exist_ok=True)
             data = self.summary()
@@ -169,7 +176,7 @@ def summarize_steps(steps):
             for attempt in step["attempts"]:
                 calls.append(dict(attempt, station=step.get("station"),
                                   model=step.get("executed_model") or attempt.get("model") or "unreported"))
-        elif (step.get("status") in {"executed", "failed"}
+        elif (step.get("status") in {"executed", "failed", "timed_out"}
               and (step.get("executor") or step.get("usage") is not None or
                    (step.get("status") == "executed" and step.get("station") not in deterministic))):
             calls.append({"station": step.get("station"), "usage": step.get("usage"),

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Station timeout: configurable, with a ceiling and honest records (station-timeout)
+
+- The hardcoded 1500 second station cap in tools/claude_station.py is gone. The timeout resolves from ANVIL_STATION_TIMEOUT_SECONDS, then runtime.station_timeout_seconds in anvil.yaml, then the class default: 3600 seconds for producing stations, 1500 for the others. The ceiling is 7200 seconds; a larger value is clamped to it.
+- The command executor timeout is never below the largest station timeout in effect (plus 60 seconds). The factory anvil.yaml runtime.timeout_seconds is 7200 and the anvil-line job allows 360 minutes.
+- A station killed at its timeout is recorded as timed_out with station, elapsed milliseconds, timeout value and reason, the dispatched model and any partial usage, instead of nulls.
+- Spec: .openspec/specs/station-timeout/spec.md. Tests: tests/test_station_timeout.py, tests/test_station_timeout_config.py. Docs: docs/EXECUTION.md. Decision 0011.
+
 ### Runtime selection: Claude Code through the gateway, or GitHub Copilot CLI
 
 - New variable ANVIL_RUNTIME: claude-gateway (default, unchanged) or copilot (GitHub Copilot CLI with the Anthropic models of a GitHub account, credential COPILOT_GITHUB_TOKEN). runtime.provider in anvil.yaml sets a project default; the variable wins.

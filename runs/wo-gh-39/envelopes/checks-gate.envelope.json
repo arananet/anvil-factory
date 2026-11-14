@@ -1,0 +1,39 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "checks-gate",
+  "to_station": "reviewer-spec",
+  "work_order_id": "wo-gh-39",
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/runs/wo-gh-39/checks-gate.pre-review.output.md",
+  "status": "failed",
+  "created_at": "2026-11-14T17:59:05.949212+00:00",
+  "phase": "pre-review",
+  "commands": [
+    "python -m unittest discover -s tests -p 'test_*.py'"
+  ],
+  "exit_codes": [
+    1
+  ],
+  "protected_paths": [
+    "tests/",
+    "anvil.json",
+    "pipelines/"
+  ],
+  "protected_path_verdict": "pass",
+  "protected_path_findings": [],
+  "observed_additions": [
+    "Protected path addition (observed): tests/test_station_timeout_config.py (matches tests/)",
+    "Protected path addition (observed): tests/test_station_timeout.py (matches tests/)"
+  ],
+  "basis": "builder_delta (attempt 3)",
+  "gate_verdict": "fail",
+  "artifact_validation": {
+    "passed": true,
+    "report": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/runs/wo-gh-39/builder.output.md",
+    "observed": "present",
+    "report_source": "station",
+    "required_literals": [],
+    "missing_literals": [],
+    "findings": []
+  },
+  "configured_model": "claude-sonnet-5-5"
+}

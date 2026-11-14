@@ -38,6 +38,9 @@ prompt, work order, upstream step summary) and sent to the executor:
 - If the executor fails or the kind is unknown, the step status is `failed`
   with the error recorded in the step and the envelope. A failed step is never
   quietly reported as `packet_ready`.
+- If the station is killed at its timeout (see Station timeout below), the
+  step status is `timed_out` instead, with a `timeout` record and the
+  dispatched model as `executed_model`.
 - Reviewer stations are expected to write exactly one review JSON object to
   their review file: `{"station": "<station-id>", "verdict": "pass | fail |
   changes_requested", "findings": ["..."]}`. The review file must parse as
@@ -99,6 +102,44 @@ the answer for the existing artifact contract and keep scalar token evidence
 in `<station>.output.md.usage.json`. Raw runtime JSON, prompts and environment
 variables are not exported to the public usage pages. Each invocation of a
 station is an agent call; its runtime may perform several model/tool turns.
+
+### Station timeout
+
+Every station invocation runs under a wall clock timeout enforced by the
+station wrapper (`tools/claude_station.py`). It is configuration, resolved in
+this order (decision 0011, spec station-timeout):
+
+1. the environment variable `ANVIL_STATION_TIMEOUT_SECONDS`;
+2. `runtime.station_timeout_seconds` in the project `anvil.yaml`, which the
+   command executor hands to the wrapper through that same variable, like
+   `ANVIL_RUNTIME` and `ANVIL_MAX_RUNTIME_TURNS`;
+3. the station class default: 3600 seconds for the producing stations
+   (builder, test-writer, spec-writer, blueprint, brief-writer, researcher,
+   writer, media-producer), 1500 seconds for every other station.
+
+The hard ceiling is 7200 seconds. A configured value above it is clamped to
+7200 and the wrapper says so on stderr, so a runaway station still dies. A
+value that is not a positive whole number of seconds is rejected with the
+value named: the command executor refuses to start, and the wrapper, when it
+meets such a value, exits 10 so the step fails. The timeout bounds the
+whole invocation, including a reviewer's one correction attempt.
+
+The command executor timeout (`runtime.timeout_seconds`, default 300) is
+raised automatically to the largest station timeout in effect plus 60
+seconds, so the wrapper is always the binding cap and writes its record
+before the executor would kill it. The factory `anvil.yaml` sets
+`runtime.timeout_seconds` to 7200, and the anvil-line job allows 360 minutes.
+
+A station killed at its timeout records what is knowable. The attempt in
+`<station>.output.md.usage.json` has status `timed_out`, `station`,
+`duration_ms` (the elapsed time measured around the call),
+`timeout_seconds`, `reason` (the configured value and where it came from),
+`configured_model`, and the partial usage the runtime printed before the
+kill, or `usage_complete: false` with a `usage_reason` when it printed none.
+The run record step has status `timed_out`, `executed_model` set to the
+dispatched model, and a `timeout` object with the station, source, timeout
+value, elapsed milliseconds and reason. A station that finishes within its
+timeout records exactly what it did before.
 
 The `efficiency` settings bound packet context for all agent stations and
 stop new calls after run thresholds are reached. The final report records
