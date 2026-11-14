@@ -63,7 +63,7 @@ jobs:
        startsWith(github.event.comment.body, '/anvil approve') &&
        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)))
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 360
     env:
       ANTHROPIC_BASE_URL: ${{ vars.ANVIL_ANTHROPIC_BASE_URL || 'https://gateway.ai.cloudflare.com/v1/693ae9c587f1f2c34328bb47447366b0/arananet-ai-gateway/anthropic' }}
       ANTHROPIC_API_KEY: ${{ secrets.CF_AIG_TOKEN }}
