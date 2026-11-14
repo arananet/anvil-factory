@@ -1,11 +1,11 @@
 {
   "version": 1,
   "efficiency": {
-    "max_packet_tokens": 12000,
-    "max_runtime_turns": 16,
+    "max_packet_tokens": 48000,
+    "max_runtime_turns": 40,
     "tool_output_tokens": 2000,
     "max_agent_calls": 32,
-    "max_run_tokens": 250000,
+    "max_run_tokens": 6000000,
     "require_usage": false
   },
   "status_projects": [
