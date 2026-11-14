@@ -1,19 +1,25 @@
-The checks gate will probably fail again on this attempt, and not because of the timeout work. The suite has 5 approval tests that fail whenever they run inside GitHub Actions, and I can't fix them within this order's rules.
+I wrote the builder report to `runs/wo-gh-39/builder.output.md`. I made no code changes this attempt: the implementation from the earlier attempt on this branch already meets every scenario, and I re-checked it on the final tree.
 
-**Why those 5 fail.** The Actions runner sets `GITHUB_ACTOR=arananet`. The approval tests don't clear that, so `anvil/line.py:151` correctly refuses `--by ana` as someone else's identity. They were already failing before this change: on a clean copy of HEAD (c673c25) the same 5 fail. With those GitHub variables unset, the full suite passes on the final tree: 736 tests, 6 skipped, no failures.
+**Test results:**
+- **Full suite with the CI login details removed** (the way the checks gate now runs it): `Ran 736 tests` / `OK (skipped=6)`.
+- **Full suite run raw in this Actions shell:** 5 approval tests fail. They also fail on the tree before this order. The cause is the CI host's GitHub identity leaking into the test run, and the operator's fix in commit 36c18c4 (`anvil/gates.py`) removes those variables before the gate's check runs. So the gate should be green this time, but I haven't watched it run.
+- **The two new test files:** 26 tests, OK.
 
-I left them alone for three reasons:
-- the code involved (`anvil/line.py`, `anvil/gates.py`) is outside the files this order may change;
-- existing tests are protected;
-- making them pass would mean loosening the check on who is approving.
+**Root cause, confirmed with `git show`:**
+- At 93ae03fc the 1500s cap was hardcoded at `tools/claude_station.py:61` and `tools/codex_station.py:51`.
+- At a011c14 it was at `tools/claude_station.py:63`.
+- Neither had any override. The final tree resolves the timeout per station from configuration instead.
 
-**Decision for you:** either run the project check without the host GitHub identity variables, or fix the tests' environment handling in a separate order. Until one of those happens, the gate fails in Actions whatever this order contains.
+**What the implementation does:**
+- **Order of precedence:** `ANVIL_STATION_TIMEOUT_SECONDS`, then `runtime.station_timeout_seconds` in `anvil.yaml`, then the default for the station's class.
+- **Defaults:** 3600s for the eight producing stations, 1500s for all others.
+- **Ceiling:** values above 7200 are clamped to 7200. Non-integer, zero or negative values are rejected with the source and value named.
+- **Other limits raised to fit:** the executor timeout is always at least the largest station timeout plus 60s, `anvil.yaml` `timeout_seconds` is now 7200, and the job timeout is 360 minutes.
+- **Timeout records:** a killed station records `timed_out` with the elapsed time, the timeout value, the reason, the model that ran and any partial usage. The model field is no longer null.
 
-**This attempt:** the code from attempt 2 is unchanged; re-checked, it covers S1 to S5:
-- **Configuration:** `ANVIL_STATION_TIMEOUT_SECONDS` wins over anvil.yaml, which wins over the defaults (3600 seconds for producing stations, 1500 for the rest). Anything above 7200 is cut down to 7200.
-- **Executor:** its timeout is always at least the largest station timeout plus 60 seconds, so the station's own limit is the one that kills it.
-- **Timeout record:** a killed station records `timed_out`, the elapsed time, the timeout value, the reason, the model and any partial usage.
-- **Root cause:** confirmed at the file and line positions the order gave, at each historical ref and the run base.
-- **Evidence:** the two new timeout test files pass (26 tests), and I checked the setting's resolution by calling it directly.
+**Still open:**
+- No live station has run past 1500 seconds; the evidence is scaled-down mechanism tests, as the spec allows.
+- The way the executor finds the largest station timeout would need revisiting if per-station overrides are ever added. The spec doesn't ask for them.
+- The branch diff also contains operator changes that this station didn't write: `anvil/gates.py`, `status/*` and `tools/model_route_smoke.py`.
 
-I wrote the missing builder report to `runs/wo-gh-39/builder.output.md`. It contains all four required literals and no en or em dashes. No station has actually run past 1500 seconds; the proof is the scaled-down tests, which is what the spec asks for.
+Nothing in the diff touches `pipelines/`, `anvil.json` or existing tests, and no changed file contains an en dash or em dash.

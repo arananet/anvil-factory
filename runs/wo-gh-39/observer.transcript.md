@@ -1,8 +1,10 @@
-I wrote the observation report to `runs/wo-gh-39/observer.output.md`. It says there is nothing to observe, because no release happened.
+I wrote the observation report to `runs/wo-gh-39/observer.output.md`. It says there is nothing to observe, because no release record exists.
 
-- **Release record:** The observer's only input is the deployer's release record, and none exists. The run has only `deployer.packet.md` and the deployer envelope, and `state.json` shows the deployer step as `packet_ready`. I did not guess at a release.
-- **Last gate result:** The final checks-gate attempt ran 736 tests and ended with 5 failures and 6 skipped. The failures visible in the log are in `test_autonomous_line` and `test_governed_delivery`, where approval is refused because `--by` doesn't match the authenticated GitHub actor. I didn't determine whether those failures predate the change.
-- **Reviews:** The reviewers were skipped, so the run has no review verdicts (`no_reviews`).
-- **Missing before it can be observed:** a release record, post-release signals for the station-timeout change, and a passing full suite.
+- **Missing input:** The deployer wrote only `deployer.packet.md`, and its envelope status is `packet_ready`. There is no deployer output file.
+- **Consistent with the work order:** The order says nothing merges or deploys and the run stops at the owner human gate.
+- **State:** `state.json` shows the run verdict as `approved`.
+- **Not observed:** Any deployment or post-release behaviour, including a live run of the new timeout setting. I also couldn't tell whether the change reached factory main.
 
-The report contains no em or en dashes. I made no code changes.
+Once a release happens, the deployer needs to write the release record and the observer should run again.
+
+I didn't run tests or look at the code.

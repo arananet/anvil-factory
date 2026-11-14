@@ -1,6 +1,6 @@
 # Checks Gate: pre-review
 Basis: builder_delta
-Attempt: 3
+Attempt: 1
 
 # Protected Path Additions (Observed, Not Violations)
 Protected path addition (observed): tests/test_station_timeout_config.py (matches tests/)
@@ -8,38 +8,36 @@ Protected path addition (observed): tests/test_station_timeout.py (matches tests
 
 # Check Commands
 ## Command 1: python -m unittest discover -s tests -p 'test_*.py'
-Exit code: 1
+Exit code: 0
 Output:
 ```
-ing stops at the human gate in execute mode
+anchName false"
+Switched to a new branch 'work-branch'
+.hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+Switched to a new branch 'work-branch'
+................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 38527)>
+  if method() is not None:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 40997)>
+  if method() is not None:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+....................................................................................s....................................ss.........................................................................................................................................................s......s......................................................................................................s............................................................................................................................
 ----------------------------------------------------------------------
-Traceback (most recent call last):
-  File "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/tests/test_autonomous_line.py", line 283, in test_publisher_held_until_approved_s5
-    self.assertEqual(h.cli("approve", h.proj, "wo-s5", "--by", "ana")[0], 0)
-AssertionError: 1 != 0
+Ran 736 tests in 79.172s
 
-======================================================================
-FAIL: test_identity_and_policy_s5 (test_governed_delivery.TestApprovalPolicy.test_identity_and_policy_s5)
-S5: verified identity inside Actions, and the policy decides who may approve what
-----------------------------------------------------------------------
-Traceback (most recent call last):
-  File "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/tests/test_governed_delivery.py", line 255, in test_identity_and_policy_s5
-    self.assertIn("verified identity", err)
-AssertionError: 'verified identity' not found in 'Approval refused: --by bo does not match the authenticated GitHub actor arananet\n'
-
-======================================================================
-FAIL: test_policy_comes_from_the_operator_checkout_s5 (test_governed_delivery.TestApprovalPolicy.test_policy_comes_from_the_operator_checkout_s5)
-S5: a policy edited inside the run's worktree does not apply
-----------------------------------------------------------------------
-Traceback (most recent call last):
-  File "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/tests/test_governed_delivery.py", line 291, in test_policy_comes_from_the_operator_checkout_s5
-    self.assertIn("not in the approvers list", err)
-AssertionError: 'not in the approvers list' not found in 'Approval refused: --by mallory does not match the authenticated GitHub actor arananet\n'
-
-----------------------------------------------------------------------
-Ran 736 tests in 56.822s
-
-FAILED (failures=5, skipped=6)
+OK (skipped=6)
 
 ```
 

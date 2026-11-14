@@ -1,0 +1,10 @@
+{
+  "station": "reviewer-architecture",
+  "verdict": "pass",
+  "findings": [
+    "Resolution logic lives once in anvil/config.py (resolve_station_timeout, effective_executor_timeout); the wrapper and executor both import it, so the dependency points from edges to core and there is one source of truth for ceiling and defaults.",
+    "Configuration follows the existing pattern: anvil.yaml value handed to the wrapper through the environment by the executor, with ANVIL_STATION_TIMEOUT_SECONDS winning. Bad values are validated at executor construction (fail closed), and the ceiling clamp is announced with the ceiling named.",
+    "Minor: PRODUCING_STATIONS in anvil/config.py duplicates WRITE_STATIONS in tools/claude_station.py. The duplication is flagged with a SYNC comment and covered by an agreement test, so it is acceptable, but a single shared definition would be cleaner.",
+    "Decision record brain/decisions/0011-station-timeout.md exists, and docs/EXECUTION.md describes the configurable behaviour. No protected pipeline files or anvil.json were touched, and no new dependency was added."
+  ]
+}

@@ -1,16 +1,11 @@
-The spec for this order already existed at `.openspec/specs/station-timeout/spec.md` (status approved). I checked it against the work order line by line and changed nothing, because it already covers every item in the order.
+The spec for this order already exists at `.openspec/specs/station-timeout/spec.md`, marked approved, so I did not change it. I re-read the work order line by line against it and found no gap.
 
-I checked the spec's citations against the tree:
-- **Old cap:** at `93ae03fc`, `TIMEOUT_SECONDS = 1500` is at `tools/claude_station.py` line 61 and `tools/codex_station.py` line 51. In the current tree it is at `tools/claude_station.py` line 63.
-- **Neighbouring layers:** `anvil/executor.py` line 93 defaults the timeout to 300 seconds. `anvil.yaml` line 23 sets it to 1800. `.github/workflows/anvil-line.yml` line 66 has `timeout-minutes: 180`.
-- **Dashes:** the spec has no em dash or en dash.
+- **Coverage:** work order S1 to S5 map to spec R1 to R10 and S1 to S10. The order's builder-report literals map to R11/S11. R8/S8 (healthy stations record exactly what they did before) is an extra guard. Each requirement has a scenario that names it. Out of scope and the allowed write set are stated, including the protected paths.
+- **Ids changed:** none. R1 to R11 and S1 to S11 are as they were.
+- **Handoff file:** I wrote `runs/wo-gh-39/spec-writer.output.md`, which was showing as deleted in git status.
 
-R1 to R11 each have a scenario S1 to S11 that names them. The spec also states out of scope and the allowed write set, including the protected paths.
+Two points are left for the owner to decide:
+- **Ceiling (R4):** a value above 7200 can be clamped to 7200 or rejected with 7200 named. The spec accepts either, and the builder picks one and records it in decision 0011.
+- **Per-station override (R2):** one is allowed on top of the environment and `anvil.yaml` values but not required.
 
-I wrote the handoff to `runs/wo-gh-39/spec-writer.output.md`. That file had been deleted in the working tree.
-
-Two choices are left for the builder or the owner, and the spec accepts either option in each:
-- **R4:** clamp a value above 7200 to 7200, or reject it with an error that names 7200.
-- **R5:** raise `runtime.timeout_seconds` in `anvil.yaml` to at least 7200, or derive the executor timeout from the station configuration.
-
-The line numbers in S1 and S6 are as of the run base and will shift once edits land.
+I did not run any checks or tests. This station only checked the spec against the order.

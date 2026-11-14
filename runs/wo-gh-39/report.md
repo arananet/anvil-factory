@@ -11,7 +11,7 @@ Outcome: accepted
 
 Risk: medium
 
-Surfaces: deploy, content
+Surfaces: deploy, api, content
 
 ## Routing
 
@@ -29,29 +29,23 @@ Surfaces: deploy, content
 
 ## Verdict
 
-Verdict: no_reviews
+Verdict: approved
 
-No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)
+All counted reviews passed. (Expected 5 reviews after routing.)
 
 ## Steps
 
 - intake: executed
 - spec-writer: executed
 - test-writer: executed
-- builder: failed
-- checks-gate: failed
-- loopback: loopback
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
-- builder: executed
-- checks-gate: failed
-- reviewer-spec: skipped
-- reviewer-security: skipped
-- reviewer-tests: skipped
-- reviewer-architecture: skipped
-- reviewer-design: skipped
-- reviewer-ux: skipped
+- checks-gate: passed
+- reviewer-spec: executed
+- reviewer-security: executed
+- reviewer-tests: executed
+- reviewer-architecture: executed
+- reviewer-design: executed
+- reviewer-ux: routed_out
 - approver: completed
 - triage-human: completed
 - deployer: packet_ready

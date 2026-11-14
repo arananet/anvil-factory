@@ -188,55 +188,75 @@ These bars apply to every product page or interface this project ships.
 
 ## Diff summary
 
-- CHANGELOG.md: +7, -0
-- anvil.yaml: +1, -1
-- anvil/config.py: +77, -0
-- anvil/executor.py: +33, -3
-- anvil/runner.py: +32, -0
-- anvil/telemetry.py: +11, -4
-- docs/COST-MEASUREMENT.md: +4, -1
-- docs/EXECUTION.md: +41, -0
+- runs/wo-gh-39/builder.output.md: +110, -80
+- runs/wo-gh-39/builder.output.md.usage.json: +13, -13
+- runs/wo-gh-39/builder.packet.md: +0, -43
+- runs/wo-gh-39/builder.transcript.md: +20, -14
+- runs/wo-gh-39/checks-gate.pre-review.output.md: +27, -29
+- runs/wo-gh-39/envelopes/builder.envelope.json: +11, -11
+- runs/wo-gh-39/envelopes/checks-gate.envelope.json: +5, -5
 - runs/wo-gh-39/envelopes/intake.envelope.json: +1, -1
+- runs/wo-gh-39/envelopes/reviewer-architecture.envelope.json: +37, -4
+- runs/wo-gh-39/envelopes/reviewer-security.envelope.json: +38, -4
+- runs/wo-gh-39/envelopes/reviewer-spec.envelope.json: +39, -4
+- runs/wo-gh-39/envelopes/reviewer-tests.envelope.json: +38, -4
 - runs/wo-gh-39/envelopes/spec-writer.envelope.json: +11, -11
-- runs/wo-gh-39/envelopes/test-writer.envelope.json: +22, -5
-- runs/wo-gh-39/events.jsonl: +16, -0
-- runs/wo-gh-39/intake.output.md: +5, -1
-- runs/wo-gh-39/intake.output.md.usage.json: +12, -12
-- runs/wo-gh-39/routing.json: +1, -2
-- runs/wo-gh-39/spec-writer.output.md: +20, -13
+- runs/wo-gh-39/envelopes/test-writer.envelope.json: +11, -11
+- runs/wo-gh-39/events.jsonl: +10, -0
+- runs/wo-gh-39/evidence/screenshot-1440x900.png: +0, -0
+- runs/wo-gh-39/evidence/screenshot-390x844.png: +0, -0
+- runs/wo-gh-39/intake.output.md: +1, -5
+- runs/wo-gh-39/intake.output.md.usage.json: +13, -13
+- runs/wo-gh-39/reviewer-architecture.packet.md: +7, -47
+- runs/wo-gh-39/reviewer-security.packet.md: +3, -45
+- runs/wo-gh-39/reviewer-spec.packet.md: +1, -44
+- runs/wo-gh-39/reviewer-tests.packet.md: +8, -45
+- runs/wo-gh-39/routing.json: +4, -3
+- runs/wo-gh-39/spec-writer.output.md: +11, -14
 - runs/wo-gh-39/spec-writer.output.md.usage.json: +13, -13
-- runs/wo-gh-39/state.json: +64, -14
-- runs/wo-gh-39/test-writer.output.md: +44, -26
-- runs/wo-gh-39/test-writer.output.md.usage.json: +14, -14
-- tools/claude_station.py: +35, -7
-- work_orders/wo-gh-39.json: +0, -1
+- runs/wo-gh-39/spec-writer.transcript.md: +8, -13
+- runs/wo-gh-39/state.json: +17, -81
+- runs/wo-gh-39/test-writer.output.md: +20, -42
+- runs/wo-gh-39/test-writer.output.md.usage.json: +13, -13
+- runs/wo-gh-39/test-writer.transcript.md: +6, -13
+- work_orders/wo-gh-39.json: +1, -0
 
 ## File access allowlist
 
 This packet may only embed content from:
 - design/DESIGN.md
 - design/tokens.json
-- CHANGELOG.md
-- anvil.yaml
-- anvil/config.py
-- anvil/executor.py
-- anvil/runner.py
-- anvil/telemetry.py
-- docs/COST-MEASUREMENT.md
-- docs/EXECUTION.md
+- runs/wo-gh-39/builder.output.md
+- runs/wo-gh-39/builder.output.md.usage.json
+- runs/wo-gh-39/builder.packet.md
+- runs/wo-gh-39/builder.transcript.md
+- runs/wo-gh-39/checks-gate.pre-review.output.md
+- runs/wo-gh-39/envelopes/builder.envelope.json
+- runs/wo-gh-39/envelopes/checks-gate.envelope.json
 - runs/wo-gh-39/envelopes/intake.envelope.json
+- runs/wo-gh-39/envelopes/reviewer-architecture.envelope.json
+- runs/wo-gh-39/envelopes/reviewer-security.envelope.json
+- runs/wo-gh-39/envelopes/reviewer-spec.envelope.json
+- runs/wo-gh-39/envelopes/reviewer-tests.envelope.json
 - runs/wo-gh-39/envelopes/spec-writer.envelope.json
 - runs/wo-gh-39/envelopes/test-writer.envelope.json
 - runs/wo-gh-39/events.jsonl
+- runs/wo-gh-39/evidence/screenshot-1440x900.png
+- runs/wo-gh-39/evidence/screenshot-390x844.png
 - runs/wo-gh-39/intake.output.md
 - runs/wo-gh-39/intake.output.md.usage.json
+- runs/wo-gh-39/reviewer-architecture.packet.md
+- runs/wo-gh-39/reviewer-security.packet.md
+- runs/wo-gh-39/reviewer-spec.packet.md
+- runs/wo-gh-39/reviewer-tests.packet.md
 - runs/wo-gh-39/routing.json
 - runs/wo-gh-39/spec-writer.output.md
 - runs/wo-gh-39/spec-writer.output.md.usage.json
+- runs/wo-gh-39/spec-writer.transcript.md
 - runs/wo-gh-39/state.json
 - runs/wo-gh-39/test-writer.output.md
 - runs/wo-gh-39/test-writer.output.md.usage.json
-- tools/claude_station.py
+- runs/wo-gh-39/test-writer.transcript.md
 - work_orders/wo-gh-39.json
 
 ## Work order
@@ -269,41 +289,6 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/39
 GitHub issue: https://github.com/arananet/anvil-factory/issues/39
 - risk_hints: 
 - status: new
-
-## Loopback feedback (attempt 3 of 3)
-
-This is a re-review. The previous attempt was sent back by checks-gate to builder. Judge the work as it is now, and check that each finding below is resolved; do not pass a finding that is still open.
-
-Reason: Gate checks failed
-
-- # Checks Gate: pre-review
-  Basis: builder_delta
-  Attempt: 2
-  
-  # Protected Path Additions (Observed, Not Violations)
-  Protected path addition (observed): tests/__pycache__/test_station_timeout_config.cpython-312.pyc (matches tests/)
-  Protected path addition (observed): tests/test_station_timeout_config.py (matches tests/)
-  
-  # Check Commands
-  ## Command 1: python -m unittest discover -s tests -p 'test_*.py'
-  Exit code: 1
-  Output:
-  ```
-  ing stops at the human gate in execute mode
-  ----------------------------------------------------------------------
-  Traceback (most recent call last):
-    File "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/tests/test_autonomous_line.py", line 283, in test_publisher_held_until_approved_s5
-      self.assertEqual(h.cli("approve", h.proj, "wo-s5", "--by", "ana")[0], 0)
-  AssertionError: 1 != 0
-  
-  ======================================================================
-  FAIL: test_identity_and_policy_s5 (test_governed_delivery.TestApprovalPolicy.test_identity_and_policy_s5)
-  S5: verified identity inside Actions, and the policy decides who may approve what
-  ----------------------------------------------------------------------
-  Traceback (most recent call last):
-    File "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/tests/test_governed_delivery.py", line 255, in test_identity_and_policy_s5
-      self.assertIn("verified identity", err)
-  AssertionError: 'verified identity' not found in 'Approval refused: --by bo does not match the
 
 ## Practices
 
