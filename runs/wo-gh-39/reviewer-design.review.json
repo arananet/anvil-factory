@@ -1,0 +1,21 @@
+{
+  "station": "reviewer-design",
+  "verdict": "pass",
+  "compliance": {
+    "verdict": "pass",
+    "findings": [
+      "Scope: the diff for wo-gh-39 touches only run artifacts under runs/wo-gh-39/ and work_orders/wo-gh-39.json. No HTML, CSS, React component or other user-facing interface artifact is added or modified, so there is no new interface output to judge against design/DESIGN.md or design/tokens.json.",
+      "Design system present: design/DESIGN.md and design/tokens.json exist. Every token (colors, typography, spacing, layout, motion) is still TODO; since this order introduces no interface code, no undefined token is used by the change and per the station rules this is not a finding against this run.",
+      "Rendered evidence (runs/wo-gh-39/evidence/screenshot-1440x900.png and screenshot-390x844.png) shows the existing ANVIL run status page, which this order does not change. As a regression check against the project quality bars: visual hierarchy is clear (title, notice banner, token panel, project cards, lifecycle board), body text contrast is high on the dark surface, the 390px capture reflows the metric grid from six columns to two with no horizontal scroll, and spacing rhythm is consistent across both captures. No regression observed."
+    ]
+  },
+  "quality": {
+    "verdict": "pass",
+    "findings": [
+      "No reference anchors were supplied; judged against the charter floor only.",
+      "The Quality Charter declares product type physical_product (materials, light, contact, scale). This work order is a backend configuration change (configurable station timeout via ANVIL_STATION_TIMEOUT_SECONDS, 3600s producing default, 7200s ceiling) with no visual deliverable, so none of the physical product criteria have a subject to evaluate. No identity_reference is declared, so no cross-output identity check (S7) applies; practices P-4 to P-7 (asset pack fidelity, parallax, cross-set coherence, genre coherence) likewise have no subject in this run.",
+      "Advisory, not blocking: the charter product type physical_product does not match this project (a software factory with a status page). The project owner may want to correct the declared product type so future visual runs are judged against appropriate criteria."
+    ],
+    "anchor": "charter floor only"
+  }
+}

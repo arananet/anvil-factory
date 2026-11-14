@@ -1,0 +1,11 @@
+{
+  "station": "reviewer-tests",
+  "verdict": "pass",
+  "findings": [
+    "Accounting (P-13): baseline at main is 736 minus the 26 new tests; two new files added (tests/test_station_timeout.py, tests/test_station_timeout_config.py); no existing test file edited, skipped or deleted (git diff main --name-status -- tests shows only two A entries).",
+    "Reproduction (P-12): the full project check run by this reviewer gave Ran 736 tests, FAILED (failures=5, skipped=6) on this runner because GITHUB_ACTOR=arananet makes approve --by ana refuse in tests/test_autonomous_line.py and tests/test_governed_delivery.py. With GITHUB_ACTOR emptied the same command gives Ran 736 tests, OK (skipped=6). The failures are environmental, are not timeout related, and match the test-writer report.",
+    "Mapping: scenarios S1 to S10 each map to named tests (scaled legacy-cap completion and counting, kill at configured cap with elapsed/timeout/status recorded, default 3600, env over project config, 7200 ceiling, executor never below station timeout, job timeout 360, docs/decision/changelog, no dashes). They exercise the real wrapper, config and executor and assert specific values.",
+    "Caveat: the TDD red check could not be shown because the implementation was already in the tree when the tests were written; fail-before-build is unproven. Tests check real behaviour against the wrapper (main's TIMEOUT_SECONDS = 1500 at tools/claude_station.py line 63 would fail the S1 and S8 tests), so they are credible. Not blocking.",
+    "S11 (builder report literals) has no test and is left to the spec reviewer."
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-architecture",
+  "to_station": "reviewer-design",
+  "work_order_id": "wo-gh-39",
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/runs/wo-gh-39/reviewer-architecture.output.md",
+  "status": "executed",
+  "created_at": "2026-11-14T20:18:28.671056+00:00",
+  "usage": {
+    "input_tokens": 116031,
+    "output_tokens": 1538,
+    "cached_input_tokens": 103254,
+    "cache_creation_input_tokens": 12767,
+    "reasoning_tokens": 0,
+    "total_tokens": 117569,
+    "input_tokens_includes_cache": true
+  },
+  "tokens": {
+    "input_tokens": 116031,
+    "output_tokens": 1538,
+    "cached_input_tokens": 103254,
+    "cache_creation_input_tokens": 12767,
+    "reasoning_tokens": 0,
+    "total_tokens": 117569,
+    "input_tokens_includes_cache": true
+  },
+  "review": {
+    "station": "reviewer-architecture",
+    "verdict": "pass",
+    "findings": [
+      "Resolution logic lives once in anvil/config.py (resolve_station_timeout, effective_executor_timeout); the wrapper and executor both import it, so the dependency points from edges to core and there is one source of truth for ceiling and defaults.",
+      "Configuration follows the existing pattern: anvil.yaml value handed to the wrapper through the environment by the executor, with ANVIL_STATION_TIMEOUT_SECONDS winning. Bad values are validated at executor construction (fail closed), and the ceiling clamp is announced with the ceiling named.",
+      "Minor: PRODUCING_STATIONS in anvil/config.py duplicates WRITE_STATIONS in tools/claude_station.py. The duplication is flagged with a SYNC comment and covered by an agreement test, so it is acceptable, but a single shared definition would be cleaner.",
+      "Decision record brain/decisions/0011-station-timeout.md exists, and docs/EXECUTION.md describes the configurable behaviour. No protected pipeline files or anvil.json were touched, and no new dependency was added."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}

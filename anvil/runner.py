@@ -809,6 +809,23 @@ def _call_executor(executor, packet_text, station_id, configured_model=None, **k
     return executor.execute(packet_text, station_id, **kwargs)
 
 
+def _timeout_record(exc, station_id):
+    """The timeout record for a station killed at its timeout, else None.
+
+    station-timeout R7: the record names the station, the elapsed time
+    measured around the call, the timeout value and the reason, so a killed
+    station is not recorded as nulls. The wrapper writes these fields into
+    the usage artifact; the executor reports its own timeout the same way.
+    """
+    found = (exc.result or {}).get("timeout")
+    if not isinstance(found, dict):
+        return None
+    seconds = found.get("timeout_seconds")
+    return {"station": station_id, "source": found.get("source"), "timeout_seconds": seconds,
+            "elapsed_ms": found.get("elapsed_ms"),
+            "reason": str(found.get("reason") or f"timed out after {seconds}s")}
+
+
 def _executor_provenance(executor, output_text=""):
     """Return (executor_object, executed_model) for an attempted execution.
 
@@ -1506,6 +1523,7 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
         extra_envelope = {}
         step_usage = None
         step_telemetry = {}
+        step_timeout = None
         deferred_verifier = None
         deferred_pre_deploy_gate = None
         deferred_health_step = None
@@ -1690,6 +1708,12 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                     step_executor, step_executed_model = _executor_provenance(executor)
                     step_usage = exc.result.get("usage")
                     step_telemetry = exc.result.get("telemetry") or {}
+                    step_timeout = _timeout_record(exc, station_id)
+                    if step_timeout:
+                        status = "timed_out"
+                        detail = (f"Station timed out after {step_timeout['timeout_seconds']}s "
+                                  f"({step_timeout['reason']}); {exc}")
+                        step_executed_model = step_executed_model or handoff_model
             else:
                 detail = "Work order normalized"
                 artifact = str(run_dir / "report.json")
@@ -2130,6 +2154,12 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                     step_executor, step_executed_model = _executor_provenance(executor)
                     step_usage = exc.result.get("usage")
                     step_telemetry = exc.result.get("telemetry") or {}
+                    step_timeout = _timeout_record(exc, station_id)
+                    if step_timeout:
+                        status = "timed_out"
+                        detail = (f"Station timed out after {step_timeout['timeout_seconds']}s "
+                                  f"({step_timeout['reason']}); {exc}")
+                        step_executed_model = step_executed_model or handoff_model
                     extra_envelope = {"error": str(exc)}
                     if station_id.startswith("reviewer"):
                         # Station artifact contract S1/S3: a failed reviewer is
@@ -2174,6 +2204,8 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
         if step_telemetry:
             step["attempts"] = step_telemetry.get("attempts") or []
             step["usage_complete"] = bool(step_telemetry.get("complete"))
+        if step_timeout:
+            step["timeout"] = step_timeout
         if (station_id == "test-writer" and status == "executed" and "builder" in order[idx:]
                 and (base_ref_config or {}).get("checks")):
             # Autonomous line S8: red before green is evidence, not a claim.

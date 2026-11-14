@@ -1,0 +1,359 @@
+{
+  "work_order_id": "wo-gh-39",
+  "pipeline": "sdlc-default",
+  "title": "Configurable per-station timeout: the hardcoded 1500s station cap becomes project configuration with a 3600s producing default and honest timeout records",
+  "kind": "feature",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "executed",
+      "detail": "Executed by command; outcome: accepted",
+      "duration_ms": 6222.956,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/runs/wo-gh-39/intake.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 3108,
+      "budget": 12000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 41814,
+        "output_tokens": 402,
+        "cached_input_tokens": 20162,
+        "cache_creation_input_tokens": 21648,
+        "reasoning_tokens": 0,
+        "total_tokens": 42216,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-sonnet-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-sonnet-5-5",
+          "duration_ms": 6134.355,
+          "usage": {
+            "input_tokens": 41814,
+            "output_tokens": 402,
+            "cached_input_tokens": 20162,
+            "cache_creation_input_tokens": 21648,
+            "reasoning_tokens": 0,
+            "total_tokens": 42216,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.060164199999999994,
+          "turns": 2,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/runs/wo-gh-39/spec-writer.output.md",
+      "duration_ms": 18331.876,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/runs/wo-gh-39/spec-writer.output.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": "claude-sonnet-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 4388,
+      "budget": 12000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 127016,
+        "output_tokens": 2040,
+        "cached_input_tokens": 98881,
+        "cache_creation_input_tokens": 28125,
+        "reasoning_tokens": 0,
+        "total_tokens": 129056,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-sonnet-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-sonnet-5-5",
+          "duration_ms": 18259.909,
+          "usage": {
+            "input_tokens": 127016,
+            "output_tokens": 2040,
+            "cached_input_tokens": 98881,
+            "cache_creation_input_tokens": 28125,
+            "reasoning_tokens": 0,
+            "total_tokens": 129056,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.1006206,
+          "turns": 5,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true
+    },
+    {
+      "station": "test-writer",
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station test-writer: {\"duration_api_ms\":97956,\"stop_reason\":\"tool_use\",\"session_id\":\"18aa8f6a-ee3e-4064-9b91-40ac10a0e7b4\",\"total_cost_usd\":0.3583209,\"usage\":{\"input_tokens\":32,\"cache_creation_input_tokens\":56627,\"cache_read_input_tokens\":779894,\"output_tokens\":13870,\"output_tokens_details\":{\"thinking_tokens\":2246},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":0,\"ephem",
+      "duration_ms": 471853.86,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/runs/wo-gh-39/test-writer.packet.md"
+      ],
+      "configured_model": "claude-sonnet-5-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 3395,
+      "budget": 12000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 836553,
+        "output_tokens": 13870,
+        "cached_input_tokens": 779894,
+        "cache_creation_input_tokens": 56627,
+        "reasoning_tokens": 0,
+        "total_tokens": 850423,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-sonnet-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "runtime": "claude",
+          "configured_model": "claude-sonnet-5-5",
+          "duration_ms": 471782.531,
+          "usage": {
+            "input_tokens": 836553,
+            "output_tokens": 13870,
+            "cached_input_tokens": 779894,
+            "cache_creation_input_tokens": 56627,
+            "reasoning_tokens": 0,
+            "total_tokens": 850423,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.3583209,
+          "turns": 17,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true
+    },
+    {
+      "station": "builder",
+      "status": "budget_exceeded",
+      "detail": "Run token threshold reached (checked between calls)",
+      "duration_ms": 0,
+      "cost": null,
+      "artifacts": [],
+      "executor": null
+    }
+  ],
+  "verdict": "budget_exceeded",
+  "human_required": false,
+  "max_loopbacks": 2,
+  "loopbacks": 0,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [],
+      "reviews_expected": [
+        "reviewer-spec",
+        "reviewer-security",
+        "reviewer-tests",
+        "reviewer-architecture",
+        "reviewer-design"
+      ],
+      "rule": "The pipeline has no approver step, so no reviews were aggregated into a verdict."
+    },
+    "human_gate": {
+      "required": false,
+      "rule": "No approver verdict was produced by this pipeline and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": [],
+  "astra_measured_tokens_total": 0,
+  "base_ref": "d2ec66ec6df8fae9aa260daf761f57aa8cb91b5a",
+  "evidence": [],
+  "cost": {
+    "total": 0,
+    "measured_steps": 0,
+    "unmeasured_steps": 2
+  },
+  "practices": {
+    "resolved": {
+      "intake": [
+        "P-14",
+        "P-15"
+      ],
+      "spec-writer": [
+        "P-15"
+      ],
+      "test-writer": [],
+      "builder": [],
+      "checks-gate": [
+        "P-1",
+        "P-2",
+        "P-3"
+      ],
+      "reviewer-spec": [
+        "P-14"
+      ],
+      "reviewer-security": [],
+      "reviewer-tests": [
+        "P-12",
+        "P-13"
+      ],
+      "reviewer-architecture": [],
+      "reviewer-design": [
+        "P-4",
+        "P-5",
+        "P-6",
+        "P-7"
+      ],
+      "reviewer-ux": [
+        "P-8",
+        "P-9",
+        "P-10",
+        "P-11"
+      ],
+      "approver": [],
+      "triage-human": [],
+      "deployer": [],
+      "observer": []
+    },
+    "excluded_topics": [],
+    "active_count": 15
+  },
+  "skills": {
+    "resolved": {
+      "intake": [],
+      "spec-writer": [
+        "architecture-fundamentals",
+        "spec-writing"
+      ],
+      "test-writer": [
+        "test-design"
+      ],
+      "builder": [
+        "architecture-fundamentals",
+        "implementation-craft",
+        "security-baseline"
+      ],
+      "checks-gate": [],
+      "reviewer-spec": [],
+      "reviewer-security": [
+        "security-baseline"
+      ],
+      "reviewer-tests": [
+        "test-design"
+      ],
+      "reviewer-architecture": [
+        "architecture-fundamentals"
+      ],
+      "reviewer-design": [],
+      "reviewer-ux": [],
+      "approver": [],
+      "triage-human": [],
+      "deployer": [],
+      "observer": []
+    },
+    "disabled": [],
+    "catalog_count": 13,
+    "signals": {
+      "surfaces": [
+        "api",
+        "content",
+        "deploy"
+      ],
+      "product_types": [],
+      "kinds": [
+        "feature"
+      ]
+    }
+  },
+  "token_usage": {
+    "input_tokens": 1005383,
+    "output_tokens": 16312,
+    "cached_input_tokens": 898937,
+    "cache_creation_input_tokens": 106400,
+    "reasoning_tokens": 0,
+    "total_tokens": 1021695,
+    "measured_calls": 3,
+    "unmeasured_calls": 0,
+    "calls": 3,
+    "retries": 0,
+    "complete": true,
+    "by_station": {
+      "intake": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 42216
+      },
+      "spec-writer": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 129056
+      },
+      "test-writer": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 850423
+      }
+    },
+    "by_model": {
+      "claude-sonnet-5-5": {
+        "calls": 2,
+        "measured_calls": 2,
+        "total_tokens": 171272
+      },
+      "unreported": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 850423
+      }
+    }
+  },
+  "efficiency": {
+    "limits": {
+      "max_packet_tokens": 12000,
+      "max_runtime_turns": 16,
+      "tool_output_tokens": 2000,
+      "max_agent_calls": 32,
+      "max_run_tokens": 250000,
+      "require_usage": false
+    },
+    "stopped": true
+  },
+  "run_id": "1bb8ef647eba4b2ca5144bdf2a83aee6"
+}

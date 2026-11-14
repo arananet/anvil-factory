@@ -101,7 +101,10 @@ than charging cached tokens at the ordinary input rate.
 The Claude wrapper reads the JSON result's usage. Each attempt writes scalar-only evidence to
 `<station>.output.md.usage.json`, including failed calls, corrections and
 timeouts. The executor preserves available evidence on errors and never
-reuses a previous invocation's usage file. Missing timeout usage stays unknown.
+reuses a previous invocation's usage file. A timed out attempt keeps the
+partial usage the runtime printed before the kill; when it printed none, the
+attempt is recorded as unmeasured with a `usage_reason`, never as a measured
+zero. See Station timeout in [EXECUTION.md](EXECUTION.md).
 
 Canonical input includes ordinary input, cache reads and cache creation.
 Cached input is not added again to the total. Reasoning is a subset of output.

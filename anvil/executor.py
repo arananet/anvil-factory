@@ -20,9 +20,11 @@ import json
 import os
 import shlex
 import subprocess
+import time
 import urllib.request
 from pathlib import Path
 from .telemetry import normalize_usage
+from .config import STATION_TIMEOUT_ENV, effective_executor_timeout, parse_station_timeout
 
 
 class ExecutorError(RuntimeError):
@@ -90,7 +92,16 @@ class CommandExecutor:
 
     def __init__(self, config):
         self.template = str(config.get("command", "")).strip()
-        self.timeout = int(config.get("timeout_seconds", 300))
+        # station-timeout: runtime.station_timeout_seconds is validated here,
+        # at the boundary, and handed to the wrapper through the environment.
+        # The executor timeout is raised above the largest station timeout in
+        # effect so the wrapper, not this layer, is the binding cap.
+        self.station_timeout = None
+        if config.get("station_timeout_seconds") is not None:
+            self.station_timeout = parse_station_timeout(config["station_timeout_seconds"],
+                                                         "runtime.station_timeout_seconds")[0]
+        self.timeout = effective_executor_timeout(config.get("timeout_seconds"), os.environ,
+                                                  self.station_timeout)
         self.name = "command"
         self.config = dict(config)
         self.sandbox = config.get("sandbox") if isinstance(config.get("sandbox"), dict) else None
@@ -117,6 +128,10 @@ class CommandExecutor:
             env["ANVIL_RUNTIME"] = str(self.config["provider"])
         if isinstance(self.config.get("copilot_models"), dict) and not env.get("ANVIL_COPILOT_MODELS"):
             env["ANVIL_COPILOT_MODELS"] = json.dumps(self.config["copilot_models"])
+        # The environment variable wins; runtime.station_timeout_seconds is
+        # the project's value (station-timeout R2).
+        if self.station_timeout is not None and not env.get(STATION_TIMEOUT_ENV):
+            env[STATION_TIMEOUT_ENV] = str(self.station_timeout)
 
         usage_path = Path(str(output_path) + ".usage.json").resolve() if output_path is not None else None
         if usage_path:
@@ -133,7 +148,16 @@ class CommandExecutor:
                 try:
                     data = json.loads(usage_path.read_text(encoding="utf-8"))
                     if isinstance(data, dict) and data.get("schema") == "anvil/usage@1":
-                        return {"usage": normalize_usage(data.get("usage")), "telemetry": data}
+                        result = {"usage": normalize_usage(data.get("usage")), "telemetry": data}
+                        attempts = data.get("attempts") or []
+                        last = attempts[-1] if attempts and isinstance(attempts[-1], dict) else {}
+                        if last.get("status") == "timed_out":
+                            # The wrapper killed the station at its timeout.
+                            result["timeout"] = {"source": "station",
+                                                 "timeout_seconds": last.get("timeout_seconds"),
+                                                 "elapsed_ms": last.get("duration_ms"),
+                                                 "reason": last.get("reason")}
+                        return result
                 except (OSError, ValueError):
                     pass
             return {"usage": None}
@@ -159,11 +183,17 @@ class CommandExecutor:
             use_shell = False
         elif self.sandbox:
             raise ExecutorError(f"unknown sandbox kind: {self.sandbox.get('kind')}")
+        call_started = time.perf_counter()
         try:
             proc = subprocess.run(run_args, shell=use_shell, cwd=str(cwd) if cwd else None,
                                   env=run_env, capture_output=True, text=True, timeout=self.timeout)
         except subprocess.TimeoutExpired:
-            raise ExecutorError(f"command executor timed out after {self.timeout}s", evidence())
+            found = evidence()
+            found.setdefault("timeout", {
+                "source": "executor", "timeout_seconds": self.timeout,
+                "elapsed_ms": round((time.perf_counter() - call_started) * 1000, 3),
+                "reason": f"command executor timeout of {self.timeout}s reached"})
+            raise ExecutorError(f"command executor timed out after {self.timeout}s", found)
         if proc.returncode != 0:
             detail = (proc.stderr or proc.stdout or "").strip()[:500]
             raise ExecutorError(f"command executor exited {proc.returncode}: {detail}", evidence())
