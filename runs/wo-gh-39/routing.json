@@ -1,0 +1,115 @@
+{
+  "selected_reviewers": [
+    "reviewer-spec",
+    "reviewer-security",
+    "reviewer-tests",
+    "reviewer-architecture",
+    "reviewer-design"
+  ],
+  "routed_out": [
+    {
+      "reviewer": "reviewer-ux",
+      "reason": "Routed out: no UI surface"
+    }
+  ],
+  "selected_models": {
+    "reviewer-security": "review-strong",
+    "reviewer-spec": "review-balanced",
+    "reviewer-design": "review-balanced",
+    "reviewer-tests": "review-balanced",
+    "reviewer-architecture": "review-balanced"
+  },
+  "reason": "High risk: full panel at policy models, no reduction applied",
+  "practices": {
+    "resolved": {
+      "intake": [
+        "P-14",
+        "P-15"
+      ],
+      "spec-writer": [
+        "P-15"
+      ],
+      "test-writer": [],
+      "builder": [],
+      "checks-gate": [
+        "P-1",
+        "P-2",
+        "P-3"
+      ],
+      "reviewer-spec": [
+        "P-14"
+      ],
+      "reviewer-security": [],
+      "reviewer-tests": [
+        "P-12",
+        "P-13"
+      ],
+      "reviewer-architecture": [],
+      "reviewer-design": [
+        "P-4",
+        "P-5",
+        "P-6",
+        "P-7"
+      ],
+      "reviewer-ux": [
+        "P-8",
+        "P-9",
+        "P-10",
+        "P-11"
+      ],
+      "approver": [],
+      "triage-human": [],
+      "deployer": [],
+      "observer": []
+    },
+    "excluded_topics": [],
+    "active_count": 15
+  },
+  "skills": {
+    "resolved": {
+      "intake": [],
+      "spec-writer": [
+        "architecture-fundamentals",
+        "spec-writing"
+      ],
+      "test-writer": [
+        "test-design"
+      ],
+      "builder": [
+        "architecture-fundamentals",
+        "implementation-craft",
+        "security-baseline"
+      ],
+      "checks-gate": [],
+      "reviewer-spec": [],
+      "reviewer-security": [
+        "security-baseline"
+      ],
+      "reviewer-tests": [
+        "test-design"
+      ],
+      "reviewer-architecture": [
+        "architecture-fundamentals"
+      ],
+      "reviewer-design": [],
+      "reviewer-ux": [],
+      "approver": [],
+      "triage-human": [],
+      "deployer": [],
+      "observer": []
+    },
+    "disabled": [],
+    "catalog_count": 13,
+    "signals": {
+      "surfaces": [
+        "api",
+        "content",
+        "deploy"
+      ],
+      "product_types": [],
+      "kinds": [
+        "feature"
+      ]
+    }
+  }
+}

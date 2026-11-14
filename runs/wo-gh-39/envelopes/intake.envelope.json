@@ -1,0 +1,15 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "intake",
+  "to_station": "spec-writer",
+  "work_order_id": "wo-gh-39",
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/runs/wo-gh-39/intake.output.md",
+  "status": "executed",
+  "created_at": "2026-11-14T14:04:58.350824+00:00",
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}
