@@ -93,17 +93,31 @@ def disclosure_gate(project_dir, slug):
     return (True, "Draft carries an AI generated disclosure")
 
 
+# The CI host identity variables. anvil.line.approver_identity reads the
+# actor from the line process environment, where it is the real
+# authenticated identity; but these names must not leak into project check
+# commands, whose suites may simulate approvers that the leaked host actor
+# would get refused (wo-gh-39: five approval tests failed under Actions for
+# exactly this reason, reproduced on the pre-product tree as well).
+HOST_IDENTITY_ENV = ("GITHUB_ACTIONS", "GITHUB_ACTOR", "GITHUB_ACTOR_ID",
+                     "GITHUB_TRIGGERING_ACTOR")
+
+
 def _run_shell(command, cwd, work_order_id, timeout, scrub=False):
     """Execute a shell command with timeout.
 
     scrub=True removes deploy and repository credentials from the command's
-    environment. Project checks run code the line itself just wrote, so they
-    get the same reduced environment as a station; deploy commands do not.
+    environment, and also the CI host identity variables (see
+    HOST_IDENTITY_ENV). Project checks run code the line itself just wrote,
+    so they get the same reduced environment as a station; deploy commands
+    do not.
     """
     env = dict(os.environ)
     if scrub:
         from .executor import station_env
         env = station_env(env, {})
+        for name in HOST_IDENTITY_ENV:
+            env.pop(name, None)
     env["ANVIL_WORK_ORDER_ID"] = work_order_id
     try:
         proc = subprocess.run(command, shell=True, cwd=str(cwd), env=env,
