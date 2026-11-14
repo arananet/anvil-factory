@@ -1,6 +1,6 @@
 {
   "schema": "anvil/run-state@1",
-  "run_id": "7a397269484844b18f009499d1f853b0",
+  "run_id": "1bb8ef647eba4b2ca5144bdf2a83aee6",
   "work_order_id": "wo-gh-39",
   "project": "anvil-factory",
   "pipeline": "sdlc-default",
@@ -8,8 +8,8 @@
   "current_station": null,
   "verdict": "budget_exceeded",
   "loopbacks": 0,
-  "started_at": "2026-11-14T14:04:54.147158+00:00",
-  "updated_at": "2026-11-14T14:11:49.314487+00:00",
+  "started_at": "2026-11-14T14:53:22.015579+00:00",
+  "updated_at": "2026-11-14T15:01:38.448639+00:00",
   "steps": [
     {
       "station": "intake",
@@ -21,7 +21,7 @@
     },
     {
       "station": "test-writer",
-      "status": "executed"
+      "status": "failed"
     },
     {
       "station": "builder",
@@ -30,7 +30,7 @@
   ],
   "token_usage": {
     "calls": 3,
-    "total_tokens": 674288,
+    "total_tokens": 1021695,
     "measured_calls": 3,
     "unmeasured_calls": 0
   },

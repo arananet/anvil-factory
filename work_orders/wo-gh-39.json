@@ -11,7 +11,7 @@
   "intake_outcome": {
     "outcome": "accepted"
   },
-  "risk": "high",
+  "risk": "medium",
   "surfaces": [
     "deploy",
     "api",

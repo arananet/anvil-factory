@@ -3,31 +3,14 @@
   "from_station": "test-writer",
   "to_station": "builder",
   "work_order_id": "wo-gh-39",
-  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/runs/wo-gh-39/test-writer.output.md",
-  "status": "executed",
-  "created_at": "2026-11-14T14:11:49.312316+00:00",
-  "usage": {
-    "input_tokens": 463210,
-    "output_tokens": 12411,
-    "cached_input_tokens": 415781,
-    "cache_creation_input_tokens": 47405,
-    "reasoning_tokens": 0,
-    "total_tokens": 475621,
-    "input_tokens_includes_cache": true
-  },
-  "tokens": {
-    "input_tokens": 463210,
-    "output_tokens": 12411,
-    "cached_input_tokens": 415781,
-    "cache_creation_input_tokens": 47405,
-    "reasoning_tokens": 0,
-    "total_tokens": 475621,
-    "input_tokens_includes_cache": true
-  },
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-39/runs/wo-gh-39/test-writer.packet.md",
+  "status": "failed",
+  "created_at": "2026-11-14T15:01:38.446117+00:00",
+  "error": "command executor exited 2: claude_station: claude exited 1 for station test-writer: {\"duration_api_ms\":97956,\"stop_reason\":\"tool_use\",\"session_id\":\"18aa8f6a-ee3e-4064-9b91-40ac10a0e7b4\",\"total_cost_usd\":0.3583209,\"usage\":{\"input_tokens\":32,\"cache_creation_input_tokens\":56627,\"cache_read_input_tokens\":779894,\"output_tokens\":13870,\"output_tokens_details\":{\"thinking_tokens\":2246},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":0,\"ephem",
   "configured_model": "claude-sonnet-5-5",
   "executor": {
     "kind": "command",
     "detail": "python3"
   },
-  "executed_model": "claude-sonnet-5-5"
+  "executed_model": null
 }

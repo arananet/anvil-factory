@@ -1,28 +1,28 @@
 {
   "project": "anvil-factory",
-  "generated_at": "2026-11-14 14:11:49 UTC",
+  "generated_at": "2026-11-14 15:01:38 UTC",
   "token_usage": {
-    "input_tokens": 656868,
-    "output_tokens": 17420,
-    "cached_input_tokens": 559144,
-    "cache_creation_input_tokens": 97684,
+    "input_tokens": 1662251,
+    "output_tokens": 33732,
+    "cached_input_tokens": 1458081,
+    "cache_creation_input_tokens": 204084,
     "reasoning_tokens": 0,
-    "total_tokens": 674288,
-    "measured_calls": 3,
+    "total_tokens": 1695983,
+    "measured_calls": 6,
     "unmeasured_calls": 188,
-    "calls": 191,
+    "calls": 194,
     "retries": 0,
     "complete": false,
     "by_station": {
       "spec-writer": {
-        "calls": 23,
-        "measured_calls": 1,
-        "total_tokens": 157997
+        "calls": 24,
+        "measured_calls": 2,
+        "total_tokens": 287053
       },
       "test-writer": {
-        "calls": 23,
-        "measured_calls": 1,
-        "total_tokens": 475621
+        "calls": 24,
+        "measured_calls": 2,
+        "total_tokens": 1326044
       },
       "builder": {
         "calls": 22,
@@ -55,9 +55,9 @@
         "total_tokens": null
       },
       "intake": {
-        "calls": 17,
-        "measured_calls": 1,
-        "total_tokens": 40670
+        "calls": 18,
+        "measured_calls": 2,
+        "total_tokens": 82886
       },
       "reviewer-design": {
         "calls": 13,
@@ -72,14 +72,14 @@
     },
     "by_model": {
       "unreported": {
-        "calls": 139,
-        "measured_calls": 0,
-        "total_tokens": null
+        "calls": 140,
+        "measured_calls": 1,
+        "total_tokens": 850423
       },
       "claude-sonnet-5-5": {
-        "calls": 42,
-        "measured_calls": 3,
-        "total_tokens": 674288
+        "calls": 44,
+        "measured_calls": 5,
+        "total_tokens": 845560
       },
       "openai/gpt-6.1-sol": {
         "calls": 5,
@@ -94,27 +94,27 @@
     }
   },
   "portfolio_token_usage": {
-    "input_tokens": 656868,
-    "output_tokens": 17420,
-    "cached_input_tokens": 559144,
-    "cache_creation_input_tokens": 97684,
+    "input_tokens": 1662251,
+    "output_tokens": 33732,
+    "cached_input_tokens": 1458081,
+    "cache_creation_input_tokens": 204084,
     "reasoning_tokens": 0,
-    "total_tokens": 674288,
-    "measured_calls": 3,
+    "total_tokens": 1695983,
+    "measured_calls": 6,
     "unmeasured_calls": 341,
-    "calls": 344,
+    "calls": 347,
     "retries": 0,
     "complete": false,
     "by_station": {
       "spec-writer": {
-        "calls": 40,
-        "measured_calls": 1,
-        "total_tokens": 157997
+        "calls": 41,
+        "measured_calls": 2,
+        "total_tokens": 287053
       },
       "test-writer": {
-        "calls": 40,
-        "measured_calls": 1,
-        "total_tokens": 475621
+        "calls": 41,
+        "measured_calls": 2,
+        "total_tokens": 1326044
       },
       "builder": {
         "calls": 39,
@@ -147,9 +147,9 @@
         "total_tokens": null
       },
       "intake": {
-        "calls": 17,
-        "measured_calls": 1,
-        "total_tokens": 40670
+        "calls": 18,
+        "measured_calls": 2,
+        "total_tokens": 82886
       },
       "reviewer-design": {
         "calls": 29,
@@ -169,14 +169,14 @@
     },
     "by_model": {
       "unreported": {
-        "calls": 148,
-        "measured_calls": 0,
-        "total_tokens": null
+        "calls": 149,
+        "measured_calls": 1,
+        "total_tokens": 850423
       },
       "claude-sonnet-5-5": {
-        "calls": 154,
-        "measured_calls": 3,
-        "total_tokens": 674288
+        "calls": 156,
+        "measured_calls": 5,
+        "total_tokens": 845560
       },
       "openai/gpt-6.1-sol": {
         "calls": 5,
@@ -4724,6 +4724,203 @@
             "calls": 1,
             "measured_calls": 0,
             "total_tokens": null
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-39",
+      "run_id": "1bb8ef647eba4b2ca5144bdf2a83aee6",
+      "title": "Configurable per-station timeout: the hardcoded 1500s station cap becomes project configuration with a 3600s producing default and honest timeout records",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "budget_exceeded",
+      "human_required": false,
+      "deployment_status": null,
+      "loopbacks": 0,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "executed",
+          "duration_ms": 6222.956,
+          "configured_model": "claude-sonnet-5-5",
+          "usage_complete": true,
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 3108,
+          "budget": 12000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": {
+            "input_tokens": 41814,
+            "output_tokens": 402,
+            "cached_input_tokens": 20162,
+            "cache_creation_input_tokens": 21648,
+            "reasoning_tokens": 0,
+            "total_tokens": 42216,
+            "input_tokens_includes_cache": true
+          },
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "succeeded",
+              "runtime": "claude",
+              "configured_model": "claude-sonnet-5-5",
+              "duration_ms": 6134.355,
+              "turns": 2,
+              "usage_complete": true,
+              "runtime_cost_estimate_usd": 0.060164199999999994,
+              "usage": {
+                "input_tokens": 41814,
+                "output_tokens": 402,
+                "cached_input_tokens": 20162,
+                "cache_creation_input_tokens": 21648,
+                "reasoning_tokens": 0,
+                "total_tokens": 42216,
+                "input_tokens_includes_cache": true
+              }
+            }
+          ]
+        },
+        {
+          "station": "spec-writer",
+          "status": "executed",
+          "duration_ms": 18331.876,
+          "configured_model": "claude-sonnet-5-5",
+          "usage_complete": true,
+          "executed_model": "claude-sonnet-5-5",
+          "measured_tokens": 4388,
+          "budget": 12000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": {
+            "input_tokens": 127016,
+            "output_tokens": 2040,
+            "cached_input_tokens": 98881,
+            "cache_creation_input_tokens": 28125,
+            "reasoning_tokens": 0,
+            "total_tokens": 129056,
+            "input_tokens_includes_cache": true
+          },
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "succeeded",
+              "runtime": "claude",
+              "configured_model": "claude-sonnet-5-5",
+              "duration_ms": 18259.909,
+              "turns": 5,
+              "usage_complete": true,
+              "runtime_cost_estimate_usd": 0.1006206,
+              "usage": {
+                "input_tokens": 127016,
+                "output_tokens": 2040,
+                "cached_input_tokens": 98881,
+                "cache_creation_input_tokens": 28125,
+                "reasoning_tokens": 0,
+                "total_tokens": 129056,
+                "input_tokens_includes_cache": true
+              }
+            }
+          ]
+        },
+        {
+          "station": "test-writer",
+          "status": "failed",
+          "duration_ms": 471853.86,
+          "configured_model": "claude-sonnet-5-5",
+          "usage_complete": true,
+          "executed_model": null,
+          "measured_tokens": 3395,
+          "budget": 12000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": {
+            "input_tokens": 836553,
+            "output_tokens": 13870,
+            "cached_input_tokens": 779894,
+            "cache_creation_input_tokens": 56627,
+            "reasoning_tokens": 0,
+            "total_tokens": 850423,
+            "input_tokens_includes_cache": true
+          },
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "failed",
+              "runtime": "claude",
+              "configured_model": "claude-sonnet-5-5",
+              "duration_ms": 471782.531,
+              "turns": 17,
+              "usage_complete": true,
+              "runtime_cost_estimate_usd": 0.3583209,
+              "usage": {
+                "input_tokens": 836553,
+                "output_tokens": 13870,
+                "cached_input_tokens": 779894,
+                "cache_creation_input_tokens": 56627,
+                "reasoning_tokens": 0,
+                "total_tokens": 850423,
+                "input_tokens_includes_cache": true
+              }
+            }
+          ]
+        },
+        {
+          "station": "builder",
+          "status": "budget_exceeded",
+          "duration_ms": 0,
+          "cost": null,
+          "usage": null
+        }
+      ],
+      "token_usage": {
+        "input_tokens": 1005383,
+        "output_tokens": 16312,
+        "cached_input_tokens": 898937,
+        "cache_creation_input_tokens": 106400,
+        "reasoning_tokens": 0,
+        "total_tokens": 1021695,
+        "measured_calls": 3,
+        "unmeasured_calls": 0,
+        "calls": 3,
+        "retries": 0,
+        "complete": true,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 1,
+            "total_tokens": 42216
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 1,
+            "total_tokens": 129056
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 1,
+            "total_tokens": 850423
+          }
+        },
+        "by_model": {
+          "claude-sonnet-5-5": {
+            "calls": 2,
+            "measured_calls": 2,
+            "total_tokens": 171272
+          },
+          "unreported": {
+            "calls": 1,
+            "measured_calls": 1,
+            "total_tokens": 850423
           }
         }
       }

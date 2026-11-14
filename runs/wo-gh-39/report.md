@@ -9,13 +9,13 @@ Status: new
 
 Outcome: accepted
 
-Risk: high
+Risk: medium
 
 Surfaces: deploy, api, content
 
 ## Routing
 
-**Decision**: High risk: full panel at policy models, no reduction applied
+**Decision**: Medium risk: full panel at policy models
 
 **Selected reviewers** (5):
 - reviewer-spec (model: review-balanced)
@@ -37,6 +37,6 @@ The pipeline has no approver step, so no reviews were aggregated into a verdict.
 
 - intake: executed
 - spec-writer: executed
-- test-writer: executed
+- test-writer: failed
 - builder: budget_exceeded
 

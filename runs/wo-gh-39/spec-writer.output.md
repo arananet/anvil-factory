@@ -1,33 +1,19 @@
-I rewrote `.openspec/specs/station-timeout/spec.md` (status stays approved). The existing spec had no requirement ids and its scenarios didn't name requirements. It also had no out-of-scope section or write set. I haven't run anything against it; there are no tests for a spec, and the only check was a dash-character search, which found none.
+# Spec writer handoff: wo-gh-39
 
-**Requirements written (R1–R11):**
-- R1: root cause with file and line, checked against the tree.
-- R2: configurable timeout and resolution order.
-- R3: defaults per station class.
-- R4: 7200 ceiling and rejection of bad values.
-- R5: executor timeout never below the largest station timeout.
-- R6: job timeout raised to 360 minutes.
-- R7: honest timeout record.
-- R8: healthy behaviour unchanged.
-- R9: scaled regression evidence.
-- R10: decision record and docs.
-- R11: required literals in the builder report.
+Spec file: .openspec/specs/station-timeout/spec.md (already present at the run base, status approved). I re-read the work order line by line against it and changed nothing, because nothing in the order is missing from it.
 
-**Scenarios written (S1–S11):** each one names its requirement and uses concrete values. They cover:
-- a station configured at 100 against 200;
-- a ceiling value of 9000, and the bad values "abc", "0" and "-5";
-- a scaled station that works for 2 seconds against a 1-second legacy cap;
-- a timeout record with elapsed time of at least 1000 ms.
+Checks run against the tree:
+- git show 93ae03fc: tools/claude_station.py line 61 and tools/codex_station.py line 51 both read `TIMEOUT_SECONDS = 1500`. Matches R1.
+- Current tree: tools/claude_station.py line 63 `TIMEOUT_SECONDS = 1500`, used at the subprocess call (line 272) and in the timeout message (line 276). Matches R1.
+- anvil/executor.py line 93 defaults timeout_seconds to 300; anvil.yaml line 23 sets 1800; .github/workflows/anvil-line.yml line 66 has timeout-minutes: 180. Matches R5 and R6.
+- The spec contains no em dash or en dash.
 
-The spec also states what is out of scope and the allowed write set. The write set authorizes new test files under the protected `tests/` path and forbids editing `anvil.json`, `pipelines/` and existing tests.
+Requirement ids covering the order: R1 (S1) diagnosis, R2 (S2) configurable resolution, R3 (S3) defaults, R4 (S4) 7200 ceiling, R5 (S5) executor coordination, R6 (S6) job timeout 360, R7 (S7) honest timeout record, R8 (S8) healthy behaviour unchanged, R9 (S9) scaled regression evidence, R10 (S10) decision and docs, R11 (S11) builder report literals.
 
-**Checks against the tree:**
-- The `TIMEOUT_SECONDS = 1500` constant is at `tools/claude_station.py:63`. I did not check the historical `93ae03fc` lines for R1. They come from the work order and the original spec.
-- `anvil.yaml` sets `runtime.timeout_seconds` to 1800.
-- The job timeout is at line 66 of `anvil-line.yml`.
+Out of scope and the allowed write set are stated in the spec, including the protected paths (anvil.json, pipelines/, existing tests/ files).
 
-**Decisions left for the owner:**
-- **Ceiling over the limit:** R4 lets the builder either clamp to 7200 or reject with an error naming 7200. The order allows both. Say so if you want only one.
-- **Executor timeout:** R5 lets the builder either set `anvil.yaml` `runtime.timeout_seconds` to at least 7200 or derive it from the station configuration. Again the order allows both.
-- **Docs search:** S10 requires that a search of `docs/` for "1500" finds no current-behaviour statement. I didn't list which docs mention 1500. A grep of `docs`, `README.md` and `CHANGELOG.md` for "1500" printed nothing, but `docs/EXECUTION.md` still needs the new behaviour documented.
+Left open for the owner:
+- R4 allows clamping or rejecting above 7200. The builder picks one; the spec accepts either.
+- R5 allows either raising anvil.yaml runtime.timeout_seconds to at least 7200 or deriving the executor timeout from station configuration. The builder picks one.
+- Line numbers cited in S1 and S6 are as of the run base and shift once edits land.
 {"model": "claude-sonnet-5-5"}
