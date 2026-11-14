@@ -1,0 +1,30 @@
+# Station Timeout
+
+Status: approved
+Slug: station-timeout
+
+## Roles
+- implementer: builds the change described here
+- reviewer: checks the change against this spec
+- qa: checks the scenarios below with tests
+- product_owner: owns the purpose and accepts the result
+
+## Purpose
+A producing station that needs more than 1500 seconds of wall clock is killed by a hardcoded constant in the station wrapper, after it has already done the work. The kill is recorded as a bare failure with executed_model null and usage unmeasured, so the run loses the station, the reviewers never count, and the gate reports no_reviews. The defect record with run ids and exact failure strings lives in issue 39. This spec makes the per station timeout configurable project configuration with a raised producing default, keeps a hard ceiling so a runaway station still dies, coordinates the neighbouring timeout layers so the wrapper cap is the binding one, and makes a timeout kill record what is knowable instead of nulls.
+
+## Requirements
+- Root cause, verified by the line against the tree at the run base and stated in the builder report with file and line: at 93ae03fc the cap was the module level constant TIMEOUT_SECONDS = 1500 in tools/claude_station.py line 61 and tools/codex_station.py line 51, with no environment or configuration override anywhere in the repo. At the current base the codex wrapper no longer exists (removed in 4c40ea3, decision 0008) and the constant survives in tools/claude_station.py (line 63 at a011c14) as the subprocess timeout and in the timed out message. No override exists at the base.
+- The per station timeout is configurable following the factory existing configuration patterns (anvil.yaml values handed to the wrapper through the environment by the executor, like ANVIL_MAX_RUNTIME_TURNS and ANVIL_RUNTIME). Resolution order: the environment variable ANVIL_STATION_TIMEOUT_SECONDS wins over project configuration in anvil.yaml, which wins over the station class default. A per station override may exist in addition, but ANVIL_STATION_TIMEOUT_SECONDS must work.
+- Defaults: producing stations (the wrapper WRITE_STATIONS set: builder, test-writer, spec-writer, blueprint, brief-writer, researcher, writer, media-producer) default to at least 3600 seconds. All other stations default to at least 1500 seconds, so no station loses time it has today.
+- Hard ceiling: 7200 seconds. A configured value above the ceiling is clamped to 7200 or rejected with the ceiling named in the error. No configuration path yields a station timeout above 7200.
+- Layer coordination: the command executor timeout (anvil/executor.py, runtime.timeout_seconds in anvil.yaml, default 300 in code) must never be lower than the largest station timeout in effect for a run; the factory anvil.yaml runtime.timeout_seconds is updated accordingly (at least the ceiling, or an executor that derives its timeout from the station configuration). The anvil-line.yml job timeout is raised from 180 to 360 minutes so one producing station at the new default plus the remaining pipeline stages fit in a single job.
+- Honest timeout records: when a station is killed by the timeout, the run record and the usage artifact record the station id, the elapsed milliseconds measured around the call, the configured timeout value as the recorded reason, the model that was dispatched for that station, and partial usage when the runtime exposes it (the TimeoutExpired stdout path). The timed out step does not record executed_model null with no explanation: the record names the dispatched model with status timed_out.
+- Regression evidence: the factory test suite stays green, and new test files under tests/ prove the mechanism deterministically at scaled values: a producing station whose work runs past a scaled legacy cap completes under the new configuration and is counted; a station exceeding its configured cap still dies with the timeout recorded (elapsed, timeout value, status); configuration resolution gives the producing default of 3600, the environment override wins over project configuration, and values above 7200 are clamped or rejected. Scaled mechanism tests are the accepted evidence form; no test needs to run for 1500 real seconds.
+- A decision record brain/decisions/0011-station-timeout.md captures the change, CHANGELOG.md is updated, and factory docs that state the old cap or the timeout behaviour (docs/EXECUTION.md at minimum) describe the configurable behaviour, the defaults, the ceiling and the override name ANVIL_STATION_TIMEOUT_SECONDS.
+
+## Scenarios
+- S1 Diagnosis recorded: given the tree at the run base, the builder report states where the 1500 second cap lived in both historical wrappers and where it lives now, with file and line, matching the tree.
+- S2 Configurable timeout: given ANVIL_STATION_TIMEOUT_SECONDS set in the environment, a station uses that value (subject to the ceiling) instead of 1500. Given only anvil.yaml configuration, the station uses the configured value. Given no configuration, a producing station uses at least 3600 and any other station at least 1500. Given a configured value above 7200, the effective timeout is 7200 or the configuration is rejected naming 7200.
+- S3 Layer coordination: given a producing station configured at 3600, the command executor does not kill the station command before 3600, and the factory anvil.yaml and the line workflow job timeout reflect the new scale.
+- S4 Honest timeout record: given a station killed by its configured timeout, the run record and usage artifact carry the station id, measured elapsed milliseconds, the timeout value as the reason, the dispatched model with status timed_out, and partial usage when the runtime exposed any.
+- S5 Regression evidence: given the new tests at scaled values, a station working past a scaled legacy cap completes and is counted, a station past its configured cap dies with the S4 record, and resolution order and ceiling behave as specified. The full existing suite stays green, existing pipelines run unchanged, and healthy station behaviour is identical to before this change.
