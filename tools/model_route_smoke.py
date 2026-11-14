@@ -58,6 +58,7 @@ def probe_anthropic(model, description, content="Say 'ok'"):
     try:
         req = urllib.request.Request(f"{base_url.rstrip('/')}/v1/messages",
                                      data=json.dumps(payload).encode("utf-8"), method="POST")
+        req.add_header("User-Agent", "anvil-model-route-smoke/1.0")
         req.add_header("Content-Type", "application/json")
         req.add_header("x-api-key", api_key)
         req.add_header("anthropic-version", "2023-06-01")
