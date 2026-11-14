@@ -46,6 +46,7 @@ permissions:
   contents: write
   issues: write
   pull-requests: write
+  workflows: write
 
 concurrency:
   group: anvil-line-${{ github.event.issue.number || github.event.inputs.issue || github.event.client_payload.work_order.id || github.run_id }}
@@ -259,12 +260,29 @@ jobs:
           [ -s comment.md ] || printf '## ANVIL line report\n\nThe workflow stopped before the line produced a report. See %s\n' "${RUN_URL}" > comment.md
           gh issue comment "${ISSUE}" --body-file comment.md
 
+      - name: Stage the run directory inside the workspace
+        if: always() && steps.line.outputs.worktree != ''
+        env:
+          WORKTREE: ${{ steps.line.outputs.worktree }}
+          WO_ID: ${{ steps.order.outputs.id }}
+        run: |
+          # upload-artifact rejects patterns with '..' pathing, and the line
+          # worktree lives outside the workspace, so copy the run directory
+          # to a workspace anchored path first or the evidence of a failed
+          # run is lost with the runner.
+          mkdir -p anvil-run-evidence
+          if [ -d "${WORKTREE}/runs/${WO_ID}" ]; then
+            cp -r "${WORKTREE}/runs/${WO_ID}" "anvil-run-evidence/${WO_ID}"
+          else
+            echo "No run directory at ${WORKTREE}/runs/${WO_ID}; nothing to stage."
+          fi
+
       - name: Upload the run directory
         if: always() && steps.line.outputs.worktree != ''
         uses: actions/upload-artifact@v4
         with:
           name: anvil-run-${{ steps.order.outputs.id }}
-          path: ${{ steps.line.outputs.worktree }}/runs/${{ steps.order.outputs.id }}
+          path: anvil-run-evidence/${{ steps.order.outputs.id }}
           if-no-files-found: ignore
 
       - name: Job outcome follows the line
