@@ -154,7 +154,7 @@
       "surfaces": [
         "content"
       ],
-      "source": "ANVIL curated. Method by Alan Daitch (@alandaitch), from his Instagram reel on making animated explainer videos with a single prompt, published around 2026-11-03: https://www.instagram.com/reel/DfSzHquzV1v/ Extracted from the video itself; the full prompt the reel points to in its comments was not accessible, and the model named in the reel could not be verified, so the skill is model-agnostic.",
+      "source": "ANVIL curated. Content method by Alan Daitch (@alandaitch), from his Instagram reel on making animated explainer videos with a single prompt, published around 2026-11-03: https://www.instagram.com/reel/DfSzHquzV1v/ Extracted from the video itself; the full prompt the reel points to in its comments was not accessible, and the model named in the reel could not be verified, so that layer is model-agnostic. Production pipeline from @unminutodeporques (Un minuto de porqués), from the Instagram reel 'Cómo montar tu fábrica de reels con Claude code', published 2026-11-10: https://www.instagram.com/reel/DfkY1E1AYW_/ Tool names confirmed from on-screen text; the reference-rules document shown was not legible, so only the three rules it names are claimed.",
       "license": "Apache-2.0"
     }
   ]
