@@ -37,6 +37,8 @@ R10. Producer write access. The station wrappers grant edit tools to every stati
 
 R11. Definitions of done. The producer prompts state when the work is finished and what to verify before handoff. Reviewer prompts and their Output Format sections are unchanged.
 
+R12. External skills. A published external skill is adopted in two parts. Where its license permits copying (MIT, Apache-2.0, CC0 or similar), the upstream text and its license file are vendored verbatim under third_party/ and recorded in third_party/README.md with the upstream repository and the vendored commit. The catalog entry is a SKILL.md written for this catalog under skills/: flat name and description frontmatter, a body within the R1 cap, and scoping that states where the upstream guidance does not apply. Adaptation is required when the upstream body exceeds the cap, when its frontmatter is not flat, or when it assumes tooling the line does not run (asset dealers, agent hooks, live fetches at review time); the adaptation keeps the rules that survive translation and names what it drops. A source whose license is unclear, absent or restrictive is never copied: the entry references it by URL and commit, and any substance it uses comes from a source whose license permits copying. Where an external skill and a shipped skill cover the same ground, the entries scope them apart (producer against reviewer, public pages against data-dense tools, a named brand against a default) instead of stacking both on the same work.
+
 ## Scenarios
 
 S1. (R1, R2) The shipped catalog loads with no problems, covers the five domains, names only stations that exist, and lists every skill directory on disk.
@@ -56,6 +58,8 @@ S7. (R9) The run context lists only upstream outputs that exist, the spec when i
 S8. (R10) Both wrappers expose the same producer write set, and no reviewer or read only station is in it.
 
 S9. (R7) A packet mode run writes the skills resolution to report.json and the skill bodies into the matching station packets.
+
+S10. (R12) Every adopted external skill has either a third_party inventory record naming its upstream and vendored commit or a catalog source that states it is referenced and not copied, with the reason. Its body is within the cap, and no station receives two skills whose stated scopes claim the same work.
 
 ## Scope limits
 
