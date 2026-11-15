@@ -143,6 +143,19 @@
       ],
       "source": "ANVIL curated. Distilled from: Bruce Block, The Visual Story; Walter Murch, In the Blink of an Eye; C2PA and platform AI disclosure guidance; this factory's quality charter.",
       "license": "Apache-2.0"
+    },
+    {
+      "id": "explainer-video",
+      "domain": "content",
+      "stations": [
+        "media-producer",
+        "reviewer-design"
+      ],
+      "surfaces": [
+        "content"
+      ],
+      "source": "ANVIL curated. Method by Alan Daitch (@alandaitch), from his Instagram reel on making animated explainer videos with a single prompt, published around 2026-11-03: https://www.instagram.com/reel/DfSzHquzV1v/ Extracted from the video itself; the full prompt the reel points to in its comments was not accessible, and the model named in the reel could not be verified, so the skill is model-agnostic.",
+      "license": "Apache-2.0"
     }
   ]
 }
