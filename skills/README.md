@@ -12,7 +12,11 @@ A skill is a short craft guide for one domain. The runner puts the skills that m
 | implementation-craft | architecture | builder | always |
 | security-baseline | architecture | builder, reviewer-security | always |
 | interface-design | design | builder | product type interface, ui surface |
+| design-taste | design | builder | product type interface or a public page kind, ui surface |
+| design-md | design | builder, reviewer-design | interface product types, ui surface |
+| image-to-code | design | builder, reviewer-design | visual product types, ui surface, when the order supplies reference images |
 | web-engineering | web | builder | product type interface, ui surface |
+| web-design-guidelines | web | reviewer-design, reviewer-ux | interface product types, ui surface |
 | game-design-feel | gaming | spec-writer, builder | product type game |
 | game-engineering | gaming | builder, test-writer | product type game |
 | content-briefing | content | brief-writer | always |
@@ -52,7 +56,9 @@ Create `skills/catalog.json` and `skills/<id>/SKILL.md` in the project. An entry
 
 ## Adding an external skill
 
-SKILL.md uses the common skill format (name and description frontmatter, then the body), so a published skill can be adopted. Vendor it under third_party/ with its license file, record it in third_party/README.md, and add a catalog entry whose `path` points at the vendored SKILL.md and whose `source` names the upstream and the commit. Read it first: a skill is prompt text every matching station will follow.
+SKILL.md uses the common skill format (name and description frontmatter, then the body), so a published skill can be adopted. Vendor it under third_party/ with its license file, record it in third_party/README.md, and add a catalog entry whose `path` points at the vendored SKILL.md and whose `source` names the upstream and the commit.
+
+When the upstream body exceeds the 6000 character cap, its frontmatter is not flat, or it assumes tooling the line does not run, vendor the original as above and write the catalog entry as an adaptation under skills/<id>/ instead: the same provenance in `source`, the rules that survive translation in the body, and a note in the body naming what was dropped. When a source's license is unclear or absent, do not copy it at all: reference it in `source` and take any substance from a source whose license permits copying. .openspec/specs/curated-skills/spec.md R12 states the rule. Read it first: a skill is prompt text every matching station will follow.
 
 ## Authority
 
