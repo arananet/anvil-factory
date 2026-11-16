@@ -136,3 +136,17 @@ Approval belongs to the independent reviewers and owner.
   Earlier suite results are not presented as validation of this attempt.
 - Build facts, browser measurements, contrast ratios and charter comparisons
   accompany the captures. They are evidence for independent review.
+
+## Content update 2026-11-15
+
+On the owner's order, the proof section now shows the same three projects as
+the README showcase: Sentia, Doom Fire and Mochi Smash. Platform25 left the
+showcase; its project and repository are unchanged, and no project data was
+deleted. The Doom Fire card cites its run report (runs/wo-gh-1 in
+arananet/doom-fire): gate verdict approved, 3,012,947 tokens measured against
+a 5,000,000 cap. The Mochi Smash description comes from its own repository
+README. Counts re-verified against the tree on 2026-11-15: 27 stations, 8
+pipelines, 18 skills in skills/catalog.json, and 6 parallel reviewers in
+pipelines/sdlc-default.json. The hero stats now print the 18 skills count and
+carry the 2026-11-15 verification date. The landing and readme showcase
+checks pass with the new links.

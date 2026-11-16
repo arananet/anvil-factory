@@ -12,17 +12,15 @@ Full name: ANVIL, Agentic Network for Verified Implementation Lifecycle.
 
 **Real run trail**: [wo-gh-9](runs/wo-gh-9/) shows the complete cycle from work order through five independent reviews to merge. Every station's packet, every review file, and the final report are preserved in the runs/ directory. No mockups - this is what the factory actually produced.
 
-**Live example**: The [Taskline repository](https://github.com/arananet/anvil-example-taskline) is a working task board API built entirely on the ANVIL line from a blank slate, with spec-first, red-green TDD evidence, and all station artifacts committed to its tree.
-
 ## Built by ANVIL
 
 Three projects running in production, built on this factory:
 
 - **[Sentia](https://sentia.info-693.workers.dev)** - Full-stack web app with database persistence, built from spec through deployment verification on the greenfield pipeline
-- **[Platform25](https://platform25.pages.dev)** - Playable game built through the content pipeline with media production and brand review stations
-- **[Status Board](https://anvil-status.pages.dev)** - Live factory run status, generated from run reports and published automatically
+- **[Doom Fire](https://doom-fire.pages.dev)** - The classic DOOM fire effect as a single static page, built greenfield under wo-gh-1: the gate verdict was approved with 4 of 4 reviewers counted, at 3,012,947 tokens measured against a 5,000,000 cap
+- **[Mochi Smash](https://mochi-smash.pages.dev)** - Playable 2D platform game: a heavy little ninja in a destructible pixel world across three levels, with every asset generated in code
 
-Each proves the same line can ship software, content, and infrastructure.
+A full-stack app, a game and a single page effect: three different kinds of product through the same spec, tests, independent reviews and human gate.
 
 ## Quickstart
 
