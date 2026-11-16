@@ -29,7 +29,7 @@ Run 1 (41944293495) verdict: no_reviews. The checks gate failed (suite exit 1, 5
 ### R1. First screen (above the fold)
 - Title and badges per the house README template (stack badges, the OpenSpec badge and the Apache 2.0 badge), the quoted one line description, then, in this order:
   1. An animated demo of one real run's cycle: work order, spec, tests, build, reviews, human gate, merged. GIF or embedded MP4, under 90 seconds, produced from a real run's evidence (captures and run reports), never a mockup. If a truthful animated demo cannot be produced inside the line, the run reports that plainly and the README ships with the strongest truthful evidence available instead of a fabricated demo.
-  2. A Built by ANVIL block with live links, each with one line on what it proves: Sentia (https://sentia.info-693.workers.dev), Platform25 playable (https://platform25.pages.dev) and the status board (https://anvil-status.pages.dev).
+  2. A Built by ANVIL block with live links, each with one line on what it proves: Sentia (https://sentia.info-693.workers.dev), Doom Fire (https://doom-fire.pages.dev) and Mochi Smash (https://mochi-smash.pages.dev). Amended 2026-11-15 on the owner's order: the showcase set is these three projects. Platform25 and the status board left the block; the projects, their repositories and the status page itself are unchanged.
   3. A quickstart of under 5 minutes against arananet/anvil-example-taskline: clone, `anvil onboard` or the example run, and what the reader sees at the end. The quickstart is executed from a clean clone as part of this order's evidence (production form: the quickstart is run, not described).
 
 ### R2. Trust section (why you can trust the output)

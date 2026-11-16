@@ -26,11 +26,11 @@ class TestReadmeStructure(unittest.TestCase):
         self.assertTrue(has_quote, "One-line description (quoted) missing from first screen")
 
     def test_built_by_anvil_block_with_links_r1(self):
-        """readme-showcase R1: Built by ANVIL block with Sentia, Platform25, status board links"""
+        """readme-showcase R1: Built by ANVIL block with Sentia, Doom Fire, Mochi Smash links"""
         self.assertIn("Built by ANVIL", self.content, "Built by ANVIL block missing")
         self.assertIn("https://sentia.info-693.workers.dev", self.content, "Sentia link missing")
-        self.assertIn("https://platform25.pages.dev", self.content, "Platform25 link missing")
-        self.assertIn("https://anvil-status.pages.dev", self.content, "Status board link missing")
+        self.assertIn("https://doom-fire.pages.dev", self.content, "Doom Fire link missing")
+        self.assertIn("https://mochi-smash.pages.dev", self.content, "Mochi Smash link missing")
 
     def test_quickstart_section_present_r1(self):
         """readme-showcase R1: quickstart section mentioning arananet/anvil-example-taskline"""
@@ -190,7 +190,7 @@ class TestLinkValidation(unittest.TestCase):
                               f"Relative link '{url}' does not resolve: {link_path}")
 
     def test_showcase_external_links_valid(self):
-        """readme-showcase verification: external showcase links (Sentia, Platform25, status board) are valid"""
+        """readme-showcase verification: external showcase links (Sentia, Doom Fire, Mochi Smash) are valid"""
         # Skip unless ANVIL_LIVE_TESTS=1 is set, as these links are behind Cloudflare bot filtering
         # The live verification is in run evidence (evidence/link-and-claim-verification.md)
         if os.environ.get("ANVIL_LIVE_TESTS") != "1":
@@ -198,8 +198,8 @@ class TestLinkValidation(unittest.TestCase):
 
         showcase_links = [
             "https://sentia.info-693.workers.dev",
-            "https://platform25.pages.dev",
-            "https://anvil-status.pages.dev"
+            "https://doom-fire.pages.dev",
+            "https://mochi-smash.pages.dev"
         ]
 
         for link in showcase_links:
