@@ -2,6 +2,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
+from .attribution import REQUIREMENT_TEXT as ATTRIBUTION_REQUIREMENT, find_deliverable
 from .brain import LEARNINGS_HEADER
 from .community import render_community_files
 from .config import render_anvil_yaml
@@ -170,6 +171,10 @@ def onboard_project(path, name=None, description=None, contact=None):
              "", "## Gaps"] + ([f"- {g}" for g in gaps] or ["- None detected"]) + [
              "", "## Suggested first work orders"] + ([f"- {s}" for s in suggested] or ["- None. The line is ready for normal work orders."]) + [
              "", "Pipeline: sdlc-default (brownfield). The baseline spec is a draft until a human confirms it."]
+    if find_deliverable(root):
+        # Attribution default (decision 0012): recorded for the web project,
+        # never written into its existing pages.
+        lines += ["", ATTRIBUTION_REQUIREMENT.rstrip("\n")]
     (root / "ONBOARDING.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     created.append("ONBOARDING.md")
     return {"analysis": report, "created": created, "kept": kept, "gaps": gaps, "suggested_work_orders": suggested}

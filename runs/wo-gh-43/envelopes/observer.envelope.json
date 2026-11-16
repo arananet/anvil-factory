@@ -1,0 +1,16 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "observer",
+  "to_station": null,
+  "work_order_id": "wo-gh-43",
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-43/runs/wo-gh-43/observer.packet.md",
+  "status": "failed",
+  "created_at": "2026-11-16T03:11:07.313494+00:00",
+  "error": "command executor exited 2: claude_station: claude exited 1 for station observer: {\"duration_api_ms\":10973,\"stop_reason\":\"stop_sequence\",\"session_id\":\"76878f9b-399b-42cd-9eda-24bd477dfe65\",\"total_cost_usd\":0.0548151,\"usage\":{\"input_tokens\":8,\"cache_creation_input_tokens\":14597,\"cache_read_input_tokens\":79066,\"output_tokens\":1040,\"output_tokens_details\":{\"thinking_tokens\":345},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":0,\"ephemer",
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": null
+}

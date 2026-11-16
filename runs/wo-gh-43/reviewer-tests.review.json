@@ -1,0 +1,11 @@
+{
+  "station": "reviewer-tests",
+  "verdict": "pass",
+  "findings": [
+    "Reproduced on the final tree: python -m unittest tests.test_attribution_default gives Ran 15 tests, OK. The 15 tests map to S1 (scaffold, non-web blueprint, onboard no-overwrite), S2 (default line, Sentia style credit, dist/root lookup), S3 (missing, comment-only, script/attribute-only, non-builder mention), S4 (exception honoured, exact prefix only), S5 (non web unaffected), S6 (station prompts) and S7 (decision record). The required R6 cases are covered and each has a rejecting counterpart.",
+    "Full suite as the gate runs it: Ran 751 tests, FAILED (failures=5, skipped=6). The builder report states the same numbers, so P-12 is satisfied. I reran the two modules holding the 5 failures: with GITHUB_ACTIONS, GITHUB_ACTOR and CI unset they give Ran 32 tests, OK; with the runner environment they give FAILED (failures=5). The failures come from the environment (the approval actor mismatch) and not from this change. The builder report also says they fail on an unmodified HEAD checkout; I did not rerun that. The operator needs to decide how to handle the gate environment.",
+    "Test accounting (P-13): git diff on tests/ is empty, so no existing test was edited, skipped or deleted. The only test change is the new untracked tests/test_attribution_default.py (15 tests), which sits inside the spec exception for tests/. The builder report names the suite totals (751 run, 6 skipped) and the added file, but gives no explicit pre-change baseline count. This is a minor accounting gap and does not affect the verdict.",
+    "Gap, S8 (game placement): no deterministic test exists. The builder report discloses this, and the spec scenario is covered only by station guidance and the seeded requirement text. This is acceptable because DOM placement is not machine-checkable here.",
+    "The builder report now exists and carries the required literals (default line, 0012, spec path, S1 to S5, suite result line). The loopback reason is resolved."
+  ]
+}

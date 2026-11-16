@@ -1,0 +1,46 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-architecture",
+  "to_station": "reviewer-design",
+  "work_order_id": "wo-gh-43",
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-43/runs/wo-gh-43/reviewer-architecture.output.md",
+  "status": "executed",
+  "created_at": "2026-11-16T03:07:42.386554+00:00",
+  "usage": {
+    "input_tokens": 137760,
+    "output_tokens": 1962,
+    "cached_input_tokens": 119237,
+    "cache_creation_input_tokens": 18513,
+    "reasoning_tokens": 0,
+    "total_tokens": 139722,
+    "input_tokens_includes_cache": true
+  },
+  "tokens": {
+    "input_tokens": 137760,
+    "output_tokens": 1962,
+    "cached_input_tokens": 119237,
+    "cache_creation_input_tokens": 18513,
+    "reasoning_tokens": 0,
+    "total_tokens": 139722,
+    "input_tokens_includes_cache": true
+  },
+  "review": {
+    "station": "reviewer-architecture",
+    "verdict": "pass",
+    "findings": [
+      "Fit with decisions: the rule, wording and compliance test live in one module, anvil/attribution.py, read by scaffold, onboard and the checks gate. This gives one source of truth for the default line. Dependencies point one way: gates, scaffold and onboard import attribution, and attribution imports nothing from them.",
+      "Decision 0012 is recorded in the format of the existing records (Context, Decision, Consequences). It states the trade-offs honestly: a deterministic bespoke-credit pattern can false-fail, only the index page is checked, and cloudflare-worker is marked ships_pages false. No accepted decision is broken.",
+      "Gate integration is small and fail-closed. check_attribution returns None when there is no HTML deliverable, so non-web projects are unaffected. Output is added only when the check applies, and a recorded owner exception is honoured. The exception form is strict (exact line shape), so a loose note cannot weaken the gate.",
+      "Scaffold and onboard follow existing structure. The new blueprint flag ships_pages is a small data-driven switch, not hard-coded blueprint names. Onboard writes only into ONBOARDING.md and never overwrites existing project files.",
+      "Minor, non-blocking: the ships_pages flag is read with blueprint.get and only the first spec gets the requirement. This is acceptable for the current two blueprints. A later blueprint with several page specs would need the flag documented.",
+      "Minor, non-blocking: the full suite shows 5 failures in test_autonomous_line and test_governed_delivery. They come from GITHUB_ACTOR in the runner and fail the same way on an unmodified checkout. I re-ran the suite and saw the same 5 failures. The builder report discloses this. It is an environment issue outside the authorised surface and not an architecture defect. The operator must decide how the gate handles it.",
+      "The earlier loopback reason (missing builder report and literals) is resolved: runs/wo-gh-43/builder.output.md now exists."
+    ]
+  },
+  "configured_model": "claude-sonnet-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-sonnet-5-5"
+}

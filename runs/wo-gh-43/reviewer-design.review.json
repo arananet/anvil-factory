@@ -1,0 +1,21 @@
+{
+  "station": "reviewer-design",
+  "verdict": "pass",
+  "compliance": {
+    "verdict": "pass",
+    "findings": [
+      "Scope note (not a defect): this order changes no interface artifact. The diff is Python (anvil/scaffold.py, anvil/onboard.py, anvil/gates.py, new anvil/attribution.py), blueprint JSON (a ships_pages flag), station prompt text and spec or decision markdown. No HTML, CSS, component or user-facing page is added or edited, so no design token, component, layout or motion rule from design/DESIGN.md applies to the changed files.",
+      "Design tokens in design/DESIGN.md and design/tokens.json are all TODO. Per station rule this is a finding only when interface output uses undefined tokens; the changed files use no tokens, so this is not a finding against this order.",
+      "Rendered evidence (runs/wo-gh-43/evidence/screenshot-1440x900.png, screenshot-390x844.png) shows the pre-existing ANVIL run status page, which this diff does not touch. Both captures show clear hierarchy, readable text at 390px, no horizontal overflow and adequate contrast; nothing in them is attributable to this order.",
+      "The attribution requirement this order seeds (exact text \"Made with ANVIL, an open source software factory.\", footer or equivalent visible placement, credits or footer element outside the canvas on game surfaces) is consistent with the quality bars: it places no constraint that conflicts with Visual Hierarchy, Scale Contrast, Spacing Rhythm or Responsive Behavior. Future builders still have to style it with project tokens and meet the 4.5:1 contrast bar for footer text; that is checked on each project's own deliverable, not here."
+    ]
+  },
+  "quality": {
+    "verdict": "pass",
+    "findings": [
+      "No visual deliverable is produced by this order, so there is nothing to compare against the charter. The charter product type 'game' and its criterion 'Project must state observable criteria in design system' are not met by the factory design system (no game criteria are stated), but that gap is not introduced by this order and no game output exists in it to judge. Record it for the factory design system backlog rather than this order.",
+      "Practices P-4 to P-7 (asset pack fidelity, parallax depth, cross-set coherence, genre coherence) do not apply: no captures of a game or scene set were produced by this order."
+    ],
+    "anchor": "charter floor only"
+  }
+}

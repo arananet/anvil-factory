@@ -1,6 +1,8 @@
 import json, os, re, subprocess
 from pathlib import Path
 
+from .attribution import check_attribution
+
 REVIEWER_STATIONS = ["reviewer-spec", "reviewer-security", "reviewer-tests", "reviewer-architecture"]
 RISK_HINTS = {"auth", "payments", "data-deletion", "production-deploy", "secrets", "publishing"}
 
@@ -421,6 +423,12 @@ def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_i
     # Determine overall gate verdict
     checks_passed = all(code == 0 for code in exit_codes)
 
+    # ANVIL attribution (spec attribution-default R4): only a project with an
+    # HTML deliverable is checked; None means the check does not apply.
+    attribution = check_attribution(project_dir, base_ref_config)
+    if attribution and attribution["verdict"] == "fail":
+        checks_passed = False
+
     if protected_path_verdict == "fail":
         gate_verdict = "fail"
         status = "failed"
@@ -449,6 +457,11 @@ def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_i
         output_lines.extend(observed_additions)
         output_lines.append("")
 
+    if attribution:
+        output_lines.append("# ANVIL Attribution")
+        output_lines.extend(attribution["lines"])
+        output_lines.append("")
+
     output_lines.append("# Check Commands")
     for i, (cmd, code, out) in enumerate(zip(commands, exit_codes, outputs)):
         output_lines.append(f"## Command {i+1}: {cmd}")
@@ -471,6 +484,7 @@ def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_i
         "observed_additions": observed_additions,
         "gate_verdict": gate_verdict,
         "basis": basis_str,
+        "attribution_verdict": attribution["verdict"] if attribution else "not_applicable",
         "output": "\n".join(output_lines)
     }
 

@@ -15,6 +15,7 @@
     "site-shell"
   ],
   "notes": "Default for sites and landing pages. Keep it build free as long as possible.",
+  "ships_pages": true,
   "deploy_targets": {
     "cloudflare": {
       "deploy": {

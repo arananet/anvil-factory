@@ -1,0 +1,36 @@
+{
+  "schema": "anvil/usage@1",
+  "attempts": [
+    {
+      "attempt": 1,
+      "status": "succeeded",
+      "runtime": "claude",
+      "configured_model": "claude-sonnet-5-5",
+      "duration_ms": 120918.302,
+      "usage": {
+        "input_tokens": 124134,
+        "output_tokens": 2832,
+        "cached_input_tokens": 109281,
+        "cache_creation_input_tokens": 14843,
+        "reasoning_tokens": 0,
+        "total_tokens": 126966,
+        "input_tokens_includes_cache": true
+      },
+      "runtime_cost_estimate_usd": 0.0763756,
+      "turns": 5,
+      "usage_complete": true
+    }
+  ],
+  "usage": {
+    "input_tokens": 124134,
+    "output_tokens": 2832,
+    "cached_input_tokens": 109281,
+    "cache_creation_input_tokens": 14843,
+    "reasoning_tokens": 0,
+    "total_tokens": 126966,
+    "input_tokens_includes_cache": true
+  },
+  "measured_attempts": 1,
+  "unmeasured_attempts": 0,
+  "complete": true
+}

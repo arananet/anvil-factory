@@ -16,6 +16,7 @@
     "core-worker"
   ],
   "notes": "Default for web apps and APIs at the edge. Secrets live in Worker secrets, never in the repo.",
+  "ships_pages": false,
   "deploy_targets": {
     "cloudflare": {
       "deploy": {

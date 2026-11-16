@@ -1,0 +1,11 @@
+{
+  "station": "reviewer-security",
+  "verdict": "pass",
+  "findings": [
+    "No secrets, new dependencies (stdlib html.parser, re, pathlib only), outbound calls, or network access added. The new file reads are read-only and limited to the project deliverable HTML and .openspec/specs/*/spec.md.",
+    "Untrusted HTML is parsed with html.parser, which does not execute it. Script, style, template and noscript text, comments and attributes are excluded, so hidden markup cannot fake the attribution. The credit regexes use bounded quantifiers ({0,80}) and no nested repetition, so there is no ReDoS risk.",
+    "The check fails closed: an unreadable page returns a fail verdict, and no attribution with no exception fails the gate. Non-web projects return None and are unaffected. Error text reports relative paths only.",
+    "Low, advisory: the exception is honoured from any matching line in any project spec or from the attribution_exception config key. A builder station could in principle write that line itself to bypass the check. The spec scopes the exception to a recorded owner approval, and the exact-form regex limits accidental matches. Human gate review of spec diffs is the mitigation. This is not blocking.",
+    "Low, advisory: find_deliverable reads index.html without refusing symlinks. A symlink could make the gate read an outside file, but the content is only tested for a string and never echoed, so the impact is negligible."
+  ]
+}

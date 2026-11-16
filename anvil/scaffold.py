@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from .attribution import REQUIREMENT_TEXT as ATTRIBUTION_REQUIREMENT
 from .brain import ensure_brain_memory
 from .community import render_community_files
 from .config import render_anvil_yaml
@@ -140,5 +141,15 @@ def new_project(path, name, blueprint, idea="", description=None, contact=None, 
         (root / "anvil.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
     scaffold_design_system(root)
     for slug in blueprint["first_specs"]:
-        scaffold_spec(root, slug, slug.replace("-", " ").title())
+        spec_file = scaffold_spec(root, slug, slug.replace("-", " ").title())
+        if blueprint.get("ships_pages") and slug == blueprint["first_specs"][0]:
+            _append(spec_file, "\n" + ATTRIBUTION_REQUIREMENT)
+    if blueprint.get("ships_pages"):
+        # Attribution default (decision 0012): a blueprint that ships pages
+        # carries the footer requirement from the first build.
+        _append(root / "brain" / "project.md", "\n" + ATTRIBUTION_REQUIREMENT)
     return root
+
+
+def _append(path, text):
+    path.write_text(path.read_text(encoding="utf-8") + text, encoding="utf-8")
