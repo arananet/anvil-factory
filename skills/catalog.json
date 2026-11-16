@@ -229,6 +229,19 @@
       ],
       "source": "Distilled from: Vercel Labs, Web Interface Guidelines (command.md), MIT, https://github.com/vercel-labs/web-interface-guidelines at commit 434b7f91364665f2f733b310ec54809bf8f37937, vendored under third_party/web-interface-guidelines/. The companion skill in vercel-labs/agent-skills is referenced, not copied: that repo carries no LICENSE file (its README states MIT), and its fetch-fresh-at-review design is replaced by this pinned copy so verdicts stay reproducible.",
       "license": "MIT"
+    },
+    {
+      "id": "explainer-video",
+      "domain": "content",
+      "stations": [
+        "media-producer",
+        "reviewer-design"
+      ],
+      "surfaces": [
+        "content"
+      ],
+      "source": "ANVIL curated. Content method by Alan Daitch (@alandaitch), from his Instagram reel on making animated explainer videos with a single prompt, published around 2026-11-03: https://www.instagram.com/reel/DfSzHquzV1v/ Extracted from the video itself; the full prompt the reel points to in its comments was not accessible, and the model named in the reel could not be verified, so that layer is model-agnostic. Production pipeline from @unminutodeporques (Un minuto de porqués), from the Instagram reel 'Cómo montar tu fábrica de reels con Claude code', published 2026-11-10: https://www.instagram.com/reel/DfkY1E1AYW_/ Tool names confirmed from on-screen text; the reference-rules document shown was not legible, so only the three rules it names are claimed.",
+      "license": "Apache-2.0"
     }
   ]
 }

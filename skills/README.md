@@ -23,6 +23,7 @@ A skill is a short craft guide for one domain. The runner puts the skills that m
 | source-research | content | researcher | always |
 | content-writing | content | writer | always |
 | media-production | content | media-producer | always |
+| explainer-video | content | media-producer, reviewer-design | content surface |
 
 ## The curation rule
 
