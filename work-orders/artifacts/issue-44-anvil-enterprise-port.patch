@@ -1,0 +1,1521 @@
+diff --git a/.gitignore b/.gitignore
+index 9de8aad..006adb5 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,3 +1,53 @@
++# --- Secrets and credentials: never commit these ---------------------------
++# This only stops accidental adds of known file types. It does not detect a
++# secret pasted into a tracked file; GitHub secret scanning does that.
++
++# Environment files. Commit a .env.example with placeholder values instead.
++.env
++.env.*
++*.env
++!.env.example
++!.env.sample
++!.env.template
++
++# Private keys, certificates with keys, and keystores
++*.pem
++*.key
++*.p12
++*.pfx
++*.jks
++*.keystore
++*.ppk
++id_rsa*
++id_ecdsa*
++id_ed25519*
++
++# Tool credentials
++.netrc
++.npmrc
++.pypirc
++.git-credentials
++credentials.json
++client_secret*.json
++service-account*.json
++secrets.json
++secrets.yaml
++secrets.yml
++secrets.toml
++*.secret
++.secrets/
++
++# Cloud and infrastructure files that embed secrets
++*.tfvars
++*.tfstate
++*.tfstate.*
++.terraform/
++local.settings.json
++.aws/
++.azure/
++
++# --- Local and build output ---------------------------------------------------
++.DS_Store
+ __pycache__/
+ *.pyc
+ .pytest_cache/
+diff --git a/.openspec/specs/project-scaffolding/spec.md b/.openspec/specs/project-scaffolding/spec.md
+index 0e9e346..29e8210 100644
+--- a/.openspec/specs/project-scaffolding/spec.md
++++ b/.openspec/specs/project-scaffolding/spec.md
+@@ -15,6 +15,7 @@ Scaffolding creates a ready to use project skeleton and new specs from the share
+ ## Requirements
+ - Init creates the OpenSpec, brain, tests and reviews structure plus anvil.yaml and anvil.json.
+ - New spec fills the shared template placeholders.
++- Init writes a `.gitignore` from `templates/project.gitignore`: secret bearing files (environment files, private keys, tool credentials, infrastructure state), operating system and editor files, Python and Node artifacts, and the `.anvil-factory` checkout. Run evidence under `runs/` stays tracked. An existing `.gitignore` is never replaced.
+ 
+ ## Scenarios
+ 
+@@ -29,3 +30,6 @@ Scaffolding creates a ready to use project skeleton and new specs from the share
+ 
+ ### Scenario: Slugify normalizes titles
+ - S4: Given a title with spaces and punctuation, when slugify runs, then it returns a lowercase hyphenated slug.
++
++### Scenario: Init writes the ignore rules
++- S5: Given a new path, when init runs, then .gitignore exists and ignores secret bearing files and the `.anvil-factory` checkout, and an existing .gitignore is left as it is.
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index a8000bb..0f49902 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -2,6 +2,16 @@
+ 
+ ## Unreleased
+ 
++### Ported from the enterprise edition
++
++- Optional GitHub Copilot CLI runtime: `ANVIL_RUNTIME=copilot` runs every known model through `tools/copilot_station.py` (`copilot -p` in non-interactive mode, ANVIL model ids mapped to Copilot ids, reviewers write only their own review file, other read only stations get the shell only, read only stations keep URL access). `tools/dispatch_station.py` selects the runtime; `claude-codex` through the gateway stays the default, and an unknown runtime or model fails loudly. `anvil/telemetry.py` reads token usage from Copilot's JSONL usage checkpoint and the failure reason from its `session.error` event. Copilot CLI resends its setup context on every model turn, so a project that runs on it needs a higher `max_run_tokens`.
++- Secrets hygiene: `.gitignore` ignores secret bearing files (environment files, private keys, tool credentials, infrastructure state). `tests/test_secret_scan.py` fails when a credential-shaped string or a secret bearing file appears in anything git would commit.
++- New projects get a `.gitignore` from `templates/project.gitignore`; an existing one is never replaced (project-scaffolding S5).
++- `anvil new-project` writes a README and `PIPELINES.md` that name the greenfield pipeline the project runs, instead of sdlc-default.
++- `tools/sync_project_usage.py` accepts `--allow-private` for a privately published status site; private repositories are still refused without it. The tool keeps the `status_projects` configured in `anvil.yaml` on the board, also when the catalog is empty.
++- docs/OPERATOR-GUIDE.md explains how to use the factory end to end; the README Documentation table lists it first. docs/EXECUTION.md documents `ANVIL_RUNTIME`.
++- Tests: tests/test_copilot_runtime.py, tests/test_secret_scan.py, tests/test_sync_project_usage.py.
++
+ ### Token consumption and project pages
+ 
+ - Capture Claude JSON and Codex JSONL usage per attempt, including corrections, errors and timeouts; preserve usage through command executor failures. Cache and reasoning counts are not added twice, and missing usage stays unknown.
+diff --git a/README.md b/README.md
+index 840e15e..5347c46 100644
+--- a/README.md
++++ b/README.md
+@@ -221,6 +221,7 @@ Every change starts with a spec under .openspec/specs/ (OpenSpec). Write the spe
+ 
+ | Document | What it covers |
+ |---|---|
++| [docs/OPERATOR-GUIDE.md](docs/OPERATOR-GUIDE.md) | Start here to use the factory: set up, start a project, write a work order, run the line, read the result, hand over, and troubleshoot |
+ | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Layers, artifact flow, gates, risk triage, Core Four, model stack, loopback, envelopes, observability |
+ | [docs/SDLC.md](docs/SDLC.md) | How the default pipeline maps to SDLC phases |
+ | [docs/EXECUTION.md](docs/EXECUTION.md) | Agent runtime executors, the runtime contract, automatic deploy and post deploy verification |
+diff --git a/anvil/scaffold.py b/anvil/scaffold.py
+index 9d6178c..bf856c5 100644
+--- a/anvil/scaffold.py
++++ b/anvil/scaffold.py
+@@ -55,6 +55,11 @@ def init_project(path, name, description=None, contact=None):
+     }
+     (root / "anvil.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
+     (root / "anvil.yaml").write_text(render_anvil_yaml(STATION_IDS), encoding="utf-8")
++    # Never replace ignore rules that are already there (init over an existing folder).
++    gitignore_path = root / ".gitignore"
++    if not gitignore_path.exists():
++        template = Path(__file__).parent.parent / "templates" / "project.gitignore"
++        gitignore_path.write_text(template.read_text(encoding="utf-8"), encoding="utf-8")
+     (root / "README.md").write_text(f"# {name}\n\nProject created with ANVIL. Pipeline: sdlc-default (see anvil.json). Station settings: see anvil.yaml. Specs live under .openspec/specs/.\n", encoding="utf-8")
+     note = root / "PIPELINES.md"
+     note.write_text("# Pipelines\n\nThis project uses the sdlc-default pipeline by default. Copy a pipeline JSON into pipelines/ to compose a different line from the same stations.\n", encoding="utf-8")
+@@ -120,6 +125,10 @@ def new_project(path, name, blueprint, idea="", description=None, contact=None):
+         }
+     }
+     (root / "anvil.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
++    # init_project wrote these for sdlc-default; a greenfield project says what it runs.
++    for rel in ("README.md", "PIPELINES.md"):
++        doc = root / rel
++        doc.write_text(doc.read_text(encoding="utf-8").replace("sdlc-default", "greenfield"), encoding="utf-8")
+     scaffold_design_system(root)
+     for slug in blueprint["first_specs"]:
+         scaffold_spec(root, slug, slug.replace("-", " ").title())
+diff --git a/anvil/telemetry.py b/anvil/telemetry.py
+index 25e24cc..64aafa2 100644
+--- a/anvil/telemetry.py
++++ b/anvil/telemetry.py
+@@ -85,6 +85,8 @@ def parse_runtime_output(raw, provider):
+             result["turns"] = turns
+         result["is_error"] = bool(data.get("is_error"))
+         return result
++    if provider == "copilot":
++        return _parse_copilot_output(raw, result)
+     messages, usages, events = [], [], 0
+     for line in raw.splitlines():
+         try:
+@@ -107,6 +109,69 @@ def parse_runtime_output(raw, provider):
+     return result
+ 
+ 
++def _copilot_usage(snapshot):
++    """Sum the per-model counters of a Copilot CLI accounting snapshot.
++
++    Copilot reports inputTokens with cache reads and writes already included.
++    """
++    metrics = snapshot.get("modelMetrics") if isinstance(snapshot, dict) else None
++    if not isinstance(metrics, dict) or not metrics:
++        return None
++    usages = []
++    for entry in metrics.values():
++        counters = entry.get("usage") if isinstance(entry, dict) else None
++        if not isinstance(counters, dict):
++            return None
++        usages.append(normalize_usage({
++            "input_tokens": counters.get("inputTokens"),
++            "output_tokens": counters.get("outputTokens"),
++            "cached_input_tokens": counters.get("cacheReadTokens", 0),
++            "cache_creation_input_tokens": counters.get("cacheWriteTokens", 0),
++            "reasoning_tokens": counters.get("reasoningTokens", 0),
++            "input_tokens_includes_cache": True,
++        }))
++    if any(u is None for u in usages):
++        return None
++    return sum_usage(usages)
++
++
++def _parse_copilot_output(raw, result):
++    """Read Copilot CLI JSONL (copilot -p ... --output-format json)."""
++    messages, turns, snapshot, final, events, errors = [], set(), None, None, 0, []
++    for line in raw.splitlines():
++        try:
++            event = json.loads(line)
++        except ValueError:
++            continue
++        if not isinstance(event, dict) or "type" not in event:
++            continue
++        events += 1
++        data = event.get("data") if isinstance(event.get("data"), dict) else {}
++        if event["type"] == "assistant.message" and not data.get("parentToolCallId"):
++            content = str(data.get("content") or "")
++            if content.strip():
++                messages.append(content)
++        elif event["type"] == "assistant.turn_end":
++            turns.add(data.get("turnId"))
++        elif event["type"] == "session.usage_checkpoint":
++            snapshot = data.get("accountingSnapshot")
++        elif event["type"] == "session.error":
++            errors.append(str(data.get("message") or "").strip())
++        elif event["type"] == "result":
++            final = event
++    if not events:
++        return result
++    # Copilot reports failures as session.error events on stdout, not on stderr.
++    result["error"] = "; ".join(e for e in errors if e)
++    result["output"] = "\n".join(messages)
++    result["usage"] = _copilot_usage(snapshot)
++    result["usage_complete"] = result["usage"] is not None
++    result["turns"] = len(turns)
++    if final is not None:
++        result["is_error"] = final.get("exitCode") not in (0, None)
++    return result
++
++
+ class UsageRecorder:
+     """One invocation ledger, persisted after every completed/failed attempt."""
+     def __init__(self, path=None):
+diff --git a/docs/EXECUTION.md b/docs/EXECUTION.md
+index bcea851..530b339 100644
+--- a/docs/EXECUTION.md
++++ b/docs/EXECUTION.md
+@@ -97,7 +97,21 @@ and a reviewer that changes anything besides its own review file fails. Any
+ other model, a missing `codex` CLI, or a missing gateway environment fails
+ the step; there is no fallback runtime.
+ 
+-Claude uses JSON result output; Codex uses JSONL events. The wrappers extract
++`ANVIL_RUNTIME` selects the runtime. Unset, or `claude-codex`, is the routing
++above. `copilot` runs every known model through `tools/copilot_station.py`,
++which runs GitHub Copilot CLI non-interactively
++(`copilot -p <packet> --model <id> --output-format json`) in the project tree
++and maps ANVIL model ids to Copilot ids (claude-opus-5.5, claude-sonnet-5.5,
++gpt-6.1-sol). Copilot CLI authenticates with `COPILOT_GITHUB_TOKEN` or a
++stored `copilot login`. Under Copilot a producing station may edit, a reviewer
++may run shell commands and write exactly one file, its own review file, and
++other read only stations get the shell only; read only stations keep URL
++access. A failed Copilot call reports the reason from Copilot's
++`session.error` event. An unknown runtime fails the step. Copilot CLI resends
++its setup context on every model turn, so a project that runs on it needs a
++higher `max_run_tokens` than the default.
++
++Claude uses JSON result output; Codex and Copilot use JSONL events. The wrappers extract
+ the answer for the existing artifact contract and keep scalar token evidence
+ in `<station>.output.md.usage.json`. Raw runtime JSON, prompts and environment
+ variables are not exported to the public usage pages. Each invocation of a
+diff --git a/docs/OPERATOR-GUIDE.md b/docs/OPERATOR-GUIDE.md
+new file mode 100644
+index 0000000..ea2bc2e
+--- /dev/null
++++ b/docs/OPERATOR-GUIDE.md
+@@ -0,0 +1,292 @@
++# Operator guide
++
++How to use the factory, start to finish. An operator starts projects, writes
++work orders, runs the line and hands the result to a human for the merge.
++
++For credentials, access control and repository settings see
++[OPERATOR-REQUIREMENTS.md](OPERATOR-REQUIREMENTS.md). For how the runtime
++works see [EXECUTION.md](EXECUTION.md).
++
++## The short version
++
++```bash
++# 1. Scaffold a project next to the factory
++python3 -m anvil.cli new-project ../my-project --name MyProject --blueprint python-service --idea "What this project should prove"
++
++# 2. In the project: link the factory, add the runtime block to anvil.yaml (step 2 below), write a work order
++cd ../my-project
++ln -s ../anvil-factory .anvil-factory
++
++# 3. Dry run: no model calls, shows what each station will be asked
++PYTHONPATH=.anvil-factory python3 -m anvil.cli run . --pipeline .anvil-factory/pipelines/plan-build-test.json --work-order work-orders/wo-1.json
++
++# 4. Real run, on a run branch
++git checkout -b anvil/run-wo-1
++PYTHONPATH=.anvil-factory python3 -m anvil.cli run . --pipeline .anvil-factory/pipelines/plan-build-test.json --work-order work-orders/wo-1.json --execute
++
++# 5. Read runs/wo-1/report.md, commit, push the branch, open a pull request. A human merges.
++```
++
++## 1. Before you start
++
++You need, once:
++
++| Need | Check |
++|---|---|
++| Git and Python 3.11 or later | `python3 --version` |
++| GitHub CLI, signed in | `gh auth status` |
++| A station runtime, one of the two below | the checks in each row |
++
++| Runtime | `ANVIL_RUNTIME` | What it needs |
++|---|---|---|
++| Claude Code and Codex through the gateway | unset, or `claude-codex` (default) | The `claude` and `codex` CLIs on PATH, plus the gateway environment: `ANTHROPIC_BASE_URL`, `ANTHROPIC_API_KEY`, and `CF_AIG_TOKEN` or the `cf-aig-authorization` header in `ANTHROPIC_CUSTOM_HEADERS`. See [OPERATOR-REQUIREMENTS.md](OPERATOR-REQUIREMENTS.md) |
++| GitHub Copilot CLI | `copilot` | `npm install -g @github/copilot` (Node 22 or later), then `copilot login` with an account that has a Copilot seat, and claude-opus-5.5, claude-sonnet-5.5 and gpt-6.1-sol enabled for it |
++
++Then clone the factory and check it works:
++
++```bash
++git clone https://github.com/arananet/anvil-factory.git
++cd anvil-factory
++python3 -m unittest discover -s tests        # about 90 seconds, must end with OK
++python3 tools/model_route_smoke.py           # gateway runtime only: small calls to each model route
++```
++
++The smoke test probes the gateway routes; if it names a route as failing,
++nothing else will work on the default runtime until it passes. It does not
++probe Copilot CLI. With `ANVIL_RUNTIME=copilot`, local runs use your own
++Copilot sign-in and are billed to your own seat.
++
++## 2. Start a project
++
++Each project lives in its own repository.
++
++```bash
++python3 -m anvil.cli new-project ../my-project --name MyProject --blueprint python-service --idea "What this project should prove"
++cd ../my-project
++ln -s ../anvil-factory .anvil-factory
++```
++
++Blueprints: `python-service` for code, `static-site` for pages,
++`cloudflare-worker` for a Worker.
++
++The scaffold gives you the brain seeded with your idea, a first spec to fill
++in, ignore rules that keep secrets out, and a status page. It does not yet tell the project how to reach the factory. Add
++this block to `anvil.yaml` (the file is JSON), between the `"efficiency"`
++block and `"stations"`:
++
++```json
++"runtime": {
++  "kind": "command",
++  "command": "python3 .anvil-factory/tools/dispatch_station.py {packet} {output}",
++  "timeout_seconds": 1800
++},
++```
++
++Then put it on GitHub:
++
++```bash
++git init -b main && git add -A && git commit -m "Scaffold MyProject with the ANVIL software factory"
++gh repo create <owner>/my-project --private --source . --remote origin --push
++```
++
++To bring an existing codebase in instead, run
++`python3 -m anvil.cli onboard <path>`. It reads the project, adds only the
++factory files that are missing and reports the gaps as suggested first work
++orders. It never replaces a file you already have.
++
++## 3. Write a work order
++
++A work order is one unit of work. Save it as `work-orders/<id>.json`:
++
++```json
++{
++  "id": "wo-1",
++  "kind": "feature",
++  "title": "Survey score insights",
++  "source": "manual",
++  "description": "Write the spec in .openspec/specs/core-service/spec.md and implement it. Build insights.py with summarize(scores) ... Tests live in tests/test_insights.py and map to the spec scenarios. Keep it minimal.",
++  "risk_hints": [],
++  "status": "new"
++}
++```
++
++- `kind` is one of: `idea`, `feature`, `bug`, `incident`, `task`, `content`.
++- `id` is a short name without slashes; it becomes the folder `runs/<id>/`.
++- A good description says what to build, where it goes, how it is proven, and
++  what is out of scope. Name the spec file when there is one.
++- `risk_hints` may list `auth`, `payments`, `data-deletion`,
++  `production-deploy`, `secrets` or `publishing`. Any of them forces a human
++  decision even when every review passes.
++
++## 4. Pick a pipeline
++
++Pipelines are in the factory's `pipelines/` folder. Start small.
++
++| Pipeline | Stations | Use it for |
++|---|---|---|
++| `scout` | 1 | Read only recon of a codebase, no changes |
++| `docs-only` | 4 | A small change with one review |
++| `plan-build-test` | 6 | Spec, tests, build and a test review. The best first run for a new project |
++| `hotfix` | 7 | An urgent fix with spec and security review |
++| `greenfield` | 13 | A new project from an idea, with the full review set |
++| `sdlc-default` | 15 | The full line for work on an existing project |
++| `content-short` | 10 | A short post |
++| `content-default` | 15 | A full content piece with media |
++
++More stations means more model calls and more tokens. As a reference, one
++`plan-build-test` run for a small function took about nine minutes and
++measured 874,331 tokens through Copilot CLI, which resends its setup context
++on every model turn; that is above the default `max_run_tokens` (see
++section 9).
++
++## 5. Dry run first
++
++Without `--execute` the factory makes no model call. It writes the packet
++each station would receive, so you can read exactly what will be asked.
++
++```bash
++PYTHONPATH=.anvil-factory python3 -m anvil.cli run . --pipeline .anvil-factory/pipelines/plan-build-test.json --work-order work-orders/wo-1.json
++```
++
++Look at `runs/wo-1/*.packet.md`. The report will say `no_reviews`, which is
++expected for a dry run. To see which craft skills each station gets:
++
++```bash
++PYTHONPATH=.anvil-factory python3 -m anvil.cli check-skills . --work-order work-orders/wo-1.json --pipeline .anvil-factory/pipelines/plan-build-test.json
++```
++
++## 6. Run the line
++
++Run on a branch named `anvil/run-<id>`, never on `main`:
++
++```bash
++git checkout -b anvil/run-wo-1
++PYTHONPATH=.anvil-factory python3 -m anvil.cli run . --pipeline .anvil-factory/pipelines/plan-build-test.json --work-order work-orders/wo-1.json --execute
++```
++
++Each station now runs through the selected runtime in your project folder.
++To use Copilot CLI, put `ANVIL_RUNTIME=copilot` in front of the command. Producing
++stations (spec-writer, test-writer, builder and the content producers) may
++edit files. Reviewers can run commands and write only their own review file.
++
++## 7. Read the result
++
++Everything about the run is in `runs/<id>/`:
++
++| File | What it tells you |
++|---|---|
++| `report.md` | The verdict and the reason, in plain words. Read this first |
++| `report.json` | The same, plus models used and tokens per station |
++| `<station>.output.md` | What each station answered |
++| `<station>.review.json` | Each reviewer's verdict and findings |
++| `<station>.packet.md` | What each station was asked |
++
++Verdicts:
++
++| Verdict | Meaning | What you do |
++|---|---|---|
++| `approved` | Every review produced in the run passed | Open a pull request for a human to merge |
++| `changes_requested` | A reviewer wants changes | Read the findings, fix or rerun |
++| `rejected` | A reviewer failed the change | Read the findings; usually rewrite the work order or the spec |
++| `human_required` | Reviews passed but an expected reviewer was not counted | A person decides; check why the review is missing |
++| `gate_failed` | The project's own checks failed before review | Fix what the checks report, rerun |
++| `budget_exceeded` | The run hit its token or call limit | See limits below |
++| `no_reviews` | No review was produced | Normal for a dry run; otherwise check for failed steps |
++
++Intake can also stop a work order before any work: `rejected`,
++`waiting_info` (it needs an answer from you) or `rescoped` (it narrowed the
++request and continued).
++
++Run the project's own tests yourself before you trust an `approved`.
++
++To run again after a fix, use the same command. The previous report is kept
++under `runs/<id>/history/`.
++
++## 8. Hand over to a human
++
++The factory never merges. Commit the change and the run evidence, push the
++branch and open a pull request with the project's template:
++
++```bash
++git add -A && git commit -m "ANVIL run wo-1: <title> (verdict approved)"
++git push -u origin anvil/run-wo-1
++gh pr create --base main --head anvil/run-wo-1 --title "ANVIL run wo-1: <title>"
++```
++
++Someone other than the author reviews and merges. Commit `runs/<id>/` with the
++change; it is the evidence.
++
++## 9. Limits and cost
++
++Each project sets its limits in `anvil.yaml` under `efficiency`:
++
++| Setting | Default | Meaning |
++|---|---|---|
++| `max_run_tokens` | 250,000 | No new station starts once the run has used this much |
++| `max_agent_calls` | 16 | Station calls per run, corrections included |
++| `max_packet_tokens` | 12,000 | An oversized packet stops the run instead of being cut |
++
++A station that is already running can pass the limit; the check happens
++between stations. If a run ends with `budget_exceeded`, either use a smaller
++pipeline or raise `max_run_tokens` for that project.
++
++Copilot CLI counts its resent setup context as cached input on every turn, so
++a project that runs on it needs a higher `max_run_tokens`; 1,500,000 has been
++enough for `plan-build-test`. Copilot bills premium requests, not tokens: the
++token counts measure how much the run consumed, they are not the charge.
++
++## 10. Running in GitHub Actions
++
++Local runs are the simplest path today. Projects are scaffolded without a
++workflow.
++
++In the factory repository, each run workflow is tied to one work order and one
++`anvil/run-*` branch. To run a factory work order in Actions:
++
++1. Copy an existing workflow, for example
++   `.github/workflows/anvil-execute-tier-map.yml`, and change the branch name,
++   the work order path and the issue number.
++2. Push the work order and the workflow to that branch.
++3. Open the run in the Actions tab. The workflow reads the gateway credential
++   from the `CF_AIG_TOKEN` repository secret.
++
++## 11. When something goes wrong
++
++| What you see | Cause | Fix |
++|---|---|---|
++| `--execute needs a runtime object in the project anvil.yaml` | The runtime block is missing | Add the block from step 2 |
++| `the copilot CLI is not on PATH` | Copilot CLI is not installed | `npm install -g @github/copilot` |
++| `Model "..." is not available` | Copilot runtime: the model is not enabled for your account | Enable it in the Copilot policy |
++| `unknown model` or `unknown runtime` | A model or `ANVIL_RUNTIME` value the factory does not know | Use the models in `anvil.yaml`; set `ANVIL_RUNTIME` to `claude-codex` or `copilot`, or unset it |
++| `budget_exceeded` | The run reached its limit | Smaller pipeline, or raise `max_run_tokens` |
++| A reviewer step with `review_file_missing` or `review_parse_failed` | The reviewer did not write a valid review file, even after one correction | Rerun; if it repeats, read the reviewer's output file |
++| `Invalid work order kind` | `kind` is not one of the six allowed values | Fix the work order |
++| The secret scan test fails | A credential-shaped string or a secret file is about to be committed | Remove it and rotate the credential |
++
++## 12. Rules
++
++- Never commit a credential. Use `.env` files locally; they are ignored.
++- Never merge your own run. The human gate is the point.
++- Do not put confidential or personal data in a work order.
++- Keep one work order small enough to review in one sitting.
++- Do not edit the line itself (`anvil/`, `tools/`, `stations/`, `pipelines/`,
++  workflows) without a review.
++
++## Command reference
++
++Run from the factory folder as `python3 -m anvil.cli <command>`, or from a
++project as `PYTHONPATH=.anvil-factory python3 -m anvil.cli <command>`.
++
++| Command | What it does |
++|---|---|
++| `new-project <path> --name N --blueprint B [--idea TEXT]` | Scaffold a new project from a blueprint |
++| `init <path> --name N` | Scaffold a bare project |
++| `onboard <path> [--name N]` | Add the factory files to an existing project |
++| `new-spec <project> <slug> --title T` | Create a spec from the template |
++| `run <project> --pipeline P --work-order W [--execute]` | Run the line; without `--execute` it only writes packets |
++| `validate-pipeline <file>` | Check a pipeline file |
++| `check <project> --slug S` | Check the spec, test and review gates for one spec |
++| `check-skills <project> [--work-order W --pipeline P]` | Validate the skills catalog and show what each station gets |
++| `status-page <project> [--out DIR]` | Regenerate the run status page |
++| `check-brain <project>` | Check the verified learnings store |
++| `supervise <project>` | Propose pipeline changes from past run reports; nothing applies itself |
+diff --git a/templates/project.gitignore b/templates/project.gitignore
+new file mode 100644
+index 0000000..e01d52f
+--- /dev/null
++++ b/templates/project.gitignore
+@@ -0,0 +1,81 @@
++# --- Secrets and credentials: never commit these ---------------------------
++# This only stops accidental adds of known file types. It does not detect a
++# secret pasted into a tracked file; GitHub secret scanning does that.
++
++# Environment files. Commit a .env.example with placeholder values instead.
++.env
++.env.*
++*.env
++!.env.example
++!.env.sample
++!.env.template
++
++# Private keys, certificates with keys, and keystores
++*.pem
++*.key
++*.p12
++*.pfx
++*.jks
++*.keystore
++*.ppk
++id_rsa*
++id_ecdsa*
++id_ed25519*
++
++# Tool credentials
++.netrc
++.npmrc
++.pypirc
++.git-credentials
++credentials.json
++client_secret*.json
++service-account*.json
++secrets.json
++secrets.yaml
++secrets.yml
++secrets.toml
++*.secret
++.secrets/
++
++# Cloud and infrastructure files that embed secrets
++*.tfvars
++*.tfstate
++*.tfstate.*
++.terraform/
++local.settings.json
++.aws/
++.azure/
++
++# --- Operating system and editors -------------------------------------------
++.DS_Store
++Thumbs.db
++*.swp
++*~
++.idea/
++.vscode/
++*.code-workspace
++
++# --- Python -------------------------------------------------------------------
++__pycache__/
++*.py[cod]
++.pytest_cache/
++.mypy_cache/
++.ruff_cache/
++.coverage
++.coverage.*
++htmlcov/
++.venv/
++venv/
++*.egg-info/
++
++# --- Node ---------------------------------------------------------------------
++node_modules/
++npm-debug.log*
++
++# --- Temporary files ----------------------------------------------------------
++*.tmp
++
++# --- ANVIL ----------------------------------------------------------------------
++# Checkout (or local link) of the ANVIL factory that runs this project's line.
++# Run evidence under runs/ is committed on purpose.
++.anvil-factory
+diff --git a/tests/test_anvil.py b/tests/test_anvil.py
+index d05220a..5e9039b 100644
+--- a/tests/test_anvil.py
++++ b/tests/test_anvil.py
+@@ -133,6 +133,18 @@ class TestGates(unittest.TestCase):
+         self.assertTrue(needs_human(wo2, "rejected"))
+ 
+ class TestScaffold(unittest.TestCase):
++    def test_init_gitignore_s5(self):
++        """project-scaffolding S5: a new project ignores secret files and the factory link"""
++        with tempfile.TemporaryDirectory() as tmp:
++            proj = Path(tmp) / "p"; init_project(proj, "Demo")
++            rules = (proj / ".gitignore").read_text(encoding="utf-8").splitlines()
++            for rule in (".env", "*.pem", "*.key", "credentials.json", ".DS_Store", ".anvil-factory", "!.env.example"):
++                self.assertIn(rule, rules)
++            self.assertNotIn("runs/", rules)
++            existing = Path(tmp) / "existing"; existing.mkdir()
++            (existing / ".gitignore").write_text("mine\n", encoding="utf-8")
++            init_project(existing, "Existing")
++            self.assertEqual((existing / ".gitignore").read_text(encoding="utf-8"), "mine\n")
+     def test_init_s1_s2(self):
+         """project-scaffolding S1 S2"""
+         with tempfile.TemporaryDirectory() as tmp:
+diff --git a/tests/test_copilot_runtime.py b/tests/test_copilot_runtime.py
+new file mode 100644
+index 0000000..563d29c
+--- /dev/null
++++ b/tests/test_copilot_runtime.py
+@@ -0,0 +1,219 @@
++"""GitHub Copilot CLI is an optional station runtime (ANVIL_RUNTIME=copilot).
++
++A fake `copilot` executable on PATH stands in for the CLI; it records argv and
++cwd, writes reviewer review files, and emits Copilot JSONL events.
++"""
++import json, os, shutil, stat, subprocess, sys, tempfile, unittest
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parent.parent
++sys.path.insert(0, str(ROOT))
++from anvil.telemetry import parse_runtime_output  # noqa: E402
++
++COPILOT = ROOT / "tools" / "copilot_station.py"
++DISPATCH = ROOT / "tools" / "dispatch_station.py"
++
++FAKE = '''#!/usr/bin/env python3
++import json, os, sys
++from pathlib import Path
++rec = Path(os.environ["FAKE_RECORD"])
++n = len(rec.read_text().splitlines()) if rec.exists() else 0
++with rec.open("a") as fh:
++    fh.write(json.dumps({"argv": sys.argv[1:], "cwd": os.getcwd()}) + "\\n")
++mode = os.environ.get("FAKE_MODE", "")
++wo, st = os.environ.get("FAKE_WO"), os.environ.get("FAKE_STATION")
++if wo and st:
++    p = Path(os.getcwd()) / "runs" / wo / (st + ".review.json")
++    p.parent.mkdir(parents=True, exist_ok=True)
++    if mode == "invalid_then_valid" and n == 0:
++        p.write_text("not json")
++    else:
++        p.write_text(json.dumps({"station": st, "verdict": "pass", "findings": []}))
++usage = {"inputTokens": 120, "outputTokens": 30, "cacheReadTokens": 20,
++         "cacheWriteTokens": 50, "reasoningTokens": 5}
++if mode == "fail":
++    print(json.dumps({"type": "session.error", "data": {"message": "Model is not available."}}))
++    print(json.dumps({"type": "result", "exitCode": 3}))
++    sys.exit(3)
++for event in (
++    {"type": "assistant.message", "data": {"content": "", "toolRequests": [{"name": "bash"}]}},
++    {"type": "assistant.turn_end", "data": {"turnId": "0"}},
++    {"type": "assistant.message", "data": {"content": "copilot did some work"}},
++    {"type": "assistant.turn_end", "data": {"turnId": "1"}},
++    {"type": "session.usage_checkpoint",
++     "data": {"accountingSnapshot": {"modelMetrics": {"m": {"usage": usage}}}}},
++    {"type": "result", "exitCode": 0},
++):
++    print(json.dumps(event))
++'''
++
++
++class Harness:
++    def __init__(self, tc):
++        self.tmp = Path(tempfile.mkdtemp())
++        tc.addCleanup(shutil.rmtree, self.tmp, True)
++        self.bin = self.tmp / "bin"
++        self.bin.mkdir()
++        fake = self.bin / "copilot"
++        fake.write_text(FAKE)
++        fake.chmod(fake.stat().st_mode | stat.S_IXUSR)
++        self.project = self.tmp / "project"
++        self.project.mkdir()
++        self.record = self.tmp / "record.jsonl"
++        self.wo = "wo-copilot-test"
++
++    def run(self, station, model="claude-opus-5-5", script=COPILOT, **extra):
++        packet = self.tmp / f"{station}.packet.md"
++        packet.write_text(f"# Task packet: {station}\n\n- id: {self.wo}\n\nDo the work.\n")
++        out = self.tmp / f"{station}.out.md"
++        env = {k: v for k, v in os.environ.items() if k != "ANVIL_RUNTIME"}
++        env.update({"PATH": str(self.bin) + os.pathsep + str(Path(sys.executable).parent),
++                    "ANVIL_CONFIGURED_MODEL": model, "ANVIL_PROJECT_ROOT": str(self.project),
++                    "ANVIL_USAGE_PATH": str(self.tmp / "usage.json"),
++                    "FAKE_RECORD": str(self.record)})
++        if station.startswith("reviewer"):
++            env.update({"FAKE_WO": self.wo, "FAKE_STATION": station})
++        env.update(extra)
++        proc = subprocess.run([sys.executable, str(script), str(packet), str(out)],
++                              env=env, capture_output=True, text=True, timeout=60)
++        return proc, out
++
++    def calls(self):
++        if not self.record.exists():
++            return []
++        return [json.loads(line) for line in self.record.read_text().splitlines()]
++
++
++class TestCopilotOutputParsing(unittest.TestCase):
++    def test_reply_turns_and_usage_from_jsonl(self):
++        usage = {"inputTokens": 100, "outputTokens": 10, "cacheReadTokens": 40,
++                 "cacheWriteTokens": 30, "reasoningTokens": 4}
++        raw = "\n".join(json.dumps(e) for e in (
++            {"type": "assistant.message", "data": {"content": "first"}},
++            {"type": "assistant.turn_end", "data": {"turnId": "0"}},
++            {"type": "assistant.message", "data": {"content": "nested", "parentToolCallId": "t1"}},
++            {"type": "assistant.message", "data": {"content": "second"}},
++            {"type": "assistant.turn_end", "data": {"turnId": "1"}},
++            {"type": "session.usage_checkpoint", "data": {"accountingSnapshot": {
++                "modelMetrics": {"a": {"usage": usage}, "b": {"usage": usage}}}}},
++            {"type": "result", "exitCode": 0},
++        ))
++        parsed = parse_runtime_output(raw, "copilot")
++        self.assertEqual(parsed["output"], "first\nsecond")
++        self.assertEqual(parsed["turns"], 2)
++        self.assertTrue(parsed["usage_complete"])
++        self.assertFalse(parsed["is_error"])
++        self.assertEqual(parsed["usage"]["input_tokens"], 200)
++        self.assertEqual(parsed["usage"]["output_tokens"], 20)
++        self.assertEqual(parsed["usage"]["cached_input_tokens"], 80)
++        self.assertEqual(parsed["usage"]["cache_creation_input_tokens"], 60)
++        self.assertEqual(parsed["usage"]["total_tokens"], 220)
++
++    def test_missing_usage_stays_unknown_and_nonzero_exit_is_error(self):
++        raw = "\n".join(json.dumps(e) for e in (
++            {"type": "assistant.message", "data": {"content": "partial"}},
++            {"type": "result", "exitCode": 1},
++        ))
++        parsed = parse_runtime_output(raw, "copilot")
++        self.assertIsNone(parsed["usage"])
++        self.assertFalse(parsed["usage_complete"])
++        self.assertTrue(parsed["is_error"])
++
++
++class TestCopilotStation(unittest.TestCase):
++    def test_reviewer_runs_mapped_model_and_may_write_only_its_review(self):
++        h = Harness(self)
++        proc, out = h.run("reviewer-design", model="claude-opus-5-5")
++        self.assertEqual(proc.returncode, 0, proc.stderr)
++        call = h.calls()[0]
++        argv = call["argv"]
++        self.assertEqual(Path(call["cwd"]).resolve(), h.project.resolve())
++        self.assertEqual(argv[argv.index("--model") + 1], "claude-opus-5.5")
++        self.assertNotIn("--allow-all-tools", argv)
++        allowed = [argv[i + 1] for i, a in enumerate(argv) if a == "--allow-tool"]
++        self.assertEqual(allowed, ["shell", f"write(runs/{h.wo}/reviewer-design.review.json)"])
++        self.assertIn("--no-custom-instructions", argv)
++        prompt = argv[argv.index("-p") + 1]
++        self.assertIn("Do the work.", prompt)
++        self.assertIn("Write your review file with the file create tool", prompt)
++        self.assertEqual(out.read_text(), "copilot did some work")
++        usage = json.loads((h.tmp / "usage.json").read_text())
++        self.assertEqual(usage["attempts"][0]["runtime"], "copilot")
++        self.assertEqual(usage["usage"]["total_tokens"], 150)
++
++    def test_builder_may_write(self):
++        h = Harness(self)
++        proc, _ = h.run("builder", model="openai/gpt-6.1-sol")
++        self.assertEqual(proc.returncode, 0, proc.stderr)
++        argv = h.calls()[0]["argv"]
++        self.assertIn("--allow-all-tools", argv)
++        self.assertNotIn("--allow-tool", argv)
++        self.assertNotIn("Runtime permissions", argv[argv.index("-p") + 1])
++        self.assertEqual(argv[argv.index("--model") + 1], "gpt-6.1-sol")
++
++    def test_read_only_station_gets_shell_only(self):
++        h = Harness(self)
++        proc, _ = h.run("supervisor")
++        self.assertEqual(proc.returncode, 0, proc.stderr)
++        argv = h.calls()[0]["argv"]
++        self.assertNotIn("--allow-all-tools", argv)
++        self.assertIn("--allow-all-urls", argv)
++        self.assertEqual([argv[i + 1] for i, a in enumerate(argv) if a == "--allow-tool"], ["shell"])
++
++    def test_one_review_correction(self):
++        h = Harness(self)
++        proc, _ = h.run("reviewer-tests", FAKE_MODE="invalid_then_valid")
++        self.assertEqual(proc.returncode, 0, proc.stderr)
++        self.assertEqual(len(h.calls()), 2)
++        retry = h.calls()[1]["argv"]
++        self.assertIn("Review file correction needed", retry[retry.index("-p") + 1])
++        correction = h.project / "runs" / h.wo / "reviewer-tests.correction.json"
++        self.assertEqual(json.loads(correction.read_text())["attempts"], 2)
++
++    def test_copilot_failure_and_unknown_model_fail_loudly(self):
++        h = Harness(self)
++        proc, out = h.run("builder", FAKE_MODE="fail")
++        self.assertNotEqual(proc.returncode, 0)
++        self.assertFalse(out.exists())
++        self.assertIn("Model is not available.", proc.stderr)
++        proc, _ = h.run("builder", model="claude-sonnet-4-5")
++        self.assertNotEqual(proc.returncode, 0)
++        self.assertIn("unknown model", proc.stderr)
++        self.assertEqual(len(h.calls()), 1)
++
++
++class TestDispatcherRuntimeSelection(unittest.TestCase):
++    def test_copilot_runs_every_known_model_when_selected(self):
++        """With ANVIL_RUNTIME=copilot every known model runs on Copilot CLI"""
++        h = Harness(self)
++        for model in ("claude-opus-5-5", "claude-sonnet-5-5", "openai/gpt-6.1-sol"):
++            proc, out = h.run("builder", model=model, script=DISPATCH, ANVIL_RUNTIME="copilot")
++            self.assertEqual(proc.returncode, 0, proc.stderr)
++            self.assertIn(json.dumps({"model": model}), out.read_text())
++        self.assertEqual(len(h.calls()), 3)
++
++    def test_claude_codex_stays_the_default_runtime(self):
++        """With ANVIL_RUNTIME unset the dispatcher routes by model family, as before"""
++        sys.path.insert(0, str(ROOT / "tools"))
++        import dispatch_station
++        self.assertEqual(dispatch_station.DEFAULT_RUNTIME, "claude-codex")
++        route = dispatch_station.runtime_script
++        self.assertEqual(route("claude-codex", "claude-opus-5-5"), "claude_station.py")
++        self.assertEqual(route("claude-codex", "claude-sonnet-5-5"), "claude_station.py")
++        self.assertEqual(route("claude-codex", "openai/gpt-6.1-sol"), "codex_station.py")
++        self.assertEqual(route("copilot", "openai/gpt-6.1-sol"), "copilot_station.py")
++        self.assertIsNone(route("claude-codex", "claude-sonnet-4-5"))
++        h = Harness(self)
++        proc, _ = h.run("builder", script=DISPATCH)
++        self.assertEqual(h.calls(), [], "the default runtime must not call Copilot CLI")
++
++    def test_unknown_runtime_fails_loudly(self):
++        h = Harness(self)
++        proc, _ = h.run("builder", script=DISPATCH, ANVIL_RUNTIME="cloudflare")
++        self.assertEqual(proc.returncode, 1)
++        self.assertIn("unknown runtime", proc.stderr)
++        self.assertEqual(h.calls(), [])
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tests/test_greenfield.py b/tests/test_greenfield.py
+index 3d3fdff..2f50669 100644
+--- a/tests/test_greenfield.py
++++ b/tests/test_greenfield.py
+@@ -37,6 +37,9 @@ class GreenfieldTests(unittest.TestCase):
+             self.assertIn("Track habits", (root / "brain" / "project.md").read_text())
+             config = json.loads((root / "anvil.json").read_text())
+             self.assertEqual(config["pipeline"], "greenfield")
++            for rel in ("README.md", "PIPELINES.md"):
++                self.assertIn("greenfield", (root / rel).read_text())
++                self.assertNotIn("sdlc-default", (root / rel).read_text())
+             self.assertTrue((root / ".openspec" / "specs" / "core-service" / "spec.md").exists())
+ 
+     def test_s4_greenfield_pipeline_validates(self):
+diff --git a/tests/test_secret_scan.py b/tests/test_secret_scan.py
+new file mode 100644
+index 0000000..941fe64
+--- /dev/null
++++ b/tests/test_secret_scan.py
+@@ -0,0 +1,98 @@
++"""No credential may be committed: every file git tracks is scanned.
++
++Maps to operator-requirements S4 (a scan of the files finds no credential
++value). The scan covers what git would commit: tracked files plus untracked
++files that are not ignored.
++
++A test that needs a credential-shaped fixture must build it at runtime (see
++test_detector_flags_built_credentials), never write it as a literal.
++"""
++import os, re, subprocess, unittest
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parent.parent
++
++PATTERNS = {
++    "GitHub token": r"\bgh[pousr]_[A-Za-z0-9]{36,}\b",
++    "GitHub fine-grained token": r"\bgithub_pat_[A-Za-z0-9_]{40,}\b",
++    "Anthropic key": r"\bsk-ant-[A-Za-z0-9_-]{20,}",
++    "OpenAI key": r"\bsk-(?:proj-)?[A-Za-z0-9_-]{32,}",
++    "AWS access key id": r"\b(?:AKIA|ASIA)[0-9A-Z]{16}\b",
++    "Google API key": r"\bAIza[0-9A-Za-z_-]{35}\b",
++    "Slack token": r"\bxox[baprs]-[A-Za-z0-9-]{10,}",
++    "Private key block": r"-----BEGIN (?:[A-Z]+ )*PRIVATE KEY-----",
++    "Azure storage key": r"AccountKey=[A-Za-z0-9+/=]{40,}",
++}
++COMPILED = {name: re.compile(pattern) for name, pattern in PATTERNS.items()}
++
++SECRET_FILE_NAMES = {".env", ".netrc", ".npmrc", ".pypirc", ".git-credentials",
++                     "credentials.json", "local.settings.json"}
++SECRET_FILE_SUFFIXES = (".pem", ".key", ".p12", ".pfx", ".jks", ".keystore", ".ppk",
++                        ".tfvars", ".tfstate")
++SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv"}
++
++
++def find_credentials(text):
++    """Return (pattern name, line number) for each credential-shaped string."""
++    found = []
++    for name, pattern in COMPILED.items():
++        for match in pattern.finditer(text):
++            found.append((name, text.count("\n", 0, match.start()) + 1))
++    return found
++
++
++def committed_files():
++    """Paths git would commit; falls back to walking the tree without git."""
++    try:
++        out = subprocess.run(["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
++                             cwd=ROOT, capture_output=True, timeout=60)
++        if out.returncode == 0 and out.stdout:
++            return [ROOT / name for name in out.stdout.decode("utf-8").split("\0") if name]
++    except (OSError, subprocess.TimeoutExpired):
++        pass
++    paths = []
++    for folder, dirs, names in os.walk(ROOT):
++        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
++        paths += [Path(folder) / name for name in names]
++    return paths
++
++
++class TestSecretScan(unittest.TestCase):
++    def test_no_credential_shaped_strings_s4(self):
++        """operator-requirements S4: no credential-shaped string in any committed file"""
++        problems = []
++        for path in committed_files():
++            try:
++                data = path.read_bytes()
++            except OSError:
++                continue
++            if b"\0" in data[:8192]:
++                continue
++            for name, line in find_credentials(data.decode("utf-8", errors="replace")):
++                problems.append(f"{path.relative_to(ROOT)}:{line}: {name}")
++        self.assertEqual(problems, [], "Credential-shaped strings found (values not shown):\n" + "\n".join(problems))
++
++    def test_no_secret_files_committed(self):
++        """Secret bearing file types are never committed, even with git add -f"""
++        problems = [str(path.relative_to(ROOT)) for path in committed_files()
++                    if path.name in SECRET_FILE_NAMES
++                    or (path.name.startswith(".env.") and path.name not in (".env.example", ".env.sample", ".env.template"))
++                    or path.name.endswith(SECRET_FILE_SUFFIXES)]
++        self.assertEqual(problems, [], "Secret bearing files must not be committed")
++
++    def test_detector_flags_built_credentials(self):
++        """The detector works: fixtures are built at runtime so this file stays clean"""
++        samples = {
++            "GitHub token": "gh" + "p_" + "a" * 36,
++            "GitHub fine-grained token": "github" + "_pat_" + "A1" * 30,
++            "AWS access key id": "AK" + "IA" + "Q" * 16,
++            "Private key block": "-----BEGIN " + "RSA PRIVATE KEY-----",
++        }
++        for name, sample in samples.items():
++            with self.subTest(name=name):
++                self.assertIn(name, [found for found, _ in find_credentials(f"line one\nvalue = {sample}\n")])
++        self.assertEqual(find_credentials("design/tokens.json and a task-list are not credentials"), [])
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tests/test_sync_project_usage.py b/tests/test_sync_project_usage.py
+new file mode 100644
+index 0000000..0b71479
+--- /dev/null
++++ b/tests/test_sync_project_usage.py
+@@ -0,0 +1,37 @@
++"""The project report refresh tool refuses private repositories unless told the site is private."""
++import json, sys, tempfile, unittest
++from pathlib import Path
++from unittest import mock
++
++ROOT = Path(__file__).resolve().parent.parent
++sys.path.insert(0, str(ROOT / "tools"))
++import sync_project_usage  # noqa: E402
++
++ENTRY = {"id": "poc", "name": "Poc", "repository": "example-org/poc"}
++
++
++def fake_github(path):
++    if path == "repos/example-org/poc":
++        return {"private": True, "default_branch": "main"}
++    if "/git/trees/" in path:
++        return {"sha": "abc", "tree": []}
++    raise AssertionError(f"unexpected GitHub read: {path}")
++
++
++class TestPrivateRepositoryGuard(unittest.TestCase):
++    def test_private_repository_needs_explicit_opt_in(self):
++        with tempfile.TemporaryDirectory() as tmp, \
++             mock.patch.object(sync_project_usage, "github", fake_github):
++            with self.assertRaises(ValueError) as ctx:
++                sync_project_usage.sync_project(ENTRY, Path(tmp))
++            self.assertIn("--allow-private", str(ctx.exception))
++            self.assertFalse((Path(tmp) / "poc").exists())
++
++            root = sync_project_usage.sync_project(ENTRY, Path(tmp), allow_private=True)
++            snapshot = json.loads((root / "report_exports.json").read_text())
++            self.assertEqual(snapshot["repository"], "example-org/poc")
++            self.assertEqual(snapshot["reports"], [])
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tools/copilot_station.py b/tools/copilot_station.py
+new file mode 100644
+index 0000000..7e53246
+--- /dev/null
++++ b/tools/copilot_station.py
+@@ -0,0 +1,241 @@
++#!/usr/bin/env python3
++"""Command executor target that runs ANVIL station packets through GitHub Copilot CLI.
++
++This is the optional copilot runtime (ANVIL_RUNTIME=copilot); the default is
++claude-codex. tools/dispatch_station.py invokes it with the
++rendered packet path and the output path. It reads the packet, learns the
++station from the packet's first line ("# Task packet: <station-id>"), and
++runs Copilot CLI in non-interactive mode in the project working tree:
++
++    copilot -p <packet> --model <copilot-model-id> --output-format json
++
++Models are reached through GitHub Copilot, so there is no separate AI
++gateway. ANVIL's concrete model ids are mapped to Copilot model ids
++(COPILOT_MODELS); an unknown model fails loudly with no fallback.
++
++Authentication: Copilot CLI reads COPILOT_GITHUB_TOKEN (then GH_TOKEN,
++GITHUB_TOKEN) or a stored `copilot login`. In GitHub Actions the workflow
++supplies COPILOT_GITHUB_TOKEN from a repository secret holding a
++fine-grained PAT with the "Copilot Requests" permission. This script never
++reads or prints the token; it only inherits the environment.
++
++Station permissions follow the ANVIL separation of duties, the same as
++claude_station.py:
++
++- Producing stations (WRITE_STATIONS) run with --allow-all-tools and may
++  edit the working tree.
++- Reviewer stations may run shell commands (a tests reviewer runs the suite)
++  and may write exactly one file, their own review file
++  (--allow-tool shell --allow-tool write(runs/<id>/<station>.review.json)).
++- Every other station (scout, observer, supervisor) may only run shell
++  commands.
++- Stations that may not edit still reach URLs (--allow-all-urls), for example
++  a facts reviewer checking a source or a reviewer reading a served page.
++
++Non-interactive mode cannot answer permission prompts, so anything not
++allowed is refused; Copilot's agent also declines to write files through
++the shell when its write tools are denied, which is why reviewers get a
++path-scoped write rule instead. The sandbox is the throwaway Actions runner.
++Built-in MCP servers and repository custom instructions are disabled so the
++packet is the station's whole context.
++
++Failure behavior: a non-zero Copilot exit, a timeout, or empty output makes
++this script exit non-zero, so the runner marks the step failed.
++"""
++
++import json
++import os
++import subprocess
++import sys
++import time
++from pathlib import Path
++
++TOOLS_DIR = Path(__file__).resolve().parent
++sys.path.insert(0, str(TOOLS_DIR.parent))
++sys.path.insert(0, str(TOOLS_DIR))
++from anvil.telemetry import UsageRecorder  # noqa: E402
++from claude_station import (  # noqa: E402
++    WRITE_STATIONS,
++    review_suffix,
++    station_of,
++    transcript_path,
++    validate_review_file,
++    work_order_id_of,
++)
++
++TIMEOUT_SECONDS = 1500
++RUNTIME = "copilot"
++# Told to stations that may not edit, after a live run showed a reviewer
++# losing its test run by bundling it with a shell redirect into its review file.
++READ_ONLY_NOTE = (
++    "\n\n## Runtime permissions\n\n"
++    "Shell commands that write files (for example `>` redirection or `tee`) are refused, "
++    "and a refused command does not run at all. Run checks such as the test suite as "
++    "their own shell commands, without redirecting output into files.{review}\n"
++)
++REVIEW_FILE_NOTE = " Write your review file with the file create tool, not through the shell."
++
++# ANVIL concrete model id -> GitHub Copilot model id.
++COPILOT_MODELS = {
++    "claude-opus-5-5": "claude-opus-5.5",
++    "claude-sonnet-5-5": "claude-sonnet-5.5",
++    "openai/gpt-6.1-sol": "gpt-6.1-sol",
++}
++
++
++def copilot_model_id(model):
++    """Map an ANVIL concrete model to its Copilot id; refuse anything unknown."""
++    if model not in COPILOT_MODELS:
++        raise ValueError(f"copilot_station: unknown model '{model}'. "
++                         f"Known models: {', '.join(COPILOT_MODELS)}")
++    return COPILOT_MODELS[model]
++
++
++def copilot_command(prompt, copilot_model, station, review_file=None):
++    """Build the non-interactive Copilot CLI invocation (argv carries no credential).
++
++    review_file is the reviewer's own review path relative to the project root,
++    the only file a reviewer may write.
++    """
++    command = [
++        "copilot", "-p", prompt,
++        "--model", copilot_model,
++        "--output-format", "json",
++        "--no-ask-user",
++        "--disable-builtin-mcps",
++        "--no-custom-instructions",
++    ]
++    if station in WRITE_STATIONS:
++        command.append("--allow-all-tools")
++    else:
++        # URL access is not an edit: read only stations keep it, as under Claude Code.
++        command += ["--allow-tool", "shell", "--allow-all-urls"]
++        if review_file:
++            command += ["--allow-tool", f"write({review_file})"]
++    effort = os.environ.get("ANVIL_COPILOT_REASONING_EFFORT", "").strip()
++    if effort:
++        command += ["--reasoning-effort", effort]
++    return command
++
++
++def main():
++    if len(sys.argv) != 3:
++        print("usage: copilot_station.py <packet> <output>", file=sys.stderr)
++        return 64
++    packet_path = Path(sys.argv[1])
++    output_path = Path(sys.argv[2])
++
++    model = os.environ.get("ANVIL_CONFIGURED_MODEL")
++    if not model:
++        print("copilot_station: ANVIL_CONFIGURED_MODEL environment variable not set", file=sys.stderr)
++        return 7
++    try:
++        copilot_model = copilot_model_id(model)
++    except ValueError as e:
++        print(str(e), file=sys.stderr)
++        return 7
++
++    try:
++        packet_text = packet_path.read_text(encoding="utf-8")
++        station = station_of(packet_text)
++        work_order_id = work_order_id_of(packet_text) if station.startswith("reviewer") else None
++    except ValueError as e:
++        print(f"copilot_station: path validation failed: {e}", file=sys.stderr)
++        return 6
++
++    repo_root = Path(os.environ.get("ANVIL_PROJECT_ROOT") or TOOLS_DIR.parent).resolve()
++    reviewer = station.startswith("reviewer") and work_order_id
++    review_file = f"runs/{work_order_id}/{station}.review.json" if reviewer else None
++    review_path = repo_root / "runs" / str(work_order_id) / f"{station}.review.json"
++    if reviewer:
++        review_path.parent.mkdir(parents=True, exist_ok=True)
++    correction_used = False
++    validation_error = ""
++    usage_recorder = UsageRecorder()
++    output = ""
++
++    for attempt in range(min(2, int(os.environ.get("ANVIL_MAX_ATTEMPTS", "2")))):
++        if attempt and not usage_recorder.within_budget():
++            print("copilot_station: token threshold reached before correction", file=sys.stderr)
++            return 8
++        prompt = packet_text
++        if station not in WRITE_STATIONS:
++            prompt += READ_ONLY_NOTE.format(review=REVIEW_FILE_NOTE if reviewer else "")
++        if reviewer:
++            if attempt == 0:
++                prompt += review_suffix(work_order_id, station)
++            else:
++                prompt += (
++                    f"\n\n## Review file correction needed\n\n"
++                    f"The review file validation failed with this error:\n\n{validation_error}\n\n"
++                    f"Please correct the issue and write a valid review JSON object to "
++                    f"runs/{work_order_id}/{station}.review.json.\n"
++                )
++
++        try:
++            output_path.unlink()
++        except FileNotFoundError:
++            pass
++
++        call_started = time.perf_counter()
++        try:
++            proc = subprocess.run(copilot_command(prompt, copilot_model, station, review_file),
++                                  cwd=str(repo_root), capture_output=True,
++                                  text=True, timeout=TIMEOUT_SECONDS)
++        except subprocess.TimeoutExpired as exc:
++            usage_recorder.record(exc.stdout, RUNTIME, "timed_out",
++                                  (time.perf_counter() - call_started) * 1000, model)
++            print(f"copilot_station: station {station} timed out after {TIMEOUT_SECONDS}s",
++                  file=sys.stderr)
++            return 4
++        except FileNotFoundError:
++            print("copilot_station: the copilot CLI is not on PATH", file=sys.stderr)
++            return 5
++
++        parsed = usage_recorder.record(proc.stdout, RUNTIME,
++                                      "succeeded" if proc.returncode == 0 else "failed",
++                                      (time.perf_counter() - call_started) * 1000, model)
++        if proc.returncode != 0 or parsed.get("is_error"):
++            detail = (parsed.get("error") or proc.stderr or "").strip()[:2000]
++            print(f"copilot_station: copilot exited {proc.returncode} for station {station}: {detail}",
++                  file=sys.stderr)
++            return 2
++
++        output = parsed["output"]
++        # Station artifact contract: a station that wrote its own output file
++        # keeps it, and the chat reply is saved beside it as a transcript.
++        station_wrote_output = output_path.is_file() and bool(
++            output_path.read_text(encoding="utf-8", errors="replace").strip())
++        review_written = bool(reviewer) and validate_review_file(review_path, station)[0]
++        if not output.strip() and not (station_wrote_output or review_written):
++            print(f"copilot_station: copilot produced empty output for station {station}",
++                  file=sys.stderr)
++            return 3
++
++        if station_wrote_output:
++            if output.strip():
++                transcript_path(output_path, station).write_text(output, encoding="utf-8")
++            output = output_path.read_text(encoding="utf-8", errors="replace")
++        else:
++            output_path.write_text(output, encoding="utf-8")
++
++        if not reviewer:
++            break
++        is_valid, validation_error = validate_review_file(review_path, station)
++        if is_valid:
++            if correction_used:
++                metadata = {"correction_used": True, "attempts": attempt + 1}
++                review_path.with_name(f"{station}.correction.json").write_text(
++                    json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
++            break
++        if attempt == 0:
++            correction_used = True
++            continue
++        break
++
++    print(output)
++    return 0
++
++
++if __name__ == "__main__":
++    sys.exit(main())
+diff --git a/tools/dispatch_station.py b/tools/dispatch_station.py
+index 580b440..8e69bbd 100755
+--- a/tools/dispatch_station.py
++++ b/tools/dispatch_station.py
+@@ -1,19 +1,22 @@
+ #!/usr/bin/env python3
+-"""Runtime dispatcher that routes to Claude or Codex based on configured model.
++"""Runtime dispatcher that routes a station to its runtime for the configured model.
+ 
+-This dispatcher reads ANVIL_CONFIGURED_MODEL from the environment (set by the
+-runner) and dispatches to the appropriate runtime:
++The runner sets ANVIL_CONFIGURED_MODEL. ANVIL_RUNTIME selects the runtime:
+ 
+-- Anthropic models (claude-opus-5-5, claude-sonnet-5-5): claude_station.py
+-- OpenAI models (openai/gpt-6.1-sol): codex_station.py
+-- Any other model: fails loudly with no fallback
++- claude-codex (default): Anthropic models run through Claude Code
++  (tools/claude_station.py) and OpenAI models through the Codex CLI
++  (tools/codex_station.py), each against the gateway in the environment.
++- copilot (optional): GitHub Copilot CLI runs every known model
++  (claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol) through
++  tools/copilot_station.py. Models are reached through GitHub Copilot.
+ 
+-The configured model and executed model are the same by construction because
+-the runtime receives the model from the runner and has no other source.
++Any other model or runtime fails loudly with no fallback. The configured
++model and executed model are the same by construction because the runtime
++receives the model from the runner and has no other source.
+ 
+ Exit codes:
+ - 0: success
+-- 1: unknown model family (loud failure, no fallback)
++- 1: unknown model or runtime (loud failure, no fallback)
+ - other: propagated from underlying runtime
+ """
+ 
+@@ -39,13 +42,34 @@ def _self_report(output_path, model):
+     print(line)
+ 
+ 
+-def dispatch_runtime(packet_path, output_path, configured_model):
+-    """Dispatch to appropriate runtime based on model family.
++DEFAULT_RUNTIME = "claude-codex"
++KNOWN_MODELS = ("claude-opus-5-5", "claude-sonnet-5-5", "openai/gpt-6.1-sol")
++CLAUDE_CODEX_ROUTES = {
++    "claude-opus-5-5": "claude_station.py",
++    "claude-sonnet-5-5": "claude_station.py",
++    "openai/gpt-6.1-sol": "codex_station.py",
++}
++
++
++def runtime_script(runtime, configured_model):
++    """Return the wrapper script name for (runtime, model), or None when unknown."""
++    if configured_model not in KNOWN_MODELS:
++        return None
++    if runtime == "copilot":
++        return "copilot_station.py"
++    if runtime == "claude-codex":
++        return CLAUDE_CODEX_ROUTES[configured_model]
++    return None
++
++
++def dispatch_runtime(packet_path, output_path, configured_model, runtime=None):
++    """Dispatch to the runtime wrapper for the configured model.
+ 
+     Args:
+         packet_path: Path to station packet
+         output_path: Path for output
+         configured_model: Model identifier from ANVIL_CONFIGURED_MODEL
++        runtime: claude-codex (default) or copilot; read from ANVIL_RUNTIME when None
+ 
+     Returns:
+         Exit code from runtime
+@@ -53,69 +77,37 @@ def dispatch_runtime(packet_path, output_path, configured_model):
+     if not configured_model:
+         print("dispatch_station: ANVIL_CONFIGURED_MODEL not set", file=sys.stderr)
+         return 1
+-
+-    tools_dir = Path(__file__).parent
+-
+-    # Dispatch by model family
+-    if configured_model in ["claude-opus-5-5", "claude-sonnet-5-5"]:
+-        # Anthropic models -> Claude runtime
+-        runtime = tools_dir / "claude_station.py"
+-        env = os.environ.copy()
+-        env["ANVIL_CONFIGURED_MODEL"] = configured_model
+-
+-        try:
+-            proc = subprocess.run(
+-                [sys.executable, str(runtime), str(packet_path), str(output_path)],
+-                env=env,
+-                capture_output=True,
+-                text=True
+-            )
+-            # Forward output
+-            if proc.stdout:
+-                print(proc.stdout, end="")
+-            if proc.stderr:
+-                print(proc.stderr, end="", file=sys.stderr)
+-            if proc.returncode == 0:
+-                _self_report(output_path, configured_model)
+-            return proc.returncode
+-
+-        except Exception as e:
+-            print(f"dispatch_station: failed to invoke Claude runtime: {e}", file=sys.stderr)
+-            return 2
+-
+-    elif configured_model == "openai/gpt-6.1-sol":
+-        # OpenAI models -> Codex runtime
+-        runtime = tools_dir / "codex_station.py"
+-        env = os.environ.copy()
+-        env["ANVIL_CONFIGURED_MODEL"] = configured_model
+-
+-        try:
+-            proc = subprocess.run(
+-                [sys.executable, str(runtime), str(packet_path), str(output_path)],
+-                env=env,
+-                capture_output=True,
+-                text=True
+-            )
+-            # Forward output
+-            if proc.stdout:
+-                print(proc.stdout, end="")
+-            if proc.stderr:
+-                print(proc.stderr, end="", file=sys.stderr)
+-            if proc.returncode == 0:
+-                _self_report(output_path, configured_model)
+-            return proc.returncode
+-
+-        except Exception as e:
+-            print(f"dispatch_station: failed to invoke Codex runtime: {e}", file=sys.stderr)
+-            return 2
+-
+-    else:
+-        # Unknown model - loud failure, no fallback
+-        print(f"dispatch_station: unknown model '{configured_model}'. " +
+-              f"Known models: claude-opus-5-5, claude-sonnet-5-5, openai/gpt-6.1-sol",
+-              file=sys.stderr)
++    runtime = (runtime or os.environ.get("ANVIL_RUNTIME") or DEFAULT_RUNTIME).strip()
++    if runtime not in ("copilot", "claude-codex"):
++        print(f"dispatch_station: unknown runtime '{runtime}'. "
++              f"Known runtimes: claude-codex, copilot", file=sys.stderr)
++        return 1
++    script = runtime_script(runtime, configured_model)
++    if script is None:
++        print(f"dispatch_station: unknown model '{configured_model}'. "
++              f"Known models: {', '.join(KNOWN_MODELS)}", file=sys.stderr)
+         return 1
+ 
++    env = os.environ.copy()
++    env["ANVIL_CONFIGURED_MODEL"] = configured_model
++    try:
++        proc = subprocess.run(
++            [sys.executable, str(Path(__file__).parent / script), str(packet_path), str(output_path)],
++            env=env,
++            capture_output=True,
++            text=True
++        )
++    except Exception as e:
++        print(f"dispatch_station: failed to invoke {script}: {e}", file=sys.stderr)
++        return 2
++    if proc.stdout:
++        print(proc.stdout, end="")
++    if proc.stderr:
++        print(proc.stderr, end="", file=sys.stderr)
++    if proc.returncode == 0:
++        _self_report(output_path, configured_model)
++    return proc.returncode
++
+ 
+ def main():
+     if len(sys.argv) != 3:
+diff --git a/tools/sync_project_usage.py b/tools/sync_project_usage.py
+index a4cfceb..d311bae 100644
+--- a/tools/sync_project_usage.py
++++ b/tools/sync_project_usage.py
+@@ -1,5 +1,10 @@
+ #!/usr/bin/env python3
+-"""Refresh public project usage snapshots with GitHub CLI; makes no model calls."""
++"""Refresh project usage snapshots with GitHub CLI; makes no model calls.
++
++Reports are sanitized with public_report before they are stored. Private and
++internal repositories are refused unless --allow-private is passed, which is
++only safe when the status site is published privately.
++"""
+ import argparse
+ import base64
+ from concurrent.futures import ThreadPoolExecutor
+@@ -13,6 +18,7 @@ from urllib.parse import quote
+ 
+ ROOT = Path(__file__).resolve().parent.parent
+ sys.path.insert(0, str(ROOT))
++from anvil.config import load_anvil_config
+ from anvil.telemetry import public_report
+ from anvil.statuspage import generate_status_page
+ 
+@@ -25,13 +31,14 @@ def github(path):
+     return json.loads(proc.stdout)
+ 
+ 
+-def sync_project(entry, destination):
++def sync_project(entry, destination, allow_private=False):
+     repository = entry["repository"]
+     if not re.fullmatch(r"[\w.-]+/[\w.-]+", repository) or not re.fullmatch(r"[a-z0-9_-]+", entry["id"]):
+         raise ValueError("Invalid project catalog identifier")
+     metadata = github(f"repos/{repository}")
+-    if metadata.get("private"):
+-        raise ValueError(f"Private repository {repository} cannot be imported into the public status site")
++    if metadata.get("private") and not allow_private:
++        raise ValueError(f"Private repository {repository} cannot be imported into a public status site; "
++                         f"pass --allow-private when the status site is published privately")
+     branch = quote(metadata["default_branch"], safe="")
+     tree = github(f"repos/{repository}/git/trees/{branch}?recursive=1")
+     if tree.get("truncated"):
+@@ -65,10 +72,16 @@ def main(argv=None):
+     parser.add_argument("--catalog", default=str(ROOT / "project-reports" / "catalog.json"))
+     parser.add_argument("--out", default=str(ROOT / "project-reports"))
+     parser.add_argument("--status-out", default=str(ROOT / "status"))
++    parser.add_argument("--allow-private", action="store_true",
++                        help="import private and internal repositories; use only when the status site is private")
+     args = parser.parse_args(argv)
+     entries = json.loads(Path(args.catalog).read_text(encoding="utf-8"))["projects"]
+-    roots = [sync_project(entry, Path(args.out)) for entry in entries]
+-    summary = generate_status_page(ROOT, args.status_out, projects=roots)
++    roots = [sync_project(entry, Path(args.out), allow_private=args.allow_private) for entry in entries]
++    # Keep the projects configured in anvil.yaml on the board, also when the catalog is empty.
++    projects = [ROOT / path for path in load_anvil_config(ROOT / "anvil.yaml").get("status_projects") or []]
++    known = {path.resolve() for path in projects}
++    projects += [root for root in roots if root.resolve() not in known]
++    summary = generate_status_page(ROOT, args.status_out, projects=projects)
+     print(f"Status page: {summary['path']}")
+     return 0
+ 
