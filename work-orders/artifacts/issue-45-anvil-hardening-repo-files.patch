@@ -1,0 +1,134 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index d15d202..eb756a0 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -2,6 +2,26 @@
+ 
+ ## Unreleased
+ 
++### Hardening against five observed failure modes
++
++Five changes, each answering a failure seen in executed runs: a reclassification that shrank the reviewer panel (FM1), runs that died without a report (FM2), a spec amended in the middle of a run (FM3), unbounded spend by one station (FM4), and review launched on incomplete work (FM5).
++
++- Classification floor (FM1): intake proposes risk and surfaces and deterministic rules decide. Intake may raise the risk and add surfaces, never lower or remove what was submitted; a low rating is refused on an unrated work order that carries a scanned risk hint. After the builder, the changed file paths can add surfaces and raise low to medium when an undeclared security, data, payments or deploy surface is touched, and reviewers are routed again before any runs. `routing.json` and `report.md` record the decisions and each escalation. Spec: classification-floor. Doc: docs/ROUTING.md.
++- Run checkpoint (FM2): `report.json` is saved atomically after every station and before every agent call, with `run_state` `in_progress`, `completed` or `aborted`. An interrupted or crashed run keeps its completed steps, names the station in flight and carries the usage that station had reported. `anvil run` turns SIGTERM into an exit the runner records. There is no resume. Spec: run-checkpoint. Doc: docs/RUN-CHECKPOINT.md.
++- Write authority (FM3): the runner hashes the protected files around every executed agent station. A station that modifies or deletes an existing protected file it does not own makes the approver reject the run; the builder also fails the pre-review gate when it amends a test or spec written earlier in the same run. Default protected paths are now `tests/`, `.openspec/`, `anvil.json` and `.anvil/`; spec-writer and blueprint own `.openspec/`, test-writer owns `tests/`. The protected path rule applies even with no checks configured. The report gains an `integrity` section. Spec: write-authority. Docs: docs/WRITE-AUTHORITY.md, docs/CHECKS-GATE.md.
++- Station token caps (FM4): `efficiency.max_station_tokens` (500,000 in new projects) and `efficiency.station_tokens.<station>` cap one station call. The station is handed the smaller of its cap and the remaining run pool; an overrun is marked `station_cap_exceeded` with a report warning. The cap is enforced between attempts, a running call cannot be cut off. Spec: station-token-caps. Doc: docs/COST-MEASUREMENT.md.
++- Checks in new projects (FM5): blueprints may name `checks`; `new-project` writes them and the default protected paths into `anvil.json`, `init` and `onboard` write the protected paths with an empty checks list, and BLUEPRINT.md states the checks. The python-service blueprint runs `python3 -m unittest discover -s tests`. Spec: scaffold-checks.
++- This repository's own `anvil.json` now protects `.openspec/` and `.anvil/` as well.
++
++### Six capabilities taken from what other factories do best
++
++- Sealed tests and specs: the runner keeps a copy of every protected file before each station and writes it back when a station changes one without authority, so the checks gate always runs against the tests as written. The violation is still recorded and still fails the attempt. `restore_protected: false` switches it off. Spec: sealed-tests. Doc: docs/WRITE-AUTHORITY.md.
++- Resume: `anvil run --resume` continues an aborted run from its first unfinished station. Finished steps are carried with their usage, the panel and the reviews already written are restored from the run record, and the aborted report is not archived twice. Spec: run-resume. Doc: docs/RUN-CHECKPOINT.md.
++- In-run loopback: with `loopback_mode: in_run` (or `--loopback in-run`) the runner sends failed work back and runs it again inside the same run, bounded by max_loopbacks and the run budget. The returning station receives the findings and the gate output. The default stays `record`. Spec: in-run-loopback. Doc: docs/ARCHITECTURE.md.
++- Pre-build gate: before the builder is called, deterministic code checks that every scenario of the specs the run works from appears in the tests and, when `require_checks` is set, that the project has a check command. A failure ends the run `gate_failed` without paying for the build. Spec: pre-build-gate. Doc: docs/CHECKS-GATE.md.
++- Outcome metrics: first pass approval, approval and loopback rates, gate failure rate, objections per reviewer and tokens per approved work order, computed from the reports on record. Shown on the status page, written to `status/usage.json`, printed by `anvil metrics`. Spec: outcome-metrics. Doc: docs/STATUS-PAGE.md.
++- Clean context reviewer: the new `reviewer-clean` station (station 28) gets the change and nothing else, on a different model family from the builder's. Opt in through the new `sdlc-clean-review` pipeline (pipeline 9); `sdlc-default` is unchanged. Spec: clean-review. Doc: docs/CLEAN-REVIEW.md.
++
+ ### Operator guide
+ 
+ - docs/OPERATOR-GUIDE.md explains how to use the factory end to end: prerequisites, starting a project, writing a work order, choosing a pipeline, the dry run, the real run, reading the verdict, the human hand over, limits, running in Actions, troubleshooting and a command reference. The README Documentation table lists it first.
+diff --git a/README.md b/README.md
+index ba0237d..6432128 100644
+--- a/README.md
++++ b/README.md
+@@ -25,6 +25,8 @@ You will see the factory's own test suite pass, then a new project in `../anvil-factory
+ 
+ Every agent station writes to its assigned artifact file (builder writes code, reviewers write review JSON). The approver station reads only the review files - it cannot see station output or logs - and aggregates verdicts using [deterministic parsing that fails closed](stations/approver/station.json). If a review file is malformed or a verdict is missing, the run is rejected, never assumed pass.
+ 
++The same separation holds for the files that judge the work. The runner hashes the specs and tests around every executed station, and a change by a station with no authority over them rejects the run ([docs/WRITE-AUTHORITY.md](docs/WRITE-AUTHORITY.md)). Intake may raise a work order's risk, never lower it, so a reclassification cannot shrink the reviewer panel ([docs/ROUTING.md](docs/ROUTING.md)).
++
+ Independent review evidence: [runs/wo-gh-9/reviewer-spec.review.json](runs/wo-gh-9/reviewer-spec.review.json), [reviewer-security.review.json](runs/wo-gh-9/reviewer-security.review.json), [reviewer-tests.review.json](runs/wo-gh-9/reviewer-tests.review.json), [reviewer-architecture.review.json](runs/wo-gh-9/reviewer-architecture.review.json), [reviewer-design.review.json](runs/wo-gh-9/reviewer-design.review.json) - five independent reviewers, none of which built the code.
+ 
+ ### 2. Memory with provenance
+@@ -41,11 +43,11 @@ Evidence: [runs/wo-gh-9/report.json](runs/wo-gh-9/report.json) line 147, triage-
+ 
+ ## What it is
+ 
+-ANVIL is a framework for running software work down a line of 27 stations. Each station has a manifest and a clear contract. Some stations are deterministic code: intake, gates, the approver and human triage. Agent stations are explicit contracts, a manifest plus a prompt packet. The runner never pretends a model ran: for an agent station it writes a packet file and marks the step packet_ready.
++ANVIL is a framework for running software work down a line of 28 stations. Each station has a manifest and a clear contract. Some stations are deterministic code: intake, gates, the approver and human triage. Agent stations are explicit contracts, a manifest plus a prompt packet. The runner never pretends a model ran: for an agent station it writes a packet file and marks the step packet_ready.
+ 
+ A project keeps everything in its repo: specs, tests, reviews, run reports, envelopes and a brain folder with context and decisions.
+ 
+-The factory ships 8 pipelines and over 500 tests covering the full SDLC, content production, and greenfield builds.
++The factory ships 9 pipelines and over 500 tests covering the full SDLC, content production, and greenfield builds.
+ 
+ ## One core, two domains: software and content
+ 
+@@ -81,6 +83,7 @@ The modes are a starting point, not a wall: a greenfield project becomes brownfi
+ | reviewer-tests | agent | Check tests are real, mapped and passing |
+ | reviewer-architecture | agent | Check fit with structure and decisions |
+ | reviewer-design | agent | Check visual output against design system |
++| reviewer-clean | agent | Clean context review: judges the change alone, with no spec, builder report or other review |
+ | approver | deterministic | Aggregate the five reviews into one verdict |
+ | triage-human | deterministic | Decide if a human must review risky work |
+ | deployer | agent | Carry out the release step for the project |
+@@ -130,10 +133,12 @@ stays unknown, including historical reports.
+ 
+ New projects include `status/index.html` and consumption controls in
+ `anvil.yaml`: a 12,000 token packet ceiling, 16 agent calls per run, a 1,500,000
+-token run threshold, and for the optional Claude Code and Codex runtimes up to
++token run threshold, a 500,000 token cap per station call, and for the optional Claude Code and Codex runtimes up to
+ 16 Claude runtime turns and 2,000 retained tokens per Codex tool result. These are adjustable starting settings. Run thresholds
+ are checked between calls; a running call can exceed them. An agent call is
+ one station runtime invocation, which may contain several model/tool turns.
++The report is saved after every station, so a run that is stopped or crashes
++keeps its accounting ([docs/RUN-CHECKPOINT.md](docs/RUN-CHECKPOINT.md)).
+ 
+ ```bash
+ python3 -m anvil.cli status-page .
+@@ -166,6 +171,8 @@ python3 -m anvil.cli check-content ../my-channel --slug my-post
+ python3 -m anvil.cli check-brain ../my-project
+ python3 -m anvil.cli check-skills ../my-project
+ python3 -m anvil.cli supervise ../my-project
++python3 -m anvil.cli metrics ../my-project
++python3 -m anvil.cli run ../my-project --pipeline pipelines/sdlc-default.json --work-order work-order.json --execute --resume
+ ```
+ 
+ Installed as a package, the same commands are available as `anvil new-project`, `anvil onboard`, `anvil init`, `anvil new-spec`, `anvil validate-pipeline`, `anvil run`, `anvil check`, `anvil check-brain` and `anvil supervise`.
+@@ -191,6 +198,7 @@ The brain/ folder holds project.md (what the project is and its principles), glo
+ - docs-only: intake, builder, one review and the approver.
+ - scout: a single read only recon station, no code changes.
+ - plan-build-test: intake, spec, tests, build, test review and approver.
++- sdlc-clean-review: sdlc-default plus the clean context reviewer, a seventh reviewer on a different model that sees only the change.
+ - greenfield: the from zero line. Intake, blueprint, spec, tests, build, the five parallel reviewers, approver, human triage, deployer and observer.
+ - content-default: the full content line. Intake, brief, research, writing, media, five parallel content reviewers, approver, human triage, publisher and observer.
+ - content-short: a short content line for posts. Intake, brief, writing, facts and voice review, approver, human triage and publisher.
+@@ -212,6 +220,9 @@ Every change starts with a spec under .openspec/specs/ (OpenSpec). Write the spe
+ | [docs/SDLC.md](docs/SDLC.md) | How the default pipeline maps to SDLC phases |
+ | [docs/EXECUTION.md](docs/EXECUTION.md) | Agent runtime executors, the runtime contract, automatic deploy and post deploy verification |
+ | [docs/STATUS-PAGE.md](docs/STATUS-PAGE.md) | The run status page: generation, publishing with GitHub Pages, and the snapshot note |
++| [docs/RUN-CHECKPOINT.md](docs/RUN-CHECKPOINT.md) | The report saved after every station: run states, what an aborted run records, stop requests, and resuming with `--resume` |
++| [docs/CLEAN-REVIEW.md](docs/CLEAN-REVIEW.md) | The clean context reviewer: what its packet leaves out, when it runs, and how to turn it on |
++| [docs/WRITE-AUTHORITY.md](docs/WRITE-AUTHORITY.md) | Protected paths and their owners: which station may change specs and tests, and what happens when another one does |
+ | [docs/MEMORY-GATE.md](docs/MEMORY-GATE.md) | Verified learnings: the inbox flow, the provenance format, and why memory writes are gated |
+ | [docs/SUPERVISOR.md](docs/SUPERVISOR.md) | The bounded supervisor: stall signals, the constitution, the proposal lifecycle, and what it can never do |
+ | [docs/OPERATOR-REQUIREMENTS.md](docs/OPERATOR-REQUIREMENTS.md) | Operator credentials and permissions: the GitHub PAT, the Copilot token for model access, and where each lives |
+diff --git a/anvil.json b/anvil.json
+index 3d5e711..52904f3 100644
+--- a/anvil.json
++++ b/anvil.json
+@@ -6,7 +6,9 @@
+   ],
+   "protected_paths": [
+     "tests/",
++    ".openspec/",
+     "anvil.json",
++    ".anvil/",
+     "pipelines/"
+   ]
+ }
+diff --git a/site/index.html b/site/index.html
+index 7956705..f393224 100644
+--- a/site/index.html
++++ b/site/index.html
+@@ -25,7 +25,7 @@
+ <p class="promise">A software factory where no agent approves its own work.</p>
+ <p>Turn a work order into specs, tests, implementation and a review trail you can inspect.</p>
+ <div class="actions"><a class="button primary" href="https://github.com/arananet/anvil-factory">Explore the repository <span aria-hidden="true">&#8599;</span></a><a class="button" href="#quickstart">Try the quickstart <span aria-hidden="true">&#8595;</span></a></div>
+-<div class="stats"><strong>27 stations</strong><strong>8 pipelines</strong><span class="label">Catalog verified at build<br>2026-11-07</span></div>
++<div class="stats"><strong>28 stations</strong><strong>9 pipelines</strong><span class="label">Catalog verified at build<br>2026-11-07</span></div>
+ </section>
+ <section id="problem" class="band"><div class="wrap split"><div><div class="label">The problem</div><h2>A convincing demo<br>isn't a review.</h2></div><div><p class="lead">When the agent that writes the code also tests and approves it, confidence becomes a closed loop.</p><p>And when a demo leaves no spec, test evidence or run record, nobody can audit what happened. ANVIL separates the work from its judgment and keeps the artifacts in your repository.</p></div></div></section>
+ <section id="how-it-works" class="band"><div class="wrap"><div class="label">How it works</div><h2>A factory line.<br>Not a longer prompt.</h2><p class="lead">The spec comes before implementation. Tests come before the build.</p><p>Each station has a contract and an assigned artifact. Pipelines compose those stations into a line that fits the work: software, content, a new project or an existing codebase.</p>
