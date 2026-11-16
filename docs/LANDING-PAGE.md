@@ -150,3 +150,14 @@ pipelines, 18 skills in skills/catalog.json, and 6 parallel reviewers in
 pipelines/sdlc-default.json. The hero stats now print the 18 skills count and
 carry the 2026-11-15 verification date. The landing and readme showcase
 checks pass with the new links.
+
+## Content update 2026-11-15, C64 proof entry
+
+On the owner's order, the proof section gains a fourth project entry: C64
+Retro Hardware, linking https://c64-retro-hardware.pages.dev and describing
+the blueprint edition, the engineering drawing style showcase of Commodore
+64 hardware built by ANVIL. The owner ordered that edition published to its
+live URL the same day; the entry was written only after the live URL was
+verified serving the blueprint edition, not the first version it replaces.
+The README showcase is unchanged by this update: its set stays Sentia, Doom
+Fire and Mochi Smash.
