@@ -1,0 +1,27 @@
+{
+  "id": "wo-gh-43",
+  "kind": "feature",
+  "title": "ANVIL attribution by default: every shipped web project credits the factory",
+  "source": "github-issue",
+  "description": "Implement the spec in .openspec/specs/attribution-default/spec.md. Pipeline for this order is sdlc-default (see anvil.json). Mode: brownfield, the factory improving itself. Domain: factory core, station guidance and project scaffolding.\n\nOWNER RULE (stated 2026-11-15): every project the factory ships carries an ANVIL attribution by default. The owner audited the shipped projects and found the rule is not true today: Sentia carries a bespoke credit, and Doom Fire, Mochi Smash, Platform25 and the live C64 page carry none. This order makes the factory itself produce the attribution by default, so future projects ship compliant without a retrofit. Retrofits of already shipped projects are separate orders (the Doom Fire retrofit is filed in its own repo); this order changes only the factory.\n\nDEFAULT WORDING AND COMPLIANCE:\n- Default attribution text, exact: \"Made with ANVIL, an open source software factory.\" with a link to the ANVIL landing https://anvil-landing-7x1.pages.dev (the factory repo link is an accepted alternative target).\n- A project bespoke credit that names ANVIL as the builder counts as compliant. Precedent, Sentia: \"Sentia is a concept product, designed and built end to end by ANVIL, an open source software factory. Developed by Eduardo Arana.\"\n- Placement: the page footer or an equivalent visible spot. On a game surface, a credits or footer element that does not break gameplay.\n- No em dashes in any text this order writes.\n\nBUILD, per the spec requirements:\n- R1, the rule and its wording, as above, recorded in the spec and in the decision record of R5.\n- R2, scaffold and onboard: anvil/scaffold.py new_project seeds the attribution requirement for web blueprints (blueprints/static-site.json, and blueprints/cloudflare-worker.json where it ships pages), so the seeded site-shell spec and project brain carry the footer requirement from the first build. anvil/onboard.py records the same requirement for onboarded web projects in its onboard output, without overwriting any existing project file (onboard never overwrites).\n- R3, station guidance: stations/builder/PROMPT.md and stations/publisher/PROMPT.md carry the rule, the default wording, the placement guidance and the exception path (an owner approved exception recorded in the project spec).\n- R4, deterministic check: the checks gate (anvil/gates.py, checks_gate) verifies, for a shipped web deliverable, that the deliverable HTML carries an attribution naming ANVIL: the default line, or a bespoke credit naming ANVIL as the builder. The gate fails when no attribution is present. Web deliverables only: orders and projects without an HTML deliverable are unaffected. A recorded owner exception in the project spec or project configuration is honoured.\n- R5, decision record: brain/decisions/0012-anvil-attribution-default.md captures the rule as a long term factory decision, in the format of the existing records.\n- R6, tests: tests cover the check passing on the default line, passing on a bespoke Sentia style credit, failing when no attribution exists, and not applying to a non web deliverable. The full factory suite stays green: python -m unittest discover -s tests -p 'test_*.py'.\n\nAUTHORISED SURFACE (full legitimate surface for this spec): anvil/scaffold.py, anvil/onboard.py, anvil/gates.py, a new anvil/ module for the check if the line prefers one, blueprints/static-site.json, blueprints/cloudflare-worker.json, stations/builder/PROMPT.md, stations/publisher/PROMPT.md, brain/decisions/0012-anvil-attribution-default.md, .openspec/specs/attribution-default/spec.md, and tests/ for the new attribution tests only (per spec exception to the anvil.json protected_paths entry for tests/: the new tests are written by the test-writer station; the builder does not edit existing tests). No other protected path changes: anvil.json and pipelines/ stay untouched.\n\nTOKEN CAP: 6,000,000, the factory standing proven configuration in anvil.yaml (max_run_tokens 6000000, max_agent_calls 32, max_runtime_turns 40), left unchanged. Calibration basis: the comparable factory feature order wo-gh-39 (configurable station timeout, code plus tests) measured 1,504,285 tokens total and was approved; this order touches more files but the same order of magnitude, and the standing cap leaves headroom above the largest single station of every comparable factory run.\n\nREQUIRED LITERALS in the builder report: \"Made with ANVIL, an open source software factory.\", \"0012\", \".openspec/specs/attribution-default/spec.md\", \"S1\", \"S2\", \"S3\", \"S4\", \"S5\", and the full suite result line.\n\nThe run stops at the human gate. Nothing merges without the owner gate word reported back through the operator.\n",
+  "risk": "medium",
+  "risk_hints": [
+    "checks gate changes can false-fail other projects runs; the spec confines the check to web deliverables, accepts bespoke ANVIL credits, and honours a recorded owner exception"
+  ],
+  "spec_path": ".openspec/specs/attribution-default/spec.md",
+  "status": "new",
+  "surfaces": [
+    "api",
+    "content"
+  ],
+  "required_literals": [
+    "Made with ANVIL, an open source software factory.",
+    "0012",
+    ".openspec/specs/attribution-default/spec.md",
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S5"
+  ]
+}
