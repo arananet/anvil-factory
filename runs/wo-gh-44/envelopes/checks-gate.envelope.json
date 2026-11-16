@@ -1,0 +1,39 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "checks-gate",
+  "to_station": "reviewer-spec",
+  "work_order_id": "wo-gh-44",
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/checks-gate.pre-review.output.md",
+  "status": "failed",
+  "created_at": "2026-11-16T03:15:46.867778+00:00",
+  "phase": "pre-review",
+  "commands": [
+    "python -m unittest discover -s tests -p 'test_*.py'"
+  ],
+  "exit_codes": [
+    0
+  ],
+  "protected_paths": [
+    "tests/",
+    "anvil.json",
+    "pipelines/"
+  ],
+  "protected_path_verdict": "pass",
+  "protected_path_findings": [],
+  "observed_additions": [],
+  "basis": "builder_delta (attempt 3)",
+  "gate_verdict": "fail",
+  "artifact_validation": {
+    "passed": false,
+    "report": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md",
+    "observed": "missing",
+    "report_source": "none",
+    "required_literals": [],
+    "missing_literals": [],
+    "findings": [
+      "Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing."
+    ]
+  },
+  "output": "## Artifact validation\n\n- builder report: /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md\n- observed: missing\n- report source: none\n- required literals declared: 0\n- result: fail\n- finding: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing.\n",
+  "configured_model": "claude-opus-5-5"
+}

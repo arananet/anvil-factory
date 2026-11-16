@@ -1,0 +1,925 @@
+{
+  "work_order_id": "wo-gh-44",
+  "pipeline": "sdlc-default",
+  "title": "Enterprise port: secret hygiene, Copilot telemetry and operator guide on the single-runtime design",
+  "kind": "feature",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "executed",
+      "detail": "Executed by command; outcome: accepted",
+      "duration_ms": 37451.316,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/intake.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 1714,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 199040,
+        "output_tokens": 2909,
+        "cached_input_tokens": 180167,
+        "cache_creation_input_tokens": 18857,
+        "reasoning_tokens": 0,
+        "total_tokens": 201949,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 37359.105,
+          "usage": {
+            "input_tokens": 199040,
+            "output_tokens": 2909,
+            "cached_input_tokens": 180167,
+            "cache_creation_input_tokens": 18857,
+            "reasoning_tokens": 0,
+            "total_tokens": 201949,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.18856240000000002,
+          "turns": 8,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true
+    },
+    {
+      "station": "spec-writer",
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station spec-writer: {\"duration_api_ms\":40634,\"stop_reason\":\"stop_sequence\",\"session_id\":\"fb370260-3128-4196-8eb1-a77cb4a638e2\",\"total_cost_usd\":0.3727542,\"usage\":{\"input_tokens\":20,\"cache_creation_input_tokens\":49658,\"cache_read_input_tokens\":293921,\"output_tokens\":3280,\"output_tokens_details\":{\"thinking_tokens\":1597},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":0,\"e",
+      "duration_ms": 42193.286,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/spec-writer.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 2993,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 343599,
+        "output_tokens": 3280,
+        "cached_input_tokens": 293921,
+        "cache_creation_input_tokens": 49658,
+        "reasoning_tokens": 0,
+        "total_tokens": 346879,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 42121.768,
+          "usage": {
+            "input_tokens": 343599,
+            "output_tokens": 3280,
+            "cached_input_tokens": 293921,
+            "cache_creation_input_tokens": 49658,
+            "reasoning_tokens": 0,
+            "total_tokens": 346879,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.3727542,
+          "turns": 12,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true
+    },
+    {
+      "station": "test-writer",
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station test-writer: {\"duration_api_ms\":0,\"stop_reason\":\"stop_sequence\",\"session_id\":\"a8c0755d-2367-4da4-8ef5-dcef98aeb125\",\"total_cost_usd\":0,\"usage\":{\"output_tokens_details\":{\"thinking_tokens\":0},\"input_tokens\":0,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"output_tokens\":0,\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":0,\"ephemeral_5m_input_tokens\":0}",
+      "duration_ms": 650.895,
+      "cost": 0.0,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/test-writer.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 1982,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "reasoning_tokens": 0,
+        "total_tokens": 0,
+        "input_tokens_includes_cache": true
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 579.696,
+          "usage": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cached_input_tokens": 0,
+            "cache_creation_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "total_tokens": 0,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0,
+          "turns": 1,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true
+    },
+    {
+      "station": "builder",
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station builder: {\"duration_api_ms\":5109,\"stop_reason\":\"stop_sequence\",\"session_id\":\"b8edbea0-d095-4aec-ae6c-295c30c75769\",\"total_cost_usd\":0.0799932,\"usage\":{\"input_tokens\":4,\"cache_creation_input_tokens\":13232,\"cache_read_input_tokens\":36186,\"output_tokens\":329,\"output_tokens_details\":{\"thinking_tokens\":52},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":0,\"ephemeral_5",
+      "duration_ms": 6200.49,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 5551,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 49422,
+        "output_tokens": 329,
+        "cached_input_tokens": 36186,
+        "cache_creation_input_tokens": 13232,
+        "reasoning_tokens": 0,
+        "total_tokens": 49751,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 6072.519,
+          "usage": {
+            "input_tokens": 49422,
+            "output_tokens": 329,
+            "cached_input_tokens": 36186,
+            "cache_creation_input_tokens": 13232,
+            "reasoning_tokens": 0,
+            "total_tokens": 49751,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.0799932,
+          "turns": 3,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true
+    },
+    {
+      "station": "checks-gate",
+      "status": "failed",
+      "detail": "Gate passed: 1 checks, protected paths: pass; artifact validation failed: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing.",
+      "duration_ms": 86582.022,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/checks-gate.pre-review.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "phase": "pre-review",
+      "commands": [
+        "python -m unittest discover -s tests -p 'test_*.py'"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "protected_paths": [
+        "tests/",
+        "anvil.json",
+        "pipelines/"
+      ],
+      "protected_path_verdict": "pass",
+      "protected_path_findings": [],
+      "gate_verdict": "fail",
+      "artifact_validation": {
+        "passed": false,
+        "report": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md",
+        "observed": "missing",
+        "report_source": "none",
+        "required_literals": [],
+        "missing_literals": [],
+        "findings": [
+          "Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing."
+        ]
+      }
+    },
+    {
+      "station": "loopback",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Gate checks failed; artifact validation: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing.",
+      "reason": "Gate checks failed; artifact validation: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing.",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null,
+      "feedback": "## Artifact validation\n\n- builder report: /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md\n- observed: missing\n- report source: none\n- required literals declared: 0\n- result: fail\n- finding: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing.\n",
+      "from_station": "checks-gate",
+      "attempt_archive": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/attempts/1"
+    },
+    {
+      "station": "builder",
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station builder: {\"duration_api_ms\":7172,\"stop_reason\":\"stop_sequence\",\"session_id\":\"a1a44ded-84aa-4d9d-860a-ad76c05edea4\",\"total_cost_usd\":0.0837302,\"usage\":{\"input_tokens\":4,\"cache_creation_input_tokens\":13387,\"cache_read_input_tokens\":36996,\"output_tokens\":469,\"output_tokens_details\":{\"thinking_tokens\":96},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":0,\"ephemeral_5",
+      "duration_ms": 8501.84,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 6120,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 50387,
+        "output_tokens": 469,
+        "cached_input_tokens": 36996,
+        "cache_creation_input_tokens": 13387,
+        "reasoning_tokens": 0,
+        "total_tokens": 50856,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 8367.651,
+          "usage": {
+            "input_tokens": 50387,
+            "output_tokens": 469,
+            "cached_input_tokens": 36996,
+            "cache_creation_input_tokens": 13387,
+            "reasoning_tokens": 0,
+            "total_tokens": 50856,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.0837302,
+          "turns": 3,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true,
+      "attempt": 2,
+      "feedback": {
+        "from_station": "checks-gate",
+        "reason": "Gate checks failed; artifact validation: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing.",
+        "findings": [
+          "# Checks Gate: pre-review\nBasis: builder_delta\nAttempt: 1\n\n# Check Commands\n## Command 1: python -m unittest discover -s tests -p 'test_*.py'\nExit code: 0\nOutput:\n```\nanchName false\"\nSwitched to a new branch 'work-branch'\n.hint: Using 'master' as the name for the initial branch. This default branch name\nhint: will change to \"main\" in Git 3.0. To configure the initial branch name\nhint: to use in all of your new repositories, which will suppress this warning,\nhint: call:\nhint:\nhint: \tgit config --global init.defaultBranch <name>\nhint:\nhint: Names commonly chosen instead of 'master' are 'main', 'trunk' and\nhint: 'development'. The just-created branch can be renamed via this command:\nhint:\nhint: \tgit branch -m <name>\nhint:\nhint: Disable this message with \"git config set advice.defaultBranchName false\"\nSwitched to a new branch 'work-branch'\n................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 37831)>\n  if method() is not None:\nResourceWarning: Enable tracemalloc to get the object allocation traceback\n.../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 46227)>\n  if method() is not None:\nResourceWarning: Enable tracemalloc to get the object allocation traceback\n....................................................................................s....................................ss.........................................................................................................................................................s......s......................................................................................................s............................................................................................................................\n----------------------------------------------------------------------\nRan 736 tests in 85.850s\n\nOK (skipped=6)\n\n```\n\n## Gate practices\n\nGate enforced practices this run resolved. The gate is accountable for them:\n\n- P-1: Traversal proof for platformer orders\n- P-2: Deterministic validation of builder reports with declared literals\n- P-3: Capture evidence must exist before design review\n"
+        ]
+      }
+    },
+    {
+      "station": "checks-gate",
+      "status": "failed",
+      "detail": "Gate passed: 1 checks, protected paths: pass; artifact validation failed: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing.",
+      "duration_ms": 81857.769,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/checks-gate.pre-review.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 2,
+      "phase": "pre-review",
+      "commands": [
+        "python -m unittest discover -s tests -p 'test_*.py'"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "protected_paths": [
+        "tests/",
+        "anvil.json",
+        "pipelines/"
+      ],
+      "protected_path_verdict": "pass",
+      "protected_path_findings": [],
+      "gate_verdict": "fail",
+      "artifact_validation": {
+        "passed": false,
+        "report": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md",
+        "observed": "missing",
+        "report_source": "none",
+        "required_literals": [],
+        "missing_literals": [],
+        "findings": [
+          "Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing."
+        ]
+      }
+    },
+    {
+      "station": "loopback",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Gate checks failed; artifact validation: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing.",
+      "reason": "Gate checks failed; artifact validation: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing.",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null,
+      "feedback": "## Artifact validation\n\n- builder report: /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md\n- observed: missing\n- report source: none\n- required literals declared: 0\n- result: fail\n- finding: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing.\n",
+      "from_station": "checks-gate",
+      "attempt_archive": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/attempts/2"
+    },
+    {
+      "station": "builder",
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station builder: {\"duration_api_ms\":4369,\"stop_reason\":\"stop_sequence\",\"session_id\":\"3f968ec8-2822-4aad-a465-275d01f667a1\",\"total_cost_usd\":0.064663,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":11672,\"cache_read_input_tokens\":12675,\"output_tokens\":188,\"output_tokens_details\":{\"thinking_tokens\":38},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":0,\"ephemeral_5m",
+      "duration_ms": 5520.703,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 6137,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 24349,
+        "output_tokens": 188,
+        "cached_input_tokens": 12675,
+        "cache_creation_input_tokens": 11672,
+        "reasoning_tokens": 0,
+        "total_tokens": 24537,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 5384.829,
+          "usage": {
+            "input_tokens": 24349,
+            "output_tokens": 188,
+            "cached_input_tokens": 12675,
+            "cache_creation_input_tokens": 11672,
+            "reasoning_tokens": 0,
+            "total_tokens": 24537,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.064663,
+          "turns": 2,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true,
+      "attempt": 3,
+      "feedback": {
+        "from_station": "checks-gate",
+        "reason": "Gate checks failed; artifact validation: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing.",
+        "findings": [
+          "# Checks Gate: pre-review\nBasis: builder_delta\nAttempt: 2\n\n# Check Commands\n## Command 1: python -m unittest discover -s tests -p 'test_*.py'\nExit code: 0\nOutput:\n```\nanchName false\"\nSwitched to a new branch 'work-branch'\n.hint: Using 'master' as the name for the initial branch. This default branch name\nhint: will change to \"main\" in Git 3.0. To configure the initial branch name\nhint: to use in all of your new repositories, which will suppress this warning,\nhint: call:\nhint:\nhint: \tgit config --global init.defaultBranch <name>\nhint:\nhint: Names commonly chosen instead of 'master' are 'main', 'trunk' and\nhint: 'development'. The just-created branch can be renamed via this command:\nhint:\nhint: \tgit branch -m <name>\nhint:\nhint: Disable this message with \"git config set advice.defaultBranchName false\"\nSwitched to a new branch 'work-branch'\n................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 36399)>\n  if method() is not None:\nResourceWarning: Enable tracemalloc to get the object allocation traceback\n.../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 45213)>\n  if method() is not None:\nResourceWarning: Enable tracemalloc to get the object allocation traceback\n....................................................................................s....................................ss.........................................................................................................................................................s......s......................................................................................................s............................................................................................................................\n----------------------------------------------------------------------\nRan 736 tests in 81.594s\n\nOK (skipped=6)\n\n```\n\n## Gate practices\n\nGate enforced practices this run resolved. The gate is accountable for them:\n\n- P-1: Traversal proof for platformer orders\n- P-2: Deterministic validation of builder reports with declared literals\n- P-3: Capture evidence must exist before design review\n"
+        ]
+      }
+    },
+    {
+      "station": "checks-gate",
+      "status": "failed",
+      "detail": "Gate passed: 1 checks, protected paths: pass; artifact validation failed: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing.",
+      "duration_ms": 79669.875,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/checks-gate.pre-review.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 3,
+      "phase": "pre-review",
+      "commands": [
+        "python -m unittest discover -s tests -p 'test_*.py'"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "protected_paths": [
+        "tests/",
+        "anvil.json",
+        "pipelines/"
+      ],
+      "protected_path_verdict": "pass",
+      "protected_path_findings": [],
+      "gate_verdict": "fail",
+      "artifact_validation": {
+        "passed": false,
+        "report": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md",
+        "observed": "missing",
+        "report_source": "none",
+        "required_literals": [],
+        "missing_literals": [],
+        "findings": [
+          "Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/builder.output.md is missing."
+        ]
+      }
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.533,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/reviewer-spec.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-security",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.602,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/reviewer-security.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.563,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/reviewer-tests.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 0.575,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/reviewer-architecture.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-design",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 5.973,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/reviewer-design.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-ux",
+      "status": "skipped",
+      "detail": "Skipped due to gate failure",
+      "duration_ms": 1.771,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/reviewer-ux.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 3
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: no_reviews",
+      "duration_ms": 0.038,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/report.json"
+      ],
+      "configured_model": "claude-fable-5-2",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 3
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: required",
+      "duration_ms": 0.01,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 3
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "detail": "Packet written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/deployer.packet.md",
+      "duration_ms": 0.871,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/deployer.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 1491,
+      "budget": 48000,
+      "budget_action": "sent",
+      "attempt": 3
+    },
+    {
+      "station": "observer",
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station observer: {\"duration_api_ms\":3058,\"stop_reason\":\"stop_sequence\",\"session_id\":\"f142627d-f035-41cd-a273-b17dbbaec0ab\",\"total_cost_usd\":0.094468,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":18220,\"cache_read_input_tokens\":0,\"output_tokens\":168,\"output_tokens_details\":{\"thinking_tokens\":37},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":0,\"ephemeral_5m_in",
+      "duration_ms": 4061.139,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-44/runs/wo-gh-44/observer.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 1498,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 18222,
+        "output_tokens": 168,
+        "cached_input_tokens": 0,
+        "cache_creation_input_tokens": 18220,
+        "reasoning_tokens": 0,
+        "total_tokens": 18390,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 3989.233,
+          "usage": {
+            "input_tokens": 18222,
+            "output_tokens": 168,
+            "cached_input_tokens": 0,
+            "cache_creation_input_tokens": 18220,
+            "reasoning_tokens": 0,
+            "total_tokens": 18390,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.094468,
+          "turns": 2,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true,
+      "attempt": 3
+    }
+  ],
+  "verdict": "no_reviews",
+  "human_required": true,
+  "max_loopbacks": 2,
+  "loopbacks": 2,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [],
+      "reviews_expected": [
+        "reviewer-spec",
+        "reviewer-security",
+        "reviewer-tests",
+        "reviewer-architecture",
+        "reviewer-design"
+      ],
+      "rule": "No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)",
+      "reviews_uncounted": [
+        {
+          "station": "reviewer-spec",
+          "reason": "no countable review artifact was produced"
+        },
+        {
+          "station": "reviewer-security",
+          "reason": "no countable review artifact was produced"
+        },
+        {
+          "station": "reviewer-tests",
+          "reason": "no countable review artifact was produced"
+        },
+        {
+          "station": "reviewer-architecture",
+          "reason": "no countable review artifact was produced"
+        },
+        {
+          "station": "reviewer-design",
+          "reason": "no countable review artifact was produced"
+        }
+      ]
+    },
+    "human_gate": {
+      "required": true,
+      "rule": "Verdict is no_reviews, not approved, so a human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": [],
+  "astra_measured_tokens_total": 17808,
+  "base_ref": "7dcc0e0d353974a15f79e2610e6447c66c92a04b",
+  "evidence": [],
+  "cost": {
+    "total": 0.0,
+    "measured_steps": 1,
+    "unmeasured_steps": 1
+  },
+  "practices": {
+    "resolved": {
+      "intake": [
+        "P-14",
+        "P-15"
+      ],
+      "spec-writer": [
+        "P-15"
+      ],
+      "test-writer": [],
+      "builder": [],
+      "checks-gate": [
+        "P-1",
+        "P-2",
+        "P-3"
+      ],
+      "reviewer-spec": [
+        "P-14"
+      ],
+      "reviewer-security": [],
+      "reviewer-tests": [
+        "P-12",
+        "P-13"
+      ],
+      "reviewer-architecture": [],
+      "reviewer-design": [
+        "P-4",
+        "P-5",
+        "P-6",
+        "P-7"
+      ],
+      "reviewer-ux": [
+        "P-8",
+        "P-9",
+        "P-10",
+        "P-11"
+      ],
+      "approver": [],
+      "triage-human": [],
+      "deployer": [],
+      "observer": []
+    },
+    "excluded_topics": [],
+    "active_count": 15
+  },
+  "skills": {
+    "resolved": {
+      "intake": [],
+      "spec-writer": [
+        "architecture-fundamentals",
+        "spec-writing"
+      ],
+      "test-writer": [
+        "test-design"
+      ],
+      "builder": [
+        "architecture-fundamentals",
+        "implementation-craft",
+        "security-baseline"
+      ],
+      "checks-gate": [],
+      "reviewer-spec": [],
+      "reviewer-security": [
+        "security-baseline"
+      ],
+      "reviewer-tests": [
+        "test-design"
+      ],
+      "reviewer-architecture": [
+        "architecture-fundamentals"
+      ],
+      "reviewer-design": [
+        "explainer-video"
+      ],
+      "reviewer-ux": [],
+      "approver": [],
+      "triage-human": [],
+      "deployer": [],
+      "observer": []
+    },
+    "disabled": [],
+    "catalog_count": 18,
+    "signals": {
+      "surfaces": [
+        "api",
+        "content",
+        "data",
+        "security"
+      ],
+      "product_types": [],
+      "kinds": [
+        "feature"
+      ]
+    }
+  },
+  "token_usage": {
+    "input_tokens": 685019,
+    "output_tokens": 7343,
+    "cached_input_tokens": 559945,
+    "cache_creation_input_tokens": 125026,
+    "reasoning_tokens": 0,
+    "total_tokens": 692362,
+    "measured_calls": 7,
+    "unmeasured_calls": 0,
+    "calls": 7,
+    "retries": 0,
+    "complete": true,
+    "by_station": {
+      "intake": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 201949
+      },
+      "spec-writer": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 346879
+      },
+      "test-writer": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 0
+      },
+      "builder": {
+        "calls": 3,
+        "measured_calls": 3,
+        "total_tokens": 125144
+      },
+      "observer": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 18390
+      }
+    },
+    "by_model": {
+      "claude-opus-5-5": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 201949
+      },
+      "unreported": {
+        "calls": 6,
+        "measured_calls": 6,
+        "total_tokens": 490413
+      }
+    }
+  },
+  "efficiency": {
+    "limits": {
+      "max_packet_tokens": 48000,
+      "max_runtime_turns": 40,
+      "tool_output_tokens": 2000,
+      "max_agent_calls": 32,
+      "max_run_tokens": 6000000,
+      "require_usage": false
+    },
+    "stopped": false
+  },
+  "run_id": "ec9e2cabc8964f7990c8dd232cfa2f0b"
+}

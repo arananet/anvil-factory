@@ -1,0 +1,21 @@
+{
+  "id": "wo-gh-44",
+  "kind": "feature",
+  "title": "Enterprise port: secret hygiene, Copilot telemetry and operator guide on the single-runtime design",
+  "source": "github-issue",
+  "description": "Port of an owner-supplied patch (produced outside this repository on 2026-11-15) with corrected scope, per the spec in .openspec/specs/enterprise-port/spec.md on branch anvil/run-enterprise-port.\n\nWhat the port brings in: the secret hygiene package (hardened factory .gitignore, a project .gitignore template installed by the scaffold, a secret scanning test), Copilot runtime telemetry (token usage and failure reasons from the session output), the usage sync --allow-private flag, and a consolidated operator guide.\n\nCorrections to the patch as supplied, decided by the owner before filing:\n- Anthropic only (decisions 0008 and 0012): the patch's Copilot model mapping names openai/gpt-6.1-sol; the ported mapping contains only Anthropic models, and a non-Anthropic id under any runtime fails loudly.\n- Single runtime design (decisions 0008 and 0010): the patch arrives as a second station wrapper (tools/copilot_station.py). The port strengthens the existing wrapper path (tools/claude_station.py and tools/copilot_runtime.py) instead; no parallel wrapper is created.\n- The patch does not apply to current main (its dispatch base diverged), so this is a hand port guided by the patch as source material, not a git apply.\n\nThe patch itself is committed on the branch as the order's source artifact. The run stops at the owner human gate; nothing merges, publishes or deploys.\n\nGitHub issue: https://github.com/arananet/anvil-factory/issues/44",
+  "risk_hints": [],
+  "status": "new",
+  "spec_path": "",
+  "evidence_images": [],
+  "intake_outcome": {
+    "outcome": "accepted"
+  },
+  "risk": "medium",
+  "surfaces": [
+    "security",
+    "api",
+    "data",
+    "content"
+  ]
+}
