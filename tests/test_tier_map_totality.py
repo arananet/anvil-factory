@@ -1,6 +1,6 @@
 """wo-gh-31: tier map totality regression.
 
-Maps to model-tier-map R1 (review-cheap resolves to claude-sonnet-5-5),
+Maps to model-tier-map R1 (review-cheap resolves to claude-opus-5-5),
 R2 (every label in routing's vocabulary resolves to a concrete model) and
 R3 (unmapped non-concrete values still pass through for the dispatcher to reject).
 """
@@ -22,8 +22,8 @@ def routing_vocabulary():
 
 
 class TierMapTotality(unittest.TestCase):
-    def test_review_cheap_resolves_to_sonnet(self):
-        self.assertEqual(resolve_model("review-cheap"), "claude-sonnet-5-5")
+    def test_review_cheap_resolves_to_opus(self):
+        self.assertEqual(resolve_model("review-cheap"), "claude-opus-5-5")
 
     def test_vocabulary_includes_review_cheap(self):
         self.assertIn("review-cheap", routing_vocabulary())

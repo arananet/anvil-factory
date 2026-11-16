@@ -16,7 +16,7 @@ DEFAULT_MODELS = {
     "researcher": "fast-reader",
     "writer": "writing-strong",
     "media-producer": "media-gen",
-    "supervisor": "reasoning-strong",
+    "supervisor": "critical-decision",
 }
 
 # model-migration R10: tier resolution at hand-off. Station definitions and
@@ -25,18 +25,19 @@ DEFAULT_MODELS = {
 # produce. A value that is already concrete passes through unchanged; any
 # other value also passes through so the dispatcher fails on it loudly.
 MODEL_TIER_MAP = {
-    "review-cheap": "claude-sonnet-5-5",
-    "review-balanced": "claude-sonnet-5-5",
-    "review-strong": "claude-sonnet-5-5",
+    "review-cheap": "claude-opus-5-5",
+    "review-balanced": "claude-opus-5-5",
+    "review-strong": "claude-opus-5-5",
     "fast-builder": "claude-opus-5-5",
     "reasoning-strong": "claude-opus-5-5",
-    "writing-strong": "claude-sonnet-5-5",
-    "fast-reader": "claude-sonnet-5-5",
-    "media-gen": "claude-sonnet-5-5",
-    "default": "claude-sonnet-5-5",
+    "writing-strong": "claude-opus-5-5",
+    "fast-reader": "claude-opus-5-5",
+    "media-gen": "claude-opus-5-5",
+    "default": "claude-opus-5-5",
+    "critical-decision": "claude-fable-5-2",
 }
 
-CONCRETE_MODELS = ("claude-opus-5-5", "claude-sonnet-5-5")
+CONCRETE_MODELS = ("claude-opus-5-5", "claude-sonnet-5-5", "claude-fable-5-2")
 
 
 def resolve_model(label):

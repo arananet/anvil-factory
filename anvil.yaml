@@ -28,7 +28,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "claude-sonnet-5-5",
+      "model": "claude-opus-5-5",
       "prompt": "stations/intake/PROMPT.md",
       "tools": []
     },
@@ -37,7 +37,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "claude-sonnet-5-5",
+      "model": "claude-opus-5-5",
       "prompt": "stations/spec-writer/PROMPT.md",
       "tools": []
     },
@@ -46,7 +46,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "claude-sonnet-5-5",
+      "model": "claude-opus-5-5",
       "prompt": "stations/test-writer/PROMPT.md",
       "tools": []
     },
@@ -64,7 +64,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "claude-sonnet-5-5",
+      "model": "claude-opus-5-5",
       "prompt": "stations/reviewer-spec/PROMPT.md",
       "tools": []
     },
@@ -73,7 +73,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "claude-sonnet-5-5",
+      "model": "claude-opus-5-5",
       "prompt": "stations/reviewer-security/PROMPT.md",
       "tools": []
     },
@@ -82,7 +82,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "claude-sonnet-5-5",
+      "model": "claude-opus-5-5",
       "prompt": "stations/reviewer-tests/PROMPT.md",
       "tools": []
     },
@@ -91,7 +91,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "claude-sonnet-5-5",
+      "model": "claude-opus-5-5",
       "prompt": "stations/reviewer-architecture/PROMPT.md",
       "tools": []
     },
@@ -118,7 +118,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "default",
+      "model": "claude-fable-5-2",
       "prompt": "stations/approver/PROMPT.md",
       "tools": []
     },
@@ -127,7 +127,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "default",
+      "model": "claude-opus-5-5",
       "prompt": "stations/triage-human/PROMPT.md",
       "tools": []
     },
@@ -136,7 +136,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "claude-sonnet-5-5",
+      "model": "claude-opus-5-5",
       "prompt": "stations/deployer/PROMPT.md",
       "tools": []
     },
@@ -145,7 +145,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "claude-sonnet-5-5",
+      "model": "claude-opus-5-5",
       "prompt": "stations/observer/PROMPT.md",
       "tools": []
     },
@@ -154,7 +154,7 @@
         "brain/project.md",
         ".openspec/specs/"
       ],
-      "model": "claude-sonnet-5-5",
+      "model": "claude-opus-5-5",
       "prompt": "stations/scout/PROMPT.md",
       "tools": []
     },
@@ -163,7 +163,7 @@
         "brain/project.md",
         "runs/"
       ],
-      "model": "claude-sonnet-5-5",
+      "model": "claude-fable-5-2",
       "prompt": "stations/supervisor/PROMPT.md",
       "tools": []
     }

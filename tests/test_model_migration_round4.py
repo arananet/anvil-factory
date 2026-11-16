@@ -16,7 +16,7 @@ from anvil.scaffold import init_project, scaffold_spec
 from anvil.stations import load_registry
 
 ROOT = Path(__file__).resolve().parent.parent
-CONCRETE = {"claude-opus-5-5", "claude-sonnet-5-5"}
+CONCRETE = {"claude-opus-5-5", "claude-sonnet-5-5", "claude-fable-5-2"}
 TIER_LABELS = {"review-balanced", "review-strong", "fast-builder", "reasoning-strong",
                "writing-strong", "fast-reader", "media-gen", "default"}
 
@@ -96,7 +96,7 @@ class TestTierResolutionOnRoutedPath(unittest.TestCase):
             for st in ("reviewer-spec", "reviewer-security"):
                 self.assertIn(st, handed, f"{st} never reached the runtime")
                 self.assertNotIn(handed[st], TIER_LABELS, st)
-                self.assertEqual(handed[st], "claude-sonnet-5-5", st)
+                self.assertEqual(handed[st], "claude-opus-5-5", st)
 
     def test_recorded_configured_model_is_concrete_on_routed_path_s8(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -104,7 +104,7 @@ class TestTierResolutionOnRoutedPath(unittest.TestCase):
             steps = {s["station"]: s for s in report.steps}
             for st in ("reviewer-spec", "reviewer-security"):
                 self.assertEqual(steps[st]["status"], "executed", steps[st])
-                self.assertEqual(steps[st]["configured_model"], "claude-sonnet-5-5", st)
+                self.assertEqual(steps[st]["configured_model"], "claude-opus-5-5", st)
                 # record and hand-off agree
                 self.assertEqual(steps[st]["configured_model"], handed[st])
 
