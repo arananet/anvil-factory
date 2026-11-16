@@ -592,7 +592,7 @@ class TestRoutingPolicy(unittest.TestCase):
         from anvil.routing import MODEL_POLICY
         from anvil.config import CONCRETE_MODELS, load_anvil_config
         self.assertEqual(MODEL_POLICY["designer"], "claude-opus-5-5")
-        self.assertEqual(CONCRETE_MODELS, ("claude-opus-5-5", "claude-sonnet-5-5"))
+        self.assertEqual(CONCRETE_MODELS, ("claude-opus-5-5", "claude-sonnet-5-5", "claude-fable-5-2"))
         stations = load_anvil_config(ROOT / "anvil.yaml")["stations"]
         for station_id, cfg in stations.items():
             self.assertTrue(str(cfg.get("model", "default")).startswith(("claude-", "default")) or

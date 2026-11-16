@@ -15,16 +15,16 @@ from anvil.scaffold import init_project
 from anvil.stations import load_registry
 
 ROOT = Path(__file__).resolve().parent.parent
-CONCRETE = {"claude-opus-5-5", "claude-sonnet-5-5"}
+CONCRETE = {"claude-opus-5-5", "claude-sonnet-5-5", "claude-fable-5-2"}
 TIER_MAP = {
-    "review-balanced": "claude-sonnet-5-5",
-    "review-strong": "claude-sonnet-5-5",
+    "review-balanced": "claude-opus-5-5",
+    "review-strong": "claude-opus-5-5",
     "fast-builder": "claude-opus-5-5",
     "reasoning-strong": "claude-opus-5-5",
-    "writing-strong": "claude-sonnet-5-5",
-    "fast-reader": "claude-sonnet-5-5",
-    "media-gen": "claude-sonnet-5-5",
-    "default": "claude-sonnet-5-5",
+    "writing-strong": "claude-opus-5-5",
+    "fast-reader": "claude-opus-5-5",
+    "media-gen": "claude-opus-5-5",
+    "default": "claude-opus-5-5",
 }
 
 RECORDER = """import json, os, sys
@@ -103,7 +103,7 @@ class TestTierResolutionAtHandoff(unittest.TestCase):
             reviewers = {s: m for s, m in handed.items() if s.startswith("reviewer")}
             self.assertTrue(reviewers, "no reviewer reached the runtime")
             for station, model in reviewers.items():
-                self.assertEqual(model, "claude-sonnet-5-5", station)
+                self.assertEqual(model, "claude-opus-5-5", station)
 
     def test_report_configured_model_concrete_for_routed_reviewers_s8(self):
         with tempfile.TemporaryDirectory() as tmp:
