@@ -143,6 +143,92 @@
       ],
       "source": "ANVIL curated. Distilled from: Bruce Block, The Visual Story; Walter Murch, In the Blink of an Eye; C2PA and platform AI disclosure guidance; this factory's quality charter.",
       "license": "Apache-2.0"
+    },
+    {
+      "id": "design-taste",
+      "domain": "design",
+      "stations": [
+        "builder"
+      ],
+      "surfaces": [
+        "ui"
+      ],
+      "product_types": [
+        "interface",
+        "landing-page",
+        "marketing-site",
+        "website"
+      ],
+      "source": "Adapted from: Leonxlnx, Taste Skill (design-taste-frontend) 2.5.1, MIT, https://github.com/Leonxlnx/taste-skill at commit f6b76575f949707b4e3c37cd86cb44b0b98643e8. Verbatim SKILL.md and license vendored under third_party/taste-skill/. The upstream Node tooling, dealers and gate hook are not adopted; the adaptation keeps its house rules, kind system and browser checklist within the catalog body cap.",
+      "license": "MIT"
+    },
+    {
+      "id": "design-md",
+      "domain": "design",
+      "stations": [
+        "builder",
+        "reviewer-design"
+      ],
+      "surfaces": [
+        "ui"
+      ],
+      "product_types": [
+        "interface",
+        "dashboard",
+        "landing-page",
+        "marketing-site",
+        "website",
+        "web-app",
+        "mobile-app"
+      ],
+      "source": "ANVIL curated. The DESIGN.md format follows Google Stitch; format and worked examples from VoltAgent, awesome-design-md, MIT, https://github.com/VoltAgent/awesome-design-md at commit fcc70284932276d085f01ef9f83edde90b1258cb, referenced and not vendored: the collection is other brands' design systems, and a project's own DESIGN.md is the authority.",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "image-to-code",
+      "domain": "design",
+      "stations": [
+        "builder",
+        "reviewer-design"
+      ],
+      "surfaces": [
+        "ui"
+      ],
+      "product_types": [
+        "interface",
+        "dashboard",
+        "landing-page",
+        "marketing-site",
+        "website",
+        "web-app",
+        "mobile-app",
+        "game",
+        "physical_product"
+      ],
+      "source": "Adapted from: Leonxlnx, image-to-code, MIT, https://github.com/Leonxlnx/imagegen-skills at commit beb16b0d0f4dae9a6f5cb04ea41e97b93a54ab8e. Verbatim SKILL.md and license vendored under third_party/image-to-code/. The upstream generate-first rules for Codex are dropped; the adaptation keeps its extraction, copy and anti-drift discipline for references that arrive with the work order.",
+      "license": "MIT"
+    },
+    {
+      "id": "web-design-guidelines",
+      "domain": "web",
+      "stations": [
+        "reviewer-design",
+        "reviewer-ux"
+      ],
+      "surfaces": [
+        "ui"
+      ],
+      "product_types": [
+        "interface",
+        "dashboard",
+        "landing-page",
+        "marketing-site",
+        "website",
+        "web-app",
+        "mobile-app"
+      ],
+      "source": "Distilled from: Vercel Labs, Web Interface Guidelines (command.md), MIT, https://github.com/vercel-labs/web-interface-guidelines at commit 434b7f91364665f2f733b310ec54809bf8f37937, vendored under third_party/web-interface-guidelines/. The companion skill in vercel-labs/agent-skills is referenced, not copied: that repo carries no LICENSE file (its README states MIT), and its fetch-fresh-at-review design is replaced by this pinned copy so verdicts stay reproducible.",
+      "license": "MIT"
     }
   ]
 }

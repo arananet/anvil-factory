@@ -137,8 +137,9 @@ class ResolutionTests(unittest.TestCase):
 
     def test_skills_reach_only_the_stations_they_name(self):
         res = resolve_skills(ROOT, order("Landing page", "A landing page", ["ui"]), SDLC)
-        for station in ("intake", "approver", "reviewer-design", "reviewer-spec"):
+        for station in ("intake", "approver", "reviewer-spec"):
             self.assertEqual(res["resolved"][station], [], station)
+        self.assertIn("web-design-guidelines", res["resolved"]["reviewer-design"])
         self.assertNotIn("interface-design", res["resolved"]["test-writer"])
 
     def test_resolution_is_deterministic(self):
