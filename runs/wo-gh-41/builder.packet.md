@@ -349,12 +349,6 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/41
 - intake: executed
 - spec-writer: executed
 - test-writer: executed
-- builder: executed
-- checks-gate: failed
-- loopback: loopback
-- builder: executed
-- checks-gate: failed
-- loopback: loopback
 
 ## Run context
 
@@ -364,36 +358,7 @@ The checks gate runs the project checks listed here; run them yourself before yo
 - Output of intake: runs/wo-gh-41/intake.output.md
 - Output of spec-writer: runs/wo-gh-41/spec-writer.output.md
 - Output of test-writer: runs/wo-gh-41/test-writer.output.md
-- Output of builder: runs/wo-gh-41/builder.output.md
-- Output of builder: runs/wo-gh-41/builder.output.md
 - Project check: `python -m unittest discover -s tests -p 'test_*.py'`
-
-## Loopback feedback (attempt 3 of 3)
-
-The previous attempt was sent back by checks-gate to builder. Resolve every finding below. Keep what already passed; do not start over.
-
-Reason: Gate checks failed
-
-- # Checks Gate: pre-review
-  Basis: builder_delta
-  Attempt: 2
-  
-  # Protected Path Additions (Observed, Not Violations)
-  Protected path addition (observed): tests/test_continuous_run_accounting.py (matches tests/)
-  
-  # Check Commands
-  ## Command 1: python -m unittest discover -s tests -p 'test_*.py'
-  Exit code: 1
-  Output:
-  ```
-  ch'
-  ...................................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 36915)>
-    if method() is not None:
-  ResourceWarning: Enable tracemalloc to get the object allocation traceback
-  .../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 36783)>
-    if method() is not None:
-  ResourceWarning: Enable tracemalloc to get the object allocation traceback
-  .......................F............................................................s....................................ss.........................................................................................................................................................s......s......................................................................................................s................................................................................
 
 ## Output contract
 

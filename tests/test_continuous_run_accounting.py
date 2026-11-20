@@ -33,7 +33,8 @@ Scenario map:
   S7 (R3.3)              test_s7_legacy_report_still_renders
   S8 (R2.1, R2.2, R2.3)  test_s8_turn_limit_stop, test_s8_checks_gate_stop, test_s8_intake_rejected_stop,
                          test_s8_intake_waiting_info_stop
-  S9 (R4.2)              test_s9_existing_test_files_untouched, test_s9_no_dashes_in_this_file
+  S9 (R4.2)              test_s9_existing_test_files_untouched (diff from the merge base with main),
+                         test_s9_no_dashes_in_this_file
 """
 import contextlib
 import io
@@ -70,6 +71,7 @@ BUILDER_TOKENS = 6359529
 MODEL = "claude-opus-5-5"
 SMALL = {"input_tokens": 100, "output_tokens": 10}
 WO = "wo-cra"
+SPEC_MERGE_BASE = "5354c7130e116658cc31dec270738ffaf2de67d6"
 
 
 def registry():
@@ -578,28 +580,36 @@ class SignalTests(unittest.TestCase):
 
 class SuiteTests(unittest.TestCase):
     def test_s9_existing_test_files_untouched(self):
-        """S9: no test file present at the base ref is modified or deleted in the working tree.
+        """S9 (R4.2): git diff --diff-filter=MD from the merge base with factory main lists nothing under tests/.
 
-        The spec names base ref 4675a131eb9aa88097741dc3cdc9772c3db17550. Main has since
-        changed several of those files through merges, so the diff runs against HEAD (the
-        ref this run started from), restricted to the test files present at the base ref.
-        New test files of this order are not protected and may change.
+        The base is the merge base of the run branch with factory main, computed at run time
+        (5354c7130e116658cc31dec270738ffaf2de67d6 at the spec revision), not the parent ref
+        4675a131eb9aa88097741dc3cdc9772c3db17550: owner operator edits to existing tests that
+        landed on main after the parent ref are part of the baseline. The diff runs to the
+        working tree, so committed and uncommitted edits both count.
         """
-        base = "4675a131eb9aa88097741dc3cdc9772c3db17550"
+        def git(*args):
+            return subprocess.run(["git", *args], cwd=str(ROOT), capture_output=True, text=True, timeout=30)
+
         try:
-            listed = subprocess.run(["git", "ls-tree", "--name-only", base, "tests/"], cwd=str(ROOT),
-                                    capture_output=True, text=True, timeout=30)
-            proc = subprocess.run(["git", "diff", "--name-status", "HEAD", "--", "tests"], cwd=str(ROOT),
-                                  capture_output=True, text=True, timeout=30)
+            base = ""
+            for main_ref in ("origin/main", "main"):
+                found = git("merge-base", "HEAD", main_ref)
+                if found.returncode == 0 and found.stdout.strip():
+                    base = found.stdout.strip()
+                    break
+            if not base and git("cat-file", "-e", SPEC_MERGE_BASE + "^{commit}").returncode == 0:
+                base = SPEC_MERGE_BASE
+            if not base:
+                self.skipTest("no factory main ref in this checkout")
+            listed = git("ls-tree", "--name-only", base, "tests/")
+            proc = git("diff", "--name-status", "--diff-filter=MD", base, "--", "tests")
         except (OSError, subprocess.TimeoutExpired):
             self.skipTest("git is not available")
-        if proc.returncode != 0 or listed.returncode != 0:
-            self.skipTest("not a git checkout holding the base ref")
-        protected = set(listed.stdout.split())
-        self.assertIn("tests/test_anvil.py", protected)
-        touched = [line for line in proc.stdout.splitlines()
-                   if line[:1] in {"M", "D"} and line.split("\t", 1)[1] in protected]
-        self.assertEqual(touched, [])
+        self.assertEqual(listed.returncode, 0, listed.stderr)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertIn("tests/test_anvil.py", listed.stdout.split())
+        self.assertEqual(proc.stdout.strip(), "", "existing test files modified or deleted since " + base)
 
     def test_s9_no_dashes_in_this_file(self):
         """Project style: no em dash or en dash in produced files"""

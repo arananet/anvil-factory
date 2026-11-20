@@ -1,19 +1,13 @@
-The build is done, but the full suite still fails: one protected test contradicts the spec, and you need to decide how to resolve it. This was attempt 3 of 3. I made no code changes, because the only ways to turn the suite green were editing that test or adding code that recognises its inputs, and I did neither.
+The continuous-run-accounting build for wo-gh-41 is ready for review, and this attempt needed no code change. The implementation from the earlier attempts is already on the branch and meets scenarios S1 to S9. The report is at `runs/wo-gh-41/builder.output.md` and contains all the required literals.
 
-**Test results** (tree at HEAD `17dab24`):
-- **New tests:** all 19 in `tests/test_continuous_run_accounting.py` pass. That is the only new test file.
-- **Full suite, clean environment:** with `GITHUB_ACTOR`, `GITHUB_ACTIONS` and the `ANVIL_*` variables unset, `Ran 760 tests ... FAILED (failures=1, skipped=6)`.
-- **Full suite, this shell's environment:** 6 failures. The extra five are approval identity tests that fail because `GITHUB_ACTOR=arananet` is set here; they don't touch this change.
-- **By hand:** I ran a scripted budget death and fed its `report.json` to `tools/line_comment.py`. The comment shows exit status `budget_exceeded`, the cap that was crossed, builder recorded as failed with its model, and every later station as not run.
+- **The earlier blocker is gone:** a protected test asserted that a crashed run leaves no report, which this order directly contradicts. Your commit 5354c71 removed that assertion and is merged into the branch, so the conflict no longer exists.
+- **Full suite:** `Ran 760 tests ... OK (skipped=6)` when run with `GITHUB_ACTOR`, `GITHUB_ACTIONS` and `GITHUB_ACTOR_ID` unset. That is 741 tests at the base ref plus 19 new.
+- **Full suite in the raw CI environment:** 5 failures. All are approval-identity tests (3 in `test_autonomous_line`, 2 in `test_governed_delivery`) that refuse their `--by` test identities because this runner sets `GITHUB_ACTOR`. They fail the same way at the base ref, and the 19 new tests pass in both environments.
+- **New tests:** 19 in `tests/test_continuous_run_accounting.py`, which is the only test file the order adds. No existing test file is modified or deleted relative to the base ref 5354c71.
+- **Write set:** the changes stay inside the authorized surface. Nothing under `pipelines/` changed, and `anvil.json` is untouched.
+- **Run end to end:** I scripted a run where the builder crosses the token cap. The runtime received no call after the builder. The record has exit status `budget_exceeded`, the 6,359,859 tokens measured against the 6,000,000 cap, and the builder's partial usage. Every later station is listed as not run, and `tools/line_comment.py` renders the record.
 
-**The conflict:** `tests/test_governed_delivery.py:113` (`test_crash_and_stall_are_visible_s1`) checks that a run whose builder raises an error leaves **no** `runs/wo-crash/report.json`. The test is protected and is the same on current main. The spec requires the opposite:
-- R1.1 writes `report.json` after intake and test-writer, which both finish before the builder runs.
-- R2.1 and S2 require a completed record with exit status `error` when a station raises.
-
-No implementation can pass both. All the test's other checks still pass. The test-writer station raised the same conflict earlier.
-
-**Decision needed** (pick one):
-1. Allow a one-line change to `tests/test_governed_delivery.py:113`: drop that check, or reverse it so it expects a completed record with exit status `error`. I recommend this.
-2. Change the spec so an error leaves no `report.json`. That contradicts S2 and the reason this order exists.
-
-My report is in `runs/wo-gh-41/builder.output.md`, with all the required literals and which spec scenario each change serves. It also lists three small untested gaps: a budget death where the in-flight station's usage is unmeasured, two stop paths with no dedicated test, and the `anvil runs` inspect path, which sits outside the files this order may change.
+Gaps, also stated in the report:
+- No test covers a budget death where the runtime reports no usage for the station in flight. The code records a reason in that case, but a fake runtime can't cross the cap without reporting usage.
+- The checks-gate stop before deploy is implemented but not tested; only the stop before review has a test.
+- The `anvil runs` inspect command reads through `anvil/observe.py`, which is outside the allowed files, so it is unchanged. The resume path is updated.

@@ -3,8 +3,43 @@
   "from_station": "reviewer-security",
   "to_station": "reviewer-tests",
   "work_order_id": "wo-gh-41",
-  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-41/runs/wo-gh-41/reviewer-security.packet.md",
-  "status": "skipped",
-  "created_at": "2026-11-20T06:04:11.879071+00:00",
-  "configured_model": "claude-opus-5-5"
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-41/runs/wo-gh-41/reviewer-security.output.md",
+  "status": "executed",
+  "created_at": "2026-11-20T12:24:49.183635+00:00",
+  "usage": {
+    "input_tokens": 237983,
+    "output_tokens": 3124,
+    "cached_input_tokens": 215349,
+    "cache_creation_input_tokens": 22618,
+    "reasoning_tokens": 0,
+    "total_tokens": 241107,
+    "input_tokens_includes_cache": true
+  },
+  "tokens": {
+    "input_tokens": 237983,
+    "output_tokens": 3124,
+    "cached_input_tokens": 215349,
+    "cache_creation_input_tokens": 22618,
+    "reasoning_tokens": 0,
+    "total_tokens": 241107,
+    "input_tokens_includes_cache": true
+  },
+  "review": {
+    "station": "reviewer-security",
+    "verdict": "pass",
+    "findings": [
+      "Attack surface: the change (anvil/runner.py, anvil/line.py, tools/line_comment.py, docs, CHANGELOG, one decision record, one new test file) adds no endpoint, no outbound call, no new permission and no dependency. New imports (signal, sys, tempfile, threading) are standard library only. No shell=True, eval, exec or new subprocess sink in the added lines.",
+      "File writes: write_report_atomic uses tempfile.mkstemp inside the run directory (private 0600 temp file, unpredictable name, no symlink race) then fsync and os.replace onto report.json; the temp file is unlinked on failure and the previous record is kept, which fails closed. The run directory is runs/<work_order.id>, the same pre-existing path construction as before; this change adds no new path derived from untrusted input.",
+      "Signal handling: SIGTERM/SIGINT handlers are installed only on the main thread, restored before recording the exit (so a second signal takes the default path) and restored again in finally; the process then exits as the signal would (KeyboardInterrupt or SystemExit 128+signum). No swallowed termination.",
+      "Output encoding: tools/line_comment.py passes exit_status, termination_reason and last_completed_station through the existing cell() helper, which escapes table pipes, strips newlines and truncates to 160 characters before the text reaches a PR comment.",
+      "Advisory (low, not blocking): RunAccounting.record_exit puts str(exc) of an uncaught spine exception verbatim into termination_reason, which lands in the committed report.json, swimlane.md and the PR line comment. Spine exceptions today carry paths and station names, not secrets, but there is no redaction step. A later order could pass the reason through a redaction helper before persisting, per the security-baseline rule that error messages and run artifacts never carry secrets.",
+      "anvil/line.py load_resume echoes termination_reason from the on-disk report in a ValueError message to the local operator; this is local CLI output from a file the factory itself wrote and introduces no injection sink."
+    ]
+  },
+  "configured_model": "claude-opus-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-opus-5-5"
 }

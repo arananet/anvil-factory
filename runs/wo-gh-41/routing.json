@@ -13,11 +13,11 @@
     }
   ],
   "selected_models": {
+    "reviewer-architecture": "review-balanced",
     "reviewer-security": "review-strong",
-    "reviewer-design": "review-balanced",
     "reviewer-spec": "review-balanced",
     "reviewer-tests": "review-balanced",
-    "reviewer-architecture": "review-balanced"
+    "reviewer-design": "review-balanced"
   },
   "reason": "Medium risk: full panel at policy models",
   "practices": {
@@ -105,7 +105,8 @@
     "signals": {
       "surfaces": [
         "content",
-        "data"
+        "data",
+        "deploy"
       ],
       "product_types": [],
       "kinds": [

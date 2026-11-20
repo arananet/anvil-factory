@@ -34,7 +34,7 @@ A run's accounting in ANVIL is written at the end of the run, by the same code w
 
 ### R4. Regression tests
 - R4.1: The order's tests are new files under tests/ that drive scripted runs through the runner with a fake runtime (no network, no real model). They cover: (a) a run killed at the run token cap in the middle of the builder station (S1); (b) a run ended by a station timeout and a run ended by an uncaught error injected into a station step (S2); (c) a healthy scripted run checkpointing after each station (S3); (d) a scripted run receiving SIGTERM and one receiving SIGINT (S5); plus the atomic write and failed rename of S6, the turn limit, checks gate and intake stops of S8, and the history preservation and legacy rendering of S4 and S7. Every scenario S1 to S8 is proved by at least one test method that names its scenario id in its name or docstring.
-- R4.2: The full factory suite (python -m unittest discover -s tests -p 'test_*.py') passes with the new files added and no existing test file modified.
+- R4.2: The full factory suite (python -m unittest discover -s tests -p 'test_*.py') passes with the new files added and no existing test file modified by this order. "Existing" means present on factory main at the commit the run branch last merged (5354c7130e116658cc31dec270738ffaf2de67d6 at this revision). Test edits that landed on main after 4675a131eb9aa88097741dc3cdc9772c3db17550 through owner-authorized operator commits (among them 5354c71, which lets tests/test_governed_delivery.py accept a completed report from a crashed run, as R2 requires) are part of that baseline, not changes by this order.
 
 ## Scenarios
 
@@ -63,7 +63,7 @@ A run's accounting in ANVIL is written at the end of the run, by the same code w
 - S7 (R3.3): Given a report.json written before this change (for example runs/wo-gh-20/report.json, which has no checkpoint, exit_status or termination_reason keys), when tools/line_comment.py, the status page and the swimlane renderer read it, then each renders without raising.
 
 ### Scenario: The suite stays green
-- S9 (R4.2): Given the tree after the build, when python -m unittest discover -s tests -p 'test_*.py' runs, then it passes, and git diff against the base ref 4675a131eb9aa88097741dc3cdc9772c3db17550 shows no modified or deleted file among the test files present at that ref.
+- S9 (R4.2): Given the tree after the build, when python -m unittest discover -s tests -p 'test_*.py' runs, then it passes, and git diff --diff-filter=MD from the merge base of the run branch with factory main (5354c7130e116658cc31dec270738ffaf2de67d6 at this revision) to the built tree lists no file under tests/. The builder report states that merge base as the base ref it verified against, alongside the parent ref 4675a131eb9aa88097741dc3cdc9772c3db17550.
 
 ## Guardrails
 - Python standard library only, consistent with the factory spine. No new dependency.
@@ -81,9 +81,9 @@ A run's accounting in ANVIL is written at the end of the run, by the same code w
 - docs/EXECUTION.md and any other factory doc that describes run reports or resume
 - CHANGELOG.md
 - one decision record under brain/decisions/: brain/decisions/0013-continuous-run-accounting.md (already created on this branch by the earlier attempt of this order; it may be revised, and no other decision record is added or edited)
-- new test files under tests/
+- new test files under tests/ (tests/test_continuous_run_accounting.py, created on this branch by an earlier attempt, counts as new and may be revised)
 - the run's own artifacts under runs/wo-gh-41/
-- No protected path changes are authorized: no edit to anvil.json, to any file under pipelines/, or to any test file present at the base ref.
+- No protected path changes are authorized: no edit to anvil.json, to any file under pipelines/, or to any test file present on factory main at the merge base named in R4.2.
 
 ## Out of scope
 - Resuming execution from a checkpoint (re-dispatching from the last completed station). This order makes the record readable after a kill; it does not add automatic resume of execution.

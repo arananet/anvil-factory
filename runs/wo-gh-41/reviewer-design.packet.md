@@ -189,34 +189,38 @@ These bars apply to every product page or interface this project ships.
 ## Diff summary
 
 - .openspec/specs/continuous-run-accounting/spec.md: +4, -4
-- runs/wo-gh-41/attempts/1/checks-gate.pre-review.output.md: +22, -26
-- runs/wo-gh-41/attempts/2/checks-gate.pre-review.output.md: +22, -26
-- runs/wo-gh-41/builder.output.md.usage.json: +14, -14
-- runs/wo-gh-41/builder.packet.md: +35, -0
-- runs/wo-gh-41/checks-gate.pre-review.output.md: +8, -9
-- runs/wo-gh-41/envelopes/builder.envelope.json: +22, -5
-- runs/wo-gh-41/envelopes/checks-gate.envelope.json: +6, -9
+- runs/wo-gh-41/builder.output.md: +34, -36
+- runs/wo-gh-41/builder.output.md.usage.json: +13, -13
+- runs/wo-gh-41/builder.packet.md: +0, -35
+- runs/wo-gh-41/builder.transcript.md: +13, -19
+- runs/wo-gh-41/checks-gate.pre-review.output.md: +22, -17
+- runs/wo-gh-41/envelopes/builder.envelope.json: +11, -11
+- runs/wo-gh-41/envelopes/checks-gate.envelope.json: +5, -5
 - runs/wo-gh-41/envelopes/intake.envelope.json: +1, -1
-- runs/wo-gh-41/envelopes/reviewer-architecture.envelope.json: +1, -1
-- runs/wo-gh-41/envelopes/reviewer-security.envelope.json: +1, -1
-- runs/wo-gh-41/envelopes/reviewer-spec.envelope.json: +1, -1
-- runs/wo-gh-41/envelopes/reviewer-tests.envelope.json: +1, -1
+- runs/wo-gh-41/envelopes/reviewer-architecture.envelope.json: +42, -4
+- runs/wo-gh-41/envelopes/reviewer-security.envelope.json: +39, -4
+- runs/wo-gh-41/envelopes/reviewer-spec.envelope.json: +42, -4
+- runs/wo-gh-41/envelopes/reviewer-tests.envelope.json: +41, -4
 - runs/wo-gh-41/envelopes/spec-writer.envelope.json: +11, -11
 - runs/wo-gh-41/envelopes/test-writer.envelope.json: +11, -11
-- runs/wo-gh-41/events.jsonl: +16, -0
-- runs/wo-gh-41/intake.output.md: +5, -7
+- runs/wo-gh-41/events.jsonl: +10, -0
+- runs/wo-gh-41/evidence/screenshot-1440x900.png: +0, -0
+- runs/wo-gh-41/evidence/screenshot-390x844.png: +0, -0
+- runs/wo-gh-41/intake.output.md: +9, -5
 - runs/wo-gh-41/intake.output.md.usage.json: +13, -13
-- runs/wo-gh-41/reviewer-architecture.packet.md: +36, -1
-- runs/wo-gh-41/reviewer-security.packet.md: +36, -1
-- runs/wo-gh-41/reviewer-spec.packet.md: +36, -1
-- runs/wo-gh-41/reviewer-tests.packet.md: +36, -1
-- runs/wo-gh-41/routing.json: +1, -1
-- runs/wo-gh-41/spec-writer.output.md: +18, -23
+- runs/wo-gh-41/reviewer-architecture.packet.md: +7, -39
+- runs/wo-gh-41/reviewer-security.packet.md: +3, -37
+- runs/wo-gh-41/reviewer-spec.packet.md: +1, -36
+- runs/wo-gh-41/reviewer-tests.packet.md: +8, -37
+- runs/wo-gh-41/routing.json: +4, -3
+- runs/wo-gh-41/spec-writer.output.md: +11, -15
 - runs/wo-gh-41/spec-writer.output.md.usage.json: +13, -13
-- runs/wo-gh-41/state.json: +38, -32
-- runs/wo-gh-41/test-writer.output.md: +42, -40
+- runs/wo-gh-41/state.json: +16, -80
+- runs/wo-gh-41/test-writer.output.md: +41, -36
 - runs/wo-gh-41/test-writer.output.md.usage.json: +13, -13
-- tests/test_continuous_run_accounting.py: +29, -8
+- runs/wo-gh-41/test-writer.transcript.md: +16, -22
+- tests/test_continuous_run_accounting.py: +28, -18
+- work_orders/wo-gh-41.json: +1, -0
 
 ## File access allowlist
 
@@ -224,10 +228,10 @@ This packet may only embed content from:
 - design/DESIGN.md
 - design/tokens.json
 - .openspec/specs/continuous-run-accounting/spec.md
-- runs/wo-gh-41/attempts/1/checks-gate.pre-review.output.md
-- runs/wo-gh-41/attempts/2/checks-gate.pre-review.output.md
+- runs/wo-gh-41/builder.output.md
 - runs/wo-gh-41/builder.output.md.usage.json
 - runs/wo-gh-41/builder.packet.md
+- runs/wo-gh-41/builder.transcript.md
 - runs/wo-gh-41/checks-gate.pre-review.output.md
 - runs/wo-gh-41/envelopes/builder.envelope.json
 - runs/wo-gh-41/envelopes/checks-gate.envelope.json
@@ -239,6 +243,8 @@ This packet may only embed content from:
 - runs/wo-gh-41/envelopes/spec-writer.envelope.json
 - runs/wo-gh-41/envelopes/test-writer.envelope.json
 - runs/wo-gh-41/events.jsonl
+- runs/wo-gh-41/evidence/screenshot-1440x900.png
+- runs/wo-gh-41/evidence/screenshot-390x844.png
 - runs/wo-gh-41/intake.output.md
 - runs/wo-gh-41/intake.output.md.usage.json
 - runs/wo-gh-41/reviewer-architecture.packet.md
@@ -251,7 +257,9 @@ This packet may only embed content from:
 - runs/wo-gh-41/state.json
 - runs/wo-gh-41/test-writer.output.md
 - runs/wo-gh-41/test-writer.output.md.usage.json
+- runs/wo-gh-41/test-writer.transcript.md
 - tests/test_continuous_run_accounting.py
+- work_orders/wo-gh-41.json
 
 ## Work order
 
@@ -285,33 +293,6 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/41
 GitHub issue: https://github.com/arananet/anvil-factory/issues/41
 - risk_hints: 
 - status: new
-
-## Loopback feedback (attempt 3 of 3)
-
-This is a re-review. The previous attempt was sent back by checks-gate to builder. Judge the work as it is now, and check that each finding below is resolved; do not pass a finding that is still open.
-
-Reason: Gate checks failed
-
-- # Checks Gate: pre-review
-  Basis: builder_delta
-  Attempt: 2
-  
-  # Protected Path Additions (Observed, Not Violations)
-  Protected path addition (observed): tests/test_continuous_run_accounting.py (matches tests/)
-  
-  # Check Commands
-  ## Command 1: python -m unittest discover -s tests -p 'test_*.py'
-  Exit code: 1
-  Output:
-  ```
-  ch'
-  ...................................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 36915)>
-    if method() is not None:
-  ResourceWarning: Enable tracemalloc to get the object allocation traceback
-  .../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 36783)>
-    if method() is not None:
-  ResourceWarning: Enable tracemalloc to get the object allocation traceback
-  .......................F............................................................s....................................ss.........................................................................................................................................................s......s......................................................................................................s................................................................................
 
 ## Practices
 
