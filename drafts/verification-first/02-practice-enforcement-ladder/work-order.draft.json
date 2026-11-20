@@ -1,0 +1,19 @@
+{
+  "id": "wo-gh-TBD",
+  "kind": "feature",
+  "title": "Practice enforcement ladder: gate by default, a named check per gate practice, and three prompt practices moved to checks",
+  "source": "github-issue",
+  "description": "Implement the spec in .openspec/specs/practice-enforcement-ladder/spec.md. Pipeline: sdlc-default.\n\nEVIDENCE: brain/practices.md on main holds 15 active practices, 3 with Enforcement gate and 12 with Enforcement prompt; anvil/cli.py defaults propose-practice --enforcement to prompt. P-9, P-10 and P-11 are measurable as written.\n\nBUILD, per the spec: R1 gate becomes the default; a prompt proposal needs a Prompt-reason, refused otherwise at propose and promote; the twelve existing prompt entries are grandfathered by id. R2 every gate practice carries a Check resolving to a registered check; P-1 to P-3 receive theirs. R3 touch-target-min, no-text-selection and pause-integrity built on the runtime verification driver, filed as proposals that supersede P-11, P-9 and P-10; promotion stays the owner's word. R4 status page shows practices by enforcement. R5 regression tests.\n\nDEPENDS ON: runtime-verification for R3. R1, R2 and R4 stand alone.\n\nAUTHORIZED WRITE SET: anvil/brain.py, anvil/cli.py, anvil/gates.py, anvil/statuspage.py, brain/practices.md (Check fields on P-1 to P-3 only), brain/inbox/ (three proposals), docs/MEMORY-GATE.md, CHANGELOG.md, new tests.\n\nDRAFT, NOT FILED: this record was drafted on 2026-11-19 outside the line, at the owner's request, from a read of factory main 65aae7cc4d5c934cbf1e5a3186b81070e81cc8c1. It has no GitHub issue, no id and no run. Before filing, the operator pins the base ref again, replaces the id, adds the issue link, and confirms the authorized write set against anvil.json protected paths (practice P-15).\n\nGUARDRAILS: see the spec's Guardrails section; it is part of this order. Python standard library in the spine. Existing test files at the base ref are protected; new tests arrive as new files. No em dash or en dash character in any produced file. Nothing in this order merges, publishes or deploys anything; the run stops at the owner human gate.\n",
+  "required_literals": [
+    "practice-enforcement-ladder",
+    "Prompt-reason",
+    "touch-target-min"
+  ],
+  "risk": "medium",
+  "risk_hints": [],
+  "spec_path": ".openspec/specs/practice-enforcement-ladder/spec.md",
+  "status": "draft",
+  "surfaces": [
+    "api"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "wo-gh-TBD",
+  "kind": "feature",
+  "title": "Runtime verification: a feature map and a verify stage that drives the built app before review",
+  "source": "github-issue",
+  "description": "Implement the spec in .openspec/specs/runtime-verification/spec.md. Pipeline: sdlc-default (the factory repo itself).\n\nEVIDENCE: anvil/capture.py captures one still per breakpoint (page.goto then page.screenshot) and performs no interaction; no feature map exists anywhere in the tree; reviewer-ux judges task completion from source and stills. Practices P-5, P-8, P-9, P-10 and P-11 describe runtime behavior and are enforced as prompt text.\n\nBUILD, per the spec: R1 feature map at verification/feature-map.json, written by spec-writer for UI work, validated deterministically. R2 anvil/drive.py with a closed verb set, reusing capture's server lifecycle, Playwright optional. R3 a deterministic verify stage after the checks gate and before reviewers, writing runs/<id>/verification.json; a failing feature is a gate loopback with zero reviewer dispatch; no servable or no driver is recorded as not performed. R4 Runtime verification section in reviewer-ux and reviewer-design packets, linked from owner acceptance. R5 regression tests with a fake driver.\n\nAUTHORIZED WRITE SET: anvil/drive.py (new), anvil/capture.py (shared lifecycle only), anvil/runner.py, anvil/gates.py, anvil/stations.py, stations/verify/ (new), stations/spec-writer/PROMPT.md, stations/reviewer-ux/PROMPT.md, stations/reviewer-design/PROMPT.md, pipelines/sdlc-default.json (protected path: add the verify stage between checks-gate and the reviewer parallel stage, nothing else), docs/ (a new RUNTIME-VERIFICATION.md and the execution doc), CHANGELOG.md, one decision record, new tests.\n\nDRAFT, NOT FILED: this record was drafted on 2026-11-19 outside the line, at the owner's request, from a read of factory main 65aae7cc4d5c934cbf1e5a3186b81070e81cc8c1. It has no GitHub issue, no id and no run. Before filing, the operator pins the base ref again, replaces the id, adds the issue link, and confirms the authorized write set against anvil.json protected paths (practice P-15).\n\nGUARDRAILS: see the spec's Guardrails section; it is part of this order. Python standard library in the spine. Existing test files at the base ref are protected; new tests arrive as new files. No em dash or en dash character in any produced file. Nothing in this order merges, publishes or deploys anything; the run stops at the owner human gate.\n",
+  "required_literals": [
+    "runtime-verification",
+    "feature-map",
+    "verification.json"
+  ],
+  "risk": "high",
+  "risk_hints": [],
+  "spec_path": ".openspec/specs/runtime-verification/spec.md",
+  "status": "draft",
+  "surfaces": [
+    "api"
+  ]
+}

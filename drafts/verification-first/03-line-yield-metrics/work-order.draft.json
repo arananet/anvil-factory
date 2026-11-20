@@ -1,0 +1,19 @@
+{
+  "id": "wo-gh-TBD",
+  "kind": "feature",
+  "title": "Line yield metrics: first pass yield, survival of merged work, verification share and cost per accepted change on the status page",
+  "source": "github-issue",
+  "description": "Implement the spec in .openspec/specs/line-yield-metrics/spec.md. Pipeline: sdlc-default.\n\nEVIDENCE: commit subjects across all refs show 14 of the orders wo-gh-1 to wo-gh-32 with at least one no_reviews verdict; status/usage.json (generated 2026-11-14) has tokens by station with 23 measured calls of 211; no file on main mentions a revert, survival or first pass figure.\n\nBUILD, per the spec: R1 first pass yield and runs by verdict from run history, line failures counted apart from judgments. R2 an optional repairs field on work orders, validated at intake, and survival of merged orders. R3 station_roles and the verification share, always with measurement coverage. R4 reviewer yield table. R5 cost per accepted change across all runs. R6 regression tests on fixture records.\n\nAUTHORIZED WRITE SET: anvil/statuspage.py, anvil/telemetry.py, anvil/config.py, anvil/intake module (repairs validation), templates/work-order.json (optional repairs field), anvil.yaml (station_roles default), docs/STATUS-PAGE.md, docs/COST-MEASUREMENT.md, CHANGELOG.md, new tests.\n\nDRAFT, NOT FILED: this record was drafted on 2026-11-19 outside the line, at the owner's request, from a read of factory main 65aae7cc4d5c934cbf1e5a3186b81070e81cc8c1. It has no GitHub issue, no id and no run. Before filing, the operator pins the base ref again, replaces the id, adds the issue link, and confirms the authorized write set against anvil.json protected paths (practice P-15).\n\nGUARDRAILS: see the spec's Guardrails section; it is part of this order. Python standard library in the spine. Existing test files at the base ref are protected; new tests arrive as new files. No em dash or en dash character in any produced file. Nothing in this order merges, publishes or deploys anything; the run stops at the owner human gate.\n",
+  "required_literals": [
+    "line-yield-metrics",
+    "station_roles",
+    "repairs"
+  ],
+  "risk": "low",
+  "risk_hints": [],
+  "spec_path": ".openspec/specs/line-yield-metrics/spec.md",
+  "status": "draft",
+  "surfaces": [
+    "api"
+  ]
+}

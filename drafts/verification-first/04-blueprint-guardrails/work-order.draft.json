@@ -1,0 +1,18 @@
+{
+  "id": "wo-gh-TBD",
+  "kind": "feature",
+  "title": "Blueprint guardrails: a blueprint carries a pack of checks that scaffolding installs and the checks gate runs from the first order",
+  "source": "github-issue",
+  "description": "Implement the spec in .openspec/specs/blueprint-guardrails/spec.md. Pipeline: sdlc-default.\n\nEVIDENCE: blueprints/static-site.json, python-service.json and cloudflare-worker.json carry stack, structure, first specs and deploy targets, and no checks; a greenfield project starts with no project specific gate.\n\nBUILD, per the spec: R1 guardrail pack format with id, why and fix per rule, validated at load. R2 scaffolding installs the pack and wires it into the project's checks; onboard reports a pack that is behind and writes nothing. R3 rules enter only from promoted gate practices scoped to the blueprint. R4 standard library only for build free stacks. R5 regression tests.\n\nOWNER INPUT NEEDED AT FILING: which promoted practices or brain/inbox proposals become the first rules of each blueprint. With none selected the order ships the mechanism and empty packs.\n\nDEPENDS ON: practice-enforcement-ladder (R2 Check field) for R3.\n\nAUTHORIZED WRITE SET: blueprints/ (new guardrails directories; one optional key in each blueprint JSON), anvil scaffolding and onboarding modules, docs/ (ARCHITECTURE.md and a new BLUEPRINT-GUARDRAILS.md), CHANGELOG.md, new tests.\n\nDRAFT, NOT FILED: this record was drafted on 2026-11-19 outside the line, at the owner's request, from a read of factory main 65aae7cc4d5c934cbf1e5a3186b81070e81cc8c1. It has no GitHub issue, no id and no run. Before filing, the operator pins the base ref again, replaces the id, adds the issue link, and confirms the authorized write set against anvil.json protected paths (practice P-15).\n\nGUARDRAILS: see the spec's Guardrails section; it is part of this order. Python standard library in the spine. Existing test files at the base ref are protected; new tests arrive as new files. No em dash or en dash character in any produced file. Nothing in this order merges, publishes or deploys anything; the run stops at the owner human gate.\n",
+  "required_literals": [
+    "blueprint-guardrails",
+    "guardrails"
+  ],
+  "risk": "medium",
+  "risk_hints": [],
+  "spec_path": ".openspec/specs/blueprint-guardrails/spec.md",
+  "status": "draft",
+  "surfaces": [
+    "api"
+  ]
+}
