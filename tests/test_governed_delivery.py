@@ -110,7 +110,15 @@ class TestLiveState(unittest.TestCase):
             crashed = state(h, "wo-crash")
             self.assertEqual((crashed["state"], crashed["current_station"]), ("crashed", "builder"))
             self.assertIn("RuntimeError", crashed["error"])
-            self.assertFalse((h.proj / "runs/wo-crash/report.json").exists())
+            # Operator fix for wo-gh-41 (continuous run accounting): that order makes a
+            # crashed run leave its report. Governed delivery never required the report
+            # to be absent (spec R1, S1 speak only of state.json), so the absence is no
+            # longer asserted; a report that exists must be this run's and not approved.
+            crash_report = h.proj / "runs/wo-crash/report.json"
+            if crash_report.exists():
+                recorded = json.loads(crash_report.read_text())
+                self.assertEqual(recorded.get("work_order_id"), "wo-crash")
+                self.assertNotEqual(recorded.get("verdict"), "approved")
             last = events(h, "wo-crash")[-1]
             self.assertEqual((last["event"], last["station"], last["error"]), ("run.crashed", "builder", "RuntimeError"))
             # a state left running and untouched is reported as stalled
