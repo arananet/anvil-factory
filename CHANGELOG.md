@@ -10,6 +10,11 @@
 - `anvil.runner.render_swimlane(report)` and tools/line_comment.py render a killed run from report.json alone; `anvil resume` names a killed run's exit status. Earlier reports render unchanged.
 - Spec: .openspec/specs/continuous-run-accounting/spec.md. Tests: tests/test_continuous_run_accounting.py. Docs: docs/EXECUTION.md. Decision 0013.
 
+### Operator fix: the station wrapper starts without a local copilot_runtime.py
+
+- tools/claude_station.py no longer imports copilot_runtime unconditionally. It loads it from beside the wrapper, else from the factory's tools (ANVIL_FACTORY_ROOT/tools, or next to the running anvil package), else falls back to the gateway runtime and fails only ANVIL_RUNTIME=copilot, naming the missing file. Run wo-gh-1 on ascii-aurora ended no_reviews, 0 of 6, with every station dead on ModuleNotFoundError: the project runs the line from a pinned factory checkout and executes stations through its own synced wrappers, which lacked copilot_runtime.py.
+- Tests: tests/test_station_runtime_import.py. Authored outside the line at the owner's request (decision 0006).
+
 ### Operator fix: a failed station names its reason
 
 - tools/claude_station.py puts the runtime's own reason (is_error, subtype, api_error_status, stop_reason, num_turns and the first 300 characters of result) ahead of the raw envelope in a station failure message. The command executor keeps the first 500 characters of a failure and the envelope's reason fields follow its usage block, so runs wo-gh-44 and wo-gh-41 ended no_reviews with no reason on record.
