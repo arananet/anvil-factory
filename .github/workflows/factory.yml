@@ -12,7 +12,14 @@ jobs:
         with:
           node-version: "24"
       - name: Unit tests
-        run: python -m unittest discover -s tests -v
+        # The suite simulates approvers (ana, bo, mallory). Under Actions the host
+        # identity variables are set and anvil.line.approver_identity refuses any
+        # --by that is not the real actor, so five approval tests fail. The checks
+        # gate already removes these names (anvil/gates.py, HOST_IDENTITY_ENV);
+        # this job runs the suite in the same reduced environment.
+        run: >-
+          env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID -u GITHUB_TRIGGERING_ACTOR
+          python -m unittest discover -s tests -v
       - name: Validate all pipelines
         run: |
           for f in pipelines/*.json; do python -m anvil.cli validate-pipeline "$f"; done
