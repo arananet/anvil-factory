@@ -1,0 +1,85 @@
+{
+  "schema": "anvil/run-state@1",
+  "run_id": "f5ea98411b994563a8e4ccf1f6851b4b",
+  "work_order_id": "wo-gh-41",
+  "project": "anvil-factory",
+  "pipeline": "sdlc-default",
+  "state": "finished",
+  "current_station": null,
+  "verdict": "approved",
+  "loopbacks": 0,
+  "started_at": "2026-11-20T12:10:38.163438+00:00",
+  "updated_at": "2026-11-20T12:29:57.728362+00:00",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "executed"
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed"
+    },
+    {
+      "station": "test-writer",
+      "status": "executed"
+    },
+    {
+      "station": "builder",
+      "status": "executed"
+    },
+    {
+      "station": "checks-gate",
+      "status": "passed"
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "executed"
+    },
+    {
+      "station": "reviewer-security",
+      "status": "executed"
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed"
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "executed"
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed"
+    },
+    {
+      "station": "reviewer-ux",
+      "status": "routed_out"
+    },
+    {
+      "station": "approver",
+      "status": "completed"
+    },
+    {
+      "station": "triage-human",
+      "status": "completed"
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready"
+    },
+    {
+      "station": "observer",
+      "status": "executed"
+    }
+  ],
+  "token_usage": {
+    "calls": 10,
+    "total_tokens": 3323473,
+    "measured_calls": 10,
+    "unmeasured_calls": 0
+  },
+  "cost": null,
+  "export_errors": [],
+  "human_required": false,
+  "deployment_status": null
+}

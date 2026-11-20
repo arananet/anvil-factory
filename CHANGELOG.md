@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Continuous run accounting: checkpointed after every station, completed on every exit (continuous-run-accounting)
+
+- runs/<id>/report.json is written atomically (sibling temporary file, then rename) after every station, in the final report's shape plus a `checkpoint` object (last completed station, elapsed milliseconds, measured usage so far). A failed write keeps the previous record and says why on stderr.
+- Every exit path completes the record with `exit_status` (completed, budget_exceeded, station_timeout, turn_limit, checks_stopped, intake_stopped, error, signal) and `termination_reason`. Unreached stations are recorded as `not_run`; a budget death carries `budget_death` with the measured consumption, the cap and the station in flight with its partial usage. SIGTERM and SIGINT are trapped for the run.
+- A crossed run token cap, a station timeout, the runtime turn limit and a failed pre-review gate with no attempt left end the line at that station.
+- `anvil.runner.render_swimlane(report)` and tools/line_comment.py render a killed run from report.json alone; `anvil resume` names a killed run's exit status. Earlier reports render unchanged.
+- Spec: .openspec/specs/continuous-run-accounting/spec.md. Tests: tests/test_continuous_run_accounting.py. Docs: docs/EXECUTION.md. Decision 0013.
+
 ### Operator fix: the station wrapper starts without a local copilot_runtime.py
 
 - tools/claude_station.py no longer imports copilot_runtime unconditionally. It loads it from beside the wrapper, else from the factory's tools (ANVIL_FACTORY_ROOT/tools, or next to the running anvil package), else falls back to the gateway runtime and fails only ANVIL_RUNTIME=copilot, naming the missing file. Run wo-gh-1 on ascii-aurora ended no_reviews, 0 of 6, with every station dead on ModuleNotFoundError: the project runs the line from a pinned factory checkout and executes stations through its own synced wrappers, which lacked copilot_runtime.py.

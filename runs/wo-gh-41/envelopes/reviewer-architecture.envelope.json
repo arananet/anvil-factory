@@ -1,0 +1,48 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-architecture",
+  "to_station": "reviewer-design",
+  "work_order_id": "wo-gh-41",
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-41/runs/wo-gh-41/reviewer-architecture.output.md",
+  "status": "executed",
+  "created_at": "2026-11-20T12:28:50.039919+00:00",
+  "usage": {
+    "input_tokens": 273315,
+    "output_tokens": 4820,
+    "cached_input_tokens": 241933,
+    "cache_creation_input_tokens": 31366,
+    "reasoning_tokens": 0,
+    "total_tokens": 278135,
+    "input_tokens_includes_cache": true
+  },
+  "tokens": {
+    "input_tokens": 273315,
+    "output_tokens": 4820,
+    "cached_input_tokens": 241933,
+    "cache_creation_input_tokens": 31366,
+    "reasoning_tokens": 0,
+    "total_tokens": 278135,
+    "input_tokens_includes_cache": true
+  },
+  "review": {
+    "station": "reviewer-architecture",
+    "verdict": "pass",
+    "findings": [
+      "Fit with structure: the change stays inside the existing spine module. anvil/runner.py owns one RunAccounting per run, and that object is the single writer of the run record. write_report_atomic is now the only path to report.json in runner.py (sibling mkstemp, fsync, os.replace), so the atomicity rule has one source of truth. The checkpoint reuses RunReport.to_dict and summarize_steps, so the checkpoint and the final report share one shape and cost-measurement semantics stay frozen as required.",
+      "Decision recorded: brain/decisions/0013-continuous-run-accounting.md gives the context, the decision and honest consequences. It names the behaviour changes a reasonable engineer could have decided differently: the line now ends at the station that crossed the cap, timed out or hit the turn limit, and a failed pre-review gate with no attempt left ends the line instead of running skipped reviewers. It also states the trade off, that a reviewer timeout now costs a re-run. This matches the skill bar of recording a non-obvious choice.",
+      "Boundaries: render_swimlane(report) is a pure function of the report dict, with every key optional, so the swimlane, tools/line_comment.py and anvil/line.py load_resume all consume the report as data and do not reach back into runner state. Signal handling sits at the outer edge (the run_pipeline wrapper), installs only on the main thread, and restores handlers in finally. The governed-delivery crashed-state marking is kept. Python standard library only (signal, tempfile, threading). No new module or dependency, no pipelines/ or anvil.json edit, and no existing test file modified.",
+      "Write set: the implementation diff since merge base 5354c71 touches only authorized paths (anvil/runner.py, anvil/line.py, tools/line_comment.py, docs/EXECUTION.md, CHANGELOG.md, decision 0013, one new test file). The status/ changes in the same range come from the factory's own 'ANVIL run wo-gh-41' run commits, not from the builder.",
+      "Non-blocking, maintainability: acct.checkpoint(station_id) is called at about nine separate sites inside _run_pipeline (intake stop, station stop, checks stop, packet/budget early breaks and the loop tail), and each early break must remember to checkpoint first. A single loop-tail hook would be a smaller structure and would make a missed exit path harder to introduce. _run_pipeline is already about 1400 lines, and this pattern adds to the next editor's burden. Suggest a follow-up refactor, not a blocker, since S1 to S8 cover the current paths.",
+      "Non-blocking, coupling: RunAccounting gets live state through late-bound lambdas (acct.steps, and acct.snapshot, which is reassigned at runner.py around line 1758 after first being set around line 1502), plus a mutable in_flight dict that the station loop updates in place (calling, configured_model, handoff_model). This works and is tested, but it is shared mutable state across the loop and the exit wrapper. A short comment or a narrow set_in_flight/mark_calling method would make ownership explicit.",
+      "Non-blocking, stale record text: the Consequences section of decision 0013 still says the governed-delivery assertion test_crash_and_stall_are_visible_s1 conflicts with R1 and is 'reported to the owner rather than edited'. Operator commit 5354c71 has since resolved that conflict on main. A one-line update to the record would keep the brain accurate.",
+      "Non-blocking, scope gap disclosed upstream: the inspect path anvil runs (anvil/observe.py) does not surface exit_status or termination_reason. R3.1 is met through report.json and line_comment/swimlane, but observe.py is a second reader of the run record that will lag behind it. Worth a follow-up order, since observe.py is outside this order's write set.",
+      "Pre-existing, not introduced here: anvil/runner.py build_packet holds unreachable code after 'return text' (a duplicate reviewer output-contract block). It is present at base 5354c71 and is noted only for a future cleanup."
+    ]
+  },
+  "configured_model": "claude-opus-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-opus-5-5"
+}
