@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Operator fix: a failed station names its reason
+
+- tools/claude_station.py puts the runtime's own reason (is_error, subtype, api_error_status, stop_reason, num_turns and the first 300 characters of result) ahead of the raw envelope in a station failure message. The command executor keeps the first 500 characters of a failure and the envelope's reason fields follow its usage block, so runs wo-gh-44 and wo-gh-41 ended no_reviews with no reason on record.
+- Tests: tests/test_station_failure_reason.py. Authored outside the line at the owner's request (decision 0006).
+
 ### Station timeout: configurable, with a ceiling and honest records (station-timeout)
 
 - The hardcoded 1500 second station cap in tools/claude_station.py is gone. The timeout resolves from ANVIL_STATION_TIMEOUT_SECONDS, then runtime.station_timeout_seconds in anvil.yaml, then the class default: 3600 seconds for producing stations, 1500 for the others. The ceiling is 7200 seconds; a larger value is clamped to it.
