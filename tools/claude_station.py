@@ -51,7 +51,69 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from anvil.telemetry import UsageRecorder
 from anvil.config import resolve_station_timeout, STATION_TIMEOUT_CEILING
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import copilot_runtime
+
+
+class _GatewayOnlyRuntime:
+    """Stand-in used when copilot_runtime.py cannot be found anywhere.
+
+    Only the default runtime (Claude Code through the gateway) works with
+    it. Asking for Copilot fails the station loudly, naming the missing file.
+    """
+
+    GATEWAY_NAMES = {"", "claude-gateway", "claude", "claude-code", "gateway"}
+
+    def __init__(self, searched):
+        self.searched = searched
+
+    def selected_runtime(self, environ=None):
+        raw = (environ if environ is not None else os.environ).get("ANVIL_RUNTIME", "")
+        if raw.strip().lower() in self.GATEWAY_NAMES:
+            return "claude-gateway"
+        raise ValueError(
+            f"ANVIL_RUNTIME '{raw}' needs tools/copilot_runtime.py, which was not found in: "
+            + ", ".join(self.searched))
+
+
+def load_copilot_runtime(environ=None):
+    """Find copilot_runtime.py: beside this wrapper, else in the factory's tools.
+
+    A project that runs the line from a pinned factory checkout (the runner
+    spine) carries its own synced copy of the station wrappers, and that copy
+    may lack copilot_runtime.py. The factory checkout always has it, at
+    ANVIL_FACTORY_ROOT/tools (the CLI sets that variable) or next to the anvil
+    package that is running. With no copy anywhere the gateway runtime still
+    works; only ANVIL_RUNTIME=copilot fails, with the reason.
+    """
+    import importlib.util
+    env = environ if environ is not None else os.environ
+    here = Path(__file__).resolve().parent
+    if (here / "copilot_runtime.py").is_file():
+        import copilot_runtime as module  # the usual case: the file sits beside this wrapper
+        return module
+    candidates = [here]
+    if env.get("ANVIL_FACTORY_ROOT"):
+        candidates.append(Path(env["ANVIL_FACTORY_ROOT"]) / "tools")
+    try:
+        import anvil
+        candidates.append(Path(anvil.__file__).resolve().parent.parent / "tools")
+    except ImportError:
+        pass
+    seen = []
+    for folder in candidates:
+        if folder in seen:
+            continue
+        seen.append(folder)
+        source = folder / "copilot_runtime.py"
+        if source.is_file():
+            spec = importlib.util.spec_from_file_location("copilot_runtime", source)
+            module = importlib.util.module_from_spec(spec)
+            sys.modules["copilot_runtime"] = module
+            spec.loader.exec_module(module)
+            return module
+    return _GatewayOnlyRuntime([str(folder) for folder in seen])
+
+
+copilot_runtime = load_copilot_runtime()
 
 # Stations that produce an artifact in the tree may edit it: each is told to
 # produce its output as a file. Reviewers and the read only stations (scout,
