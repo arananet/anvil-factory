@@ -1,6 +1,6 @@
 {
   "schema": "anvil/run-state@1",
-  "run_id": "4c6754e0f49c45b19f3610649567c86f",
+  "run_id": "b4f0fd5fff924ed3b1b832252ff19826",
   "work_order_id": "wo-gh-41",
   "project": "anvil-factory",
   "pipeline": "sdlc-default",
@@ -8,8 +8,8 @@
   "current_station": null,
   "verdict": "no_reviews",
   "loopbacks": 2,
-  "started_at": "2026-11-20T04:24:19.410606+00:00",
-  "updated_at": "2026-11-20T04:28:26.047432+00:00",
+  "started_at": "2026-11-20T04:44:45.245046+00:00",
+  "updated_at": "2026-11-20T04:49:33.297266+00:00",
   "steps": [
     {
       "station": "intake",
@@ -112,7 +112,7 @@
   ],
   "token_usage": {
     "calls": 7,
-    "total_tokens": 164045,
+    "total_tokens": 166489,
     "measured_calls": 7,
     "unmeasured_calls": 0
   },

@@ -6,28 +6,28 @@
       "status": "failed",
       "runtime": "claude",
       "configured_model": "claude-opus-5-5",
-      "duration_ms": 4971.562,
+      "duration_ms": 4584.29,
       "usage": {
-        "input_tokens": 20840,
-        "output_tokens": 243,
+        "input_tokens": 20876,
+        "output_tokens": 244,
         "cached_input_tokens": 0,
-        "cache_creation_input_tokens": 20838,
+        "cache_creation_input_tokens": 20874,
         "reasoning_tokens": 0,
-        "total_tokens": 21083,
+        "total_tokens": 21120,
         "input_tokens_includes_cache": true
       },
-      "runtime_cost_estimate_usd": 0.10905799999999999,
+      "runtime_cost_estimate_usd": 0.10925800000000001,
       "turns": 2,
       "usage_complete": true
     }
   ],
   "usage": {
-    "input_tokens": 20840,
-    "output_tokens": 243,
+    "input_tokens": 20876,
+    "output_tokens": 244,
     "cached_input_tokens": 0,
-    "cache_creation_input_tokens": 20838,
+    "cache_creation_input_tokens": 20874,
     "reasoning_tokens": 0,
-    "total_tokens": 21083,
+    "total_tokens": 21120,
     "input_tokens_includes_cache": true
   },
   "measured_attempts": 1,

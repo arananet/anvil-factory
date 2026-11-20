@@ -188,12 +188,58 @@ These bars apply to every product page or interface this project ships.
 
 ## Diff summary
 
+- runs/wo-gh-41/attempts/1/checks-gate.pre-review.output.md: +5, -5
+- runs/wo-gh-41/attempts/2/checks-gate.pre-review.output.md: +5, -5
+- runs/wo-gh-41/builder.output.md.usage.json: +10, -10
+- runs/wo-gh-41/builder.packet.md: +4, -4
+- runs/wo-gh-41/checks-gate.pre-review.output.md: +5, -5
+- runs/wo-gh-41/envelopes/builder.envelope.json: +2, -2
+- runs/wo-gh-41/envelopes/checks-gate.envelope.json: +1, -1
+- runs/wo-gh-41/envelopes/intake.envelope.json: +1, -1
+- runs/wo-gh-41/envelopes/reviewer-architecture.envelope.json: +1, -1
+- runs/wo-gh-41/envelopes/reviewer-security.envelope.json: +1, -1
+- runs/wo-gh-41/envelopes/reviewer-spec.envelope.json: +1, -1
+- runs/wo-gh-41/envelopes/reviewer-tests.envelope.json: +1, -1
+- runs/wo-gh-41/envelopes/spec-writer.envelope.json: +2, -2
+- runs/wo-gh-41/envelopes/test-writer.envelope.json: +2, -2
+- runs/wo-gh-41/events.jsonl: +16, -0
+- runs/wo-gh-41/intake.output.md.usage.json: +10, -10
+- runs/wo-gh-41/reviewer-architecture.packet.md: +4, -4
+- runs/wo-gh-41/reviewer-security.packet.md: +4, -4
+- runs/wo-gh-41/reviewer-spec.packet.md: +4, -4
+- runs/wo-gh-41/reviewer-tests.packet.md: +4, -4
+- runs/wo-gh-41/spec-writer.output.md.usage.json: +10, -10
+- runs/wo-gh-41/state.json: +10, -42
+- runs/wo-gh-41/test-writer.output.md.usage.json: +10, -10
 
 ## File access allowlist
 
 This packet may only embed content from:
 - design/DESIGN.md
 - design/tokens.json
+- runs/wo-gh-41/attempts/1/checks-gate.pre-review.output.md
+- runs/wo-gh-41/attempts/2/checks-gate.pre-review.output.md
+- runs/wo-gh-41/builder.output.md.usage.json
+- runs/wo-gh-41/builder.packet.md
+- runs/wo-gh-41/checks-gate.pre-review.output.md
+- runs/wo-gh-41/envelopes/builder.envelope.json
+- runs/wo-gh-41/envelopes/checks-gate.envelope.json
+- runs/wo-gh-41/envelopes/intake.envelope.json
+- runs/wo-gh-41/envelopes/reviewer-architecture.envelope.json
+- runs/wo-gh-41/envelopes/reviewer-security.envelope.json
+- runs/wo-gh-41/envelopes/reviewer-spec.envelope.json
+- runs/wo-gh-41/envelopes/reviewer-tests.envelope.json
+- runs/wo-gh-41/envelopes/spec-writer.envelope.json
+- runs/wo-gh-41/envelopes/test-writer.envelope.json
+- runs/wo-gh-41/events.jsonl
+- runs/wo-gh-41/intake.output.md.usage.json
+- runs/wo-gh-41/reviewer-architecture.packet.md
+- runs/wo-gh-41/reviewer-security.packet.md
+- runs/wo-gh-41/reviewer-spec.packet.md
+- runs/wo-gh-41/reviewer-tests.packet.md
+- runs/wo-gh-41/spec-writer.output.md.usage.json
+- runs/wo-gh-41/state.json
+- runs/wo-gh-41/test-writer.output.md.usage.json
 
 ## Work order
 
@@ -243,7 +289,7 @@ Reason: Gate checks failed; artifact validation: Builder report artifact /home/r
   Exit code: 0
   Output:
   ```
-  anchName false"
+  ame false"
   Switched to a new branch 'work-branch'
   .hint: Using 'master' as the name for the initial branch. This default branch name
   hint: will change to "main" in Git 3.0. To configure the initial branch name
@@ -259,12 +305,12 @@ Reason: Gate checks failed; artifact validation: Builder report artifact /home/r
   hint:
   hint: Disable this message with "git config set advice.defaultBranchName false"
   Switched to a new branch 'work-branch'
-  ................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 33281)>
+  ................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 43297)>
     if method() is not None:
   ResourceWarning: Enable tracemalloc to get the object allocation traceback
-  .../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 35267)>
+  .../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 40877)>
     if method() is not None:
-  ResourceWarning: Enable tracemal
+  ResourceWarning: Enable tracemalloc t
 
 ## Practices
 

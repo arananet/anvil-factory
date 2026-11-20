@@ -7,7 +7,7 @@ Attempt: 2
 Exit code: 0
 Output:
 ```
-anchName false"
+ame false"
 Switched to a new branch 'work-branch'
 .hint: Using 'master' as the name for the initial branch. This default branch name
 hint: will change to "main" in Git 3.0. To configure the initial branch name
@@ -23,15 +23,15 @@ hint: 	git branch -m <name>
 hint:
 hint: Disable this message with "git config set advice.defaultBranchName false"
 Switched to a new branch 'work-branch'
-................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 33281)>
+................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 43297)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-.../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 35267)>
+.../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 40877)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-....................................................................................s....................................ss.........................................................................................................................................................s......s......................................................................................................s............................................................................................................................
+....................................................................................s....................................ss.........................................................................................................................................................s......s......................................................................................................s.................................................................................................................................
 ----------------------------------------------------------------------
-Ran 736 tests in 70.851s
+Ran 741 tests in 83.156s
 
 OK (skipped=6)
 
