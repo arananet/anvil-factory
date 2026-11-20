@@ -13,10 +13,10 @@
     }
   ],
   "selected_models": {
+    "reviewer-security": "review-strong",
     "reviewer-design": "review-balanced",
     "reviewer-spec": "review-balanced",
     "reviewer-tests": "review-balanced",
-    "reviewer-security": "review-strong",
     "reviewer-architecture": "review-balanced"
   },
   "reason": "Medium risk: full panel at policy models",

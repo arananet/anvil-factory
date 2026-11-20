@@ -29,7 +29,7 @@ Surfaces: data, content
 
 ## Verdict
 
-Verdict: budget_exceeded
+Verdict: no_reviews
 
 No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)
 
@@ -38,9 +38,14 @@ No reviews were produced in this run, so the verdict is no_reviews; standing pro
 - intake: executed
 - spec-writer: executed
 - test-writer: executed
-- builder: failed
+- builder: executed
 - checks-gate: failed
 - loopback: loopback
+- builder: executed
+- checks-gate: failed
+- loopback: loopback
+- builder: executed
+- checks-gate: failed
 - reviewer-spec: skipped
 - reviewer-security: skipped
 - reviewer-tests: skipped
@@ -49,5 +54,6 @@ No reviews were produced in this run, so the verdict is no_reviews; standing pro
 - reviewer-ux: skipped
 - approver: completed
 - triage-human: completed
-- deployer: budget_exceeded
+- deployer: packet_ready
+- observer: executed
 

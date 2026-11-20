@@ -33,7 +33,7 @@ A run's accounting in ANVIL is written at the end of the run, by the same code w
 - R3.3: Report consumers (tools/line_comment.py, anvil/statuspage.py, the swimlane renderer, the cli inspect path) keep working on reports written before this change, which carry no `checkpoint`, `exit_status` or `termination_reason` keys.
 
 ### R4. Regression tests
-- R4.1: The order's tests are new files under tests/ that drive scripted runs through the runner with a fake runtime (no network, no real model). They cover: (a) a run killed at the run token cap in the middle of the builder station (S1); (b) a run ended by a station timeout and a run ended by an uncaught error injected into a station step (S2); (c) a healthy scripted run checkpointing after each station (S3); (d) a scripted run receiving SIGTERM (S5); plus the history preservation and legacy rendering of S4 and S7.
+- R4.1: The order's tests are new files under tests/ that drive scripted runs through the runner with a fake runtime (no network, no real model). They cover: (a) a run killed at the run token cap in the middle of the builder station (S1); (b) a run ended by a station timeout and a run ended by an uncaught error injected into a station step (S2); (c) a healthy scripted run checkpointing after each station (S3); (d) a scripted run receiving SIGTERM and one receiving SIGINT (S5); plus the atomic write and failed rename of S6, the turn limit, checks gate and intake stops of S8, and the history preservation and legacy rendering of S4 and S7. Every scenario S1 to S8 is proved by at least one test method that names its scenario id in its name or docstring.
 - R4.2: The full factory suite (python -m unittest discover -s tests -p 'test_*.py') passes with the new files added and no existing test file modified.
 
 ## Scenarios
@@ -48,13 +48,13 @@ A run's accounting in ANVIL is written at the end of the run, by the same code w
 - S3 (R1.1, R1.3, R4.1c): Given a healthy scripted run, when each station finishes, then the test, reading report.json after that station, finds checkpoint.last_completed_station equal to that station's id, checkpoint.elapsed_ms non decreasing across reads, and a step record for every station finished so far; and the final report equals the last checkpoint with only the verdict, decision and R2.2 exit fields added or changed, exit_status `completed`; the fake runtime's call count equals the count of model running stations.
 
 ### Scenario: Checkpoint writes are atomic
-- S6 (R1.2, R2.5): Given a scripted run, when every checkpoint write completes, then report.json parses as JSON and no temporary file remains in runs/<work-order-id>/; and given a write that raises during the rename step, then the previous report.json content is unchanged on disk.
+- S6 (R1.2, R2.5, R4.1): Given a scripted run, when every checkpoint write completes, then report.json parses as JSON and no temporary file remains in runs/<work-order-id>/; and given a write that raises during the rename step, then the previous report.json content is unchanged on disk.
 
 ### Scenario: A killed run needs no second run for its accounting
 - S4 (R3.1, R3.2, R4.1): Given the record left by the S1 budget death, when tools/line_comment.py and the swimlane renderer render it, then each returns output naming exit status `budget_exceeded` and the builder station with no station executing and the fake runtime receiving zero calls; and given a later run of the same work order, when it starts, then a file under runs/<work-order-id>/history/ is byte identical to the killed run's report.json and the new run's report.json is a different document.
 
 ### Scenario: Other stop paths complete the record
-- S8 (R2.1, R2.2, R2.3): Given scripted runs ended respectively by the runtime turn limit, a checks gate stop, and an intake outcome of rejected, when each ends, then each record carries exit_status `turn_limit`, `checks_stopped` and `intake_stopped` respectively, a non empty termination_reason, and every unreached station as `not_run`.
+- S8 (R2.1, R2.2, R2.3, R4.1): Given scripted runs ended respectively by the runtime turn limit, a checks gate stop, and an intake outcome of rejected, when each ends, then each record carries exit_status `turn_limit`, `checks_stopped` and `intake_stopped` respectively, a non empty termination_reason, and every unreached station as `not_run`.
 
 ### Scenario: An external kill still completes the record
 - S5 (R2.1, R2.2, R4.1d): Given a scripted run in progress past at least one finished station, when the runner process receives SIGTERM, then report.json is completed with exit_status `signal`, termination_reason `SIGTERM`, the per-station outcomes as of the last finished station and the remaining stations as `not_run`; and the same holds for SIGINT with termination_reason `SIGINT`.
@@ -80,7 +80,7 @@ A run's accounting in ANVIL is written at the end of the run, by the same code w
 - anvil/statuspage.py, only if needed for R3.3
 - docs/EXECUTION.md and any other factory doc that describes run reports or resume
 - CHANGELOG.md
-- one new decision record under brain/decisions/ (next free number, 0013 at the time of writing)
+- one decision record under brain/decisions/: brain/decisions/0013-continuous-run-accounting.md (already created on this branch by the earlier attempt of this order; it may be revised, and no other decision record is added or edited)
 - new test files under tests/
 - the run's own artifacts under runs/wo-gh-41/
 - No protected path changes are authorized: no edit to anvil.json, to any file under pipelines/, or to any test file present at the base ref.

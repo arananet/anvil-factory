@@ -1,6 +1,6 @@
 # Checks Gate: pre-review
 Basis: builder_delta
-Attempt: 1
+Attempt: 3
 
 # Protected Path Additions (Observed, Not Violations)
 Protected path addition (observed): tests/test_continuous_run_accounting.py (matches tests/)
@@ -10,11 +10,11 @@ Protected path addition (observed): tests/test_continuous_run_accounting.py (mat
 Exit code: 1
 Output:
 ```
-nch'
-..................................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 43763)>
+ch'
+...................................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 40693)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
-.../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 36925)>
+.../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 36349)>
   if method() is not None:
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 .......................F............................................................s....................................ss.........................................................................................................................................................s......s......................................................................................................s.................................................................................................................................
@@ -28,7 +28,7 @@ Traceback (most recent call last):
 AssertionError: True is not false
 
 ----------------------------------------------------------------------
-Ran 759 tests in 65.975s
+Ran 760 tests in 88.171s
 
 FAILED (failures=1, skipped=6)
 
@@ -45,8 +45,7 @@ Gate enforced practices this run resolved. The gate is accountable for them:
 ## Artifact validation
 
 - builder report: /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-41/runs/wo-gh-41/builder.output.md
-- observed: missing
-- report source: none
+- observed: present
+- report source: station
 - required literals declared: 0
-- result: fail
-- finding: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-41/runs/wo-gh-41/builder.output.md is missing.
+- result: pass

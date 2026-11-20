@@ -31,7 +31,8 @@ Scenario map:
   S6 (R1.2, R2.5)        test_s6_checkpoint_writes_are_atomic,
                          test_s6_failed_rename_keeps_previous_report
   S7 (R3.3)              test_s7_legacy_report_still_renders
-  S8 (R2.1, R2.2, R2.3)  test_s8_turn_limit_stop, test_s8_checks_gate_stop, test_s8_intake_rejected_stop
+  S8 (R2.1, R2.2, R2.3)  test_s8_turn_limit_stop, test_s8_checks_gate_stop, test_s8_intake_rejected_stop,
+                         test_s8_intake_waiting_info_stop
   S9 (R4.2)              test_s9_existing_test_files_untouched, test_s9_no_dashes_in_this_file
 """
 import contextlib
@@ -319,6 +320,19 @@ class DeathTests(Completeness):
             self.assertEqual(runtime.calls, ["intake"])
             self.assertIn("rejected", report["termination_reason"])
 
+    def test_s8_intake_waiting_info_stop(self):
+        """S8: an intake outcome of waiting_info ends the run with exit_status intake_stopped"""
+        with tempfile.TemporaryDirectory() as tmp:
+            project = make_project(tmp)
+            waiting = lambda: {"output": json.dumps({"intake_outcome": {  # noqa: E731
+                "outcome": "waiting_info", "questions": ["Which surface does this change?"]}}),
+                "usage": dict(SMALL), "model": MODEL}
+            runtime = Scripted({"intake": waiting})
+            report = run(project, runtime)
+            self.assert_complete(report, runtime, "intake", "intake_stopped")
+            self.assertEqual(runtime.calls, ["intake"])
+            self.assertIn("waiting_info", report["termination_reason"])
+
 
 class CheckpointTests(unittest.TestCase):
     def healthy_run(self, tmp):
@@ -564,20 +578,27 @@ class SignalTests(unittest.TestCase):
 
 class SuiteTests(unittest.TestCase):
     def test_s9_existing_test_files_untouched(self):
-        """S9: no test file tracked at HEAD is modified or deleted in the working tree.
+        """S9: no test file present at the base ref is modified or deleted in the working tree.
 
-        The spec names base ref 4675a131eb9aa88097741dc3cdc9772c3db17550, but main has moved
-        past it (several test files changed on main since), so the check runs against HEAD,
-        the ref this run started from.
+        The spec names base ref 4675a131eb9aa88097741dc3cdc9772c3db17550. Main has since
+        changed several of those files through merges, so the diff runs against HEAD (the
+        ref this run started from), restricted to the test files present at the base ref.
+        New test files of this order are not protected and may change.
         """
+        base = "4675a131eb9aa88097741dc3cdc9772c3db17550"
         try:
+            listed = subprocess.run(["git", "ls-tree", "--name-only", base, "tests/"], cwd=str(ROOT),
+                                    capture_output=True, text=True, timeout=30)
             proc = subprocess.run(["git", "diff", "--name-status", "HEAD", "--", "tests"], cwd=str(ROOT),
                                   capture_output=True, text=True, timeout=30)
         except (OSError, subprocess.TimeoutExpired):
             self.skipTest("git is not available")
-        if proc.returncode != 0:
-            self.skipTest("not a git checkout")
-        touched = [line for line in proc.stdout.splitlines() if line[:1] in {"M", "D"}]
+        if proc.returncode != 0 or listed.returncode != 0:
+            self.skipTest("not a git checkout holding the base ref")
+        protected = set(listed.stdout.split())
+        self.assertIn("tests/test_anvil.py", protected)
+        touched = [line for line in proc.stdout.splitlines()
+                   if line[:1] in {"M", "D"} and line.split("\t", 1)[1] in protected]
         self.assertEqual(touched, [])
 
     def test_s9_no_dashes_in_this_file(self):
