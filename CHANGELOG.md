@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Operator fix: a runtime refusal ends the run at the first refused station
+
+- A station the model runtime refuses with HTTP 401, 402 or 403 (bad credentials, no billing balance, no access) ends the run there with exit_status runtime_refused: no later station and no loopback is called. Runs of wo-gh-41 on 2026-11-20 made seven refused calls against a gateway with no balance before ending no_reviews. Rate limits and overloads (429, 5xx) are not refusals and the line goes on as before.
+- Tests: tests/test_runtime_refusal_stop.py. Docs: docs/EXECUTION.md. Authored outside the line at the owner's request (decision 0006).
+
 ### Continuous run accounting: checkpointed after every station, completed on every exit (continuous-run-accounting)
 
 - runs/<id>/report.json is written atomically (sibling temporary file, then rename) after every station, in the final report's shape plus a `checkpoint` object (last completed station, elapsed milliseconds, measured usage so far). A failed write keeps the previous record and says why on stderr.

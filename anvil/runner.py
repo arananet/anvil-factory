@@ -1,4 +1,5 @@
 import inspect
+import re
 import uuid
 import hashlib
 import json, os, shlex, signal, struct, subprocess, sys, tempfile, threading, time, zlib
@@ -731,7 +732,27 @@ class RunReport:
 # station and completed on every exit path, so a killed run never needs a
 # second run to write its paperwork.
 EXIT_STATUSES = ("completed", "budget_exceeded", "station_timeout", "turn_limit",
-                 "checks_stopped", "intake_stopped", "error", "signal")
+                 "checks_stopped", "intake_stopped", "runtime_refused", "error", "signal")
+
+# HTTP statuses with which a model runtime refuses every call until an operator
+# acts: bad credentials, no balance, no access. Any later call or station gets
+# the same answer, so the run ends at the first one. Runs of wo-gh-41 on
+# 2026-11-20 made seven calls, each refused with 402, before the line gave up.
+RUNTIME_REFUSALS = {"401": "authentication failed", "402": "insufficient billing balance",
+                    "403": "access forbidden"}
+_REFUSAL_STATUS = re.compile(r"\bapi_error_status=(\d{3})\b")
+
+
+def _runtime_refusal(detail):
+    """Name the refusal a failed step's detail carries, else None.
+
+    The station wrapper puts the runtime's own reason first in a failure
+    (tools/claude_station.py, failure_reason), including api_error_status.
+    """
+    found = _REFUSAL_STATUS.search(str(detail or ""))
+    if not found or found.group(1) not in RUNTIME_REFUSALS:
+        return None
+    return f"{RUNTIME_REFUSALS[found.group(1)]} (HTTP {found.group(1)})"
 
 
 class RunSignal(BaseException):
@@ -826,6 +847,12 @@ def _station_stop(step, steps, limits):
         return {"exit_status": "turn_limit",
                 "reason": f"station {sid} stopped at the runtime turn limit"
                           + (f" (max_runtime_turns {turns})" if turns else "")}
+    if step.get("status") == "failed":
+        refusal = _runtime_refusal(detail)
+        if refusal:
+            return {"exit_status": "runtime_refused",
+                    "reason": f"the model runtime refused station {sid}: {refusal}; "
+                              "no later station was called"}
     return None
 
 

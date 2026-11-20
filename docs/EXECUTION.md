@@ -167,10 +167,12 @@ so a killed run's record is never overwritten.
   station, or a packet limit), `station_timeout`, `turn_limit` (the runtime's
   `error_max_turns`), `checks_stopped` (a failed pre-review gate with no
   attempt left, or a failed pre-deploy gate), `intake_stopped` (rejected,
-  waiting_info, or a knowledge pack that does not load), `error` (an uncaught
+  waiting_info, or a knowledge pack that does not load), `runtime_refused`
+  (the model runtime answered a station with HTTP 401, 402 or 403: bad
+  credentials, no billing balance or no access), `error` (an uncaught
   exception: its type and message) and `signal` (`SIGTERM` or `SIGINT`).
-- A budget death, a station timeout, the turn limit and a checks gate stop end
-  the line at that station: no later station runs. Every pipeline station is
+- A budget death, a station timeout, the turn limit, a runtime refusal and a
+  checks gate stop end the line at that station: no later station runs. Every pipeline station is
   named once in `steps`; one that never ran has status `not_run`, and one in
   flight when an error or signal ended the run is recorded with
   `in_flight: true`.
