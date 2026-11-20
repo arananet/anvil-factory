@@ -181,6 +181,30 @@ def validate_review_file(review_path, station_id):
     return True, ""
 
 
+def failure_reason(stdout):
+    """One line naming why a runtime call failed, read from its result envelope.
+
+    The envelope carries the reason (is_error, subtype, result) after its usage
+    block, and the command executor keeps only the first 500 characters of a
+    failure, so the raw envelope alone loses the reason. Returns "" when the
+    output is not a result envelope.
+    """
+    try:
+        data = json.loads(stdout or "")
+    except (ValueError, TypeError):
+        return ""
+    if not isinstance(data, dict):
+        return ""
+    parts = []
+    for key in ("is_error", "subtype", "api_error_status", "stop_reason", "num_turns"):
+        if data.get(key) is not None:
+            parts.append(f"{key}={data[key]}")
+    text = " ".join(str(data.get("result") or "").split())
+    if text:
+        parts.append(f"result={text[:300]}")
+    return "; ".join(parts)
+
+
 def transcript_path(output_path, station):
     """Where the chat reply goes when the station wrote its own output artifact."""
     return output_path.with_name(f"{station}.transcript.md")
@@ -313,6 +337,10 @@ def main():
                                       (time.perf_counter() - call_started) * 1000, model)
         if proc.returncode != 0 or parsed.get("is_error"):
             detail = (proc.stderr or proc.stdout or "").strip()[:2000]
+            # The reason goes first so it survives the executor's 500 character cut.
+            reason = failure_reason(raw_result(proc.stdout))
+            if reason:
+                detail = f"{reason} | {detail}"
             print(f"claude_station: {cli} exited {proc.returncode} for station {station}: {detail}",
                   file=sys.stderr)
             return 2
