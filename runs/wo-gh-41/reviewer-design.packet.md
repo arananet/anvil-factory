@@ -188,37 +188,46 @@ These bars apply to every product page or interface this project ships.
 
 ## Diff summary
 
-- runs/wo-gh-41/attempts/1/checks-gate.pre-review.output.md: +5, -5
-- runs/wo-gh-41/attempts/2/checks-gate.pre-review.output.md: +5, -5
-- runs/wo-gh-41/builder.output.md.usage.json: +10, -10
-- runs/wo-gh-41/builder.packet.md: +4, -4
-- runs/wo-gh-41/checks-gate.pre-review.output.md: +5, -5
+- .openspec/specs/continuous-run-accounting/spec.md: +60, -23
+- CHANGELOG.md: +8, -0
+- anvil/line.py: +7, -0
+- anvil/runner.py: +402, -61
+- docs/EXECUTION.md: +40, -1
+- runs/wo-gh-41/builder.output.md.usage.json: +13, -13
+- runs/wo-gh-41/builder.packet.md: +104, -47
+- runs/wo-gh-41/checks-gate.pre-review.output.md: +20, -23
 - runs/wo-gh-41/envelopes/builder.envelope.json: +2, -2
-- runs/wo-gh-41/envelopes/checks-gate.envelope.json: +1, -1
-- runs/wo-gh-41/envelopes/intake.envelope.json: +1, -1
+- runs/wo-gh-41/envelopes/checks-gate.envelope.json: +6, -4
+- runs/wo-gh-41/envelopes/intake.envelope.json: +4, -4
 - runs/wo-gh-41/envelopes/reviewer-architecture.envelope.json: +1, -1
 - runs/wo-gh-41/envelopes/reviewer-security.envelope.json: +1, -1
 - runs/wo-gh-41/envelopes/reviewer-spec.envelope.json: +1, -1
 - runs/wo-gh-41/envelopes/reviewer-tests.envelope.json: +1, -1
-- runs/wo-gh-41/envelopes/spec-writer.envelope.json: +2, -2
-- runs/wo-gh-41/envelopes/test-writer.envelope.json: +2, -2
-- runs/wo-gh-41/events.jsonl: +16, -0
-- runs/wo-gh-41/intake.output.md.usage.json: +10, -10
-- runs/wo-gh-41/reviewer-architecture.packet.md: +4, -4
-- runs/wo-gh-41/reviewer-security.packet.md: +4, -4
-- runs/wo-gh-41/reviewer-spec.packet.md: +4, -4
-- runs/wo-gh-41/reviewer-tests.packet.md: +4, -4
-- runs/wo-gh-41/spec-writer.output.md.usage.json: +10, -10
-- runs/wo-gh-41/state.json: +10, -42
-- runs/wo-gh-41/test-writer.output.md.usage.json: +10, -10
+- runs/wo-gh-41/envelopes/spec-writer.envelope.json: +22, -5
+- runs/wo-gh-41/envelopes/test-writer.envelope.json: +22, -5
+- runs/wo-gh-41/events.jsonl: +11, -0
+- runs/wo-gh-41/intake.output.md.usage.json: +14, -14
+- runs/wo-gh-41/reviewer-architecture.packet.md: +10, -45
+- runs/wo-gh-41/reviewer-security.packet.md: +10, -45
+- runs/wo-gh-41/reviewer-spec.packet.md: +10, -45
+- runs/wo-gh-41/reviewer-tests.packet.md: +6, -46
+- runs/wo-gh-41/spec-writer.output.md.usage.json: +14, -14
+- runs/wo-gh-41/spec-writer.packet.md: +7, -1
+- runs/wo-gh-41/state.json: +18, -78
+- runs/wo-gh-41/test-writer.output.md.usage.json: +14, -14
+- runs/wo-gh-41/test-writer.packet.md: +4, -2
+- tools/line_comment.py: +8, -0
 
 ## File access allowlist
 
 This packet may only embed content from:
 - design/DESIGN.md
 - design/tokens.json
-- runs/wo-gh-41/attempts/1/checks-gate.pre-review.output.md
-- runs/wo-gh-41/attempts/2/checks-gate.pre-review.output.md
+- .openspec/specs/continuous-run-accounting/spec.md
+- CHANGELOG.md
+- anvil/line.py
+- anvil/runner.py
+- docs/EXECUTION.md
 - runs/wo-gh-41/builder.output.md.usage.json
 - runs/wo-gh-41/builder.packet.md
 - runs/wo-gh-41/checks-gate.pre-review.output.md
@@ -238,8 +247,11 @@ This packet may only embed content from:
 - runs/wo-gh-41/reviewer-spec.packet.md
 - runs/wo-gh-41/reviewer-tests.packet.md
 - runs/wo-gh-41/spec-writer.output.md.usage.json
+- runs/wo-gh-41/spec-writer.packet.md
 - runs/wo-gh-41/state.json
 - runs/wo-gh-41/test-writer.output.md.usage.json
+- runs/wo-gh-41/test-writer.packet.md
+- tools/line_comment.py
 
 ## Work order
 
@@ -274,44 +286,6 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/41
 - risk_hints: 
 - status: new
 
-## Loopback feedback (attempt 3 of 3)
-
-This is a re-review. The previous attempt was sent back by checks-gate to builder. Judge the work as it is now, and check that each finding below is resolved; do not pass a finding that is still open.
-
-Reason: Gate checks failed; artifact validation: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-41/runs/wo-gh-41/builder.output.md is missing.
-
-- # Checks Gate: pre-review
-  Basis: builder_delta
-  Attempt: 2
-  
-  # Check Commands
-  ## Command 1: python -m unittest discover -s tests -p 'test_*.py'
-  Exit code: 0
-  Output:
-  ```
-  ame false"
-  Switched to a new branch 'work-branch'
-  .hint: Using 'master' as the name for the initial branch. This default branch name
-  hint: will change to "main" in Git 3.0. To configure the initial branch name
-  hint: to use in all of your new repositories, which will suppress this warning,
-  hint: call:
-  hint:
-  hint: 	git config --global init.defaultBranch <name>
-  hint:
-  hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
-  hint: 'development'. The just-created branch can be renamed via this command:
-  hint:
-  hint: 	git branch -m <name>
-  hint:
-  hint: Disable this message with "git config set advice.defaultBranchName false"
-  Switched to a new branch 'work-branch'
-  ................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 43297)>
-    if method() is not None:
-  ResourceWarning: Enable tracemalloc to get the object allocation traceback
-  .../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 40877)>
-    if method() is not None:
-  ResourceWarning: Enable tracemalloc t
-
 ## Practices
 
 Promoted practices that resolved for this station. Follow each rule.
@@ -320,6 +294,69 @@ Promoted practices that resolved for this station. Follow each rule.
 - P-5 (Parallax depth must be demonstrated between layers): Parallax depth must be demonstrated between layers in captures, by measured displacement or visible relative motion; a single panning plate is not depth.
 - P-6 (Cross-set coherence check): Run an explicit cross-set coherence check on every review: same character, proportions, palette, motifs and light logic across all stages or scenes; style drift is a changes requested finding.
 - P-7 (Genre coherence): Judge the work against the genre declared in the project spec, never against imported standards from other genres; an old school 2D platformer is judged on genre craft: full-screen playable density, readable floors, big legible sprites.
+
+## Craft skills
+
+Curated craft guidance resolved for this station and this work order. Order of authority: the work order and its spec, then the project design system and decisions, then promoted practices, then these skills. Where a skill conflicts with any of those, the skill yields. Apply what fits the work in front of you; a skill is a bar to meet, not a checklist to recite.
+
+### Skill: explainer-video
+
+One idea, one short video, two layers. The content method governs what each scene's animation must obey; the production pipeline governs how the video is made. They compose: the pipeline renders what the method specifies, and the method alone is enough when a capable model renders the animation from one prompt. This skill is for the explainer format only: media-production remains the general media skill (quality bar, inspection, delivery, provenance) and applies alongside it. Where the two overlap, this skill states the format rules and media-production states everything else.
+
+**Inputs**
+- A text that has to be visualized (a script, a narration, a section of an article), or simply a concept to explain. Paste the whole text into the prompt; do not summarize it first.
+- The output is a short video that explains one idea. If the text carries several ideas, split it and make one video per idea.
+
+**The prompt (content method)**
+Paste this block to a capable model, with the text or concept where marked. This layer is model-agnostic: any model that can build and render the animation from one prompt can run it, and the skill names no model for it.
+
+```
+Turn the text below into a short animated explainer video.
+
+Style: flat, minimal 2D animation on a black background. Build it from recurring simple elements: circles and dots, thin lines, simple icons. On-screen labels are large, bold and short. Subtitles carrying the narration run under the animation.
+
+Follow these instructions, in order:
+1. First propose one visual action per block of the text, as a short list. Build the animation only after that, from the list.
+2. Use at most four words per scene on screen, apart from the subtitles.
+3. Turn ideas into actions: show things happening, not concepts sitting still.
+4. Draw the analogies in the script literally. If the text says "a needle in a haystack", draw an actual needle in hay.
+5. Show magnitudes with scale, and focus on what matters.
+6. Keep elements across scenes, so the viewer sees how they transform.
+7. Synchronize each key action with the corresponding spoken word.
+8. Leave a clear final image at the end of each scene, and hold it.
+
+Text to visualize:
+[paste the text, or state the concept to explain]
+```
+
+**The review point**
+- The proposal list from instruction 1 is the checkpoint. Read it before the build starts: one action per block, each action drawable, no block skipped, no action that needs more than four on-screen words. Correct the list, not the finished video.
+- Record the proposal list with the station output, so a reviewer can check the video against what was proposed.
+
+**Production pipeline**
+When the video is produced as a repeatable line rather than a single generation, build the factory once and run every video through it, in this order:
+1. Set up: install Claude Code and have it prepare Node and FFmpeg.
+2. Voice: get an ElevenLabs API key, so the videos have voice.
+3. References: feed it reference videos, the ones whose result you want to match, so it knows what to aim at. Reject references that do not match the target.
+4. Engine: have it build an engine with HyperFrames that draws each frame with code and assembles them into a video.
+5. Rules from references: have it extract the rules from those reference videos: how they hook in the first second, when scenes change, where each sound hit lands.
+6. Review loop: review every video and correct what fails. The named failure modes are six-fingered hands, eyes leaving the face, and subtitles arriving late. Loop until it comes out right the first time.
+
+**Motion techniques (hard requirement, both layers)**
+Scenes draw and build themselves, not by camera movement over a finished image. Strokes draw on along their path (SVG stroke-dashoffset or canvas equivalent); elements build one at a time in narration order, outline before fill; lines (cables, trails, timelines) trace themselves. Time it from the words: transcribe the narration locally (faster-whisper) and land each draw-on on the word that names it. A generated still is look and layout reference, or background only under drawn foreground action; pan or zoom (Ken Burns) over a full-frame still as primary motion fails this skill.
+
+**Check the result against the method**
+- Scenes carry at most four words on screen besides the subtitles; labels are large and bold.
+- Analogies are drawn literally; magnitudes are shown by scale; the same elements persist and transform across scenes instead of being replaced.
+- Key actions land on the spoken word they belong to, and every scene ends on a clear final image that holds.
+- On pipeline output: voice is present, subtitles land on time, and hands, eyes and faces survive inspection.
+
+**Provenance**
+- Content method by Alan Daitch (@alandaitch), taught in an Instagram reel published around 2026-11-03: https://www.instagram.com/reel/DfSzHquzV1v/
+- Extracted from the video itself; the full prompt lives in its comments, which were not accessible, so the skill carries the method as spoken and shown on screen. The model named in the reel could not be verified, so the content layer names no model.
+- Production pipeline from the reel "Cómo montar tu fábrica de reels con Claude code" by @unminutodeporques (Un minuto de porqués), published 2026-11-10: https://www.instagram.com/reel/DfkY1E1AYW_/
+- Also extracted from the video itself; the tool names (Claude Code, ElevenLabs, HyperFrames, FFmpeg) were confirmed from on-screen text. The reference-rules document shown was not legible, so the only rules claimed from it are the three it names: the first-second hook, scene-change timing and sound-hit placement. The account sells a packaged folder; this skill does not depend on it.
+- Motion layer (2026-11-15), restated, nothing copied or vendored: draw-on mechanics from iart-ai/explainer-video-skills (MIT); word cueing from owlinthebarnai/video-studio-kit (no license file; technique only); frame-deterministic drawing from illodev/drawn-by-code (MIT).
 
 ## Design knowledge
 
@@ -360,4 +397,23 @@ No specific product type declared. Using general guidelines only.
 **Spacing:**
 - Use consistent spacing scale throughout (e.g., 4px, 8px, 16px, 24px, 32px)
 - Group related elements together with whitespace separating distinct sections
+
+
+## Quality Charter
+
+Product type: physical_product
+
+Observable criteria:
+
+- **Materials**: Surfaces read as the materials the product is actually made of
+- **Light**: One coherent light story, with shadows and reflections that agree with it
+- **Contact**: Objects meet skin, surfaces and each other the way physical things do
+- **Scale**: The object's size reads true against its context and human anatomy
+
+
+## Reference Anchors
+
+⚠️ **WARNING**: This run has no reference anchors.
+
+The review will proceed under the charter floor alone.
 

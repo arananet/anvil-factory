@@ -1,27 +1,27 @@
 {
   "schema": "anvil/run-state@1",
-  "run_id": "b4f0fd5fff924ed3b1b832252ff19826",
+  "run_id": "6fc43cc391534641a9fdf48ab5053bab",
   "work_order_id": "wo-gh-41",
   "project": "anvil-factory",
   "pipeline": "sdlc-default",
   "state": "finished",
   "current_station": null,
-  "verdict": "no_reviews",
-  "loopbacks": 2,
-  "started_at": "2026-11-20T04:44:45.245046+00:00",
-  "updated_at": "2026-11-20T04:49:33.297266+00:00",
+  "verdict": "budget_exceeded",
+  "loopbacks": 1,
+  "started_at": "2026-11-20T05:05:57.405661+00:00",
+  "updated_at": "2026-11-20T05:30:15.646498+00:00",
   "steps": [
     {
       "station": "intake",
-      "status": "failed"
+      "status": "executed"
     },
     {
       "station": "spec-writer",
-      "status": "failed"
+      "status": "executed"
     },
     {
       "station": "test-writer",
-      "status": "failed"
+      "status": "executed"
     },
     {
       "station": "builder",
@@ -34,90 +34,52 @@
     {
       "station": "loopback",
       "status": "loopback"
-    },
-    {
-      "station": "builder",
-      "status": "failed",
-      "attempt": 2
-    },
-    {
-      "station": "checks-gate",
-      "status": "failed",
-      "attempt": 2
-    },
-    {
-      "station": "loopback",
-      "status": "loopback"
-    },
-    {
-      "station": "builder",
-      "status": "failed",
-      "attempt": 3
-    },
-    {
-      "station": "checks-gate",
-      "status": "failed",
-      "attempt": 3
     },
     {
       "station": "reviewer-spec",
-      "status": "skipped",
-      "attempt": 3
+      "status": "skipped"
     },
     {
       "station": "reviewer-security",
-      "status": "skipped",
-      "attempt": 3
+      "status": "skipped"
     },
     {
       "station": "reviewer-tests",
-      "status": "skipped",
-      "attempt": 3
+      "status": "skipped"
     },
     {
       "station": "reviewer-architecture",
-      "status": "skipped",
-      "attempt": 3
+      "status": "skipped"
     },
     {
       "station": "reviewer-design",
-      "status": "skipped",
-      "attempt": 3
+      "status": "skipped"
     },
     {
       "station": "reviewer-ux",
-      "status": "skipped",
-      "attempt": 3
+      "status": "skipped"
     },
     {
       "station": "approver",
-      "status": "completed",
-      "attempt": 3
+      "status": "completed"
     },
     {
       "station": "triage-human",
-      "status": "completed",
-      "attempt": 3
+      "status": "completed"
     },
     {
       "station": "deployer",
-      "status": "packet_ready",
-      "attempt": 3
-    },
-    {
-      "station": "observer",
-      "status": "failed",
-      "attempt": 3
+      "status": "budget_exceeded"
     }
   ],
   "token_usage": {
-    "calls": 7,
-    "total_tokens": 166489,
-    "measured_calls": 7,
+    "calls": 4,
+    "total_tokens": 7631610,
+    "measured_calls": 4,
     "unmeasured_calls": 0
   },
   "cost": null,
   "export_errors": [],
-  "human_required": true,
+  "human_required": false,
   "deployment_status": null
 }

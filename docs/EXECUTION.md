@@ -146,7 +146,46 @@ stop new calls after run thresholds are reached. The final report records
 `budget_exceeded` when further work is prevented; it does not grant approval.
 Executed runs refresh `status/index.html`. Rerunning the same work order
 archives its previous report under `runs/<id>/history/`, so earlier tokens
-are still counted.
+are still counted. The archive is taken before the new run writes anything,
+so a killed run's record is never overwritten.
+
+### Continuous run accounting
+
+`runs/<id>/report.json` is written while the run goes, not only at its end
+(spec continuous-run-accounting, decision 0013):
+
+- After every station (completed, failed, timed out or skipped) the runner
+  writes a checkpoint: the report in its final shape plus a `checkpoint`
+  object with `last_completed_station`, `elapsed_ms` and `usage_so_far`
+  (the measured usage summed over the steps so far). Every write goes to a
+  sibling temporary file renamed over report.json, so a reader always sees a
+  whole record. A write that fails leaves the previous record in place and
+  says why on stderr. Checkpointing adds no station and no model call.
+- Every exit path completes the record with `exit_status` and
+  `termination_reason`. The exit statuses are `completed` (the line ran to its
+  end), `budget_exceeded` (a run threshold, the run token cap crossed by a
+  station, or a packet limit), `station_timeout`, `turn_limit` (the runtime's
+  `error_max_turns`), `checks_stopped` (a failed pre-review gate with no
+  attempt left, or a failed pre-deploy gate), `intake_stopped` (rejected,
+  waiting_info, or a knowledge pack that does not load), `error` (an uncaught
+  exception: its type and message) and `signal` (`SIGTERM` or `SIGINT`).
+- A budget death, a station timeout, the turn limit and a checks gate stop end
+  the line at that station: no later station runs. Every pipeline station is
+  named once in `steps`; one that never ran has status `not_run`, and one in
+  flight when an error or signal ended the run is recorded with
+  `in_flight: true`.
+- A budget death carries `budget_death`: the `limit` that stopped the run,
+  `measured_tokens` (the run's measured consumption), `max_run_tokens`,
+  `station_in_flight` and that station's `station_usage` (or
+  `station_usage_reason` when the runtime exposed none).
+- The cost section keeps cost-measurement semantics: the total is the sum of
+  measured steps.
+
+A killed run needs no second run for its paperwork: `tools/line_comment.py`
+and `anvil.runner.render_swimlane(report)` render it from report.json alone,
+and `anvil resume` names its exit status instead of resuming. For SIGKILL or a
+lost host the last checkpoint is the record. Reports written before this
+change carry none of these keys and render as before.
 
 ### http
 

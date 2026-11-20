@@ -1,33 +1,33 @@
 {
   "project": "anvil-factory",
-  "generated_at": "2026-11-20 04:49:33 UTC",
+  "generated_at": "2026-11-20 05:30:15 UTC",
   "token_usage": {
-    "input_tokens": 8462851,
-    "output_tokens": 109402,
-    "cached_input_tokens": 7542951,
-    "cache_creation_input_tokens": 919496,
+    "input_tokens": 15999625,
+    "output_tokens": 204238,
+    "cached_input_tokens": 14766334,
+    "cache_creation_input_tokens": 1232713,
     "reasoning_tokens": 0,
-    "total_tokens": 8572253,
-    "measured_calls": 37,
+    "total_tokens": 16203863,
+    "measured_calls": 41,
     "unmeasured_calls": 188,
-    "calls": 225,
+    "calls": 229,
     "retries": 0,
     "complete": false,
     "by_station": {
       "spec-writer": {
-        "calls": 28,
-        "measured_calls": 6,
-        "total_tokens": 576913
+        "calls": 29,
+        "measured_calls": 7,
+        "total_tokens": 850257
       },
       "test-writer": {
-        "calls": 28,
-        "measured_calls": 6,
-        "total_tokens": 2004098
+        "calls": 29,
+        "measured_calls": 7,
+        "total_tokens": 4768940
       },
       "builder": {
-        "calls": 32,
-        "measured_calls": 10,
-        "total_tokens": 5010060
+        "calls": 33,
+        "measured_calls": 11,
+        "total_tokens": 9534557
       },
       "reviewer-spec": {
         "calls": 23,
@@ -55,9 +55,9 @@
         "total_tokens": 254654
       },
       "intake": {
-        "calls": 22,
-        "measured_calls": 6,
-        "total_tokens": 228492
+        "calls": 23,
+        "measured_calls": 7,
+        "total_tokens": 297419
       },
       "reviewer-design": {
         "calls": 14,
@@ -72,9 +72,9 @@
     },
     "by_model": {
       "unreported": {
-        "calls": 155,
-        "measured_calls": 16,
-        "total_tokens": 4335120
+        "calls": 156,
+        "measured_calls": 17,
+        "total_tokens": 8859617
       },
       "claude-sonnet-5-5": {
         "calls": 56,
@@ -87,39 +87,39 @@
         "total_tokens": null
       },
       "claude-opus-5-5": {
-        "calls": 9,
-        "measured_calls": 4,
-        "total_tokens": 1810859
+        "calls": 12,
+        "measured_calls": 7,
+        "total_tokens": 4917972
       }
     }
   },
   "portfolio_token_usage": {
-    "input_tokens": 8462851,
-    "output_tokens": 109402,
-    "cached_input_tokens": 7542951,
-    "cache_creation_input_tokens": 919496,
+    "input_tokens": 15999625,
+    "output_tokens": 204238,
+    "cached_input_tokens": 14766334,
+    "cache_creation_input_tokens": 1232713,
     "reasoning_tokens": 0,
-    "total_tokens": 8572253,
-    "measured_calls": 37,
+    "total_tokens": 16203863,
+    "measured_calls": 41,
     "unmeasured_calls": 341,
-    "calls": 378,
+    "calls": 382,
     "retries": 0,
     "complete": false,
     "by_station": {
       "spec-writer": {
-        "calls": 45,
-        "measured_calls": 6,
-        "total_tokens": 576913
+        "calls": 46,
+        "measured_calls": 7,
+        "total_tokens": 850257
       },
       "test-writer": {
-        "calls": 45,
-        "measured_calls": 6,
-        "total_tokens": 2004098
+        "calls": 46,
+        "measured_calls": 7,
+        "total_tokens": 4768940
       },
       "builder": {
-        "calls": 49,
-        "measured_calls": 10,
-        "total_tokens": 5010060
+        "calls": 50,
+        "measured_calls": 11,
+        "total_tokens": 9534557
       },
       "reviewer-spec": {
         "calls": 40,
@@ -147,9 +147,9 @@
         "total_tokens": 254654
       },
       "intake": {
-        "calls": 22,
-        "measured_calls": 6,
-        "total_tokens": 228492
+        "calls": 23,
+        "measured_calls": 7,
+        "total_tokens": 297419
       },
       "reviewer-design": {
         "calls": 30,
@@ -169,9 +169,9 @@
     },
     "by_model": {
       "unreported": {
-        "calls": 164,
-        "measured_calls": 16,
-        "total_tokens": 4335120
+        "calls": 165,
+        "measured_calls": 17,
+        "total_tokens": 8859617
       },
       "claude-sonnet-5-5": {
         "calls": 168,
@@ -184,9 +184,9 @@
         "total_tokens": null
       },
       "claude-opus-5-5": {
-        "calls": 9,
-        "measured_calls": 4,
-        "total_tokens": 1810859
+        "calls": 12,
+        "measured_calls": 7,
+        "total_tokens": 4917972
       },
       "gpt-6-astra": {
         "calls": 32,
@@ -6266,22 +6266,22 @@
     },
     {
       "work_order_id": "wo-gh-41",
-      "run_id": "b4f0fd5fff924ed3b1b832252ff19826",
+      "run_id": "6fc43cc391534641a9fdf48ab5053bab",
       "title": "Continuous run accounting: the run record is checkpointed after every station and completed on every exit path, budget death included",
       "pipeline": "sdlc-default",
       "kind": "feature",
-      "verdict": "no_reviews",
-      "human_required": true,
+      "verdict": "budget_exceeded",
+      "human_required": false,
       "deployment_status": null,
-      "loopbacks": 2,
+      "loopbacks": 1,
       "steps": [
         {
           "station": "intake",
-          "status": "failed",
-          "duration_ms": 4665.761,
+          "status": "executed",
+          "duration_ms": 16960.422,
           "configured_model": "claude-opus-5-5",
           "usage_complete": true,
-          "executed_model": null,
+          "executed_model": "claude-opus-5-5",
           "measured_tokens": 3126,
           "budget": 48000,
           "budget_action": "sent",
@@ -6290,31 +6290,31 @@
             "kind": "command"
           },
           "usage": {
-            "input_tokens": 20876,
-            "output_tokens": 244,
-            "cached_input_tokens": 0,
-            "cache_creation_input_tokens": 20874,
+            "input_tokens": 67675,
+            "output_tokens": 1252,
+            "cached_input_tokens": 42465,
+            "cache_creation_input_tokens": 25204,
             "reasoning_tokens": 0,
-            "total_tokens": 21120,
+            "total_tokens": 68927,
             "input_tokens_includes_cache": true
           },
           "attempts": [
             {
               "attempt": 1,
-              "status": "failed",
+              "status": "succeeded",
               "runtime": "claude",
               "configured_model": "claude-opus-5-5",
-              "duration_ms": 4584.29,
-              "turns": 2,
+              "duration_ms": 16896.134,
+              "turns": 3,
               "usage_complete": true,
-              "runtime_cost_estimate_usd": 0.10925800000000001,
+              "runtime_cost_estimate_usd": 0.15957699999999997,
               "usage": {
-                "input_tokens": 20876,
-                "output_tokens": 244,
-                "cached_input_tokens": 0,
-                "cache_creation_input_tokens": 20874,
+                "input_tokens": 67675,
+                "output_tokens": 1252,
+                "cached_input_tokens": 42465,
+                "cache_creation_input_tokens": 25204,
                 "reasoning_tokens": 0,
-                "total_tokens": 21120,
+                "total_tokens": 68927,
                 "input_tokens_includes_cache": true
               }
             }
@@ -6322,12 +6322,12 @@
         },
         {
           "station": "spec-writer",
-          "status": "failed",
-          "duration_ms": 4044.036,
+          "status": "executed",
+          "duration_ms": 78845.729,
           "configured_model": "claude-opus-5-5",
           "usage_complete": true,
-          "executed_model": null,
-          "measured_tokens": 4362,
+          "executed_model": "claude-opus-5-5",
+          "measured_tokens": 4405,
           "budget": 48000,
           "budget_action": "sent",
           "cost": null,
@@ -6335,31 +6335,31 @@
             "kind": "command"
           },
           "usage": {
-            "input_tokens": 22937,
-            "output_tokens": 244,
-            "cached_input_tokens": 0,
-            "cache_creation_input_tokens": 22935,
+            "input_tokens": 265424,
+            "output_tokens": 7920,
+            "cached_input_tokens": 228252,
+            "cache_creation_input_tokens": 37154,
             "reasoning_tokens": 0,
-            "total_tokens": 23181,
+            "total_tokens": 273344,
             "input_tokens_includes_cache": true
           },
           "attempts": [
             {
               "attempt": 1,
-              "status": "failed",
+              "status": "succeeded",
               "runtime": "claude",
               "configured_model": "claude-opus-5-5",
-              "duration_ms": 3972.851,
-              "turns": 2,
+              "duration_ms": 78791.681,
+              "turns": 9,
               "usage_complete": true,
-              "runtime_cost_estimate_usd": 0.119563,
+              "runtime_cost_estimate_usd": 0.3898924,
               "usage": {
-                "input_tokens": 22937,
-                "output_tokens": 244,
-                "cached_input_tokens": 0,
-                "cache_creation_input_tokens": 22935,
+                "input_tokens": 265424,
+                "output_tokens": 7920,
+                "cached_input_tokens": 228252,
+                "cache_creation_input_tokens": 37154,
                 "reasoning_tokens": 0,
-                "total_tokens": 23181,
+                "total_tokens": 273344,
                 "input_tokens_includes_cache": true
               }
             }
@@ -6367,12 +6367,12 @@
         },
         {
           "station": "test-writer",
-          "status": "failed",
-          "duration_ms": 3236.877,
+          "status": "executed",
+          "duration_ms": 569417.002,
           "configured_model": "claude-opus-5-5",
           "usage_complete": true,
-          "executed_model": null,
-          "measured_tokens": 3379,
+          "executed_model": "claude-opus-5-5",
+          "measured_tokens": 3412,
           "budget": 48000,
           "budget_action": "sent",
           "cost": null,
@@ -6380,31 +6380,31 @@
             "kind": "command"
           },
           "usage": {
-            "input_tokens": 21910,
-            "output_tokens": 165,
-            "cached_input_tokens": 13479,
-            "cache_creation_input_tokens": 8429,
+            "input_tokens": 2726096,
+            "output_tokens": 38746,
+            "cached_input_tokens": 2619420,
+            "cache_creation_input_tokens": 106606,
             "reasoning_tokens": 0,
-            "total_tokens": 22075,
+            "total_tokens": 2764842,
             "input_tokens_includes_cache": true
           },
           "attempts": [
             {
               "attempt": 1,
-              "status": "failed",
+              "status": "succeeded",
               "runtime": "claude",
               "configured_model": "claude-opus-5-5",
-              "duration_ms": 3165.386,
-              "turns": 2,
+              "duration_ms": 569362.441,
+              "turns": 38,
               "usage_complete": true,
-              "runtime_cost_estimate_usd": 0.048148800000000005,
+              "runtime_cost_estimate_usd": 1.8321140000000005,
               "usage": {
-                "input_tokens": 21910,
-                "output_tokens": 165,
-                "cached_input_tokens": 13479,
-                "cache_creation_input_tokens": 8429,
+                "input_tokens": 2726096,
+                "output_tokens": 38746,
+                "cached_input_tokens": 2619420,
+                "cache_creation_input_tokens": 106606,
                 "reasoning_tokens": 0,
-                "total_tokens": 22075,
+                "total_tokens": 2764842,
                 "input_tokens_includes_cache": true
               }
             }
@@ -6413,11 +6413,11 @@
         {
           "station": "builder",
           "status": "failed",
-          "duration_ms": 5411.886,
+          "duration_ms": 663818.073,
           "configured_model": "claude-opus-5-5",
           "usage_complete": true,
           "executed_model": null,
-          "measured_tokens": 6265,
+          "measured_tokens": 6999,
           "budget": 48000,
           "budget_action": "sent",
           "cost": null,
@@ -6425,12 +6425,12 @@
             "kind": "command"
           },
           "usage": {
-            "input_tokens": 25224,
-            "output_tokens": 319,
-            "cached_input_tokens": 13479,
-            "cache_creation_input_tokens": 11743,
+            "input_tokens": 4477579,
+            "output_tokens": 46918,
+            "cached_input_tokens": 4333246,
+            "cache_creation_input_tokens": 144253,
             "reasoning_tokens": 0,
-            "total_tokens": 25543,
+            "total_tokens": 4524497,
             "input_tokens_includes_cache": true
           },
           "attempts": [
@@ -6439,17 +6439,17 @@
               "status": "failed",
               "runtime": "claude",
               "configured_model": "claude-opus-5-5",
-              "duration_ms": 5283.152,
-              "turns": 3,
+              "duration_ms": 663733.26,
+              "turns": 41,
               "usage_complete": true,
-              "runtime_cost_estimate_usd": 0.0677988,
+              "runtime_cost_estimate_usd": 2.5265942000000003,
               "usage": {
-                "input_tokens": 25224,
-                "output_tokens": 319,
-                "cached_input_tokens": 13479,
-                "cache_creation_input_tokens": 11743,
+                "input_tokens": 4477579,
+                "output_tokens": 46918,
+                "cached_input_tokens": 4333246,
+                "cache_creation_input_tokens": 144253,
                 "reasoning_tokens": 0,
-                "total_tokens": 25543,
+                "total_tokens": 4524497,
                 "input_tokens_includes_cache": true
               }
             }
@@ -6458,7 +6458,7 @@
         {
           "station": "checks-gate",
           "status": "failed",
-          "duration_ms": 86630.338,
+          "duration_ms": 66167.095,
           "configured_model": "claude-opus-5-5",
           "executed_model": null,
           "measured_tokens": 0,
@@ -6473,136 +6473,13 @@
           "duration_ms": 0.0,
           "configured_model": null,
           "executed_model": null,
-          "cost": null,
-          "usage": null
-        },
-        {
-          "station": "builder",
-          "status": "failed",
-          "duration_ms": 5974.863,
-          "configured_model": "claude-opus-5-5",
-          "usage_complete": true,
-          "executed_model": null,
-          "measured_tokens": 6834,
-          "budget": 48000,
-          "budget_action": "sent",
-          "cost": null,
-          "executor": {
-            "kind": "command"
-          },
-          "usage": {
-            "input_tokens": 26155,
-            "output_tokens": 224,
-            "cached_input_tokens": 13479,
-            "cache_creation_input_tokens": 12674,
-            "reasoning_tokens": 0,
-            "total_tokens": 26379,
-            "input_tokens_includes_cache": true
-          },
-          "attempts": [
-            {
-              "attempt": 1,
-              "status": "failed",
-              "runtime": "claude",
-              "configured_model": "claude-opus-5-5",
-              "duration_ms": 5841.824,
-              "turns": 2,
-              "usage_complete": true,
-              "runtime_cost_estimate_usd": 0.0705538,
-              "usage": {
-                "input_tokens": 26155,
-                "output_tokens": 224,
-                "cached_input_tokens": 13479,
-                "cache_creation_input_tokens": 12674,
-                "reasoning_tokens": 0,
-                "total_tokens": 26379,
-                "input_tokens_includes_cache": true
-              }
-            }
-          ]
-        },
-        {
-          "station": "checks-gate",
-          "status": "failed",
-          "duration_ms": 83421.138,
-          "configured_model": "claude-opus-5-5",
-          "executed_model": null,
-          "measured_tokens": 0,
-          "budget": 0,
-          "budget_action": "none",
-          "cost": null,
-          "usage": null
-        },
-        {
-          "station": "loopback",
-          "status": "loopback",
-          "duration_ms": 0.0,
-          "configured_model": null,
-          "executed_model": null,
-          "cost": null,
-          "usage": null
-        },
-        {
-          "station": "builder",
-          "status": "failed",
-          "duration_ms": 4233.903,
-          "configured_model": "claude-opus-5-5",
-          "usage_complete": true,
-          "executed_model": null,
-          "measured_tokens": 6852,
-          "budget": 48000,
-          "budget_action": "sent",
-          "cost": null,
-          "executor": {
-            "kind": "command"
-          },
-          "usage": {
-            "input_tokens": 26215,
-            "output_tokens": 246,
-            "cached_input_tokens": 13479,
-            "cache_creation_input_tokens": 12734,
-            "reasoning_tokens": 0,
-            "total_tokens": 26461,
-            "input_tokens_includes_cache": true
-          },
-          "attempts": [
-            {
-              "attempt": 1,
-              "status": "failed",
-              "runtime": "claude",
-              "configured_model": "claude-opus-5-5",
-              "duration_ms": 4100.565,
-              "turns": 2,
-              "usage_complete": true,
-              "runtime_cost_estimate_usd": 0.0712938,
-              "usage": {
-                "input_tokens": 26215,
-                "output_tokens": 246,
-                "cached_input_tokens": 13479,
-                "cache_creation_input_tokens": 12734,
-                "reasoning_tokens": 0,
-                "total_tokens": 26461,
-                "input_tokens_includes_cache": true
-              }
-            }
-          ]
-        },
-        {
-          "station": "checks-gate",
-          "status": "failed",
-          "duration_ms": 85423.351,
-          "configured_model": "claude-opus-5-5",
-          "executed_model": null,
-          "measured_tokens": 0,
-          "budget": 0,
-          "budget_action": "none",
           "cost": null,
           "usage": null
         },
         {
           "station": "reviewer-spec",
           "status": "skipped",
-          "duration_ms": 0.681,
+          "duration_ms": 0.316,
           "configured_model": "claude-opus-5-5",
           "executed_model": null,
           "measured_tokens": 0,
@@ -6614,7 +6491,7 @@
         {
           "station": "reviewer-security",
           "status": "skipped",
-          "duration_ms": 0.613,
+          "duration_ms": 0.256,
           "configured_model": "claude-opus-5-5",
           "executed_model": null,
           "measured_tokens": 0,
@@ -6626,7 +6503,7 @@
         {
           "station": "reviewer-tests",
           "status": "skipped",
-          "duration_ms": 0.639,
+          "duration_ms": 0.255,
           "configured_model": "claude-opus-5-5",
           "executed_model": null,
           "measured_tokens": 0,
@@ -6638,7 +6515,7 @@
         {
           "station": "reviewer-architecture",
           "status": "skipped",
-          "duration_ms": 0.678,
+          "duration_ms": 0.254,
           "configured_model": "claude-opus-5-5",
           "executed_model": null,
           "measured_tokens": 0,
@@ -6650,7 +6527,7 @@
         {
           "station": "reviewer-design",
           "status": "skipped",
-          "duration_ms": 8.162,
+          "duration_ms": 8.236,
           "configured_model": "claude-opus-5-5",
           "executed_model": null,
           "measured_tokens": 0,
@@ -6662,7 +6539,7 @@
         {
           "station": "reviewer-ux",
           "status": "skipped",
-          "duration_ms": 3.689,
+          "duration_ms": 0.838,
           "configured_model": "claude-opus-5-5",
           "executed_model": null,
           "measured_tokens": 0,
@@ -6674,7 +6551,7 @@
         {
           "station": "approver",
           "status": "completed",
-          "duration_ms": 0.037,
+          "duration_ms": 0.022,
           "configured_model": "claude-fable-5-2",
           "executed_model": null,
           "measured_tokens": 0,
@@ -6686,7 +6563,7 @@
         {
           "station": "triage-human",
           "status": "completed",
-          "duration_ms": 0.009,
+          "duration_ms": 0.008,
           "configured_model": "claude-opus-5-5",
           "executed_model": null,
           "measured_tokens": 0,
@@ -6697,106 +6574,56 @@
         },
         {
           "station": "deployer",
-          "status": "packet_ready",
-          "duration_ms": 0.951,
-          "configured_model": "claude-opus-5-5",
-          "executed_model": null,
-          "measured_tokens": 2860,
-          "budget": 48000,
-          "budget_action": "sent",
+          "status": "budget_exceeded",
+          "duration_ms": 0,
           "cost": null,
           "usage": null
-        },
-        {
-          "station": "observer",
-          "status": "failed",
-          "duration_ms": 4975.215,
-          "configured_model": "claude-opus-5-5",
-          "usage_complete": true,
-          "executed_model": null,
-          "measured_tokens": 2866,
-          "budget": 48000,
-          "budget_action": "sent",
-          "cost": null,
-          "executor": {
-            "kind": "command"
-          },
-          "usage": {
-            "input_tokens": 21562,
-            "output_tokens": 168,
-            "cached_input_tokens": 12895,
-            "cache_creation_input_tokens": 8665,
-            "reasoning_tokens": 0,
-            "total_tokens": 21730,
-            "input_tokens_includes_cache": true
-          },
-          "attempts": [
-            {
-              "attempt": 1,
-              "status": "failed",
-              "runtime": "claude",
-              "configured_model": "claude-opus-5-5",
-              "duration_ms": 4903.447,
-              "turns": 2,
-              "usage_complete": true,
-              "runtime_cost_estimate_usd": 0.049272,
-              "usage": {
-                "input_tokens": 21562,
-                "output_tokens": 168,
-                "cached_input_tokens": 12895,
-                "cache_creation_input_tokens": 8665,
-                "reasoning_tokens": 0,
-                "total_tokens": 21730,
-                "input_tokens_includes_cache": true
-              }
-            }
-          ]
         }
       ],
       "token_usage": {
-        "input_tokens": 164879,
-        "output_tokens": 1610,
-        "cached_input_tokens": 66811,
-        "cache_creation_input_tokens": 98054,
+        "input_tokens": 7536774,
+        "output_tokens": 94836,
+        "cached_input_tokens": 7223383,
+        "cache_creation_input_tokens": 313217,
         "reasoning_tokens": 0,
-        "total_tokens": 166489,
-        "measured_calls": 7,
+        "total_tokens": 7631610,
+        "measured_calls": 4,
         "unmeasured_calls": 0,
-        "calls": 7,
+        "calls": 4,
         "retries": 0,
         "complete": true,
         "by_station": {
           "intake": {
             "calls": 1,
             "measured_calls": 1,
-            "total_tokens": 21120
+            "total_tokens": 68927
           },
           "spec-writer": {
             "calls": 1,
             "measured_calls": 1,
-            "total_tokens": 23181
+            "total_tokens": 273344
           },
           "test-writer": {
             "calls": 1,
             "measured_calls": 1,
-            "total_tokens": 22075
+            "total_tokens": 2764842
           },
           "builder": {
-            "calls": 3,
-            "measured_calls": 3,
-            "total_tokens": 78383
-          },
-          "observer": {
             "calls": 1,
             "measured_calls": 1,
-            "total_tokens": 21730
+            "total_tokens": 4524497
           }
         },
         "by_model": {
+          "claude-opus-5-5": {
+            "calls": 3,
+            "measured_calls": 3,
+            "total_tokens": 3107113
+          },
           "unreported": {
-            "calls": 7,
-            "measured_calls": 7,
-            "total_tokens": 166489
+            "calls": 1,
+            "measured_calls": 1,
+            "total_tokens": 4524497
           }
         }
       }
@@ -7334,6 +7161,543 @@
             "calls": 7,
             "measured_calls": 7,
             "total_tokens": 164045
+          }
+        }
+      }
+    },
+    {
+      "work_order_id": "wo-gh-41",
+      "run_id": "b4f0fd5fff924ed3b1b832252ff19826",
+      "title": "Continuous run accounting: the run record is checkpointed after every station and completed on every exit path, budget death included",
+      "pipeline": "sdlc-default",
+      "kind": "feature",
+      "verdict": "no_reviews",
+      "human_required": true,
+      "deployment_status": null,
+      "loopbacks": 2,
+      "steps": [
+        {
+          "station": "intake",
+          "status": "failed",
+          "duration_ms": 4665.761,
+          "configured_model": "claude-opus-5-5",
+          "usage_complete": true,
+          "executed_model": null,
+          "measured_tokens": 3126,
+          "budget": 48000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": {
+            "input_tokens": 20876,
+            "output_tokens": 244,
+            "cached_input_tokens": 0,
+            "cache_creation_input_tokens": 20874,
+            "reasoning_tokens": 0,
+            "total_tokens": 21120,
+            "input_tokens_includes_cache": true
+          },
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "failed",
+              "runtime": "claude",
+              "configured_model": "claude-opus-5-5",
+              "duration_ms": 4584.29,
+              "turns": 2,
+              "usage_complete": true,
+              "runtime_cost_estimate_usd": 0.10925800000000001,
+              "usage": {
+                "input_tokens": 20876,
+                "output_tokens": 244,
+                "cached_input_tokens": 0,
+                "cache_creation_input_tokens": 20874,
+                "reasoning_tokens": 0,
+                "total_tokens": 21120,
+                "input_tokens_includes_cache": true
+              }
+            }
+          ]
+        },
+        {
+          "station": "spec-writer",
+          "status": "failed",
+          "duration_ms": 4044.036,
+          "configured_model": "claude-opus-5-5",
+          "usage_complete": true,
+          "executed_model": null,
+          "measured_tokens": 4362,
+          "budget": 48000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": {
+            "input_tokens": 22937,
+            "output_tokens": 244,
+            "cached_input_tokens": 0,
+            "cache_creation_input_tokens": 22935,
+            "reasoning_tokens": 0,
+            "total_tokens": 23181,
+            "input_tokens_includes_cache": true
+          },
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "failed",
+              "runtime": "claude",
+              "configured_model": "claude-opus-5-5",
+              "duration_ms": 3972.851,
+              "turns": 2,
+              "usage_complete": true,
+              "runtime_cost_estimate_usd": 0.119563,
+              "usage": {
+                "input_tokens": 22937,
+                "output_tokens": 244,
+                "cached_input_tokens": 0,
+                "cache_creation_input_tokens": 22935,
+                "reasoning_tokens": 0,
+                "total_tokens": 23181,
+                "input_tokens_includes_cache": true
+              }
+            }
+          ]
+        },
+        {
+          "station": "test-writer",
+          "status": "failed",
+          "duration_ms": 3236.877,
+          "configured_model": "claude-opus-5-5",
+          "usage_complete": true,
+          "executed_model": null,
+          "measured_tokens": 3379,
+          "budget": 48000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": {
+            "input_tokens": 21910,
+            "output_tokens": 165,
+            "cached_input_tokens": 13479,
+            "cache_creation_input_tokens": 8429,
+            "reasoning_tokens": 0,
+            "total_tokens": 22075,
+            "input_tokens_includes_cache": true
+          },
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "failed",
+              "runtime": "claude",
+              "configured_model": "claude-opus-5-5",
+              "duration_ms": 3165.386,
+              "turns": 2,
+              "usage_complete": true,
+              "runtime_cost_estimate_usd": 0.048148800000000005,
+              "usage": {
+                "input_tokens": 21910,
+                "output_tokens": 165,
+                "cached_input_tokens": 13479,
+                "cache_creation_input_tokens": 8429,
+                "reasoning_tokens": 0,
+                "total_tokens": 22075,
+                "input_tokens_includes_cache": true
+              }
+            }
+          ]
+        },
+        {
+          "station": "builder",
+          "status": "failed",
+          "duration_ms": 5411.886,
+          "configured_model": "claude-opus-5-5",
+          "usage_complete": true,
+          "executed_model": null,
+          "measured_tokens": 6265,
+          "budget": 48000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": {
+            "input_tokens": 25224,
+            "output_tokens": 319,
+            "cached_input_tokens": 13479,
+            "cache_creation_input_tokens": 11743,
+            "reasoning_tokens": 0,
+            "total_tokens": 25543,
+            "input_tokens_includes_cache": true
+          },
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "failed",
+              "runtime": "claude",
+              "configured_model": "claude-opus-5-5",
+              "duration_ms": 5283.152,
+              "turns": 3,
+              "usage_complete": true,
+              "runtime_cost_estimate_usd": 0.0677988,
+              "usage": {
+                "input_tokens": 25224,
+                "output_tokens": 319,
+                "cached_input_tokens": 13479,
+                "cache_creation_input_tokens": 11743,
+                "reasoning_tokens": 0,
+                "total_tokens": 25543,
+                "input_tokens_includes_cache": true
+              }
+            }
+          ]
+        },
+        {
+          "station": "checks-gate",
+          "status": "failed",
+          "duration_ms": 86630.338,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "loopback",
+          "status": "loopback",
+          "duration_ms": 0.0,
+          "configured_model": null,
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "failed",
+          "duration_ms": 5974.863,
+          "configured_model": "claude-opus-5-5",
+          "usage_complete": true,
+          "executed_model": null,
+          "measured_tokens": 6834,
+          "budget": 48000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": {
+            "input_tokens": 26155,
+            "output_tokens": 224,
+            "cached_input_tokens": 13479,
+            "cache_creation_input_tokens": 12674,
+            "reasoning_tokens": 0,
+            "total_tokens": 26379,
+            "input_tokens_includes_cache": true
+          },
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "failed",
+              "runtime": "claude",
+              "configured_model": "claude-opus-5-5",
+              "duration_ms": 5841.824,
+              "turns": 2,
+              "usage_complete": true,
+              "runtime_cost_estimate_usd": 0.0705538,
+              "usage": {
+                "input_tokens": 26155,
+                "output_tokens": 224,
+                "cached_input_tokens": 13479,
+                "cache_creation_input_tokens": 12674,
+                "reasoning_tokens": 0,
+                "total_tokens": 26379,
+                "input_tokens_includes_cache": true
+              }
+            }
+          ]
+        },
+        {
+          "station": "checks-gate",
+          "status": "failed",
+          "duration_ms": 83421.138,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "loopback",
+          "status": "loopback",
+          "duration_ms": 0.0,
+          "configured_model": null,
+          "executed_model": null,
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "builder",
+          "status": "failed",
+          "duration_ms": 4233.903,
+          "configured_model": "claude-opus-5-5",
+          "usage_complete": true,
+          "executed_model": null,
+          "measured_tokens": 6852,
+          "budget": 48000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": {
+            "input_tokens": 26215,
+            "output_tokens": 246,
+            "cached_input_tokens": 13479,
+            "cache_creation_input_tokens": 12734,
+            "reasoning_tokens": 0,
+            "total_tokens": 26461,
+            "input_tokens_includes_cache": true
+          },
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "failed",
+              "runtime": "claude",
+              "configured_model": "claude-opus-5-5",
+              "duration_ms": 4100.565,
+              "turns": 2,
+              "usage_complete": true,
+              "runtime_cost_estimate_usd": 0.0712938,
+              "usage": {
+                "input_tokens": 26215,
+                "output_tokens": 246,
+                "cached_input_tokens": 13479,
+                "cache_creation_input_tokens": 12734,
+                "reasoning_tokens": 0,
+                "total_tokens": 26461,
+                "input_tokens_includes_cache": true
+              }
+            }
+          ]
+        },
+        {
+          "station": "checks-gate",
+          "status": "failed",
+          "duration_ms": 85423.351,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-spec",
+          "status": "skipped",
+          "duration_ms": 0.681,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-security",
+          "status": "skipped",
+          "duration_ms": 0.613,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-tests",
+          "status": "skipped",
+          "duration_ms": 0.639,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-architecture",
+          "status": "skipped",
+          "duration_ms": 0.678,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-design",
+          "status": "skipped",
+          "duration_ms": 8.162,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "reviewer-ux",
+          "status": "skipped",
+          "duration_ms": 3.689,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "approver",
+          "status": "completed",
+          "duration_ms": 0.037,
+          "configured_model": "claude-fable-5-2",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "triage-human",
+          "status": "completed",
+          "duration_ms": 0.009,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": null,
+          "measured_tokens": 0,
+          "budget": 0,
+          "budget_action": "none",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "deployer",
+          "status": "packet_ready",
+          "duration_ms": 0.951,
+          "configured_model": "claude-opus-5-5",
+          "executed_model": null,
+          "measured_tokens": 2860,
+          "budget": 48000,
+          "budget_action": "sent",
+          "cost": null,
+          "usage": null
+        },
+        {
+          "station": "observer",
+          "status": "failed",
+          "duration_ms": 4975.215,
+          "configured_model": "claude-opus-5-5",
+          "usage_complete": true,
+          "executed_model": null,
+          "measured_tokens": 2866,
+          "budget": 48000,
+          "budget_action": "sent",
+          "cost": null,
+          "executor": {
+            "kind": "command"
+          },
+          "usage": {
+            "input_tokens": 21562,
+            "output_tokens": 168,
+            "cached_input_tokens": 12895,
+            "cache_creation_input_tokens": 8665,
+            "reasoning_tokens": 0,
+            "total_tokens": 21730,
+            "input_tokens_includes_cache": true
+          },
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "failed",
+              "runtime": "claude",
+              "configured_model": "claude-opus-5-5",
+              "duration_ms": 4903.447,
+              "turns": 2,
+              "usage_complete": true,
+              "runtime_cost_estimate_usd": 0.049272,
+              "usage": {
+                "input_tokens": 21562,
+                "output_tokens": 168,
+                "cached_input_tokens": 12895,
+                "cache_creation_input_tokens": 8665,
+                "reasoning_tokens": 0,
+                "total_tokens": 21730,
+                "input_tokens_includes_cache": true
+              }
+            }
+          ]
+        }
+      ],
+      "token_usage": {
+        "input_tokens": 164879,
+        "output_tokens": 1610,
+        "cached_input_tokens": 66811,
+        "cache_creation_input_tokens": 98054,
+        "reasoning_tokens": 0,
+        "total_tokens": 166489,
+        "measured_calls": 7,
+        "unmeasured_calls": 0,
+        "calls": 7,
+        "retries": 0,
+        "complete": true,
+        "by_station": {
+          "intake": {
+            "calls": 1,
+            "measured_calls": 1,
+            "total_tokens": 21120
+          },
+          "spec-writer": {
+            "calls": 1,
+            "measured_calls": 1,
+            "total_tokens": 23181
+          },
+          "test-writer": {
+            "calls": 1,
+            "measured_calls": 1,
+            "total_tokens": 22075
+          },
+          "builder": {
+            "calls": 3,
+            "measured_calls": 3,
+            "total_tokens": 78383
+          },
+          "observer": {
+            "calls": 1,
+            "measured_calls": 1,
+            "total_tokens": 21730
+          }
+        },
+        "by_model": {
+          "unreported": {
+            "calls": 7,
+            "measured_calls": 7,
+            "total_tokens": 166489
           }
         }
       }

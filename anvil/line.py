@@ -262,6 +262,13 @@ def load_resume(project, work_order_id):
             raise ValueError("the recorded approval is for a different run of this work order; "
                              "approve the current run first")
     verdict = report.get("verdict")
+    exit_status = report.get("exit_status")
+    if approval is None and exit_status and exit_status != "completed":
+        # continuous-run-accounting R3.1: a killed run's record is its
+        # accounting; there is no gate to re-enter after it.
+        raise ValueError(f"the run ended with exit status {exit_status} "
+                         f"({report.get('termination_reason') or 'no reason recorded'}); its record is "
+                         f"runs/{work_order_id}/report.json and there is nothing to resume")
     if approval is None:
         if verdict != "approved":
             raise ValueError(f"the run's verdict is {verdict} and no human approval is recorded; "

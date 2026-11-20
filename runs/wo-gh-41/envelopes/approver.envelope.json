@@ -5,6 +5,6 @@
   "work_order_id": "wo-gh-41",
   "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-41/runs/wo-gh-41/report.json",
   "status": "completed",
-  "created_at": "2026-11-20T04:49:28.315741+00:00",
+  "created_at": "2026-11-20T05:30:15.644889+00:00",
   "configured_model": "claude-fable-5-2"
 }

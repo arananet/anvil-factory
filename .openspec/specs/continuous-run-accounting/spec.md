@@ -16,44 +16,81 @@ A run's accounting in ANVIL is written at the end of the run, by the same code w
 ## Requirements
 
 ### R1. Checkpoint after every station
-- The runner writes the run record (runs/<work-order-id>/report.json, with the step records it aggregates) after every station completes, fails or is skipped, in the same shape the final report uses, plus a checkpoint field set: the last completed station, the run's elapsed milliseconds at the checkpoint, and the measured usage so far.
-- A reader opening the record mid-run sees a valid report that is complete as of the last finished station, never a partial document: each checkpoint write is atomic (written to a sibling temporary file and renamed over the record).
-- The final report of a healthy run is the last checkpoint plus the verdict and decision sections; checkpointing adds no station and no model call.
+- R1.1: When a station completes, fails, times out or is skipped, the runner shall write the run record runs/<work-order-id>/report.json, with the step records it aggregates, in the same shape the final report uses plus a top level `checkpoint` object with three fields: `last_completed_station` (the station id), `elapsed_ms` (the run's elapsed milliseconds at the checkpoint, a number) and `usage_so_far` (the measured usage summed over the steps recorded so far, under cost-measurement semantics).
+- R1.2: Each checkpoint write is atomic: the record is written to a sibling temporary file in the same directory and renamed over report.json. A reader opening report.json at any moment during the run parses valid JSON that is complete as of the last finished station. No temporary file is left behind after a write.
+- R1.3: Checkpointing adds no station and no model call. The final report of a healthy run equals the last checkpoint plus the verdict and decision sections (and the exit fields of R2.2); every other key and every step record is unchanged between the last checkpoint and the final report.
 
 ### R2. Save on every exit path
-- Every termination path of a run completes the record before the process exits: normal completion; a verdict reached; budget exhausted (exit status budget_exceeded); a station timeout (using the station-timeout capability's honest timeout records); the runtime turn limit; a checks gate stop; an intake stop (rejected, rescoped stop or waiting_info); an uncaught exception in spine code; and the external termination signals the runner can trap (SIGTERM, SIGINT).
-- The completed record names: the exit status; the termination reason in the run's own vocabulary; every station that ran, with its outcome and its executed model (null only when no model ran, per the station artifact contract); every station that never ran, recorded as not run; and the cost section under cost-measurement semantics (the total is the sum of measured steps, unmeasured steps are recorded as unmeasured with their reason).
-- A budget death is itself a recorded, complete outcome: the record carries status budget_exceeded, the measured consumption that crossed the cap, and the station in flight when the cap was crossed, with that station's partial usage when the runtime exposed it.
+- R2.1: Every termination path of a run completes the record before the process exits. The paths are: normal completion; a verdict reached; run budget exhausted; a station timeout (using the station-timeout capability's timeout records as they stand); the runtime turn limit (max_runtime_turns); a checks gate stop; an intake stop (rejected, rescoped stop or waiting_info); an uncaught exception in spine code; and the trappable external signals SIGTERM and SIGINT.
+- R2.2: The completed record carries a top level `exit_status` and a top level `termination_reason`. `exit_status` is one value from this closed set, one per path in R2.1: `completed` (normal completion or a verdict reached), `budget_exceeded`, `station_timeout`, `turn_limit`, `checks_stopped`, `intake_stopped`, `error`, `signal`. `termination_reason` is a non empty string in the run's own vocabulary that names the specific cause: the station and limit for a budget death or timeout, the exception type and message for `error`, the signal name (`SIGTERM` or `SIGINT`) for `signal`, the intake outcome for `intake_stopped`.
+- R2.3: The completed record names every station in the pipeline exactly once in the step records: each station that ran with its outcome and its executed model (null only when no model ran, per the station artifact contract), and each station that never ran with status `not_run`. The cost section follows cost-measurement semantics unchanged: the total is the sum of measured steps; unmeasured steps are counted as unmeasured and say why.
+- R2.4: A budget death is a recorded, complete outcome: the record carries exit_status `budget_exceeded`, the measured run consumption that crossed the cap together with the cap value, and the station in flight when the cap was crossed, recorded with that station's partial measured usage when the runtime exposed it, or as unmeasured with its reason when it did not.
+- R2.5: If the record cannot be completed on an exit path (for example the write itself fails), the last checkpoint written under R1 stays on disk unchanged and the failure is reported on stderr naming its reason; the runner never leaves a truncated report.json.
 
 ### R3. No second run for paperwork
-- Inspecting or resuming after a killed run reads the checkpointed record as the run's accounting. The report tooling (tools/line_comment.py and the swimlane renderer) renders a killed run's record without any station executing.
-- When a later run of the same work order starts, the killed run's record is preserved in the run history (the token-efficiency spec already requires earlier reports to be preserved in project totals); the new run never overwrites the killed run's accounting.
+- R3.1: Inspecting or resuming after a killed run (the inspect and resume paths in anvil/cli.py) reads the checkpointed or completed report.json as the run's accounting. tools/line_comment.py and the swimlane renderer in anvil/runner.py render a killed run's record from report.json alone, with no station executing and no model call.
+- R3.2: When a later run of the same work order starts, the earlier run's report.json, killed or not, is preserved in runs/<work-order-id>/history/ by the existing content-addressed preservation before any checkpoint of the new run is written; the new run never overwrites the earlier run's accounting.
+- R3.3: Report consumers (tools/line_comment.py, anvil/statuspage.py, the swimlane renderer, the cli inspect path) keep working on reports written before this change, which carry no `checkpoint`, `exit_status` or `termination_reason` keys.
 
 ### R4. Regression tests
-- The order's own tests are new files under tests/ and drive scripted runs through the runner with a fake runtime: (a) a run killed at the run token cap in the middle of the builder station leaves a complete record on disk: exit status budget_exceeded, per-station outcomes for the stations that ran, the builder station recorded with its measured partial usage, the unrun stations named as not run, and the record parses as JSON; (b) the same completeness assertions hold for a run ended by a station timeout and for a run ended by an uncaught error injected into a station step, each with its own exit status and reason; (c) a healthy scripted run leaves a checkpoint after each station, and its final report equals the last checkpoint plus the verdict sections; (d) a scripted run that receives SIGTERM leaves a completed record naming the signal as the termination reason.
-
-### Guardrails
-- Python standard library only, consistent with the factory spine. No new dependency.
-- The report schema grows additively (checkpoint field set, exit status, termination reason). Existing report consumers (the line comment, the status page, the swimlane) keep working on reports written before this change and on checkpointed reports.
-- Frozen surfaces: cost-measurement semantics (totals are sums of measured steps only; unmeasured stays unmeasured and says why); the station-timeout record fields; the station artifact contract's executed model honesty; the review parse contract; the reviewer prompts; pipeline definition files (protected in anvil.json); anvil.json itself (protected).
-- Relationship to token-efficiency: its per-attempt usage artifacts and its rule that a budget stop preserves the report are inputs to this order, not replaced by it; this order generalizes preservation from the budget stop to every exit path and makes it a property of the runner.
-- Existing test files at the base ref are not modified or deleted; new tests arrive as new files.
-- No em dash or en dash character in any produced file (project style rule).
-- Nothing in this order merges, publishes or deploys anything; the run stops at the owner human gate.
+- R4.1: The order's tests are new files under tests/ that drive scripted runs through the runner with a fake runtime (no network, no real model). They cover: (a) a run killed at the run token cap in the middle of the builder station (S1); (b) a run ended by a station timeout and a run ended by an uncaught error injected into a station step (S2); (c) a healthy scripted run checkpointing after each station (S3); (d) a scripted run receiving SIGTERM (S5); plus the history preservation and legacy rendering of S4 and S7.
+- R4.2: The full factory suite (python -m unittest discover -s tests -p 'test_*.py') passes with the new files added and no existing test file modified.
 
 ## Scenarios
 
 ### Scenario: A budget death leaves a complete report
-- S1: Given a scripted run whose builder station crosses the run token cap mid-station, when the run dies, then the record on disk parses, carries exit status budget_exceeded with the measured consumption that crossed the cap, records the stations that ran with their outcomes and executed models, names the stations that never ran as not run, and no station executes to produce that record after the death.
+- S1 (R2.1, R2.3, R2.4, R4.1a): Given a scripted sdlc-default run with max_run_tokens 6000000 whose fake runtime reports 6359529 measured tokens for the builder call, when the run dies at the cap, then report.json parses as JSON; exit_status is `budget_exceeded`; the record carries the consumption 6359529 and the cap 6000000; intake and spec-writer (and any other station before builder) carry their outcomes and executed models; builder is recorded as the station in flight with its measured partial usage; every station after builder is present with status `not_run`; and the fake runtime received no call after the builder call.
 
 ### Scenario: Timeout and error deaths are recorded the same way
-- S2: Given a scripted run ended by a station timeout, and a second scripted run ended by an uncaught error in a station step, when each run ends, then each record is complete in the S1 sense and carries its own exit status and termination reason, distinct from budget_exceeded and from each other.
+- S2 (R2.1, R2.2, R2.3, R4.1b): Given one scripted run whose builder step exceeds its station timeout, and a second scripted run whose builder step raises RuntimeError("injected"), when each run ends, then each record satisfies every S1 completeness assertion except the budget fields; the first carries exit_status `station_timeout` with the station-timeout record fields unchanged on the builder step; the second carries exit_status `error` with termination_reason containing `RuntimeError` and `injected`; and the two exit_status values differ from each other and from `budget_exceeded`.
 
 ### Scenario: Checkpoints accumulate during a healthy run
-- S3: Given a healthy scripted run, when each station finishes, then a checkpoint of the run record exists naming that station as the last completed one, and the final report equals the last checkpoint plus the verdict and decision sections.
+- S3 (R1.1, R1.3, R4.1c): Given a healthy scripted run, when each station finishes, then the test, reading report.json after that station, finds checkpoint.last_completed_station equal to that station's id, checkpoint.elapsed_ms non decreasing across reads, and a step record for every station finished so far; and the final report equals the last checkpoint with only the verdict, decision and R2.2 exit fields added or changed, exit_status `completed`; the fake runtime's call count equals the count of model running stations.
+
+### Scenario: Checkpoint writes are atomic
+- S6 (R1.2, R2.5): Given a scripted run, when every checkpoint write completes, then report.json parses as JSON and no temporary file remains in runs/<work-order-id>/; and given a write that raises during the rename step, then the previous report.json content is unchanged on disk.
 
 ### Scenario: A killed run needs no second run for its accounting
-- S4: Given the record left by the S1 budget death, when the line comment tooling renders it, then it renders without executing any station; and given a later run of the same work order, when it starts, then the killed run's record is preserved in the run history and is not overwritten.
+- S4 (R3.1, R3.2, R4.1): Given the record left by the S1 budget death, when tools/line_comment.py and the swimlane renderer render it, then each returns output naming exit status `budget_exceeded` and the builder station with no station executing and the fake runtime receiving zero calls; and given a later run of the same work order, when it starts, then a file under runs/<work-order-id>/history/ is byte identical to the killed run's report.json and the new run's report.json is a different document.
+
+### Scenario: Other stop paths complete the record
+- S8 (R2.1, R2.2, R2.3): Given scripted runs ended respectively by the runtime turn limit, a checks gate stop, and an intake outcome of rejected, when each ends, then each record carries exit_status `turn_limit`, `checks_stopped` and `intake_stopped` respectively, a non empty termination_reason, and every unreached station as `not_run`.
 
 ### Scenario: An external kill still completes the record
-- S5: Given a scripted run in progress, when the runner process receives SIGTERM, then the record on disk is completed with the signal named as the termination reason and the per-station outcomes as of the last finished station.
+- S5 (R2.1, R2.2, R4.1d): Given a scripted run in progress past at least one finished station, when the runner process receives SIGTERM, then report.json is completed with exit_status `signal`, termination_reason `SIGTERM`, the per-station outcomes as of the last finished station and the remaining stations as `not_run`; and the same holds for SIGINT with termination_reason `SIGINT`.
+
+### Scenario: Old reports still render
+- S7 (R3.3): Given a report.json written before this change (for example runs/wo-gh-20/report.json, which has no checkpoint, exit_status or termination_reason keys), when tools/line_comment.py, the status page and the swimlane renderer read it, then each renders without raising.
+
+### Scenario: The suite stays green
+- S9 (R4.2): Given the tree after the build, when python -m unittest discover -s tests -p 'test_*.py' runs, then it passes, and git diff against the base ref 4675a131eb9aa88097741dc3cdc9772c3db17550 shows no modified or deleted file among the test files present at that ref.
+
+## Guardrails
+- Python standard library only, consistent with the factory spine. No new dependency.
+- The report schema grows additively (checkpoint object, exit_status, termination_reason, the `not_run` step status, the budget death fields). Existing keys keep their meaning.
+- Frozen surfaces: cost-measurement semantics (totals are sums of measured steps only; unmeasured stays unmeasured and says why); the station-timeout record fields; the station artifact contract's executed model honesty; the review parse contract; the reviewer prompts; pipeline definition files under pipelines/ (protected in anvil.json); anvil.json itself (protected).
+- Relationship to token-efficiency: its per-attempt usage artifacts and its rule that a budget stop preserves the report are inputs to this order, not replaced by it; this order generalizes preservation from the budget stop to every exit path and makes it a property of the runner.
+- No em dash or en dash character in any produced file (project style rule).
+- Nothing in this order merges, publishes or deploys anything; the run stops at the owner human gate.
+
+## Allowed write set
+- anvil/runner.py, anvil/line.py, anvil/telemetry.py, anvil/cost.py, anvil/executor.py
+- anvil/cli.py (the resume and inspect paths only)
+- tools/line_comment.py
+- anvil/statuspage.py, only if needed for R3.3
+- docs/EXECUTION.md and any other factory doc that describes run reports or resume
+- CHANGELOG.md
+- one new decision record under brain/decisions/ (next free number, 0013 at the time of writing)
+- new test files under tests/
+- the run's own artifacts under runs/wo-gh-41/
+- No protected path changes are authorized: no edit to anvil.json, to any file under pipelines/, or to any test file present at the base ref.
+
+## Out of scope
+- Resuming execution from a checkpoint (re-dispatching from the last completed station). This order makes the record readable after a kill; it does not add automatic resume of execution.
+- Per-station token partitions and the pre-review completeness gate (wo-gh-42, station-budgets-completeness).
+- Changes to cost-measurement semantics, price tables, the station-timeout fields, review parsing or reviewer prompts.
+- Untrappable kills (SIGKILL, host loss): for these the last R1 checkpoint is the record; no completion is required.
+- Any change to the C64 project or its runs; the evidence there motivates this order but is not edited.
+
+## Builder report required literals
+- runs/wo-gh-41/builder.output.md contains, in full: 4675a131eb9aa88097741dc3cdc9772c3db17550, continuous-run-accounting, checkpoint, budget_exceeded; the base ref the tree was verified against; the exact full factory test count from the suite run; and the names of the new test files.

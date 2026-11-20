@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Continuous run accounting: checkpointed after every station, completed on every exit (continuous-run-accounting)
+
+- runs/<id>/report.json is written atomically (sibling temporary file, then rename) after every station, in the final report's shape plus a `checkpoint` object (last completed station, elapsed milliseconds, measured usage so far). A failed write keeps the previous record and says why on stderr.
+- Every exit path completes the record with `exit_status` (completed, budget_exceeded, station_timeout, turn_limit, checks_stopped, intake_stopped, error, signal) and `termination_reason`. Unreached stations are recorded as `not_run`; a budget death carries `budget_death` with the measured consumption, the cap and the station in flight with its partial usage. SIGTERM and SIGINT are trapped for the run.
+- A crossed run token cap, a station timeout, the runtime turn limit and a failed pre-review gate with no attempt left end the line at that station.
+- `anvil.runner.render_swimlane(report)` and tools/line_comment.py render a killed run from report.json alone; `anvil resume` names a killed run's exit status. Earlier reports render unchanged.
+- Spec: .openspec/specs/continuous-run-accounting/spec.md. Tests: tests/test_continuous_run_accounting.py. Docs: docs/EXECUTION.md. Decision 0013.
+
 ### Operator fix: a failed station names its reason
 
 - tools/claude_station.py puts the runtime's own reason (is_error, subtype, api_error_status, stop_reason, num_turns and the first 300 characters of result) ahead of the raw envelope in a station failure message. The command executor keeps the first 500 characters of a failure and the envelope's reason fields follow its usage block, so runs wo-gh-44 and wo-gh-41 ended no_reviews with no reason on record.

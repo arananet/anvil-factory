@@ -5,25 +5,42 @@ Title: Continuous run accounting: the run record is checkpointed after every sta
 Kind: feature
 Status: new
 
+## Intake Outcome
+
+Outcome: accepted
+
+Risk: medium
+
+Surfaces: data, content
+
+## Routing
+
+**Decision**: Medium risk: full panel at policy models
+
+**Selected reviewers** (5):
+- reviewer-spec (model: review-balanced)
+- reviewer-security (model: review-strong)
+- reviewer-tests (model: review-balanced)
+- reviewer-architecture (model: review-balanced)
+- reviewer-design (model: review-balanced)
+
+**Routed out** (1):
+- reviewer-ux: Routed out: no UI surface
+
 ## Verdict
 
-Verdict: no_reviews
+Verdict: budget_exceeded
 
-No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 6.)
+No reviews were produced in this run, so the verdict is no_reviews; standing project reviews are never counted. (Counted 0 reviews, expected 5.)
 
 ## Steps
 
-- intake: failed
-- spec-writer: failed
-- test-writer: failed
+- intake: executed
+- spec-writer: executed
+- test-writer: executed
 - builder: failed
 - checks-gate: failed
 - loopback: loopback
-- builder: failed
-- checks-gate: failed
-- loopback: loopback
-- builder: failed
-- checks-gate: failed
 - reviewer-spec: skipped
 - reviewer-security: skipped
 - reviewer-tests: skipped
@@ -32,6 +49,5 @@ No reviews were produced in this run, so the verdict is no_reviews; standing pro
 - reviewer-ux: skipped
 - approver: completed
 - triage-human: completed
-- deployer: packet_ready
-- observer: failed
+- deployer: budget_exceeded
 

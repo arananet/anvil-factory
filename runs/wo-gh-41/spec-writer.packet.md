@@ -149,4 +149,10 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/41
 
 ## Upstream steps
 
-- intake: failed
+- intake: executed
+
+## Run context
+
+Read the upstream work before you start; it is the input your station builds on.
+
+- Output of intake: runs/wo-gh-41/intake.output.md

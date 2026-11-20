@@ -72,6 +72,85 @@ Re-read your whole diff as a reviewer would and fix what you find. Then write th
 Read the spec and the relevant upstream artifacts first. Search before opening files; read only the relevant ranges. Bound command output and summarize long test logs with failures and a path to the full log. Run focused checks while editing and the required project checks at handoff. Reuse valid upstream work. Keep the final handoff concise, with changed files, evidence and unresolved issues. Preserve the required output contract.
 
 
+## Project design
+
+### Design tokens
+
+```json
+{
+  "colors": {
+    "primary": "TODO",
+    "secondary": "TODO",
+    "accent": "TODO",
+    "background": "TODO",
+    "surface": "TODO",
+    "text": "TODO",
+    "text-secondary": "TODO",
+    "error": "TODO",
+    "warning": "TODO",
+    "success": "TODO",
+    "info": "TODO"
+  },
+  "typography": {
+    "font-family-base": "TODO",
+    "font-family-heading": "TODO",
+    "font-family-mono": "TODO",
+    "font-size-base": "TODO",
+    "font-size-scale": "TODO",
+    "line-height-base": "TODO",
+    "line-height-heading": "TODO"
+  },
+  "spacing": {
+    "unit": "TODO",
+    "scale": [
+      "TODO"
+    ]
+  },
+  "layout": {
+    "max-width": "TODO",
+    "breakpoint-mobile": "TODO",
+    "breakpoint-tablet": "TODO",
+    "breakpoint-desktop": "TODO"
+  },
+  "motion": {
+    "duration-fast": "TODO",
+    "duration-base": "TODO",
+    "duration-slow": "TODO",
+    "easing-standard": "TODO",
+    "easing-enter": "TODO",
+    "easing-exit": "TODO"
+  }
+}
+```
+
+### Quality bars
+
+for Product Pages
+
+These bars apply to every product page or interface this project ships.
+
+### Visual Hierarchy
+- [ ] Clear content hierarchy with size, weight, and spacing
+- [ ] Important actions are visually prominent
+- [ ] Related elements are grouped
+
+### Scale Contrast
+- [ ] Minimum 4.5:1 contrast ratio for normal text
+- [ ] Minimum 3:1 contrast ratio for large text (18pt+)
+- [ ] Interactive elements have sufficient contrast
+
+### Spacing Rhythm
+- [ ] Consistent spacing scale used throughout
+- [ ] Whitespace creates clear content boundaries
+- [ ] Spacing adapts appropriately to different screen sizes
+
+### Responsive Behavior
+- [ ] Layout works on mobile, tablet, and desktop
+- [ ] Touch targets are at least 44x44px on mobile
+- [ ] Text is readable without zooming on any device
+- [ ] No horizontal scrolling on standard viewports
+
+
 ## Craft skills
 
 Curated craft guidance resolved for this station and this work order. Order of authority: the work order and its spec, then the project design system and decisions, then promoted practices, then these skills. Where a skill conflicts with any of those, the skill yields. Apply what fits the work in front of you; a skill is a bar to meet, not a checklist to recite.
@@ -213,6 +292,25 @@ No specific product type declared. Using general guidelines only.
 - Group related elements together with whitespace separating distinct sections
 
 
+## Quality Charter
+
+Product type: physical_product
+
+Observable criteria:
+
+- **Materials**: Surfaces read as the materials the product is actually made of
+- **Light**: One coherent light story, with shadows and reflections that agree with it
+- **Contact**: Objects meet skin, surfaces and each other the way physical things do
+- **Scale**: The object's size reads true against its context and human anatomy
+
+
+## Reference Anchors
+
+⚠️ **WARNING**: This run has no reference anchors.
+
+The review will proceed under the charter floor alone.
+
+
 ## Work order
 
 - id: wo-gh-41
@@ -248,60 +346,19 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/41
 
 ## Upstream steps
 
-- intake: failed
-- spec-writer: failed
-- test-writer: failed
-- builder: failed
-- checks-gate: failed
-- loopback: loopback
-- builder: failed
-- checks-gate: failed
-- loopback: loopback
+- intake: executed
+- spec-writer: executed
+- test-writer: executed
 
 ## Run context
 
 Read the upstream work before you start; it is the input your station builds on.
 The checks gate runs the project checks listed here; run them yourself before you hand off.
 
+- Output of intake: runs/wo-gh-41/intake.output.md
+- Output of spec-writer: runs/wo-gh-41/spec-writer.output.md
+- Output of test-writer: runs/wo-gh-41/test-writer.output.md
 - Project check: `python -m unittest discover -s tests -p 'test_*.py'`
-
-## Loopback feedback (attempt 3 of 3)
-
-The previous attempt was sent back by checks-gate to builder. Resolve every finding below. Keep what already passed; do not start over.
-
-Reason: Gate checks failed; artifact validation: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-41/runs/wo-gh-41/builder.output.md is missing.
-
-- # Checks Gate: pre-review
-  Basis: builder_delta
-  Attempt: 2
-  
-  # Check Commands
-  ## Command 1: python -m unittest discover -s tests -p 'test_*.py'
-  Exit code: 0
-  Output:
-  ```
-  ame false"
-  Switched to a new branch 'work-branch'
-  .hint: Using 'master' as the name for the initial branch. This default branch name
-  hint: will change to "main" in Git 3.0. To configure the initial branch name
-  hint: to use in all of your new repositories, which will suppress this warning,
-  hint: call:
-  hint:
-  hint: 	git config --global init.defaultBranch <name>
-  hint:
-  hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
-  hint: 'development'. The just-created branch can be renamed via this command:
-  hint:
-  hint: 	git branch -m <name>
-  hint:
-  hint: Disable this message with "git config set advice.defaultBranchName false"
-  Switched to a new branch 'work-branch'
-  ................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 43297)>
-    if method() is not None:
-  ResourceWarning: Enable tracemalloc to get the object allocation traceback
-  .../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 40877)>
-    if method() is not None:
-  ResourceWarning: Enable tracemalloc t
 
 ## Output contract
 

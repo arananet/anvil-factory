@@ -1,7 +1,7 @@
 import inspect
 import uuid
 import hashlib
-import json, os, shlex, struct, subprocess, time, zlib
+import json, os, shlex, signal, struct, subprocess, sys, tempfile, threading, time, zlib
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -686,6 +686,12 @@ class RunReport:
     skills: dict = field(default_factory=lambda: {"resolved": {}, "disabled": [], "catalog_count": 0, "signals": {}})
     efficiency: dict = field(default_factory=dict)
     run_id: str = ""
+    # Continuous run accounting (continuous-run-accounting R1, R2): additive
+    # keys, emitted only when set, so reports built without them keep their shape.
+    checkpoint: dict = None
+    exit_status: str = None
+    termination_reason: str = None
+    budget_death: dict = None
     def to_dict(self):
         # Build cost section from steps
         measured_steps = [s for s in self.steps if s.get("cost") is not None]
@@ -714,8 +720,273 @@ class RunReport:
         # Add health section if present
         if self.health:
             result["health"] = self.health
+        for key in ("checkpoint", "exit_status", "termination_reason", "budget_death"):
+            if getattr(self, key) is not None:
+                result[key] = getattr(self, key)
 
         return result
+
+# Continuous run accounting (spec continuous-run-accounting). The run record
+# is a by-product of execution: report.json is checkpointed after every
+# station and completed on every exit path, so a killed run never needs a
+# second run to write its paperwork.
+EXIT_STATUSES = ("completed", "budget_exceeded", "station_timeout", "turn_limit",
+                 "checks_stopped", "intake_stopped", "error", "signal")
+
+
+class RunSignal(BaseException):
+    """A trappable external signal (SIGTERM, SIGINT) that ends the run."""
+
+    def __init__(self, signum):
+        self.signum = signum
+        self.name = signal.Signals(signum).name
+        super().__init__(self.name)
+
+
+def write_report_atomic(run_dir, data):
+    """Write report.json by a sibling temporary file renamed over it (R1.2).
+
+    Returns True when the record is on disk. A failed write leaves the
+    previous report.json unchanged, removes the temporary file and names the
+    reason on stderr (R2.5); it never decides the run.
+    """
+    run_dir = Path(run_dir)
+    text = json.dumps(data, indent=2) + "\n"
+    tmp = None
+    try:
+        fd, tmp = tempfile.mkstemp(prefix=".report.", suffix=".json.tmp", dir=str(run_dir))
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp, run_dir / "report.json")
+        tmp = None
+        return True
+    except Exception as exc:
+        print(f"anvil: report.json not written ({type(exc).__name__}: {exc}); "
+              f"the previous record in {run_dir} stays unchanged", file=sys.stderr)
+        return False
+    finally:
+        if tmp is not None:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+
+
+def _not_run_steps(order, steps):
+    """One not_run step for every pipeline station absent from the steps (R2.3)."""
+    seen = {s.get("station") for s in steps}
+    return [{"station": sid, "status": "not_run", "detail": "The run ended before this station ran.",
+             "duration_ms": 0, "cost": None, "artifacts": [], "configured_model": None,
+             "executed_model": None, "executor": None}
+            for sid in order if sid not in seen]
+
+
+def _budget_death(steps, limits, station_id, limit="max_run_tokens"):
+    """The budget death section (R2.4): consumption, cap and station in flight.
+
+    The station's own usage is the measured partial usage the runtime
+    exposed; when it exposed none, the section says so instead of guessing.
+    """
+    usage = next((s.get("usage") for s in reversed(steps) if s.get("station") == station_id), None)
+    death = {"limit": limit, "measured_tokens": summarize_steps(steps)["total_tokens"],
+             "max_run_tokens": limits.get("max_run_tokens"), "station_in_flight": station_id,
+             "station_usage": usage if isinstance(usage, dict) else None}
+    if death["station_usage"] is None:
+        death["station_usage_reason"] = "the runtime exposed no usage for this station"
+    return death
+
+
+def _station_stop(step, steps, limits):
+    """The run-ending outcome of a finished model step, else None.
+
+    A run token cap crossed by the step (or the runtime's own threshold
+    stop), a station timeout and the runtime turn limit each end the run at
+    that station: no later station runs and the runtime gets no further call.
+    """
+    sid = step.get("station")
+    detail = str(step.get("detail") or "")
+    if step.get("executor") is None:
+        return None
+    cap = limits.get("max_run_tokens")
+    total = summarize_steps(steps)["total_tokens"] or 0
+    if cap and (total >= cap or "token threshold reached" in detail):
+        return {"exit_status": "budget_exceeded",
+                "reason": f"run token cap crossed in station {sid}: measured {total} tokens "
+                          f"against max_run_tokens {cap}",
+                "budget_death": _budget_death(steps, limits, sid)}
+    if step.get("status") == "timed_out":
+        timeout = step.get("timeout") or {}
+        return {"exit_status": "station_timeout",
+                "reason": f"station {sid} timed out after {timeout.get('timeout_seconds')}s "
+                          f"({timeout.get('reason')})"}
+    if step.get("status") == "failed" and "error_max_turns" in detail:
+        turns = limits.get("max_runtime_turns")
+        return {"exit_status": "turn_limit",
+                "reason": f"station {sid} stopped at the runtime turn limit"
+                          + (f" (max_runtime_turns {turns})" if turns else "")}
+    return None
+
+
+class RunAccounting:
+    """The run record's writer, shared by the runner and its exit paths.
+
+    The runner registers a snapshot function (the report as of now), the
+    station in flight and the steps; checkpoint() writes the record after a
+    station, record_exit() completes it when the run ends by an exception
+    or a signal. One instance per run; it lives as long as run_pipeline.
+    """
+
+    def __init__(self):
+        self.started = time.monotonic()
+        self.run_dir = None
+        self.order = []
+        self.snapshot = None      # callable(steps=None, verdict=None) -> report dict
+        self.steps = None         # callable() -> the live step list
+        self.executor = None
+        self.in_flight = None     # the station started and not yet recorded
+        self.last_checkpoint = None
+        self.completed = False
+
+    def elapsed_ms(self):
+        return round((time.monotonic() - self.started) * 1000, 3)
+
+    def checkpoint(self, station_id):
+        data = self.snapshot()
+        self.last_checkpoint = {"last_completed_station": station_id, "elapsed_ms": self.elapsed_ms(),
+                                "usage_so_far": summarize_steps(data["steps"])}
+        data["checkpoint"] = self.last_checkpoint
+        write_report_atomic(self.run_dir, data)
+
+    def record_exit(self, exc):
+        """Complete the record for a run ended by exc (R2.1): error or signal."""
+        if self.completed or self.snapshot is None or self.run_dir is None:
+            return
+        if isinstance(exc, RunSignal):
+            exit_status, reason, status = "signal", exc.name, "interrupted"
+        elif isinstance(exc, KeyboardInterrupt):
+            exit_status, reason, status = "signal", "SIGINT", "interrupted"
+        else:
+            where = f" in station {self.in_flight['station']}" if self.in_flight else ""
+            exit_status, status = "error", "failed"
+            reason = f"uncaught {type(exc).__name__}{where}: {exc}"
+        steps = list(self.steps())
+        flight = self.in_flight
+        if flight:
+            calling = bool(flight.get("calling"))
+            step = {"station": flight["station"], "status": status,
+                    "detail": f"The run ended while this station was in flight: {reason}",
+                    "duration_ms": round((time.perf_counter() - flight["started"]) * 1000, 3),
+                    "cost": None, "artifacts": [], "configured_model": flight.get("configured_model"),
+                    # Same rule as a station timeout record: the runtime was
+                    # running the handed-off model when the run ended.
+                    "executed_model": flight.get("handoff_model") if calling else None,
+                    "executor": _executor_provenance(self.executor)[0] if calling else None,
+                    "in_flight": True}
+            if flight.get("attempt"):
+                step["attempt"] = flight["attempt"]
+            steps.append(step)
+        steps.extend(_not_run_steps(self.order, steps))
+        data = self.snapshot(steps=steps, verdict="interrupted" if exit_status == "signal" else "failed")
+        data["checkpoint"] = self.last_checkpoint
+        data["exit_status"] = exit_status
+        data["termination_reason"] = reason
+        self.completed = write_report_atomic(self.run_dir, data)
+        try:
+            (self.run_dir / "swimlane.md").write_text(render_swimlane(data), encoding="utf-8")
+        except Exception as write_exc:
+            print(f"anvil: swimlane.md not written ({type(write_exc).__name__}: {write_exc})", file=sys.stderr)
+
+
+def _install_signal_handlers():
+    """Turn SIGTERM and SIGINT into RunSignal; returns the previous handlers.
+
+    Handlers can only be installed from the main thread; elsewhere the run
+    still checkpoints after every station and a KeyboardInterrupt is still
+    recorded as SIGINT.
+    """
+    if threading.current_thread() is not threading.main_thread():
+        return None
+
+    def on_signal(signum, frame):
+        raise RunSignal(signum)
+
+    previous = {}
+    for signum in (signal.SIGTERM, signal.SIGINT):
+        try:
+            previous[signum] = signal.signal(signum, on_signal)
+        except (ValueError, OSError):
+            pass
+    return previous
+
+
+def _restore_signal_handlers(previous):
+    for signum, handler in (previous or {}).items():
+        try:
+            signal.signal(signum, handler if handler is not None else signal.SIG_DFL)
+        except (ValueError, OSError):
+            pass
+
+
+def render_swimlane(report, routing_summary=None, intake_outcome=None):
+    """The swimlane markdown, rendered from a report dict alone (R3.1).
+
+    Works on a killed run's checkpointed or completed record and on reports
+    written before continuous run accounting (R3.3): every key is optional.
+    """
+    lines = ["# Swimlane", ""]
+    outcome = (intake_outcome or {}).get("outcome")
+    if outcome == "rejected":
+        lines += ["**Status**: rejected at intake", ""]
+    elif outcome == "waiting_info":
+        lines += ["**Status**: waiting for information", ""]
+    if routing_summary:
+        lines += [routing_summary, ""]
+    if report.get("exit_status"):
+        lines += [f"**Exit status**: {report['exit_status']} ({report.get('termination_reason') or 'no reason recorded'})", ""]
+    elif report.get("checkpoint"):
+        cp = report["checkpoint"]
+        lines += [f"**Exit status**: not recorded; last checkpoint after {cp.get('last_completed_station')}", ""]
+    steps = report.get("steps") or []
+    cost_section = report.get("cost") or {}
+    measured = cost_section.get("measured_steps", 0)
+    total_steps = measured + cost_section.get("unmeasured_steps", 0)
+    if measured > 0:
+        lines.append(f"**Cost**: ${cost_section.get('total', 0):.4f} ({measured} of {total_steps} steps measured)")
+    else:
+        lines.append(f"**Cost**: No measured steps ({total_steps} executed steps)")
+    lines.append("")
+    lines.append("| Station | Status | Duration ms | Artifacts | Cost |")
+    lines.append("|---|---|---|---|---|")
+    for s in steps:
+        arts = ", ".join(str(a) for a in s.get("artifacts") or []) or "-"
+        cost = s.get("cost")
+        lines.append(f"| {s.get('station')} | {s.get('status')} | {s.get('duration_ms', 0)} | {arts} | "
+                     f"{cost if cost is not None else 'null'} |")
+    decision = report.get("decision") or {}
+    if decision:
+        lines.append("")
+        lines.append("## Decision")
+        lines.append("")
+        lines.append(f"- Approver: {(decision.get('approver') or {}).get('rule')}")
+        lines.append(f"- Human gate: {(decision.get('human_gate') or {}).get('rule')}")
+    if report.get("deployment_status") is not None:
+        lines.append("")
+        lines.append(f"Deployment: {report['deployment_status']}")
+    if report.get("verify_results"):
+        lines.append("")
+        lines.append("Verification:")
+        for r in report["verify_results"]:
+            lines.append(f"- {r.get('status')}: {r.get('command')}")
+    health = report.get("health") or {}
+    if health:
+        lines.append("")
+        lines.append(f"Health: {health.get('outcome', 'unknown')}")
+        if health.get("health_reason"):
+            lines.append(f"- Reason: {health['health_reason']}")
+    return "\n".join(lines) + "\n"
+
 
 def parse_review(text, station_id):
     """Parse exactly one review JSON object from the authoritative channel.
@@ -1162,24 +1433,46 @@ def _packet_text(station_id, prompt, work_order, steps, learnings_section="", de
 def run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks=2,
                  executor=None, deploy_cfg=None, health_cfg=None, base_ref=None, resume=None):
     """Run the line. A run that raises leaves its state marked crashed
-    (governed-delivery S1) instead of looking like it is still running."""
+    (governed-delivery S1) instead of looking like it is still running, and
+    its report.json completed with exit_status error or signal
+    (continuous-run-accounting R2). SIGTERM and SIGINT are trapped for the
+    length of the run so they end it through the same completion."""
+    accounting = RunAccounting()
+    previous_handlers = _install_signal_handlers()
     try:
         return _run_pipeline(project_dir, pipeline, work_order, registry=registry, max_loopbacks=max_loopbacks,
                              executor=executor, deploy_cfg=deploy_cfg, health_cfg=health_cfg,
-                             base_ref=base_ref, resume=resume)
+                             base_ref=base_ref, resume=resume, accounting=accounting)
     except BaseException as exc:
+        # A second signal during completion takes the default path; the
+        # atomic write keeps report.json whole either way.
+        _restore_signal_handlers(previous_handlers)
+        previous_handlers = None
+        try:
+            accounting.record_exit(exc)
+        except Exception as record_exc:
+            print(f"anvil: run record not completed ({type(record_exc).__name__}: {record_exc})", file=sys.stderr)
         wo_id = work_order.get("id") if isinstance(work_order, dict) else getattr(work_order, "id", None)
         if wo_id:
             try:
                 mark_crashed(Path(project_dir) / "runs" / str(wo_id), exc)
             except Exception:
                 pass
+        if isinstance(exc, RunSignal):
+            # The record is complete; leave the way the signal would have.
+            if exc.signum == signal.SIGINT:
+                raise KeyboardInterrupt() from None
+            raise SystemExit(128 + exc.signum) from None
         raise
+    finally:
+        _restore_signal_handlers(previous_handlers)
 
 
 def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopbacks=2,
-                  executor=None, deploy_cfg=None, health_cfg=None, base_ref=None, resume=None):
+                  executor=None, deploy_cfg=None, health_cfg=None, base_ref=None, resume=None,
+                  accounting=None):
     project = Path(project_dir)
+    acct = accounting if accounting is not None else RunAccounting()
     if isinstance(work_order, dict):
         work_order = WorkOrder.from_dict(work_order)
 
@@ -1202,6 +1495,13 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
     loopbacks = 0
     order = pipeline.topological_order()
     execute_mode = executor is not None
+    # Until the full snapshot is registered before the line starts, an
+    # exit records the minimal report (the earlier record is already in history/).
+    acct.run_dir, acct.order, acct.executor = run_dir, order, executor
+    acct.steps = lambda: steps
+    acct.snapshot = lambda steps=None, verdict=None: RunReport(
+        work_order_id=work_order.id, pipeline=pipeline.name, title=work_order.title, kind=work_order.kind,
+        steps=list(steps if steps is not None else acct.steps()), verdict=verdict or "", run_id=run_id).to_dict()
 
     # Load price table for cost measurement
     config = load_anvil_config(project / "anvil.yaml")
@@ -1434,10 +1734,36 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
     preview_done = False
     preview_url = None
 
+    def snapshot(steps_now=None, verdict_now=None):
+        """The report as of now, in the final report's shape (R1.1).
+
+        The decision and human gate are settled only when the run ends, so
+        a checkpoint carries the approver entry once it exists and the human
+        gate as decided at triage so far.
+        """
+        current = verdict if verdict_now is None else verdict_now
+        return RunReport(work_order_id=work_order.id, pipeline=pipeline.name,
+                         steps=list(steps if steps_now is None else steps_now), verdict=current,
+                         title=work_order.title, kind=work_order.kind,
+                         human_required=bool(human_blocked), max_loopbacks=max_loopbacks, loopbacks=loopbacks,
+                         deployment_status=deployment_status, verify_results=verify_results,
+                         risk_hints=list(work_order.risk_hints or []),
+                         decision={"approver": decision_approver} if decision_approver else {},
+                         warnings=warnings, astra_measured_tokens_total=astra_measured_tokens_total,
+                         base_ref=base_ref, evidence=evidence_list, health=health_result,
+                         practices=practices_resolution, skills=public_resolution(skills_resolution),
+                         efficiency={"limits": limits, "stopped": current == "budget_exceeded"},
+                         run_id=run_id).to_dict()
+
+    acct.snapshot = lambda steps=None, verdict=None: snapshot(steps, verdict)
+    stop = None  # {"exit_status", "reason", "budget_death"?} once the line stops early (R2.2)
+
     while pos < len(order):
         idx = pos
         station_id = order[idx]
         pos += 1
+        acct.in_flight = {"station": station_id, "started": time.perf_counter(),
+                          "attempt": loopback_note["attempt"] if loopback_note else None}
         recorder.flush(steps, current_station=station_id, verdict=verdict, loopbacks=loopbacks)
         if station_id == preview_at and not preview_done and not gate_failed and builder_attempt > 0:
             preview_done = True
@@ -1463,6 +1789,9 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                         "model": "", "usage": {}, "cost": None,
                         "error": f"Knowledge pack loading failed: {pack_load_error}"})
             verdict = "failed"
+            stop = {"exit_status": "intake_stopped",
+                    "reason": f"intake stopped: knowledge pack loading failed: {pack_load_error}"}
+            acct.checkpoint(station_id)
             break
 
         station = None
@@ -1479,6 +1808,13 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 steps.append({"station": station_id, "status": "budget_exceeded", "detail": reason,
                               "duration_ms": 0, "cost": None, "artifacts": [], "executor": None})
                 verdict = "budget_exceeded"
+                limit = ("max_agent_calls" if reason.startswith("Agent call") else
+                         "require_usage" if reason.startswith("Usage required") else "max_run_tokens")
+                stop = {"exit_status": "budget_exceeded",
+                        "reason": f"{reason} before station {station_id}"
+                                  + (f" (max_run_tokens {limits['max_run_tokens']})" if limit == "max_run_tokens" else ""),
+                        "budget_death": _budget_death(steps, limits, station_id, limit)}
+                acct.checkpoint(station_id)
                 break
             if getattr(executor, "kind", None) == "command":
                 totals = summarize_steps(steps)
@@ -1515,6 +1851,7 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
         # keep recording the configured label (agent-execution S8).
         if execute_mode and _consumes_model_handoff(executor):
             configured_model = handoff_model
+        acct.in_flight.update(configured_model=configured_model, handoff_model=handoff_model)
         step_executor = None
         step_executed_model = None
         status = "completed"
@@ -1550,6 +1887,9 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 steps.append({"station": station_id, "status": "budget_exceeded", "detail": str(exc),
                               "duration_ms": 0, "cost": None, "artifacts": [], "executor": None})
                 verdict = "budget_exceeded"
+                stop = {"exit_status": "budget_exceeded", "reason": f"packet limit before station {station_id}: {exc}",
+                        "budget_death": _budget_death(steps, limits, station_id, "max_packet_tokens")}
+                acct.checkpoint(station_id)
                 break
         if station_id == "reviewer-design":
             rd_captures = []
@@ -1614,6 +1954,11 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                                   "detail": f"Scoped design packet exceeds {prebuilt_budget} tokens",
                                   "duration_ms": 0, "cost": None, "artifacts": [str(prebuilt_path)], "executor": None})
                     verdict = "budget_exceeded"
+                    stop = {"exit_status": "budget_exceeded",
+                            "reason": f"packet limit before station {station_id}: scoped design packet exceeds "
+                                      f"{prebuilt_budget} tokens",
+                            "budget_death": _budget_death(steps, limits, station_id, "max_packet_tokens")}
+                    acct.checkpoint(station_id)
                     break
             prebuilt_action = "sent" if prebuilt_measured <= prebuilt_budget else "trimmed"
             prebuilt_packet = (prebuilt_path, prebuilt_measured, prebuilt_budget, prebuilt_action)
@@ -1623,6 +1968,7 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 packet, measured_tokens, budget, budget_action = prebuilt_packet if prebuilt_packet is not None else packet_step(station, station_id)
                 packet_text = packet.read_text(encoding="utf-8")
                 output_file = run_dir / f"{station_id}.output.md"
+                acct.in_flight["calling"] = True
                 try:
                     result = _call_executor(executor, packet_text, station_id, packet_path=packet,
                                               output_path=output_file, cwd=project,
@@ -2034,6 +2380,7 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                     except FileNotFoundError:
                         pass
 
+                acct.in_flight["calling"] = True
                 try:
                     result = _call_executor(executor, packet_text, station_id, packet_path=packet,
                                               output_path=output_file, cwd=project,
@@ -2238,6 +2585,7 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 if key in extra_envelope:
                     step[key] = extra_envelope[key]
         steps.append(step)
+        acct.in_flight = None
 
         # S5: Track interface stations' measured tokens for report total
         if station_id in astra_bound_stations and measured_tokens > 0:
@@ -2276,6 +2624,11 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
 
         # Stop pipeline if intake outcome is terminal (rejected or waiting_info)
         if station_id == "intake" and terminal_outcome:
+            outcome = work_order.intake_outcome.get("outcome")
+            reasons = work_order.intake_outcome.get("reasons") or work_order.intake_outcome.get("questions") or []
+            stop = {"exit_status": "intake_stopped",
+                    "reason": f"intake outcome {outcome}" + (f": {'; '.join(str(r) for r in reasons)}" if reasons else "")}
+            acct.checkpoint(station_id)
             break
 
         # Insert pre-deploy gate before deployer (S5)
@@ -2297,6 +2650,14 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
             write_envelope("health-check", next_station,
                            str(run_dir / "report.json"),
                            deferred_health_step["status"], {"configured_model": None})
+        # A cap crossed, a station timeout or the runtime turn limit ends the
+        # run at this station (continuous-run-accounting R2.1).
+        stop = _station_stop(step, steps, limits) if execute_mode else None
+        if stop:
+            verdict = "budget_exceeded" if stop["exit_status"] == "budget_exceeded" else "failed"
+            acct.checkpoint(station_id)
+            break
+        looped_back = False
         # Loopback after checks-gate failure (S2)
         if station_id == "checks-gate" and gate_failed and loopbacks < max_loopbacks:
             loopbacks += 1
@@ -2365,15 +2726,40 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 verdict = ""
                 decision_approver = None
                 preview_done = False
+                looped_back = True
+        # A failed pre-review gate with no further attempt stops the line:
+        # no reviewer runs on work the checks rejected (R2.1).
+        if station_id == "checks-gate" and gate_failed and execute_mode and not looped_back:
+            verdict = "gate_failed"
+            stop = {"exit_status": "checks_stopped",
+                    "reason": f"pre-review checks gate failed with {loopbacks} of {max_loopbacks} loopbacks used: {detail}"}
+            acct.checkpoint(station_id)
+            break
+        acct.checkpoint(station_id)
+    acct.in_flight = None
     recorder.flush(steps, verdict=verdict, loopbacks=loopbacks)
     if not verdict:
         verdict = "packet_ready"
+    if stop is None:
+        if verdict == "gate_failed":
+            stop = {"exit_status": "checks_stopped", "reason": "pre-deploy checks gate failed; deployment blocked"}
+        else:
+            stop = {"exit_status": "completed", "reason": f"run completed with verdict {verdict}"}
+    # Every station of the pipeline is named once: unreached ones as not_run
+    # (R2.3). They are record entries, not station events.
+    steps.extend(_not_run_steps(order, steps))
+    recorder.emitted = len(steps)
     if decision_approver is None:
         # A pipeline without an approver step aggregates nothing; say so
-        # instead of inventing a verdict explanation.
+        # instead of inventing a verdict explanation. A line stopped before
+        # its approver says that instead.
+        rule = "The pipeline has no approver step, so no reviews were aggregated into a verdict."
+        if "approver" in order and stop["exit_status"] != "completed":
+            rule = (f"The run ended ({stop['exit_status']}) before the approver step, so no reviews were "
+                    f"aggregated into a verdict.")
         decision_approver = {"reviews_counted": [{"station": r.station, "verdict": r.verdict} for r in run_reviews],
                              "reviews_expected": list(reviews_expected),
-                             "rule": "The pipeline has no approver step, so no reviews were aggregated into a verdict."}
+                             "rule": rule}
     if verdict in {"approved", "rejected", "changes_requested", "no_reviews", "human_required"}:
         human_required, human_rule, hints_matched = needs_human_explained(work_order, verdict)
     else:
@@ -2437,61 +2823,16 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                        practices=practices_resolution,
                        skills=public_resolution(skills_resolution),
                        efficiency={"limits": limits, "stopped": verdict == "budget_exceeded"},
-                       run_id=run_id)
-    (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
+                       run_id=run_id, checkpoint=acct.last_checkpoint, exit_status=stop["exit_status"],
+                       termination_reason=stop["reason"], budget_death=stop.get("budget_death"))
+    # The completed record is the last checkpoint plus the verdict, decision
+    # and exit fields (R1.3); a failed write keeps that checkpoint (R2.5).
+    acct.completed = write_report_atomic(run_dir, report.to_dict())
     recorder.finish(steps, report.to_dict())
-    # Swimlane
-    lines = ["# Swimlane", ""]
-
-    # Add intake outcome summary if present
-    if work_order.intake_outcome:
-        outcome = work_order.intake_outcome.get("outcome")
-        if outcome == "rejected":
-            lines.append("**Status**: rejected at intake")
-            lines.append("")
-        elif outcome == "waiting_info":
-            lines.append("**Status**: waiting for information")
-            lines.append("")
-
-    # Add routing summary if present
-    if routing_record:
-        lines.append(routing_swimlane_summary(routing_record))
-        lines.append("")
-
-    # Add cost summary
-    report_dict = report.to_dict()
-    cost_section = report_dict["cost"]
-    total_steps = cost_section["measured_steps"] + cost_section["unmeasured_steps"]
-    if cost_section["measured_steps"] > 0:
-        lines.append(f"**Cost**: ${cost_section['total']:.4f} ({cost_section['measured_steps']} of {total_steps} steps measured)")
-    else:
-        lines.append(f"**Cost**: No measured steps ({total_steps} executed steps)")
-    lines.append("")
-    lines.append("| Station | Status | Duration ms | Artifacts | Cost |")
-    lines.append("|---|---|---|---|---|")
-    for s in steps:
-        arts = ", ".join(s.get("artifacts", [])) or "-"
-        cost = s.get("cost")
-        lines.append(f"| {s['station']} | {s['status']} | {s.get('duration_ms', 0)} | {arts} | {cost if cost is not None else 'null'} |")
-    lines.append("")
-    lines.append("## Decision")
-    lines.append("")
-    lines.append(f"- Approver: {decision['approver']['rule']}")
-    lines.append(f"- Human gate: {decision['human_gate']['rule']}")
-    if deployment_status is not None:
-        lines.append("")
-        lines.append(f"Deployment: {deployment_status}")
-    if verify_results:
-        lines.append("")
-        lines.append("Verification:")
-        for r in verify_results:
-            lines.append(f"- {r['status']}: {r['command']}")
-    if health_result:
-        lines.append("")
-        lines.append(f"Health: {health_result.get('outcome', 'unknown')}")
-        if health_result.get('health_reason'):
-            lines.append(f"- Reason: {health_result['health_reason']}")
-    (run_dir / "swimlane.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # Swimlane, rendered from the report alone (R3.1)
+    (run_dir / "swimlane.md").write_text(
+        render_swimlane(report.to_dict(), routing_swimlane_summary(routing_record) if routing_record else None,
+                        work_order.intake_outcome), encoding="utf-8")
 
     # Render report.md
     report_lines = ["# Run Report", "", f"Work Order: {work_order.id}", f"Title: {work_order.title}",
@@ -2588,7 +2929,7 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
             generate_status_page(project)
         except OSError as exc:
             report.warnings.append(f"Status page refresh failed: {exc}")
-            (run_dir / "report.json").write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
+            write_report_atomic(run_dir, report.to_dict())
     return report
 
 run = run_pipeline

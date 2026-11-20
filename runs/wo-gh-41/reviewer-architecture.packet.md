@@ -114,58 +114,23 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/41
 
 ## Upstream steps
 
-- intake: failed
-- spec-writer: failed
-- test-writer: failed
+- intake: executed
+- spec-writer: executed
+- test-writer: executed
 - builder: failed
 - checks-gate: failed
 - loopback: loopback
-- builder: failed
-- checks-gate: failed
-- loopback: loopback
-- builder: failed
-- checks-gate: failed
 - reviewer-spec: skipped
 - reviewer-security: skipped
 - reviewer-tests: skipped
 
-## Loopback feedback (attempt 3 of 3)
+## Run context
 
-This is a re-review. The previous attempt was sent back by checks-gate to builder. Judge the work as it is now, and check that each finding below is resolved; do not pass a finding that is still open.
+Read the upstream work before you start; it is the input your station builds on.
 
-Reason: Gate checks failed; artifact validation: Builder report artifact /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-41/runs/wo-gh-41/builder.output.md is missing.
-
-- # Checks Gate: pre-review
-  Basis: builder_delta
-  Attempt: 2
-  
-  # Check Commands
-  ## Command 1: python -m unittest discover -s tests -p 'test_*.py'
-  Exit code: 0
-  Output:
-  ```
-  ame false"
-  Switched to a new branch 'work-branch'
-  .hint: Using 'master' as the name for the initial branch. This default branch name
-  hint: will change to "main" in Git 3.0. To configure the initial branch name
-  hint: to use in all of your new repositories, which will suppress this warning,
-  hint: call:
-  hint:
-  hint: 	git config --global init.defaultBranch <name>
-  hint:
-  hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
-  hint: 'development'. The just-created branch can be renamed via this command:
-  hint:
-  hint: 	git branch -m <name>
-  hint:
-  hint: Disable this message with "git config set advice.defaultBranchName false"
-  Switched to a new branch 'work-branch'
-  ................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 43297)>
-    if method() is not None:
-  ResourceWarning: Enable tracemalloc to get the object allocation traceback
-  .../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 40877)>
-    if method() is not None:
-  ResourceWarning: Enable tracemalloc t
+- Output of intake: runs/wo-gh-41/intake.output.md
+- Output of spec-writer: runs/wo-gh-41/spec-writer.output.md
+- Output of test-writer: runs/wo-gh-41/test-writer.output.md
 
 ## Output contract
 

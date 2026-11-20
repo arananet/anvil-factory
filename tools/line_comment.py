@@ -39,6 +39,14 @@ def render(report, code, run_url="", branch=""):
         f"- Human review required: {report.get('human_required')}",
         f"- Deployment status: {cell(report.get('deployment_status'))}",
     ]
+    # Continuous run accounting: a killed run's record says how it ended.
+    # Reports written before that change carry neither key and render as before.
+    if report.get("exit_status"):
+        lines.append(f"- Exit status: {cell(report['exit_status'])}")
+        lines.append(f"- Termination reason: {cell(report.get('termination_reason'))}")
+    elif (report.get("checkpoint") or {}).get("last_completed_station"):
+        lines.append(f"- Exit status: not recorded; last checkpoint after "
+                     f"{cell(report['checkpoint']['last_completed_station'])}")
     previews = [s for s in report.get("steps") or [] if s.get("station") == "preview" and s.get("url")]
     if previews:
         last = previews[-1]

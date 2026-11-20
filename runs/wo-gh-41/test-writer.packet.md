@@ -104,12 +104,14 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/41
 
 ## Upstream steps
 
-- intake: failed
-- spec-writer: failed
+- intake: executed
+- spec-writer: executed
 
 ## Run context
 
 Read the upstream work before you start; it is the input your station builds on.
 The checks gate runs the project checks listed here; run them yourself before you hand off.
 
+- Output of intake: runs/wo-gh-41/intake.output.md
+- Output of spec-writer: runs/wo-gh-41/spec-writer.output.md
 - Project check: `python -m unittest discover -s tests -p 'test_*.py'`
