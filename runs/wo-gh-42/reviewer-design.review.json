@@ -1,0 +1,20 @@
+{
+  "station": "reviewer-design",
+  "verdict": "changes_requested",
+  "compliance": {
+    "verdict": "changes_requested",
+    "findings": [
+      "Carried loopback finding, still open (R4; S4, S5, S8), not passed by this station: anvil/runner.py:1652 still sets completeness_active = any(station_budget_settings(config)) and anvil/runner.py:2440 still gates the pre-review completeness precondition on that flag, while .openspec/specs/station-budgets-completeness/spec.md line 35 (R4) still states the precondition unconditionally. A project with no efficiency.station_budgets and no default_station_budget skips completeness. This needs the owner ruling (amend R4 to scope completeness to configured partitions, or authorize updating the 22 protected tests so the gate runs unconditionally). It is not a design-system defect, but this re-review cannot pass an open loopback finding.",
+      "Design-system scope, no defect: the diff against 72a84126a600fafb99446946694b5de809e01e66 touches no interface artifact (no HTML, CSS, JS or status page template; anvil/statuspage is unchanged). Every token in design/tokens.json is TODO, and no changed file uses a design token, so per the TODO rule there is nothing to flag. The rendered evidence (runs/wo-gh-42/evidence/screenshot-1440x900.png, screenshot-390x844.png) shows the existing ANVIL run status page, which this order does not change. Checked against the DESIGN.md quality bars for the record: hierarchy is clear (orange 'run status' title, bold section heads, large stat figures), the 390px capture reflows the stat grid to two columns with no horizontal scroll, and body text is readable without zoom. No regression is attributable to this order.",
+      "Non-blocking note: R5 adds a per-station money column to the run report's cost section. It is a data field in report.json and docs, not a rendered UI change in this diff. If the status page later renders it, that page change should come back to this station for review against the quality bars (Scale Contrast for the muted secondary text, Spacing Rhythm once spacing tokens are defined)."
+    ]
+  },
+  "quality": {
+    "verdict": "pass",
+    "findings": [
+      "The Quality Charter declares physical_product (materials, light, contact, scale). This order produces no visual deliverable: no product imagery, no page, no capture of a changed surface. So there is no materials, light, contact or scale gap to name. The screenshots show an unchanged software status page and are not product renders. Judged against the charter floor only: not applicable, no finding.",
+      "Promoted practices P-4 to P-7 (asset pack fidelity, parallax depth, cross-set coherence, genre coherence) cover games and visual sets. They do not apply to this backend-only order, and no work-order identity_reference is declared."
+    ],
+    "anchor": "charter floor only"
+  }
+}

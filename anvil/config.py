@@ -244,3 +244,96 @@ def get_contact_sheet_max_width(config):
         return DEFAULT_CONTACT_SHEET_MAX_WIDTH
 
     return config.get("contact_sheet_max_width", DEFAULT_CONTACT_SHEET_MAX_WIDTH)
+
+
+# station-budgets-completeness R1: per-station token partitions inside the
+# run cap. efficiency.station_budgets maps a station id to the tokens that
+# station may consume across one run; efficiency.default_station_budget is
+# the partition of a model station the map does not name. Both differ from
+# the top level station_budgets key above (get_station_budget), which caps
+# the size of one packet, not what a station consumes. An absent default
+# leaves unnamed stations unpartitioned (bounded by max_run_tokens alone) and
+# adds nothing to the worst case.
+# Stations that call a model although their manifest says deterministic.
+MODEL_CALLING_DETERMINISTIC = frozenset({"intake"})
+# Stations treated as deterministic when no registry is given (the runner's
+# own fallback for stations it does not know).
+DETERMINISTIC_FALLBACK = frozenset({"approver", "triage-human", "checks-gate"})
+
+
+def _positive_tokens(value, name):
+    if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+        raise ValueError(f"{name} must be a positive integer number of tokens, got {value!r}")
+    return value
+
+
+def station_budget_settings(config):
+    """Validated (station_budgets, default_station_budget) from the efficiency section.
+
+    Returns ({station: tokens}, default or None). A malformed map, a station
+    id that is not a non empty string or a value that is not a positive
+    integer raises ValueError naming the key and the station.
+    """
+    efficiency = config.get("efficiency") if isinstance(config, dict) else None
+    efficiency = efficiency if isinstance(efficiency, dict) else {}
+    raw = efficiency.get("station_budgets")
+    if raw is None:
+        raw = {}
+    if not isinstance(raw, dict):
+        raise ValueError(f"efficiency.station_budgets must be a map from station id to tokens, got {raw!r}")
+    budgets = {}
+    for station, value in raw.items():
+        if not isinstance(station, str) or not station.strip():
+            raise ValueError(f"efficiency.station_budgets has an invalid station id {station!r}")
+        budgets[station] = _positive_tokens(value, f"efficiency.station_budgets.{station}")
+    default = efficiency.get("default_station_budget")
+    if default is not None:
+        default = _positive_tokens(default, "efficiency.default_station_budget")
+    return budgets, default
+
+
+def is_model_station(station_id, registry=None):
+    """True when the station calls a model (agent kind, or intake)."""
+    if station_id in MODEL_CALLING_DETERMINISTIC:
+        return True
+    if registry is not None and station_id in registry:
+        return registry.get(station_id).kind == "agent"
+    return station_id not in DETERMINISTIC_FALLBACK
+
+
+def pipeline_partitions(config, pipeline, registry=None):
+    """{station: partition} for one pipeline: named stations, then the default
+    for each unnamed model station. Deterministic stations the map does not
+    name (the checks gate) take no partition."""
+    budgets, default = station_budget_settings(config)
+    result = {}
+    for station in pipeline.topological_order():
+        if station in budgets:
+            result[station] = budgets[station]
+        elif default is not None and is_model_station(station, registry):
+            result[station] = default
+    return result
+
+
+def validate_station_budgets(config, pipelines, registry=None):
+    """Check the partition set against max_run_tokens for every pipeline (R1).
+
+    Returns {pipeline name: worst case tokens}, the worst case being the sum
+    of the pipeline's partitions (pipeline_partitions). A worst case above
+    max_run_tokens raises ValueError naming each such pipeline and its
+    excess; a worst case equal to the cap is accepted.
+    """
+    efficiency = config.get("efficiency") if isinstance(config, dict) else None
+    cap = efficiency.get("max_run_tokens") if isinstance(efficiency, dict) else None
+    worst = {}
+    excess = []
+    for pipeline in pipelines:
+        total = sum(pipeline_partitions(config, pipeline, registry).values())
+        worst[pipeline.name] = total
+        if cap is not None and total > cap:
+            excess.append(f"pipeline {pipeline.name}: worst case {total} tokens exceeds "
+                          f"max_run_tokens {cap} by {total - cap}")
+    if excess:
+        raise ValueError("efficiency.station_budgets exceed the run cap: " + "; ".join(excess)
+                         + ". Lower the partitions or the default; the run cap is the outer bound.")
+    return worst

@@ -8,7 +8,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 from .model import WorkOrder, Review
-from .config import default_model, resolve_model, load_anvil_config, health_config, CHARS_PER_TOKEN, get_station_budget
+from .config import (default_model, resolve_model, load_anvil_config, health_config, CHARS_PER_TOKEN,
+                     get_station_budget, validate_station_budgets, pipeline_partitions,
+                     station_budget_settings)
 from .brain import (packet_learnings_section, resolve_practices, practices_by_id,
                     packet_practices_section, gate_practices_section)
 from .design import packet_design_section, load_design_system
@@ -31,7 +33,8 @@ from .quality import (
     is_visual_run,
 )
 from .skills import resolve_skills, skills_by_id, packet_skills_section, public_resolution
-from .telemetry import summarize_steps, efficiency_config, budget_reason, EFFICIENCY_NOTE
+from .telemetry import (summarize_steps, efficiency_config, budget_reason, EFFICIENCY_NOTE,
+                        station_consumption, precall_decision, normalize_usage)
 
 def _sanitize_control_chars(text):
     """Sanitize control characters from text to prevent injection.
@@ -693,6 +696,13 @@ class RunReport:
     exit_status: str = None
     termination_reason: str = None
     budget_death: dict = None
+    # station-budgets-completeness: per-station partitions and their outcomes
+    # (R2, R3), the completeness evaluations before review (R4) and the
+    # per-station money view of the cost section (R5). Additive and emitted
+    # only when set, like the accounting keys above.
+    budgets: dict = None
+    completeness: list = None
+    cost_stations: dict = None
     def to_dict(self):
         # Build cost section from steps
         measured_steps = [s for s in self.steps if s.get("cost") is not None]
@@ -704,6 +714,8 @@ class RunReport:
             "measured_steps": len(measured_steps),
             "unmeasured_steps": len(unmeasured_steps)
         }
+        if self.cost_stations is not None:
+            cost_section["stations"] = self.cost_stations
 
         result = {"work_order_id": self.work_order_id, "pipeline": self.pipeline,
                 "title": self.title, "kind": self.kind,
@@ -721,7 +733,8 @@ class RunReport:
         # Add health section if present
         if self.health:
             result["health"] = self.health
-        for key in ("checkpoint", "exit_status", "termination_reason", "budget_death"):
+        for key in ("checkpoint", "exit_status", "termination_reason", "budget_death",
+                    "budgets", "completeness"):
             if getattr(self, key) is not None:
                 result[key] = getattr(self, key)
 
@@ -837,6 +850,14 @@ def _station_stop(step, steps, limits):
                 "reason": f"run token cap crossed in station {sid}: measured {total} tokens "
                           f"against max_run_tokens {cap}",
                 "budget_death": _budget_death(steps, limits, sid)}
+    if step.get("status") == "budget_exceeded":
+        # station-budgets-completeness R3: the in-flight ceiling stopped the
+        # station at its partition, or the wrapper refused its correction.
+        ceiling = step.get("budget_ceiling") or {}
+        return {"exit_status": "budget_exceeded",
+                "reason": ceiling.get("termination_reason")
+                          or f"station {sid} stopped at its token partition",
+                "budget_death": _budget_death(steps, limits, sid, "station_budget")}
     if step.get("status") == "timed_out":
         timeout = step.get("timeout") or {}
         return {"exit_status": "station_timeout",
@@ -1122,6 +1143,92 @@ def _timeout_record(exc, station_id):
     return {"station": station_id, "source": found.get("source"), "timeout_seconds": seconds,
             "elapsed_ms": found.get("elapsed_ms"),
             "reason": str(found.get("reason") or f"timed out after {seconds}s")}
+
+
+# The wrapper's stderr marker for a correction re-dispatch it refused because
+# the station's partition was spent (tools/claude_station.py). SYNC: the same
+# text as CORRECTION_REFUSED in the wrapper.
+CORRECTION_REFUSED = "partition exhausted before the correction re-dispatch"
+
+
+def _ceiling_record(exc, station_id, partition):
+    """The budget record for a station the wrapper stopped at its partition, else None.
+
+    station-budgets-completeness R3: the wrapper kills a session whose
+    measured usage crosses the station's partition and records the attempt
+    with status budget_exceeded (station, reason, configured model, partial
+    usage); the executor exposes it as result["budget_exceeded"]. A
+    correction re-dispatch the wrapper refused is recorded the same way,
+    with outcome refused and no attempt added.
+    """
+    found = (exc.result or {}).get("budget_exceeded")
+    if isinstance(found, dict):
+        return {"station": station_id, "outcome": "budget_exceeded", "partition": partition,
+                "elapsed_ms": found.get("elapsed_ms"), "reason": str(found.get("reason") or ""),
+                "dispatched_model": found.get("configured_model")}
+    if CORRECTION_REFUSED in str(exc):
+        return {"station": station_id, "outcome": "refused", "dispatch": "correction",
+                "partition": partition, "reason": CORRECTION_REFUSED,
+                "refused_at": datetime.now(timezone.utc).isoformat()}
+    return None
+
+
+def _nonempty_file(path):
+    # Whitespace only counts as empty, the same rule the artifact contract's
+    # builder report validation applies (gates.validate_builder_report).
+    try:
+        return Path(path).is_file() and bool(Path(path).read_bytes().strip())
+    except OSError:
+        return False
+
+
+# Step statuses that mean a station did not complete its work.
+FAILED_STATUSES = {"failed", "timed_out", "budget_exceeded"}
+
+
+def completeness_gaps(project, run_dir, order, gate_index, steps, attempt, gate_verdict,
+                      builder_delta, test_writer_delta):
+    """The completeness precondition before review (station-budgets-completeness R4).
+
+    Deterministic and read only: it consumes the artifacts on disk, the
+    builder attempt's delta and the checks gate verdict already decided; it
+    runs no command and does not repeat the artifact contract's literal
+    validation. Returns the named gaps; an empty list means the attempt may
+    go to review. (a) the builder report exists and is non-empty, the
+    test-writer's test files exist and are non-empty, the attempt's delta is
+    not empty; (b) the gate verdict is pass; (c) no station the pipeline
+    runs before the gate is recorded failed without its artifact.
+    """
+    project, run_dir = Path(project), Path(run_dir)
+    gaps = []
+    report = run_dir / "builder.output.md"
+    builder_report_rel = f"runs/{run_dir.name}/builder.output.md"
+    if not _nonempty_file(report):
+        gaps.append(f"builder report {builder_report_rel} is missing or empty for attempt {attempt}")
+    earlier = order[:gate_index]
+    ran = {s.get("station") for s in steps}
+    test_files = sorted(f for f in (test_writer_delta or ()) if _nonempty_file(project / f))
+    if "test-writer" in earlier and "test-writer" in ran and not test_files:
+        gaps.append(f"test-writer test files for attempt {attempt} are absent: the test-writer left "
+                    f"no changed file that exists and is non-empty")
+    if not builder_delta:
+        gaps.append(f"run delta file list for attempt {attempt} is empty: the builder changed no file")
+    if gate_verdict != "pass":
+        gaps.append(f"checks gate verdict for attempt {attempt} is {gate_verdict}, not pass")
+    for sid in earlier:
+        latest = next((s for s in reversed(steps) if s.get("station") == sid), None)
+        if latest is None or latest.get("status") not in FAILED_STATUSES:
+            continue
+        if sid == "builder":
+            present, what = _nonempty_file(report), builder_report_rel
+        elif sid == "test-writer":
+            present, what = bool(test_files), "its test files"
+        else:
+            present = _nonempty_file(run_dir / f"{sid}.output.md")
+            what = f"runs/{run_dir.name}/{sid}.output.md"
+        if not present:
+            gaps.append(f"station {sid} is recorded {latest.get('status')} without its artifact ({what})")
+    return gaps
 
 
 def _executor_provenance(executor, output_text=""):
@@ -1533,6 +1640,19 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
     # Load price table for cost measurement
     config = load_anvil_config(project / "anvil.yaml")
     limits = efficiency_config(config)
+    # station-budgets-completeness R1: the partitions are validated against
+    # the run cap before any station runs; an over-cap set fails here,
+    # naming the pipeline and the excess, with zero model calls.
+    validate_station_budgets(config, [pipeline], registry)
+    partitions = pipeline_partitions(config, pipeline, registry)
+    # The completeness precondition (R4) belongs to the same spend controls:
+    # it is live when the project configures partitions (the factory's own
+    # anvil.yaml does). A project without them keeps the review flow it had,
+    # which the line's existing contract tests pin (decision 0014).
+    completeness_active = any(station_budget_settings(config))
+    budget_outcomes = []       # refused, budget_exceeded and proceeded_unmeasured records (R2, R3)
+    completeness_records = []  # one evaluation per builder attempt reaching the pre-review gate (R4)
+    precall_done = None        # station whose next dispatch already passed the pre-call check
     if getattr(executor, "kind", None) == "command":
         executor.limits = {}
         for key, name in (("max_runtime_turns", "ANVIL_MAX_RUNTIME_TURNS"),
@@ -1545,6 +1665,47 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
         # Price table validation failed - log warning but continue
         price_table = {}
         print(f"Warning: {e}")
+
+    def budgets_view(steps_now):
+        """The run record's budgets field set (R2, R3): every partitioned
+        station with its partition and consumption so far, and the outcomes."""
+        if not partitions:
+            return None
+        stations = {}
+        for sid, partition in partitions.items():
+            found = station_consumption(steps_now, sid)
+            stations[sid] = {"partition": partition, "consumed": found["consumed"],
+                             "measured_tokens": found["measured_tokens"], "calls": found["calls"],
+                             "unmeasured_calls": found["unmeasured_calls"]}
+        return {"stations": stations, "outcomes": [dict(o) for o in budget_outcomes],
+                "source": "per-attempt usage artifacts (token-efficiency), summed per station"}
+
+    def cost_stations_view(steps_now):
+        """Per-station money next to the tokens (R5). A station is priced only
+        when every measured call of it was priced from the recorded table;
+        otherwise it shows tokens only and stays unmeasured in money."""
+        if not partitions:
+            return None
+        view = {}
+        for sid, partition in partitions.items():
+            found = station_consumption(steps_now, sid)
+            measured = [st for st in steps_now if st.get("station") == sid and st.get("usage") is not None]
+            priced = bool(measured) and found["consumed"] is not None and all(
+                st.get("cost") is not None for st in measured)
+            entry = {"partition": partition, "consumed": found["consumed"],
+                     "amount": None, "priced": priced, "source": None}
+            if priced:
+                models = sorted({st.get("executed_model") or st.get("configured_model") for st in measured})
+                entry["amount"] = sum(st["cost"] for st in measured)
+                entry["source"] = "recorded price table (anvil.yaml prices): " + ", ".join(
+                    f"{m} priced from {price_table[m].get('source')} recorded {price_table[m].get('date_recorded')}"
+                    for m in models if m in price_table)
+                entry["label"] = "priced from the recorded price table; an estimate, not an invoice"
+            else:
+                entry["label"] = "tokens only: unmeasured in money (no recorded price covers this station)"
+            view[sid] = entry
+        return view
+
     # Run scoped reviews: only reviews produced during this run feed the
     # approver. Standing project reviews under reviews/<slug>/ are the project
     # record read by `anvil check`, never inputs to a run.
@@ -1624,6 +1785,11 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
     builder_attempt = 0
     builder_delta = set()
     builder_snapshot_before = None
+    test_writer_delta = set()
+    # The current attempt's own delta for completeness (R4), also when the
+    # builder failed; builder_delta keeps the checks gate's basis unchanged.
+    builder_attempt_delta = set()
+    completeness_failed = False
 
     # Check for design system and prepare warnings
     warnings = []
@@ -1780,9 +1946,56 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                          base_ref=base_ref, evidence=evidence_list, health=health_result,
                          practices=practices_resolution, skills=public_resolution(skills_resolution),
                          efficiency={"limits": limits, "stopped": current == "budget_exceeded"},
-                         run_id=run_id).to_dict()
+                         run_id=run_id, budgets=budgets_view(steps if steps_now is None else steps_now),
+                         completeness=list(completeness_records) if completeness_records else None,
+                         cost_stations=cost_stations_view(steps if steps_now is None else steps_now)).to_dict()
 
     acct.snapshot = lambda steps=None, verdict=None: snapshot(steps, verdict)
+
+    def precall(station_id, dispatch):
+        """The pre-call check before one dispatch (station-budgets-completeness R2).
+
+        Returns the stop record when the dispatch is refused, else None. A
+        refusal is recorded as a budget outcome and a step with no executor,
+        so it costs zero model calls; a dispatch that proceeds on unmeasured
+        usage is recorded as such.
+        """
+        partition = partitions.get(station_id)
+        if partition is None:
+            return None
+        found = precall_decision(steps, station_id, partition, bool(limits.get("require_usage")))
+        at = datetime.now(timezone.utc).isoformat()
+        if found["decision"] == "proceed_unmeasured":
+            budget_outcomes.append({"station": station_id, "outcome": "proceeded_unmeasured",
+                                    "partition": partition, "consumed": None,
+                                    "measured_tokens": found["measured_tokens"],
+                                    "unmeasured_calls": found["unmeasured_calls"],
+                                    "dispatch": dispatch, "checked_at": at})
+            return None
+        if found["decision"] != "refuse":
+            return None
+        if found["measured_tokens"] >= partition:
+            why = f"measured {found['measured_tokens']} tokens against its partition {partition}"
+        else:
+            why = (f"{found['unmeasured_calls']} earlier call(s) unmeasured and require_usage is set, "
+                   f"so it counts as exhausted until measured (partition {partition})")
+        budget_outcomes.append({"station": station_id, "outcome": "refused", "partition": partition,
+                                "consumed": found["consumed"], "measured_tokens": found["measured_tokens"],
+                                "refused_at": at, "dispatch": dispatch, "reason": why})
+        death = _budget_death(steps, limits, station_id, "station_budget")
+        refusal = {"station": station_id, "status": "budget_exceeded",
+                   "detail": f"Dispatch refused by the pre-call check: station {station_id} {why}; "
+                             f"no model call was made",
+                   "duration_ms": 0, "cost": None, "artifacts": [], "configured_model": None,
+                   "executed_model": None, "executor": None, "budget_outcome": "refused"}
+        if loopback_note:
+            refusal["attempt"] = loopback_note["attempt"]
+        steps.append(refusal)
+        return {"exit_status": "budget_exceeded",
+                "reason": f"station {station_id} partition exhausted: {why} (efficiency.station_budgets "
+                          f"{station_id} {partition}); its {dispatch} dispatch was refused with zero model calls",
+                "budget_death": death}
+
     stop = None  # {"exit_status", "reason", "budget_death"?} once the line stops early (R2.2)
 
     while pos < len(order):
@@ -1830,6 +2043,15 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
         calls_agent = (execute_mode and (station_id == "intake" or kind == "agent") and not routed_out
                        and not (station_id == "deployer" and deploy_cfg and deploy_cfg.get("command")))
         if calls_agent:
+            if station_id in partitions and precall_done != station_id:
+                dispatch = "loopback" if any(s.get("station") == station_id for s in steps) else "first"
+                refused = precall(station_id, dispatch)
+                if refused:
+                    verdict = "budget_exceeded"
+                    stop = refused
+                    acct.checkpoint(station_id)
+                    break
+            precall_done = None
             reason = budget_reason(steps, limits)
             if reason:
                 steps.append({"station": station_id, "status": "budget_exceeded", "detail": reason,
@@ -1849,6 +2071,15 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                     executor.limits["ANVIL_MAX_STATION_TOKENS"] = max(1, limits["max_run_tokens"] - (totals["total_tokens"] or 0))
                 if limits.get("max_agent_calls"):
                     executor.limits["ANVIL_MAX_ATTEMPTS"] = max(1, min(2, limits["max_agent_calls"] - totals["calls"]))
+                # station-budgets-completeness R3: the wrapper's in-flight
+                # ceiling is what is left of the station's partition.
+                if station_id in partitions:
+                    spent = station_consumption(steps, station_id)["measured_tokens"]
+                    executor.limits["ANVIL_STATION_BUDGET_TOKENS"] = max(1, partitions[station_id] - spent)
+                    executor.limits["ANVIL_STATION_PARTITION"] = partitions[station_id]
+                else:
+                    executor.limits.pop("ANVIL_STATION_BUDGET_TOKENS", None)
+                    executor.limits.pop("ANVIL_STATION_PARTITION", None)
         # Model provenance: the configured label is a fact of configuration,
         # recorded in every mode. Executed fields stay null until a runtime
         # actually runs the station (agent-execution S8).
@@ -1888,6 +2119,7 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
         step_usage = None
         step_telemetry = {}
         step_timeout = None
+        step_ceiling = None
         deferred_verifier = None
         deferred_pre_deploy_gate = None
         deferred_health_step = None
@@ -2087,6 +2319,13 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                         detail = (f"Station timed out after {step_timeout['timeout_seconds']}s "
                                   f"({step_timeout['reason']}); {exc}")
                         step_executed_model = step_executed_model or handoff_model
+                    step_ceiling = _ceiling_record(exc, station_id, partitions.get(station_id))
+                    if step_ceiling:
+                        status = "budget_exceeded"
+                        detail = (f"Station stopped at its token partition {step_ceiling['partition']} "
+                                  f"({step_ceiling['reason']}); {exc}")
+                        step_executed_model = (step_executed_model or step_ceiling.get("dispatched_model")
+                                               or handoff_model)
             else:
                 detail = "Work order normalized"
                 artifact = str(run_dir / "report.json")
@@ -2194,6 +2433,19 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                     status = "failed"
                     detail = f"{detail}; artifact validation failed: {' '.join(validation['findings'])}"
                     extra_envelope["output"] = validation["log"]
+
+            # station-budgets-completeness R4: the completeness precondition
+            # before any reviewer, consuming the verdict decided above. It
+            # is recorded in its own field set, never in the gate's step.
+            if phase == "pre-review" and execute_mode and completeness_active and builder_attempt > 0:
+                gaps = completeness_gaps(project, run_dir, order, idx, steps, builder_attempt,
+                                         gate_result["gate_verdict"], builder_attempt_delta, test_writer_delta)
+                completeness_records.append({"attempt": builder_attempt, "passed": not gaps, "gaps": gaps,
+                                             "gate_verdict": gate_result["gate_verdict"],
+                                             "evaluated_at": datetime.now(timezone.utc).isoformat()})
+                if gaps:
+                    completeness_failed = True
+                    gate_failed = True  # no reviewer is dispatched for this attempt
 
             # If gate failed and we're in pre-review phase, trigger loopback (S2)
             if gate_result["gate_verdict"] == "fail" and phase == "pre-review":
@@ -2371,7 +2623,8 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
             # Skip reviewers if gate failed (S2)
             if gate_failed and station_id.startswith("reviewer"):
                 status = "skipped"
-                detail = "Skipped due to gate failure"
+                detail = ("Skipped: the completeness precondition failed before review" if completeness_failed
+                          else "Skipped due to gate failure")
                 packet = prebuilt_packet[0] if prebuilt_packet is not None else packet_step(station, station_id)[0]
                 artifact = str(packet)
             # Skip reviewers that were routed out
@@ -2386,6 +2639,9 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 if station_id == "builder":
                     builder_attempt += 1
                     builder_snapshot_before = _snapshot_working_tree(project)
+                    builder_attempt_delta = set()
+                # Completeness (R4) names the test-writer's files from its own delta.
+                test_writer_before = _snapshot_working_tree(project) if station_id == "test-writer" else None
 
                 packet, measured_tokens, budget, budget_action = prebuilt_packet if prebuilt_packet is not None else packet_step(station, station_id)
                 packet_text = packet.read_text(encoding="utf-8")
@@ -2521,6 +2777,7 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                         builder_snapshot_after = _snapshot_working_tree(project)
                         # Compute delta: files added, modified, or deleted by this builder attempt
                         builder_delta = _compute_delta(builder_snapshot_before, builder_snapshot_after)
+                        builder_attempt_delta = builder_delta
                 except ExecutorError as exc:
                     status = "failed"
                     detail = f"Executor failed: {exc}"
@@ -2534,6 +2791,13 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                         detail = (f"Station timed out after {step_timeout['timeout_seconds']}s "
                                   f"({step_timeout['reason']}); {exc}")
                         step_executed_model = step_executed_model or handoff_model
+                    step_ceiling = _ceiling_record(exc, station_id, partitions.get(station_id))
+                    if step_ceiling:
+                        status = "budget_exceeded"
+                        detail = (f"Station stopped at its token partition {step_ceiling['partition']} "
+                                  f"({step_ceiling['reason']}); {exc}")
+                        step_executed_model = (step_executed_model or step_ceiling.get("dispatched_model")
+                                               or handoff_model)
                     extra_envelope = {"error": str(exc)}
                     if station_id.startswith("reviewer"):
                         # Station artifact contract S1/S3: a failed reviewer is
@@ -2550,6 +2814,11 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                         uncounted_reasons[station_id] = f"failed: {reason}"
                     elif station_id == "builder":
                         builder_report_source = "station" if output_file.is_file() else "none"
+                        if builder_snapshot_before is not None:
+                            builder_attempt_delta = _compute_delta(builder_snapshot_before,
+                                                                   _snapshot_working_tree(project))
+                if test_writer_before is not None:
+                    test_writer_delta = _compute_delta(test_writer_before, _snapshot_working_tree(project))
         else:
             packet, measured_tokens, budget, budget_action = prebuilt_packet if prebuilt_packet is not None else packet_step(station, station_id)
             status = "packet_ready"
@@ -2580,6 +2849,23 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
             step["usage_complete"] = bool(step_telemetry.get("complete"))
         if step_timeout:
             step["timeout"] = step_timeout
+        if step_ceiling:
+            usage_now = normalize_usage(step_usage)
+            step_ceiling["consumed"] = station_consumption(steps + [step], station_id)["consumed"]
+            step_ceiling["usage"] = usage_now
+            step_ceiling["elapsed_ms"] = step_ceiling.get("elapsed_ms") or duration_ms
+            if step_ceiling["outcome"] == "budget_exceeded":
+                step_ceiling["termination_reason"] = (
+                    f"station {station_id} stopped by its in-flight ceiling at efficiency.station_budgets "
+                    f"{station_id} {step_ceiling['partition']}: measured "
+                    f"{usage_now['total_tokens'] if usage_now else 'unmeasured'} tokens; "
+                    f"the undone work is not resumed in this dispatch")
+            else:
+                step_ceiling["termination_reason"] = (
+                    f"station {station_id} partition exhausted (efficiency.station_budgets {station_id} "
+                    f"{step_ceiling['partition']}): its correction re-dispatch was refused with zero model calls")
+            step["budget_ceiling"] = step_ceiling
+            budget_outcomes.append(dict(step_ceiling))
         if (station_id == "test-writer" and status == "executed" and "builder" in order[idx:]
                 and (base_ref_config or {}).get("checks")):
             # Autonomous line S8: red before green is evidence, not a claim.
@@ -2693,6 +2979,10 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
             av = extra_envelope.get("artifact_validation") or {}
             if av and not av.get("passed"):
                 reason += f"; artifact validation: {' '.join(av.get('findings', [])[:3])}"
+            gaps = completeness_records[-1]["gaps"] if completeness_failed else []
+            if gaps:
+                reason = ("Completeness precondition failed: " + "; ".join(gaps)
+                          if gate_result.get("gate_verdict") == "pass" else reason + "; completeness: " + "; ".join(gaps))
             steps.append({"station": "loopback", "status": "loopback", "return_to": return_to,
                           "detail": f"Loopback to {return_to}: {reason}", "reason": reason,
                           "duration_ms": 0.0, "cost": None, "artifacts": [],
@@ -2700,7 +2990,8 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                           "feedback": extra_envelope.get("output", ""),
                           "from_station": "checks-gate"})
             rewind = (return_to, reason, "checks-gate",
-                      [gate_result.get("output", "")[-3000:]] if gate_result.get("output") else [])
+                      [f"completeness gap: {g}" for g in gaps]
+                      + ([gate_result.get("output", "")[-3000:]] if gate_result.get("output") else []))
         # Loopback right after approver when aggregation fails
         elif station_id == "approver" and verdict in {"rejected", "changes_requested"} and loopbacks < max_loopbacks:
             loopbacks += 1
@@ -2719,6 +3010,18 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
             target = rewind[0] if rewind[0] in order[:idx] else ("builder" if "builder" in order[:idx] else None)
             # Another attempt is started only when the run thresholds leave
             # room for it; otherwise the verdict stands and the step says why.
+            if target is not None and target in partitions:
+                # R2: the loopback re-dispatch passes the pre-call check first.
+                loopback_step = steps[-1]
+                refused = precall(target, "loopback")
+                if refused:
+                    loopback_step["detail"] += f"; not re-executed: {refused['reason']}"
+                    loopback_step["not_reexecuted"] = refused["reason"]
+                    verdict = "budget_exceeded"
+                    stop = refused
+                    acct.checkpoint(station_id)
+                    break
+                precall_done = target
             if target is not None:
                 held = budget_reason(steps, limits)
                 if not held and limits.get("max_agent_calls"):
@@ -2748,6 +3051,7 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                                  "reason": rewind[1], "findings": rewind[3]}
                 pos = order.index(target)
                 gate_failed = False
+                completeness_failed = False
                 run_reviews, run_findings = [], []
                 uncounted_reasons, artifact_failures = {}, {}
                 verdict = ""
@@ -2758,8 +3062,11 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
         # no reviewer runs on work the checks rejected (R2.1).
         if station_id == "checks-gate" and gate_failed and execute_mode and not looped_back:
             verdict = "gate_failed"
+            what = detail
+            if completeness_failed:
+                what += "; completeness precondition failed: " + "; ".join(completeness_records[-1]["gaps"])
             stop = {"exit_status": "checks_stopped",
-                    "reason": f"pre-review checks gate failed with {loopbacks} of {max_loopbacks} loopbacks used: {detail}"}
+                    "reason": f"pre-review checks gate failed with {loopbacks} of {max_loopbacks} loopbacks used: {what}"}
             acct.checkpoint(station_id)
             break
         acct.checkpoint(station_id)
@@ -2851,7 +3158,10 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                        skills=public_resolution(skills_resolution),
                        efficiency={"limits": limits, "stopped": verdict == "budget_exceeded"},
                        run_id=run_id, checkpoint=acct.last_checkpoint, exit_status=stop["exit_status"],
-                       termination_reason=stop["reason"], budget_death=stop.get("budget_death"))
+                       termination_reason=stop["reason"], budget_death=stop.get("budget_death"),
+                       budgets=budgets_view(steps),
+                       completeness=list(completeness_records) if completeness_records else None,
+                       cost_stations=cost_stations_view(steps))
     # The completed record is the last checkpoint plus the verdict, decision
     # and exit fields (R1.3); a failed write keeps that checkpoint (R2.5).
     acct.completed = write_report_atomic(run_dir, report.to_dict())

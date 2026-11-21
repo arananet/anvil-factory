@@ -189,6 +189,114 @@ and `anvil resume` names its exit status instead of resuming. For SIGKILL or a
 lost host the last checkpoint is the record. Reports written before this
 change carry none of these keys and render as before.
 
+### Per-station token budgets and the completeness gate
+
+The run cap `efficiency.max_run_tokens` is one shared pool. Per-station
+partitions divide it so one station cannot use it all up (spec
+station-budgets-completeness, decision 0014). There are two keys in the
+`efficiency` section of `anvil.yaml`:
+
+- `efficiency.station_budgets`: a map from station id to the tokens that
+  station may consume across one run, summed over all of its dispatches.
+- `efficiency.default_station_budget`: the partition for a model station the
+  map does not name. When it is absent, an unnamed station has no partition
+  and is bounded only by `max_run_tokens`. Deterministic stages such as
+  `checks-gate` make no model call and take no partition.
+
+These keys are a different quantity from the top level `station_budgets` key
+(astra-consumption, read by `anvil.config.get_station_budget`). The top level
+`station_budgets` caps the packet tokens a station is sent in one packet. The
+efficiency keys `efficiency.station_budgets` and
+`efficiency.default_station_budget` cap what a station consumes over the run.
+Each keeps its own place and behaviour.
+
+Load time validation: before any station runs, the runner computes each
+pipeline's worst case. That is the sum of the named partitions of its
+stations, plus the default for each unnamed model station. A worst case above
+`max_run_tokens` fails to load, naming the pipeline and the excess. A worst
+case equal to the cap loads. `anvil.config.validate_station_budgets(config,
+pipelines, registry)` runs the same check for any set of pipelines. The
+factory's own `anvil.yaml` ships sdlc-default partitions that sum to exactly
+15000000, the run cap, so no default partition is set:
+
+| station | partition |
+|---|---|
+| intake | 200000 |
+| spec-writer | 600000 |
+| test-writer | 3200000 |
+| builder | 6400000 |
+| reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture, reviewer-design, reviewer-ux | 600000 each |
+| approver | 200000 |
+| triage-human | 100000 |
+| deployer | 300000 |
+| observer | 400000 |
+
+The pre-call check: the spine checks every dispatch of a partitioned station
+before it is made. That covers the first attempt and a loopback re-dispatch
+in the runner, and a reviewer's in-session correction re-dispatch in the
+wrapper. The check sums the station's consumption for this run from the
+per-attempt usage records the token-efficiency capability writes. A station
+whose measured consumption has reached its partition is refused. Usage that
+was never measured is not counted as zero. With `require_usage` set, a
+station with an unmeasured earlier call counts as exhausted until it is
+measured. Without it, the dispatch proceeds and the check records
+`proceeded_unmeasured`. A refusal makes no model call. It is recorded as a
+budget outcome (station, partition, consumed, `refused_at`) and ends the run
+through the continuous run accounting exit path: `exit_status`
+`budget_exceeded`, a `termination_reason` naming the station and its
+partition, and unreached stations recorded as `not_run`.
+
+The in-flight ceiling: the runner hands the wrapper what is left of the
+station's partition (`ANVIL_STATION_BUDGET_TOKENS`, with the partition itself
+in `ANVIL_STATION_PARTITION`). With a ceiling set, the wrapper runs Claude
+Code with `--output-format stream-json --verbose`. It sums the usage each
+model call reports while the session runs, and kills the session once that
+reaches the ceiling, in the same way it kills a session at its station
+timeout. The attempt in `<station>.output.md.usage.json` has status
+`budget_exceeded`, `station`, `duration_ms`, `partition`, `reason` (the limit
+reached), `configured_model` and the partial usage. The run record step has
+status `budget_exceeded`, the dispatched model as `executed_model` and a
+`budget_ceiling` object. The undone work is not resumed in that dispatch, and
+the run ends through the same exit path. The copilot runtime reports usage
+only when a session ends, so it gets the pre-call check but no in-flight
+ceiling, and the wrapper says so on stderr. The station timeout keys are
+unchanged: timeouts partition wall clock time, these keys partition tokens.
+
+The run report carries `budgets`: `stations` (each partitioned station with
+`partition`, `consumed` (null when unmeasured), `measured_tokens` and `calls`)
+and `outcomes` (`refused`, `budget_exceeded`, `proceeded_unmeasured`). Its
+cost section gains `cost.stations`, which gives each partitioned station's
+`partition`, `consumed`, `amount`, `priced` and `source`. A station is priced
+only when the recorded price table covers every measured call. The amount is
+labelled as priced from that table, an estimate and never an invoice. Any
+other station shows tokens only and stays unmeasured in money. The cost total
+keeps cost-measurement semantics.
+
+The completeness precondition: in a project that configures partitions, the
+runner evaluates a deterministic completeness precondition after the builder
+and the pre-review checks gate, before any reviewer is dispatched. It needs
+all of the following:
+
+- the builder report `runs/<id>/builder.output.md` exists and is non-empty;
+- the test-writer's test files (the files its dispatch changed) exist and are
+  non-empty;
+- the attempt's delta file list is not empty;
+- the checks gate verdict for the attempt is `pass` (the verdict as the gate
+  decided it, artifact validation included);
+- no station the pipeline runs before the gate is recorded failed, timed out
+  or budget exceeded without its artifact.
+
+A failed precondition sends the named gaps back to the builder as a gate
+loopback. That loopback counts against `max_loopbacks` exactly as a checks
+failure does, and no reviewer is dispatched for the attempt. With no loopback
+left, the run stops with `checks_stopped` and a reason naming the gaps. Each
+evaluation is recorded in the report's own `completeness` list (`attempt`,
+`passed`, `gaps`, `gate_verdict`), never in the gate's step. The precondition
+reads verdicts and artifacts that already exist. It runs no command, does not
+re-run the project suite, does not repeat the artifact contract's literal
+validation and does not change the gate. A project without partitions keeps
+the review flow it had (decision 0014).
+
 ### http
 
 ```json
