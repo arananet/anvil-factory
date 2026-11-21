@@ -250,3 +250,38 @@ def public_report(report):
     result["steps"] = steps
     result["token_usage"] = summarize_steps(steps)
     return result
+
+
+def station_consumption(steps, station_id):
+    """One station's consumption so far in this run (station-budgets-completeness R2).
+
+    Read from the per-attempt usage records the token-efficiency capability
+    writes (each executed step carries its usage artifact's attempts), summed
+    over every dispatch of the station. Returns {"consumed", "measured_tokens",
+    "calls", "unmeasured_calls"}: consumed is None when any call went
+    unmeasured, never a guessed zero; measured_tokens is what was measured.
+    """
+    usage = summarize_steps([s for s in steps if s.get("station") == station_id])
+    calls = usage["calls"]
+    unmeasured = usage["unmeasured_calls"] if calls else 0
+    measured_tokens = (usage["total_tokens"] or 0) if calls else 0
+    return {"consumed": None if unmeasured else measured_tokens, "measured_tokens": measured_tokens,
+            "calls": calls, "unmeasured_calls": unmeasured}
+
+
+def precall_decision(steps, station_id, partition, require_usage=False):
+    """The pre-call check before one dispatch (R2): "proceed", "refuse" or
+    "proceed_unmeasured", with the consumption it was decided on.
+
+    A station whose measured consumption reached its partition is refused.
+    A station with an unmeasured prior call is refused when require_usage is
+    set (treated as exhausted until measured); otherwise it proceeds and the
+    caller records that it proceeded on unmeasured usage.
+    """
+    found = station_consumption(steps, station_id)
+    decision = "proceed"
+    if found["measured_tokens"] >= partition:
+        decision = "refuse"
+    elif found["unmeasured_calls"]:
+        decision = "refuse" if require_usage else "proceed_unmeasured"
+    return dict(found, decision=decision, partition=partition)

@@ -1,0 +1,44 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-spec",
+  "to_station": "reviewer-security",
+  "work_order_id": "wo-gh-42",
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-spec.output.md",
+  "status": "executed",
+  "created_at": "2026-11-21T15:23:31.356302+00:00",
+  "usage": {
+    "input_tokens": 200307,
+    "output_tokens": 2982,
+    "cached_input_tokens": 162071,
+    "cache_creation_input_tokens": 38224,
+    "reasoning_tokens": 0,
+    "total_tokens": 203289,
+    "input_tokens_includes_cache": true
+  },
+  "tokens": {
+    "input_tokens": 200307,
+    "output_tokens": 2982,
+    "cached_input_tokens": 162071,
+    "cache_creation_input_tokens": 38224,
+    "reasoning_tokens": 0,
+    "total_tokens": 203289,
+    "input_tokens_includes_cache": true
+  },
+  "review": {
+    "station": "reviewer-spec",
+    "verdict": "changes_requested",
+    "findings": [
+      "STILL OPEN, needs an owner ruling (R4; S4, S5, S8): R4 in .openspec/specs/station-budgets-completeness/spec.md (line 35) is unchanged. It still says that before any reviewer dispatch the runner evaluates a completeness precondition, with no condition attached. The code still scopes the gate: anvil/runner.py:1652 sets completeness_active = any(station_budget_settings(config)), and the pre-review check at anvil/runner.py:2440 requires that flag. A project with no efficiency.station_budgets and no default_station_budget skips completeness and sends incomplete attempts to review. Attempt 3 made no code change. The builder report measured the alternative: with the flag forced to True, the suite gave failures=21, errors=2, which is 22 protected existing tests whose fixtures have an empty delta, no test-writer files or a not_configured checks verdict, and those are true gaps under R4(a), R4(b) and S8. This is a conflict between R4 and the protected-test guardrail (P-14), and the line cannot resolve it. The owner must choose one of two rulings: (1) amend R4 to scope completeness to projects with configured partitions, which matches the current code and decision 0014, or (2) authorize updates to the 22 protected tests and make the flag always on. I cannot pass this open loopback finding.",
+      "Restored (R8, S10): attempt 3 restores runs/wo-gh-42/builder.output.md, which had been missing from the run tree. It contains the literals 72a84126a600fafb99446946694b5de809e01e66, station-budgets-completeness, 15000000 and completeness, and it states the base ref, the partition table and its sum, the suite count and the new test file.",
+      "No regressions (R1/S3, R2/S2/S7, R3/S1, R4 where active/S4/S5/S8/S9, R5/S6, R7, S11): the code is unchanged since attempt 2, and the reviewer-spec and reviewer-tests findings resolved in attempt 2 (the missing-report test can fail, and a whitespace-only report counts as empty) stay resolved.",
+      "Evidence: 'python -m unittest tests.test_station_budgets_completeness' gave Ran 28 tests, OK. 'env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p test_*.py' gave Ran 799 tests, OK (skipped=6), which is 771 base plus 28 new. 'git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests pipelines anvil.json' is empty.",
+      "Disclosed and not blocking: the in-session correction-refusal path (wrapper exit 12) has no test through the runner. S2's 'a correction or a loopback' is covered on the loopback path."
+    ]
+  },
+  "configured_model": "claude-opus-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-opus-5-5"
+}

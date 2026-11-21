@@ -1,0 +1,186 @@
+{
+  "schema": "anvil/run-state@1",
+  "run_id": "fa800c2ff04f424283b0b3a573742b02",
+  "work_order_id": "wo-gh-42",
+  "project": "anvil-factory",
+  "pipeline": "sdlc-default",
+  "state": "finished",
+  "current_station": null,
+  "verdict": "changes_requested",
+  "loopbacks": 2,
+  "started_at": "2026-11-21T14:13:32.802553+00:00",
+  "updated_at": "2026-11-21T15:29:37.292968+00:00",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "executed"
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed"
+    },
+    {
+      "station": "test-writer",
+      "status": "executed"
+    },
+    {
+      "station": "builder",
+      "status": "executed"
+    },
+    {
+      "station": "checks-gate",
+      "status": "passed"
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "executed"
+    },
+    {
+      "station": "reviewer-security",
+      "status": "executed"
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed"
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "executed"
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed"
+    },
+    {
+      "station": "reviewer-ux",
+      "status": "routed_out"
+    },
+    {
+      "station": "approver",
+      "status": "completed"
+    },
+    {
+      "station": "approver",
+      "status": "loopback"
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "checks-gate",
+      "status": "passed",
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-security",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-ux",
+      "status": "routed_out",
+      "attempt": 2
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "attempt": 2
+    },
+    {
+      "station": "approver",
+      "status": "loopback"
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "attempt": 3
+    },
+    {
+      "station": "checks-gate",
+      "status": "passed",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "executed",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-security",
+      "status": "executed",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "executed",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "attempt": 3
+    },
+    {
+      "station": "reviewer-ux",
+      "status": "routed_out",
+      "attempt": 3
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "attempt": 3
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "attempt": 3
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "attempt": 3
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "attempt": 3
+    }
+  ],
+  "token_usage": {
+    "calls": 22,
+    "total_tokens": 14913271,
+    "measured_calls": 22,
+    "unmeasured_calls": 0
+  },
+  "cost": null,
+  "export_errors": [],
+  "human_required": true,
+  "deployment_status": null
+}

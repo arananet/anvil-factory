@@ -1,0 +1,20 @@
+{
+  "station": "reviewer-design",
+  "verdict": "pass",
+  "compliance": {
+    "verdict": "pass",
+    "findings": [
+      "Note (non-blocking): this change has no interface output. The diff touches only Python (anvil/config.py, anvil/executor.py, anvil/runner.py, anvil/telemetry.py, tools/claude_station.py), configuration (anvil.yaml), docs and spec markdown (docs/EXECUTION.md, CHANGELOG.md, .openspec/specs/station-budgets-completeness/spec.md), a decision record and a new test file. No HTML, CSS, JS, JSX, TSX or SVG file is added or changed, so no design token, component, layout or motion rule in design/DESIGN.md applies.",
+      "Note (non-blocking): design/DESIGN.md exists, but every value in design/tokens.json is still TODO. Under the reviewer rule these placeholders count as findings only when interface output uses an undefined token. No interface output here uses any token, so no token finding is raised.",
+      "Note (non-blocking): the rendered evidence (runs/wo-gh-42/evidence/screenshot-1440x900.png, screenshot-390x844.png) shows the existing ANVIL run status page, a snapshot generated 2026-11-20 12:29:57 UTC, before this run. This diff does not change that page. In both captures text contrast is high (light text on a near-black surface) and the 390px capture shows no horizontal overflow, so the Scale Contrast and Responsive Behavior bars are not regressed. Nothing here is attributable to wo-gh-42."
+    ]
+  },
+  "quality": {
+    "verdict": "pass",
+    "findings": [
+      "Note (non-blocking): the Quality Charter declares product type physical_product (materials, light, contact, scale). This work order is a backend feature of the factory: per-station token budgets and the completeness precondition. It produces no rendered depiction of a physical product, so none of the four charter criteria apply. There are no reference anchors, so the review ran under the charter floor alone. No identity_reference is declared, so same-subject consistency (S7) does not apply.",
+      "Note (non-blocking): the promoted practices P-4 to P-7 (asset pack fidelity, parallax depth, cross-set coherence, genre coherence) and the explainer-video craft skill cover game and video output. This order has none, so none apply."
+    ],
+    "anchor": "charter floor only"
+  }
+}

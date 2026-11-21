@@ -1,0 +1,44 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-tests",
+  "to_station": "reviewer-architecture",
+  "work_order_id": "wo-gh-42",
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-tests.output.md",
+  "status": "executed",
+  "created_at": "2026-11-21T15:25:59.550799+00:00",
+  "usage": {
+    "input_tokens": 204619,
+    "output_tokens": 3732,
+    "cached_input_tokens": 178606,
+    "cache_creation_input_tokens": 26001,
+    "reasoning_tokens": 0,
+    "total_tokens": 208351,
+    "input_tokens_includes_cache": true
+  },
+  "tokens": {
+    "input_tokens": 204619,
+    "output_tokens": 3732,
+    "cached_input_tokens": 178606,
+    "cache_creation_input_tokens": 26001,
+    "reasoning_tokens": 0,
+    "total_tokens": 208351,
+    "input_tokens_includes_cache": true
+  },
+  "review": {
+    "station": "reviewer-tests",
+    "verdict": "changes_requested",
+    "findings": [
+      "STILL OPEN (approver loopback finding, R4; S4, S5, S8): the spec at .openspec/specs/station-budgets-completeness/spec.md R4 has not been amended. Its diff against 72a84126a600fafb99446946694b5de809e01e66 adds no condition to the completeness precondition. anvil/runner.py:1652 still sets completeness_active = any(station_budget_settings(config)), and anvil/runner.py:2440 still makes the pre-review check depend on it. So a project with no efficiency partitions skips completeness. No test covers the unconditional behaviour R4 states; such a test would fail on this tree. Attempt 3 made no code change, and the builder report says so. The loopback rule does not let this station pass a finding that is still open. Only the owner can close it: amend R4 to scope completeness to projects with configured partitions (which matches the code and decision 0014), or authorize updates to the 22 protected existing tests so the flag can be always on.",
+      "The tests themselves are sound where completeness is active. The mutation check, rerun on a copy of the final tree, still fails: replacing `if not _nonempty_file(report):` (anvil/runner.py:1206) with `if False:` makes tests.test_station_budgets_completeness.CompletenessGate report FAILED (failures=3, errors=8). The copy was not a git repo, which accounts for the extra errors. The attempt 2 resolution of the missing-report finding stands.",
+      "Suite reproduces against the final tree (P-12): `env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p 'test_*.py'` gives 'Ran 799 tests ... OK (skipped=6)'. `python -m unittest tests.test_station_budgets_completeness` gives 'Ran 28 tests ... OK'. Both match the builder report for attempt 3. The builder disclosed that S10 failed until the missing builder report was restored. It passes now.",
+      "Test accounting (P-13) is complete and unchanged: baseline 771 at 72a84126a600fafb99446946694b5de809e01e66. Added: one file, tests/test_station_budgets_completeness.py, with 28 tests (29 'def test_' matches; one is fixture text). 771 + 28 = 799. Edited existing tests: none. `git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests pipelines anvil.json` is empty, and git status lists only the new test file under tests/. No em dash or en dash appears in the test file or the builder report.",
+      "Disclosed gaps that carry forward and do not block: the in-session correction refusal (wrapper exit 12) has no test through the runner, though S2 is covered on the loopback path, which the scenario allows. The in-flight ceiling (S1) has only been run against a stand-in claude CLI."
+    ]
+  },
+  "configured_model": "claude-opus-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-opus-5-5"
+}

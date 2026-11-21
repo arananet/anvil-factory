@@ -1,0 +1,20 @@
+{
+  "station": "reviewer-design",
+  "verdict": "changes_requested",
+  "compliance": {
+    "verdict": "changes_requested",
+    "findings": [
+      "Design system scope: design/DESIGN.md and design/tokens.json exist, but every token (colors, typography, spacing, layout, motion) is still TODO. The diff against 72a84126a600fafb99446946694b5de809e01e66 touches no interface artifact: the nine changed files are the spec, CHANGELOG.md, anvil.yaml, anvil/config.py, anvil/executor.py, anvil/runner.py, anvil/telemetry.py, docs/EXECUTION.md and tools/claude_station.py. There is no HTML, CSS, React or page template among them. No undefined token is used by changed interface output, because there is no changed interface output. Nothing in this order violates a token, component, layout or motion rule.",
+      "Rendered evidence: runs/wo-gh-42/evidence/screenshot-1440x900.png shows the existing ANVIL run status page. This diff does not change it, so it is not judged here. The page's visual hierarchy (the 'ANVIL run status' heading, the token consumption panel and the project cards) is outside this order's surface.",
+      "Carried loopback finding, still open (this is not a design-system finding; it is carried because a re-review may not pass an open loopback finding): R4 / S4, S5, S8. anvil/runner.py:1652 still sets completeness_active = any(station_budget_settings(config)), and the pre-review check at anvil/runner.py:2440 still depends on that flag. A project with no efficiency.station_budgets or default_station_budget therefore skips the completeness precondition. The spec diff does not amend R4 to scope it to projects that configure partitions. Decision 0014 is 'Status: proposed' and records the scoping as the builder's choice, not as an owner ruling. The owner must either amend R4 or authorize updates to the 22 protected tests. Until then, the conflict between R4 and the protected-test guardrail is unresolved.",
+      "Resolved from the loopback: the S4 missing-builder-report gap now has dedicated tests. tests/test_station_budgets_completeness.py test_s4_missing_report_alone_blocks_review_when_checks_pass runs a builder that changed a file, with checks passing and the report missing or empty. test_s4_completeness_gaps_names_a_missing_or_empty_report checks the None, empty and whitespace report cases against a passing control. These tests close the mutation gap where the report check was replaced with 'if False:'."
+    ]
+  },
+  "quality": {
+    "verdict": "pass",
+    "findings": [
+      "The Quality Charter declares product type physical_product (materials, light, contact, scale). This order is a software change to the factory's budget and completeness controls. It produces no visual deliverable, so the charter criteria have nothing to apply to, and no quality gap is recorded. No identity_reference is declared, so the S7 same-subject consistency check does not apply."
+    ],
+    "anchor": "charter floor only"
+  }
+}

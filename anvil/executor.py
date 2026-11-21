@@ -157,6 +157,12 @@ class CommandExecutor:
                                                  "timeout_seconds": last.get("timeout_seconds"),
                                                  "elapsed_ms": last.get("duration_ms"),
                                                  "reason": last.get("reason")}
+                        elif last.get("status") == "budget_exceeded":
+                            # station-budgets-completeness R3: the wrapper
+                            # stopped the station at its token partition.
+                            result["budget_exceeded"] = {"elapsed_ms": last.get("duration_ms"),
+                                                         "reason": last.get("reason"),
+                                                         "configured_model": last.get("configured_model")}
                         return result
                 except (OSError, ValueError):
                     pass

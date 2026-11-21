@@ -1,0 +1,3 @@
+The background suite run I was waiting on has finished, and it confirms what I reported. The plain project check command gives `OK (skipped=6)`. That's the same result as the run with the host identity variables unset (`Ran 799 tests, OK (skipped=6)`). Nothing has changed since my last report.
+
+The R4 scope question is still open and needs your ruling. Either amend R4 so completeness applies only to projects with configured partitions, or authorize updates to the 22 protected tests so the gate can always run.
