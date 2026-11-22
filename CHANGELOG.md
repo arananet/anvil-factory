@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Operator recalibration: the spec-writer partition
+
+- efficiency.station_budgets in the factory anvil.yaml: spec-writer 600000 to 1200000, builder 6400000 to 5800000; the table still sums to 15000000. The first run under the accepted table (wo-gh-47, run 45042545362) was stopped in the spec-writer at 653517 tokens, 599136 of them cache reads.
+- tests/test_station_budgets_completeness.py no longer pins the figures of the factory table: it asserts which stations carry a partition and that the table sums to the run cap, so a recalibration is a configuration change. Owner-authorized, outside the line (decision 0006).
+- The same file's tree evidence (changed paths against the fixed base ref of wo-gh-42) is asserted only inside that order's run. In a checkout with full history, the line's checks gate included, it failed for every order after wo-gh-42, because any later change falls outside that order's write set.
+
 ### Per-station token budgets and a completeness gate before review (station-budgets-completeness, wo-gh-42)
 
 - `efficiency.station_budgets` and `efficiency.default_station_budget` in anvil.yaml divide `max_run_tokens` per station. Configuration is validated at run start against the run cap for the pipeline and fails naming the pipeline and the excess (`anvil.config.validate_station_budgets`). The factory ships sdlc-default partitions summing to exactly 15000000. The top level `station_budgets` packet cap is unchanged.
