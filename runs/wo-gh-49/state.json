@@ -1,0 +1,125 @@
+{
+  "schema": "anvil/run-state@1",
+  "run_id": "9cbf95ce359b4575bbfa047f47de69a0",
+  "work_order_id": "wo-gh-49",
+  "project": "anvil-factory",
+  "pipeline": "sdlc-default",
+  "state": "finished",
+  "current_station": null,
+  "verdict": "budget_exceeded",
+  "loopbacks": 0,
+  "started_at": "2026-11-22T22:41:28.685840+00:00",
+  "updated_at": "2026-11-22T22:42:11.033527+00:00",
+  "stations": [
+    "intake",
+    "spec-writer",
+    "test-writer",
+    "builder",
+    "checks-gate",
+    "reviewer-spec",
+    "reviewer-security",
+    "reviewer-tests",
+    "reviewer-architecture",
+    "reviewer-design",
+    "reviewer-ux",
+    "approver",
+    "triage-human",
+    "deployer",
+    "observer"
+  ],
+  "steps": [
+    {
+      "station": "intake",
+      "status": "budget_exceeded",
+      "total_tokens": 212779
+    },
+    {
+      "station": "spec-writer",
+      "status": "not_run",
+      "total_tokens": 0
+    },
+    {
+      "station": "test-writer",
+      "status": "not_run",
+      "total_tokens": 0
+    },
+    {
+      "station": "builder",
+      "status": "not_run",
+      "total_tokens": 0
+    },
+    {
+      "station": "checks-gate",
+      "status": "not_run",
+      "total_tokens": 0
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "not_run",
+      "total_tokens": 0
+    },
+    {
+      "station": "reviewer-security",
+      "status": "not_run",
+      "total_tokens": 0
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "not_run",
+      "total_tokens": 0
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "not_run",
+      "total_tokens": 0
+    },
+    {
+      "station": "reviewer-design",
+      "status": "not_run",
+      "total_tokens": 0
+    },
+    {
+      "station": "reviewer-ux",
+      "status": "not_run",
+      "total_tokens": 0
+    },
+    {
+      "station": "approver",
+      "status": "not_run",
+      "total_tokens": 0
+    },
+    {
+      "station": "triage-human",
+      "status": "not_run",
+      "total_tokens": 0
+    },
+    {
+      "station": "deployer",
+      "status": "not_run",
+      "total_tokens": 0
+    },
+    {
+      "station": "observer",
+      "status": "not_run",
+      "total_tokens": 0
+    }
+  ],
+  "token_usage": {
+    "calls": 1,
+    "total_tokens": 212779,
+    "measured_calls": 1,
+    "unmeasured_calls": 0
+  },
+  "cost": null,
+  "export_errors": [],
+  "human_required": false,
+  "deployment_status": null,
+  "exit_status": "budget_exceeded",
+  "sinks": [
+    {
+      "type": "github-issue",
+      "active": true,
+      "reason": null
+    }
+  ]
+}
