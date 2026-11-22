@@ -118,7 +118,14 @@ class Sink:
         req.add_header("User-Agent", "anvil-progress")
         if data is not None:
             req.add_header("Content-Type", "application/json")
-        with urllib.request.urlopen(req, timeout=self.timeout) as response:
+        try:
+            response = urllib.request.urlopen(req, timeout=self.timeout)
+        except urllib.error.HTTPError as exc:
+            # An HTTPError holds the open response; close it so a failing API does not
+            # leak one socket per state write. The caller records only the status (R1.5).
+            exc.close()
+            raise
+        with response:
             raw = response.read()
             return (json.loads(raw.decode("utf-8")) if raw else None), response.headers
 

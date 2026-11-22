@@ -1,0 +1,36 @@
+{
+  "schema": "anvil/usage@1",
+  "attempts": [
+    {
+      "attempt": 1,
+      "status": "succeeded",
+      "runtime": "claude",
+      "configured_model": "claude-opus-5-5",
+      "duration_ms": 67340.183,
+      "usage": {
+        "input_tokens": 194033,
+        "output_tokens": 4274,
+        "cached_input_tokens": 167007,
+        "cache_creation_input_tokens": 27014,
+        "reasoning_tokens": 0,
+        "total_tokens": 198307,
+        "input_tokens_includes_cache": true
+      },
+      "runtime_cost_estimate_usd": 0.2539994,
+      "turns": 6,
+      "usage_complete": true
+    }
+  ],
+  "usage": {
+    "input_tokens": 194033,
+    "output_tokens": 4274,
+    "cached_input_tokens": 167007,
+    "cache_creation_input_tokens": 27014,
+    "reasoning_tokens": 0,
+    "total_tokens": 198307,
+    "input_tokens_includes_cache": true
+  },
+  "measured_attempts": 1,
+  "unmeasured_attempts": 0,
+  "complete": true
+}

@@ -14,12 +14,12 @@
   ],
   "selected_models": {
     "reviewer-security": "review-strong",
-    "reviewer-architecture": "review-balanced",
     "reviewer-spec": "review-balanced",
-    "reviewer-tests": "review-balanced",
-    "reviewer-design": "review-balanced"
+    "reviewer-architecture": "review-balanced",
+    "reviewer-design": "review-balanced",
+    "reviewer-tests": "review-balanced"
   },
-  "reason": "High risk: full panel at policy models, no reduction applied; Security surface: reviewer-security at strong model",
+  "reason": "Default applied: work is unrated, using full panel at policy models",
   "practices": {
     "resolved": {
       "intake": [
@@ -91,9 +91,7 @@
       "reviewer-architecture": [
         "architecture-fundamentals"
       ],
-      "reviewer-design": [
-        "explainer-video"
-      ],
+      "reviewer-design": [],
       "reviewer-ux": [],
       "approver": [],
       "triage-human": [],
@@ -103,12 +101,7 @@
     "disabled": [],
     "catalog_count": 18,
     "signals": {
-      "surfaces": [
-        "api",
-        "content",
-        "data",
-        "security"
-      ],
+      "surfaces": [],
       "product_types": [],
       "kinds": [
         "feature"

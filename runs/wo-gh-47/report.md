@@ -5,17 +5,9 @@ Title: Live progress sinks: a run seen while it runs, on the work order's issue 
 Kind: feature
 Status: new
 
-## Intake Outcome
-
-Outcome: accepted
-
-Risk: high
-
-Surfaces: api, security, data, content
-
 ## Routing
 
-**Decision**: High risk: full panel at policy models, no reduction applied; Security surface: reviewer-security at strong model
+**Decision**: Default applied: work is unrated, using full panel at policy models
 
 **Selected reviewers** (5):
 - reviewer-spec (model: review-balanced)
@@ -29,9 +21,9 @@ Surfaces: api, security, data, content
 
 ## Verdict
 
-Verdict: gate_failed
+Verdict: approved
 
-The run ended (checks_stopped) before the approver step, so no reviews were aggregated into a verdict.
+All counted reviews passed. (Expected 5 reviews after routing.)
 
 ## Steps
 
@@ -39,21 +31,18 @@ The run ended (checks_stopped) before the approver step, so no reviews were aggr
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: failed
+- checks-gate: passed
 - loopback: loopback
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
-- builder: executed
-- checks-gate: failed
-- reviewer-spec: not_run
-- reviewer-security: not_run
-- reviewer-tests: not_run
-- reviewer-architecture: not_run
-- reviewer-design: not_run
-- reviewer-ux: not_run
-- approver: not_run
-- triage-human: not_run
-- deployer: not_run
-- observer: not_run
+- checks-gate: passed
+- reviewer-spec: executed
+- reviewer-security: executed
+- reviewer-tests: executed
+- reviewer-architecture: executed
+- reviewer-design: executed
+- reviewer-ux: routed_out
+- approver: completed
+- triage-human: completed
+- deployer: packet_ready
+- observer: executed
 

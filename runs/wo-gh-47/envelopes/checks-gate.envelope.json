@@ -4,14 +4,14 @@
   "to_station": "reviewer-spec",
   "work_order_id": "wo-gh-47",
   "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/checks-gate.pre-review.output.md",
-  "status": "failed",
-  "created_at": "2026-11-22T17:43:25.256061+00:00",
+  "status": "passed",
+  "created_at": "2026-11-22T21:57:50.535674+00:00",
   "phase": "pre-review",
   "commands": [
     "python -m unittest discover -s tests -p 'test_*.py'"
   ],
   "exit_codes": [
-    1
+    0
   ],
   "protected_paths": [
     "tests/",
@@ -20,9 +20,12 @@
   ],
   "protected_path_verdict": "pass",
   "protected_path_findings": [],
-  "observed_additions": [],
-  "basis": "builder_delta (attempt 3)",
-  "gate_verdict": "fail",
+  "observed_additions": [
+    "Protected path addition (observed): tests/__pycache__/test_live_progress_sink_errors.cpython-312.pyc (matches tests/)",
+    "Protected path addition (observed): tests/test_live_progress_sink_errors.py (matches tests/)"
+  ],
+  "basis": "builder_delta (attempt 2)",
+  "gate_verdict": "pass",
   "artifact_validation": {
     "passed": true,
     "report": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/builder.output.md",

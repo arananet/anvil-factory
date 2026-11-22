@@ -1,0 +1,47 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-spec",
+  "to_station": "reviewer-security",
+  "work_order_id": "wo-gh-47",
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/reviewer-spec.output.md",
+  "status": "executed",
+  "created_at": "2026-11-22T21:59:01.471872+00:00",
+  "usage": {
+    "input_tokens": 259399,
+    "output_tokens": 4568,
+    "cached_input_tokens": 218499,
+    "cache_creation_input_tokens": 40884,
+    "reasoning_tokens": 0,
+    "total_tokens": 263967,
+    "input_tokens_includes_cache": true
+  },
+  "tokens": {
+    "input_tokens": 259399,
+    "output_tokens": 4568,
+    "cached_input_tokens": 218499,
+    "cache_creation_input_tokens": 40884,
+    "reasoning_tokens": 0,
+    "total_tokens": 263967,
+    "input_tokens_includes_cache": true
+  },
+  "review": {
+    "station": "reviewer-spec",
+    "verdict": "pass",
+    "findings": [
+      "Loopback finding resolved: the attempt 1 delta was empty; attempt 2 changes anvil/sinks.py (Sink.request closes the HTTPError response before re-raising), CHANGELOG.md (one line plus the test list) and adds tests/test_live_progress_sink_errors.py. All three files are inside the authorized surface, and the change maps to R1.5 and S3.",
+      "R1.5/S3: the new test drives five state writes against a collector that answers 500. It asserts export_errors == ['github-issue: HTTP 500'] and that no descriptor stays open. The builder reports it fails without the fix and passes with it. ANVIL_WORK_ORDER_ID=wo-gh-47 python -m unittest on the three order test files ran 31 tests, all OK, when re-run by this reviewer.",
+      "R1.10 holds: the anvil/runner.py diff against ae0bbfb is the single RunRecorder(..., stations=order) construction, with no network code and no 'retry'. Sink code is in anvil/sinks.py and observe.py calls it. mark_crashed keeps its signature and reads anvil.yaml through _crashed_to_sinks.",
+      "R1.3/R1.4 hold: in RunRecorder.state, sinks are delivered before the single state.json write. The record gains stations, total_tokens per step, sinks and exit_status (the finished write, and the crashed write when report.json has one). No existing field changes.",
+      "R2.2, R2.4, R2.5, R3.3 hold in anvil/sinks.py: activation reasons come in spec order and name the variable, never its value. The marker is <!-- anvil-progress run_id=... -->. Exit status and state are shown verbatim with no list of allowed values, so runtime_refused displays. The project phase is failed for any exit_status other than completed.",
+      "R4.5 holds: README 'Watching a run' is 10 lines (limit 15) and links docs/OPERATIONS.md. The CHANGELOG entry names all three new test files. Decision 0015 is present. The attempt 2 files contain no em or en dash.",
+      "Open item for the approver/owner (R1.2, not covered by any scenario): a resumed run makes no state write at run.resumed. Its first sink call is the write before the first remaining station. A run.resumed write with correct station rows would need the kept steps, which R1.10 forbids passing beyond the RunRecorder construction. The spec is in tension with itself here; the builder disclosed it. It is not a blocker, because the comment is adopted by marker (R2.4) and updated one write later.",
+      "Out-of-surface paths in the branch diff (status/*, work_orders/wo-gh-47.json, runs/) come from line and operator commits, not the builder delta. The spec's own file was changed by the spec-writer station."
+    ]
+  },
+  "configured_model": "claude-opus-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-opus-5-5"
+}

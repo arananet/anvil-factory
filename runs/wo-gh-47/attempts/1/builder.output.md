@@ -1,69 +1,47 @@
-# Builder report: wo-gh-47, live-progress-sinks
+# Builder report: wo-gh-47 (live-progress-sinks)
 
-Spec: .openspec/specs/live-progress-sinks/spec.md (slug live-progress-sinks).
-Spec base ref: factory main 10168fa560af7284b23f99e4e639621cf47eacd2.
-I checked the tree against HEAD fd67af9 of the run branch, which merges 10168fa560af7284b23f99e4e639621cf47eacd2. For the frozen paths I diffed against 10168fa560af7284b23f99e4e639621cf47eacd2 itself: `test_s13_frozen_paths_and_existing_tests_untouched` passes when ANVIL_WORK_ORDER_ID=wo-gh-47.
+Base ref I checked the tree against: factory main `ae0bbfb2af95b41d96d8e2af7c9f8b787f54d83b`. The spec is `.openspec/specs/live-progress-sinks/spec.md`. The sinks are `github-issue` and `github-project`.
 
-## Blocking conflict (needs the owner)
+## What this attempt did
 
-`tests/test_station_budgets_completeness.py::PartitionConfiguration::test_s3_factory_other_keys_and_packet_budgets_unchanged` fails on the final tree. It is an existing, protected test from wo-gh-42. It asserts that the factory `anvil.yaml` equals the file at wo-gh-42's base ref 72a84126 apart from the two efficiency partition keys. This order's R4.1 and scenario S12 (`test_s12_factory_and_scaffold_enable_github_issue_only`) require the factory `anvil.yaml` to carry `observability.sinks: [{"type": "github-issue"}]`. No tree can satisfy both. I followed the work order (R4.1). I did not change the test, and I did not hide the key at load time. The test passes at HEAD without my change, so this is the only suite failure this order introduces. The way out is the same kind of owner-authorized unpin that 10168fa applied to two sibling assertions in that file: compare only the keys that wo-gh-42 owns.
+This attempt made no code changes. The implementation from the earlier builder pass is already on this branch. I re-read it against the spec and the tests on the current tree, after the merge of ae0bbfb. In attempt 3 the checks gate failed on `test_station_budgets_completeness`, an anvil.yaml comparison from wo-gh-42. That failure is gone: factory main ae0bbfb limited that check to wo-gh-42's own run, and the test passes on this tree. No other change was needed.
 
-## What changed, by scenario
+## Changed files (diff against ae0bbfb, outside `runs/`) and the scenario each serves
 
-- `anvil/sinks.py` (new, standard library only). Holds both sinks and their HTTP calls.
-  - `SinkSet.deliver` calls the sinks in list order. It catches any failure and records it as `<type>: HTTP <status>` or `<type>: <ExceptionClass>`, never with a message, URL or body. It returns the `sinks` state field. Covers R1.5, R1.6, R1.7, S3.
-  - `GitHubIssueSink`: activation reasons are checked in R2.2 order. At its first call it lists comments, following `Link: rel="next"` only on the configured API host, and adopts the comment carrying the `<!-- anvil-progress run_id=... -->` marker. Otherwise it POSTs one comment, then PATCHes it on every later call. Headers are Bearer, `application/vnd.github+json` and `anvil-progress`. The API base is `GITHUB_API_URL`. Covers R2, S1, S2, S4, S11, S15.
-  - `render_issue_comment` renders scalar facts only (R2.5, R2.6):
-    - heading, Pipeline, State, Verdict and Exit status shown verbatim;
-    - one row per station in pipeline order, with these statuses: running, done, not run, pending, and anything else as recorded;
-    - attempt (an unstamped step counts as attempt 1, because the runner stamps attempts only from 2 on) and tokens;
-    - Loopbacks, Tokens, Cost, Updated, and Workflow run when `GITHUB_RUN_ID` is set.
+| File | Change | Scenarios |
+|---|---|---|
+| `anvil/sinks.py` (new) | The sink module beside the recorder. `SinkSet` calls each sink in order and turns any exception into an export error `"<type>: <ExceptionClass>"` or `"<type>: HTTP <code>"`. Each request is bounded by `timeout_seconds`. `github-issue`: activation checks; one comment found again by the `<!-- anvil-progress run_id=... -->` marker; one POST, then PATCH edits; station rows in pipeline order; scalar facts only; API base from `GITHUB_API_URL`; workflow run link. `github-project`: phase mapping; looks up the project, field, option and item over GraphQL; adds a missing item; sets the status only when the phase changes; a missing project, field or option is recorded by name and the sink goes inactive. | S1 to S7, S9 to S11, S15, S16 |
+| `anvil/observe.py` | `RunRecorder` builds a `SinkSet` from `observability.sinks` and takes the pipeline order (`stations`). `state()` hands the record to the sinks before writing `state.json`, then adds `sinks` and `export_errors`. A state write happens at `run.started`. `finish()` passes `exit_status` on. `mark_crashed` hands the crashed record to the sinks, reading the config from the project's anvil.yaml. Events, the webhook and the OTLP trace are unchanged. | S1, S2, S3, S10, S11 |
+| `anvil/runner.py` | One line: the recorder is built with `stations=order`. No network code. The word "retry" does not appear (count 0). | S2, S13 |
+| `anvil/config.py` | `validate_sinks`, called from `load_anvil_config`. It fails loading with an error that names the offending `observability.sinks[i]` entry and key. A `token_env` that would reach a station is refused. `build_default_config` enables `github-issue`; the scaffold uses this through `render_anvil_yaml`, so `anvil/scaffold.py` needed no change. | S8, S12 |
+| `anvil.yaml` | `observability.sinks: [{"type": "github-issue"}]`. | S12 |
+| `docs/OPERATIONS.md`, `docs/EXECUTION.md`, `README.md` ("Watching a run"), `CHANGELOG.md`, `brain/decisions/0015-live-progress-sinks.md` | Documentation. The `github-project` sink is documented and ships off. | S12, S14 |
+| `tests/test_live_progress_sinks.py`, `tests/test_live_progress_project_sink.py` (new, from test-writer) | Regression tests with a local HTTP collector. | R6 |
 
-    It never includes `error`, `detail`, output or paths. Covers S10, S15.
-  - `GitHubProjectSink` (R3, S5, S6, S16):
-    - The phase follows `record_phase` (R3.3).
-    - At the first change it runs two lookups: the project with its status field and options, then the issue with its project items.
-    - It sends `addProjectV2ItemById` only when the issue is missing from the project, and `updateProjectV2ItemFieldValue` only when the phase changes.
-    - A missing project, field or option is recorded as the exact R3.5 note, and the sink goes inactive with that same text as its reason. It never sends any other mutation.
-- `anvil/observe.py` (R1.2, R1.3, R1.4, R1.10).
-  - `RunRecorder` takes `stations=` and builds a `SinkSet` from `observability.sinks`.
-  - `state()` adds `stations` and a per-step `total_tokens` (computed with `summarize_steps([step])`), calls the sinks, then writes state.json once, with `sinks` and `export_errors` as the sinks left them.
-  - The `run.started` event now triggers the run-start state write.
-  - `finish()` adds `exit_status` to the finished record.
-  - `mark_crashed(run_dir, error)` keeps its signature. It adds `exit_status` from report.json, loads `<run_dir>/../../anvil.yaml`, and calls the sinks before writing the crashed record.
-- `anvil/runner.py`: one line. `RunRecorder(..., stations=order)`. No network code, no "retry". Covers R1.10, S13.
-- `anvil/config.py`: `validate_sinks`, called by `load_anvil_config` on JSON configs. It raises ValueError naming `observability.sinks` or `observability.sinks[<i>]` and the key or type, and checks that `token_env` cannot reach a station (in `runtime.env_keep`, or neither in `STATION_ENV_DENY` nor in `runtime.env_deny`). `build_default_config` (and so `render_anvil_yaml` and `anvil init`) now carries the github-issue sink. Covers R1.1, R3.1, R5.3, R4.2, S8, S12.
-- `anvil.yaml`: adds `"observability": {"sinks": [{"type": "github-issue"}]}` and nothing else. Covers R4.1, S12; this is what triggers the conflict above.
-- Docs (R4.3, R4.5, S12, S14):
-  - docs/OPERATIONS.md: new section on progress sinks covering github-issue, github-project (keys, phase table, defaults, the token requirement, the env_deny rule), and how tokens stay with the line.
-  - docs/EXECUTION.md: where sinks are called in a run.
-  - README.md: "Watching a run" section, 8 lines.
-  - CHANGELOG.md entry.
-  - brain/decisions/0015-live-progress-sinks.md.
-- Not touched: .github/workflows, pipelines, anvil.json, anvil/executor.py, tools/line_comment.py (R4.4), and every existing test file. The new test files were written by the test-writer, and I did not edit them.
+The `status/*` and `work_orders/wo-gh-47.json` diffs come from the line's own run commits (0871de5, 77151ca), not from the builder.
 
-## Verification (real summary lines)
+## Verification (run on the final tree)
 
-- New tests: `ANVIL_WORK_ORDER_ID=wo-gh-47 python -m unittest tests.test_live_progress_sinks tests.test_live_progress_project_sink` gave `Ran 30 tests ... OK`.
-- Full suite, as I ran it in this station's environment: `python -m unittest discover -s tests -p 'test_*.py'` gave `Ran 832 tests in 104.365s`, `FAILED (failures=7, errors=1, skipped=13)`.
-  - Five of the failures are the GITHUB_ACTOR approval tests in test_autonomous_line and test_governed_delivery. The test-writer saw them on the base tree too.
-  - Two are pre-existing failures in test_token_efficiency: one failure and one error.
-  - One is the conflict above.
-- Full suite in the checks gate's scrubbed environment (`env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID -u GITHUB_TRIGGERING_ACTOR ANVIL_WORK_ORDER_ID=wo-gh-47 python -m unittest discover -s tests -p 'test_*.py'`) gave `Ran 832 tests in 107.140s`, `FAILED (failures=2, errors=1, skipped=11)`. That is:
-  - test_token_efficiency `test_project_handoff_executes_in_target_tree_s2` (FAIL) and `test_claude_correction_includes_both_attempts_s2` (ERROR). Both reproduce on a clean worktree of HEAD without my change (`Ran 50 tests ... FAILED (failures=1, errors=1, skipped=5)` for test_token_efficiency plus test_station_budgets_completeness at HEAD).
-  - The conflict test above.
-- Exact full factory test count: 832 tests: 802 at the base plus the 30 new ones.
-- Exercised as a user would: I ran a scripted sdlc-default run with a reviewer failure against the local collector. Requests were GET, POST, then PATCH only: 38 requests for 37 state writes. I read the final comment: the station table in pipeline order, `State: finished`, `Verdict: rejected`, `Exit status: completed`, `Loopbacks: 2`, `Cost: not priced`, and the workflow link.
+New test files added: `tests/test_live_progress_sinks.py` and `tests/test_live_progress_project_sink.py`.
 
-## New test files
-
-- tests/test_live_progress_sinks.py
-- tests/test_live_progress_project_sink.py
+- `ANVIL_WORK_ORDER_ID=wo-gh-47 python -m unittest tests/test_live_progress_sinks.py tests/test_live_progress_project_sink.py`: `Ran 30 tests in 19.049s`, `OK`. This includes S13 and S14, which skip for other orders.
+- Project check `python -m unittest discover -s tests -p 'test_*.py'`, run with `GITHUB_ACTOR`, `GITHUB_TRIGGERING_ACTOR` and the station `ANVIL_*` variables unset (the checks gate environment): `Ran 832 tests in 107.593s`, `OK (skipped=14)`. **Full factory test count: 832** (802 at the base ref plus the 30 new tests).
+- Same command in this builder's raw station environment: `Ran 832 tests in 106.310s`, `FAILED (failures=6, errors=1, skipped=14)`. The 7 failing tests are 3 in `test_autonomous_line.TestHumanGate`, 2 in `test_governed_delivery.TestApprovalPolicy` and 2 in `test_token_efficiency.WrapperEvidenceTests`. This order did not cause them: I ran the same three modules on `git archive ae0bbfb` in the same environment and got the same failures (`FAILED (failures=3)`, `FAILED (failures=2)`, `FAILED (failures=1, errors=1)`). With those variables unset, all of them pass.
+- Run by hand:
+  - `render_issue_comment` on a running record shows done, running and pending rows, the attempt, tokens, loopbacks, cost and the workflow link.
+  - On a finished `runtime_refused` record it shows the verdict and exit status verbatim and "not run" for stations that never ran.
+  - `validate_sinks` rejects an unknown type with `observability.sinks[1]: type 'nope' is unknown ...` and a project sink without a number with `observability.sinks[0]: type github-project requires key 'number'`.
+  - `load_anvil_config('anvil.yaml')` returns `{'sinks': [{'type': 'github-issue'}]}`.
+- Guardrails, checked against the diff from ae0bbfb:
+  - No file was touched under `.github/workflows`, under `pipelines/`, in `anvil.json` or `tools/line_comment.py`, and no existing test file.
+  - No added line contains an em dash or en dash.
+  - Standard library only.
 
 ## Open or unverified
 
-- The run-start write happens for `run.started` only. A resumed run's first state write is the one before its first station, a moment later. The recorder does not hold the kept steps at `run.resumed`, and the runner may change only at the construction site. This is documented in docs/EXECUTION.md.
-- Nothing was run against real GitHub. The REST and GraphQL calls follow the documented API shapes and were exercised only against the local collector.
-- Deterministic stations show tokens `0`, not `-`, because `summarize_steps` returns 0 for a step with no model call. R1.4 asks for exactly that value.
-- In CI, factory.yml runs the suite without GH_TOKEN, and the checks gate strips GH_TOKEN, so existing tests that use wo-gh ids cannot post to real issues. A developer shell that sets GH_TOKEN and GITHUB_REPOSITORY and leaves GITHUB_API_URL unset, while running scaffolded wo-gh test runs, would reach api.github.com.
+- No sink has been run against real GitHub. Everything is verified against the local collector only. The first live check will be this factory's next run, where the issue comment should appear.
+- The `github-project` sink cannot run in the factory until a workflow supplies a Projects-capable token in `token_env`, and this order forbids workflow changes. It ships documented and off.
+- S13 reads the "no urllib in runner.py" rule as a ban on network calls: `urllib.request`, `urlopen`, `http.client` and `socket`. The base ref already imports `urllib.parse.urlparse` in the runner. A reviewer should confirm this reading.
+- The sinks have no retry. When the API cannot be reached, each state write can wait up to `timeout_seconds`, 5 by default.
+- If someone runs the suite locally with `GH_TOKEN` and `GITHUB_REPOSITORY` exported, the existing tests that scaffold `wo-gh-<n>` projects could post to real issues. CI and the checks step do not carry `GH_TOKEN`.
 {"model": "claude-opus-5-5"}

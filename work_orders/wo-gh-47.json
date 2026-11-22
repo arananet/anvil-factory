@@ -8,14 +8,6 @@
   "status": "new",
   "spec_path": "",
   "evidence_images": [],
-  "intake_outcome": {
-    "outcome": "accepted"
-  },
-  "risk": "high",
-  "surfaces": [
-    "api",
-    "security",
-    "data",
-    "content"
-  ]
+  "risk": null,
+  "surfaces": []
 }

@@ -1,54 +1,74 @@
-# Builder report: wo-gh-47 (live-progress-sinks), attempt 3
+# Builder report: wo-gh-47 (live-progress-sinks), attempt 2
 
-## Base
+Base ref I checked the tree against: factory main `ae0bbfb2af95b41d96d8e2af7c9f8b787f54d83b`. Spec: `.openspec/specs/live-progress-sinks/spec.md`. Sinks: `github-issue` and `github-project`.
 
-- Base ref verified against: 10168fa560af7284b23f99e4e639621cf47eacd2 (factory main after the operator recalibration). It is an ancestor of the run branch HEAD fd67af9f03faedc6dccfa4cc46babc6f01bba763.
-- No existing test file at the base ref is modified: `git diff --name-only 10168fa560af7284b23f99e4e639621cf47eacd2 -- tests/` lists nothing; only new files were added.
-- Nothing under .github/workflows, pipelines/, anvil.json or tools/ is touched.
+## Loopback finding and how this attempt resolves it
 
-## What this attempt did
+The checks gate sent attempt 1 back because its delta was empty: that builder pass changed no file. The implementation from the earlier passes was already on the branch, so there was nothing new to write. This attempt re-reviewed that implementation against the spec and found one real defect, which it fixes:
 
-Attempt 2 was sent back because it changed no file and wrote no builder report. The implementation from attempt 1 is in the tree and was kept (the loopback asks not to start over). This attempt re-ran the whole suite, found the one remaining gate failure, showed that it is a contradiction between two tests rather than a code defect, and wrote this report. No code was changed in this attempt, because the only fix that would turn the gate green is editing a test, which this station must not do (see "Blocking conflict").
+- **Defect (R1.5, S3):** in `Sink.request` (`anvil/sinks.py`), `urlopen` raises `urllib.error.HTTPError` for a status of 400 or higher. That exception holds the open response, and nothing closed it. Every failed request kept a socket open until the exception was collected. I measured it: 5 failed requests with the exceptions still referenced left 5 descriptors open, and closing them released all 5.
+- **Fix:** catch `HTTPError`, call `exc.close()`, then re-raise. Recording stays the same: still `github-issue: HTTP <status>` and nothing else.
 
-## Changes and the scenarios they serve
+Everything that already passed is kept as it was.
 
-- `anvil/sinks.py` (new): the sink module beside the recorder (R1). `SinkSet` runs the configured sinks in order, bounds each call by `observability.timeout_seconds` and records a failure as `<type>: <reason>` in export_errors without stopping the line (R1, S3). `GitHubIssueSink`, entry type `github-issue` (R2): active only for `wo-gh-<n>` with `GITHUB_REPOSITORY` and the token variable (default `GH_TOKEN`) set, otherwise inactive with one recorded reason and no network call; creates one comment and then edits it, found again by a hidden marker with the run id; one row per pipeline station in pipeline order with status, attempt and tokens; verdict and any exit status shown as given, without a fixed list (so `runtime_refused` shows too); API base from `GITHUB_API_URL`. `GitHubProjectSink`, entry type `github-project` (R3): maps stations to the phases intake, spec, build, checks, review, human, done, failed; sends a status change only when the phase changes; adds a missing item; a missing project, field or option is recorded by name and the sink goes inactive; never changes the project's shape; inactive and said once when `token_env` is unset.
-- `anvil/observe.py`: the recorder builds a `SinkSet` from `observability.sinks`, calls it with the state record (anvil/run-state@1, existing fields unchanged, adds `stations`, per-step `total_tokens`, `sinks`) at run start, before each station, after the last one and at run end; the crash path (`mark_crashed`) also delivers. No new event kind; events.jsonl is unchanged (R1).
-- `anvil/config.py`: validation of `observability.sinks` (an ordered list; an entry with an unknown type, a missing or malformed `owner`/`number`, or unknown keys fails loading naming the entry index) (R1, test g); `render_anvil_yaml` (used by `anvil/scaffold.py`) now writes the `github-issue` sink for new projects (R4).
-- `anvil/runner.py`: one line, the recorder is told the pipeline order (`stations=order`). No network code, no occurrence of the word the review-producer test forbids.
-- `anvil.yaml`: the factory enables `{"type": "github-issue"}` (R4). See the blocking conflict.
-- Docs: `docs/OPERATIONS.md` (sink configuration, github-project setup and token), `docs/EXECUTION.md` (when sinks are called), `README.md` (short "watching a run" section), `CHANGELOG.md`, `brain/decisions/0015-live-progress-sinks.md`.
-- Tokens (R5): sinks read the token in the line process; the station environment reduction is unchanged; test (h) checks no token value appears in any file the run writes or any request body.
+## Changed files in this attempt
 
-New test files (added by the test-writer, unchanged by the builder): `tests/test_live_progress_sinks.py` (24 tests) and `tests/test_live_progress_project_sink.py` (6 tests).
+| File | Change | Scenario |
+|---|---|---|
+| `anvil/sinks.py` | `Sink.request` closes the response of an `HTTPError` before re-raising (+8/-1 lines). | R1.5, S3 |
+| `tests/test_live_progress_sink_errors.py` (new) | A regression test. A local collector answers 500. Five state writes give exactly `["github-issue: HTTP 500"]`. The test keeps the raised exceptions alive and asserts they hold no descriptor open. | R1.5, S3 |
+| `CHANGELOG.md` | One line in the live-progress-sinks entry about the fix; the test list names the new file. | R4.5 |
 
-## Verification
+The full change against ae0bbfb is unchanged from the earlier passes apart from these three files:
+- `anvil/sinks.py` (new)
+- `anvil/observe.py`
+- `anvil/runner.py` (only the `RunRecorder(..., stations=order)` construction)
+- `anvil/config.py` (`validate_sinks`, and the scaffold default in `build_default_config`)
+- `anvil.yaml`
+- `docs/OPERATIONS.md`
+- `docs/EXECUTION.md`
+- `README.md` ("Watching a run")
+- `CHANGELOG.md`
+- `brain/decisions/0015-live-progress-sinks.md`
+- the new test files
 
-Full factory suite, clean environment (the runner's own GITHUB_ACTOR and ANVIL_* variables removed, as on the checks gate):
+`work_orders/wo-gh-47.json` and `runs/` were written by the line, not by the builder.
+
+## Verification (final tree)
+
+**Fail first:** with my `anvil/sinks.py` change set aside and only the new test present:
 
 ```
-env -i PATH="$PATH" HOME="$HOME" python -m unittest discover -s tests -p 'test_*.py'
-Ran 832 tests in 100.868s
-FAILED (failures=1, skipped=13)
-FAIL: test_s3_factory_other_keys_and_packet_budgets_unchanged (test_station_budgets_completeness.PartitionConfiguration)
+AssertionError: 6 not less than or equal to 0 : 6 descriptors held open by failed sink requests
+FAILED (failures=1)
 ```
 
-The exact full factory test count is 832. The single failure is the conflict below. Every test in both new files passes.
+With the fix: `Ran 1 test`, `OK`.
 
-When I ran the suite inside this station's own environment, the approval tests in test_autonomous_line and test_governed_delivery also failed, because GITHUB_ACTOR is set to the real actor there, and so did two test_token_efficiency wrapper tests, because of the inherited ANVIL_* variables. Both groups pass in the clean environment. They have nothing to do with this order.
+**Project check** `python -m unittest discover -s tests -p 'test_*.py'`, run with the station `ANVIL_*` variables, `GITHUB_ACTOR` and `GITHUB_TRIGGERING_ACTOR` unset (the checks gate environment): exit 0, `Ran 833 tests in 111.164s`, `OK (skipped=14)`.
 
-## Blocking conflict (unmet: the checks gate cannot pass without a test change)
+**Full factory test count: 833.** That is 802 at the base ref, plus 30 from the earlier passes, plus 1 new test.
 
-`tests/test_station_budgets_completeness.py::test_s3_factory_other_keys_and_packet_budgets_unchanged` is an existing protected test from wo-gh-42. It loads the factory anvil.yaml, removes only the two efficiency partition keys and asserts that the whole config equals anvil.yaml at its fixed base ref 72a84126a600fafb99446946694b5de809e01e66. R4 requires the factory anvil.yaml to enable the github-issue sink, and the new test `test_s12_factory_and_scaffold_enable_github_issue_only` asserts it does. The two cannot both pass:
+**The order's own tests,** run with `ANVIL_WORK_ORDER_ID=wo-gh-47` (this command): `ANVIL_WORK_ORDER_ID=wo-gh-47 python -m unittest tests/test_live_progress_sinks.py tests/test_live_progress_project_sink.py tests/test_live_progress_sink_errors.py`. Result: `Ran 31 tests in 19.544s`, `OK`. S13 and S14 run here.
 
-- With the `observability.sinks` block in anvil.yaml (the current tree): the wo-gh-42 test fails (above).
-- With anvil.yaml reverted to HEAD (checked, then restored): `python -m unittest tests.test_station_budgets_completeness tests.test_live_progress_sinks.Shipping` gives `Ran 37 tests`, `FAILED (failures=1, skipped=7)`, with test_s12 failing.
+**New test files added by this order:**
+- `tests/test_live_progress_sinks.py`
+- `tests/test_live_progress_project_sink.py`
+- `tests/test_live_progress_sink_errors.py` (this attempt)
 
-The work order's reconciliation note says the wo-gh-42 efficiency keys and this order's observability keys do not overlap. That is true of the keys, but this test compares the whole config, so any new top-level key breaks it. This is the same kind of pin the operator removed in 10168fa for two other assertions. I kept the tree as the work order specifies (R4 met) and did not edit the protected test. The owner can authorize a one-line change to that test: also pop `observability` from `stripped` before the comparison, as 10168fa did for the other pins. After that change the suite should be fully green.
+**Guardrails, checked against ae0bbfb:**
+- `git diff ae0bbfb -- .github/workflows pipelines anvil.json anvil/executor.py tools/line_comment.py` is empty.
+- No existing test file was modified or deleted.
+- `anvil/runner.py` has 0 matches for `urllib.request`, `http.client` or `retry`.
+- No em dash or en dash appears in the files changed this attempt.
+- Standard library only.
 
-## Other open items
+## Open or unverified
 
-- Flaky new test: `test_live_progress_sinks.SinkFailures.test_s3_http_500_changes_nothing_but_one_export_error` failed 1 of 5 isolated runs (`/steps[2]/duration_ms`). It decides which report keys are volatile by comparing two baseline runs. When both baselines happen to record the same `duration_ms` for a step, that key counts as stable and the sink run's different timing fails the test. This is a defect in the test, not in the sink, since the report differs only in wall-clock timing. I did not edit it. It should treat `duration_ms` and timestamp keys as volatile.
-- Live GitHub behaviour (a real issue comment and a real Projects v2 board) was exercised only against the local HTTP collector in the tests, not against api.github.com.
-- No em dash or en dash in any produced file (checked with grep on every changed and new file).
+- **Resumed runs (R1.2):** a resumed run makes no separate state write at `run.resumed`. Its first write is the flush before the first remaining station, which comes right after. A separate write needs the kept steps, which the recorder does not have at that point. Getting them would mean changing the runner beyond the `RunRecorder(...)` construction, which this order does not allow. A reviewer should decide whether the first flush counts as the run start write.
+- **S13 reading:** the runner already imports `urllib.parse.urlparse` at the base ref. So the check forbids network imports (`urllib.request`, `http.client`) rather than every `urllib` string.
+- **Real GitHub:** neither sink has run against real GitHub, only against the local collector.
+- **github-project:** this sink needs a Projects-capable token in `token_env`, which the workflow does not supply. It ships documented and off.
+- **No retry:** a sink has no retry. When the API cannot be reached, each state write can wait up to `timeout_seconds` (5 by default).
+- **Station environment:** in the raw station environment, with `GITHUB_ACTOR` and the `ANVIL_*` hand-off variables set, 7 existing tests fail. They fail the same way on `git archive ae0bbfb`, as recorded in the earlier passes. They pass in the checks gate environment.
 {"model": "claude-opus-5-5"}

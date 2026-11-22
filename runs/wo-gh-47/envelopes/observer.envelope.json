@@ -1,0 +1,33 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "observer",
+  "to_station": null,
+  "work_order_id": "wo-gh-47",
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/observer.output.md",
+  "status": "executed",
+  "created_at": "2026-11-22T22:09:14.661919+00:00",
+  "usage": {
+    "input_tokens": 304258,
+    "output_tokens": 6060,
+    "cached_input_tokens": 280217,
+    "cache_creation_input_tokens": 24021,
+    "reasoning_tokens": 0,
+    "total_tokens": 310318,
+    "input_tokens_includes_cache": true
+  },
+  "tokens": {
+    "input_tokens": 304258,
+    "output_tokens": 6060,
+    "cached_input_tokens": 280217,
+    "cache_creation_input_tokens": 24021,
+    "reasoning_tokens": 0,
+    "total_tokens": 310318,
+    "input_tokens_includes_cache": true
+  },
+  "configured_model": "claude-opus-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-opus-5-5"
+}

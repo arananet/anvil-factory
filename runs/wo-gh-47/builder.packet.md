@@ -72,85 +72,6 @@ Re-read your whole diff as a reviewer would and fix what you find. Then write th
 Read the spec and the relevant upstream artifacts first. Search before opening files; read only the relevant ranges. Bound command output and summarize long test logs with failures and a path to the full log. Run focused checks while editing and the required project checks at handoff. Reuse valid upstream work. Keep the final handoff concise, with changed files, evidence and unresolved issues. Preserve the required output contract.
 
 
-## Project design
-
-### Design tokens
-
-```json
-{
-  "colors": {
-    "primary": "TODO",
-    "secondary": "TODO",
-    "accent": "TODO",
-    "background": "TODO",
-    "surface": "TODO",
-    "text": "TODO",
-    "text-secondary": "TODO",
-    "error": "TODO",
-    "warning": "TODO",
-    "success": "TODO",
-    "info": "TODO"
-  },
-  "typography": {
-    "font-family-base": "TODO",
-    "font-family-heading": "TODO",
-    "font-family-mono": "TODO",
-    "font-size-base": "TODO",
-    "font-size-scale": "TODO",
-    "line-height-base": "TODO",
-    "line-height-heading": "TODO"
-  },
-  "spacing": {
-    "unit": "TODO",
-    "scale": [
-      "TODO"
-    ]
-  },
-  "layout": {
-    "max-width": "TODO",
-    "breakpoint-mobile": "TODO",
-    "breakpoint-tablet": "TODO",
-    "breakpoint-desktop": "TODO"
-  },
-  "motion": {
-    "duration-fast": "TODO",
-    "duration-base": "TODO",
-    "duration-slow": "TODO",
-    "easing-standard": "TODO",
-    "easing-enter": "TODO",
-    "easing-exit": "TODO"
-  }
-}
-```
-
-### Quality bars
-
-for Product Pages
-
-These bars apply to every product page or interface this project ships.
-
-### Visual Hierarchy
-- [ ] Clear content hierarchy with size, weight, and spacing
-- [ ] Important actions are visually prominent
-- [ ] Related elements are grouped
-
-### Scale Contrast
-- [ ] Minimum 4.5:1 contrast ratio for normal text
-- [ ] Minimum 3:1 contrast ratio for large text (18pt+)
-- [ ] Interactive elements have sufficient contrast
-
-### Spacing Rhythm
-- [ ] Consistent spacing scale used throughout
-- [ ] Whitespace creates clear content boundaries
-- [ ] Spacing adapts appropriately to different screen sizes
-
-### Responsive Behavior
-- [ ] Layout works on mobile, tablet, and desktop
-- [ ] Touch targets are at least 44x44px on mobile
-- [ ] Text is readable without zooming on any device
-- [ ] No horizontal scrolling on standard viewports
-
-
 ## Craft skills
 
 Curated craft guidance resolved for this station and this work order. Order of authority: the work order and its spec, then the project design system and decisions, then promoted practices, then these skills. Where a skill conflicts with any of those, the skill yields. Apply what fits the work in front of you; a skill is a bar to meet, not a checklist to recite.
@@ -292,25 +213,6 @@ No specific product type declared. Using general guidelines only.
 - Group related elements together with whitespace separating distinct sections
 
 
-## Quality Charter
-
-Product type: physical_product
-
-Observable criteria:
-
-- **Materials**: Surfaces read as the materials the product is actually made of
-- **Light**: One coherent light story, with shadows and reflections that agree with it
-- **Contact**: Objects meet skin, surfaces and each other the way physical things do
-- **Scale**: The object's size reads true against its context and human anatomy
-
-
-## Reference Anchors
-
-⚠️ **WARNING**: This run has no reference anchors.
-
-The review will proceed under the charter floor alone.
-
-
 ## Work order
 
 - id: wo-gh-47
@@ -319,7 +221,7 @@ The review will proceed under the charter floor alone.
 - source: github-issue
 - description: Implement the spec in .openspec/specs/live-progress-sinks/spec.md. Pipeline for this order is sdlc-default (software domain, the factory repo itself), selected by the run workflow.
 
-RELEASE (owner decision, 2026-11-22): this order is released for execution. It was filed on 2026-11-21 and staged until wo-gh-42 landed, which it did on 2026-11-22 (merge 6191e8c1f235b4cd248a51203d40177834dc4ae2). Baseline now: factory main 10168fa560af7284b23f99e4e639621cf47eacd2, whose anvil.yaml carries max_run_tokens 15000000, max_runtime_turns 100, max_packet_tokens 48000 and the efficiency station partitions of wo-gh-42, and whose anvil.json wires the checks command (python -m unittest discover -s tests -p 'test_*.py'). First run of this order (45042545362) was stopped in the spec-writer by its token partition, since recalibrated (spec-writer 1200000, builder 5800000); the run branch carries that fix. The exit statuses now on main include runtime_refused; a sink must be able to show any exit status as a final state without knowing the list.
+RELEASE (owner decision, 2026-11-22): this order is released for execution. It was filed on 2026-11-21 and staged until wo-gh-42 landed, which it did on 2026-11-22 (merge 6191e8c1f235b4cd248a51203d40177834dc4ae2). Baseline now: factory main ae0bbfb2af95b41d96d8e2af7c9f8b787f54d83b, whose anvil.yaml carries max_run_tokens 15000000, max_runtime_turns 100, max_packet_tokens 48000 and the efficiency station partitions of wo-gh-42, and whose anvil.json wires the checks command (python -m unittest discover -s tests -p 'test_*.py'). First run of this order (45042545362) was stopped in the spec-writer by its token partition, since recalibrated (spec-writer 1200000, builder 5800000); the run branch carries that fix. The exit statuses now on main include runtime_refused; a sink must be able to show any exit status as a final state without knowing the list.
 
 EVIDENCE (the defect this order closes):
 A run cannot be watched. state.json is rewritten before every station and report.json is checkpointed after every station (wo-gh-41), but both stay on the disk of the machine that runs the line until the run ends. The five runs of wo-gh-41 on 2026-11-20 and the run of wo-gh-42 on 2026-11-21 each showed only "In progress" for 5 to 27 minutes; the owner asked what the line was doing and nobody could tell from outside. The existing export (observability.events_url and otlp_endpoint) needs a receiver someone must build and host. Owner direction of 2026-11-21: no dependence on one vendor for this, and a person who copies ANVIL must see their runs without standing anything up. Every work order is already a GitHub issue and every run already holds a token that can write to it.
@@ -335,7 +237,7 @@ R6: regression tests as new files under tests/, with a local HTTP collector in t
 RECONCILIATION WITH ACTIVE SPECS AND EXISTING TESTS (read before building; these are decisions, not discoveries for the line to make):
 Governed delivery owns state.json, events.jsonl, the webhook and the OTLP trace; all four are frozen and this order only adds consumers of the state record. tests/test_governed_delivery.py asserts that the events POSTed to the webhook equal the events in events.jsonl and counts station.finished and loopback events against the report's steps: sinks must not add, remove or reorder events, which is why they are fed by the state and not by a new event. tests/test_review_producer.py asserts that the word "retry" does not occur in anvil/runner.py: keep network code and that word out of the runner. tests/test_continuous_run_accounting.py (wo-gh-41) asserts the report's shape after every exit path: a sink call on an exit path must not change what is written. wo-gh-42 (station partitions) may land before this order; its efficiency keys and this order's observability keys do not overlap. The runtime refusal stop (exit_status runtime_refused) is one more final state a sink must be able to show.
 
-BUILDER REPORT: the builder report must contain each of these in full: 10168fa560af7284b23f99e4e639621cf47eacd2, live-progress-sinks, github-issue, github-project. It must also state the base ref it verified the tree against, the exact full factory test count from the suite run, and the names of the new test files added.
+BUILDER REPORT: the builder report must contain each of these in full: ae0bbfb2af95b41d96d8e2af7c9f8b787f54d83b, live-progress-sinks, github-issue, github-project. It must also state the base ref it verified the tree against, the exact full factory test count from the suite run, and the names of the new test files added.
 
 GUARDRAILS: authorized surface for this order: anvil/observe.py, a new module beside it for the sinks, anvil/config.py (validation of observability.sinks), anvil/scaffold.py (the default for new projects), anvil.yaml (the factory's own sink entry), docs/OPERATIONS.md, docs/EXECUTION.md, README.md (one short section on watching a run), CHANGELOG.md, one new decision record under brain/decisions/, and new test files under tests/. anvil/runner.py may change only where the recorder is constructed or told the pipeline order, and gains no network code. Do not touch any file under .github/workflows: the run's own token cannot push workflow changes and none are needed, because the line step already carries GH_TOKEN. Pipeline files under pipelines/ and anvil.json are protected paths. Existing test files at the base ref are protected: do not modify or delete them; new tests arrive as new files. A test that asserts something about this order's own run (which paths it changed, what its builder report says, a comparison against a fixed base ref) must skip unless ANVIL_WORK_ORDER_ID names this order: left unconditional, such a test fails for every order after this one, as the tree evidence of wo-gh-42 did. Frozen: the events contract, the OTLP trace, the existing fields of the run-state schema, the rule that export never decides a run, the station environment reduction, tools/line_comment.py. Python standard library only, no new dependency. No em dash or en dash character in any produced file. Nothing in this order merges, publishes or deploys anything; the run stops at the owner human gate.
 
@@ -349,10 +251,7 @@ GitHub issue: https://github.com/arananet/anvil-factory/issues/47
 - spec-writer: executed
 - test-writer: executed
 - builder: executed
-- checks-gate: failed
-- loopback: loopback
-- builder: executed
-- checks-gate: failed
+- checks-gate: passed
 - loopback: loopback
 
 ## Run context
@@ -364,20 +263,18 @@ The checks gate runs the project checks listed here; run them yourself before yo
 - Output of spec-writer: runs/wo-gh-47/spec-writer.output.md
 - Output of test-writer: runs/wo-gh-47/test-writer.output.md
 - Output of builder: runs/wo-gh-47/builder.output.md
-- Output of builder: runs/wo-gh-47/builder.output.md
 - Project check: `python -m unittest discover -s tests -p 'test_*.py'`
 
-## Loopback feedback (attempt 3 of 3)
+## Loopback feedback (attempt 2 of 3)
 
 The previous attempt was sent back by checks-gate to builder. Resolve every finding below. Keep what already passed; do not start over.
 
-Reason: Gate checks failed; completeness: run delta file list for attempt 2 is empty: the builder changed no file; checks gate verdict for attempt 2 is fail, not pass
+Reason: Completeness precondition failed: run delta file list for attempt 1 is empty: the builder changed no file
 
-- completeness gap: run delta file list for attempt 2 is empty: the builder changed no file
-- completeness gap: checks gate verdict for attempt 2 is fail, not pass
+- completeness gap: run delta file list for attempt 1 is empty: the builder changed no file
 - # Checks Gate: pre-review
   Basis: builder_delta
-  Attempt: 2
+  Attempt: 1
   
   # Protected Path Additions (Observed, Not Violations)
   Protected path addition (observed): tests/test_live_progress_sinks.py (matches tests/)
@@ -385,16 +282,27 @@ Reason: Gate checks failed; completeness: run delta file list for attempt 2 is e
   
   # Check Commands
   ## Command 1: python -m unittest discover -s tests -p 'test_*.py'
-  Exit code: 1
+  Exit code: 0
   Output:
   ```
-  rceWarning: Enable tracemalloc to get the object allocation traceback
-  .../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 35495)>
+  nitial branch. This default branch name
+  hint: will change to "main" in Git 3.0. To configure the initial branch name
+  hint: to use in all of your new repositories, which will suppress this warning,
+  hint: call:
+  hint:
+  hint: 	git config --global init.defaultBranch <name>
+  hint:
+  hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+  hint: 'development'. The just-created branch can be renamed via this command:
+  hint:
+  hint: 	git branch -m <name>
+  hint:
+  hint: Disable this message with "git config set advice.defaultBranchName false"
+  Switched to a new branch 'work-branch'
+  ...................................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 43177)>
     if method() is not None:
   ResourceWarning: Enable tracemalloc to get the object allocation traceback
-  ....................................................................................s..................................................................ss.........................................................................................................................................................s......s......................................................................................................s.................................................................F........ss.sss...........................................................................................
-  ======================================================================
-  FAIL: test_s3_factory_other_keys_and_packet_budgets_unchanged (test_station_budgets
+  .../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: Reso
 
 ## Output contract
 

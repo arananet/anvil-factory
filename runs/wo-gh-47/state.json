@@ -1,15 +1,15 @@
 {
   "schema": "anvil/run-state@1",
-  "run_id": "972b34956bdd4e32a5219369755246ad",
+  "run_id": "147148f794d445c4b597085f6b2b38a6",
   "work_order_id": "wo-gh-47",
   "project": "anvil-factory",
   "pipeline": "sdlc-default",
   "state": "finished",
   "current_station": null,
-  "verdict": "gate_failed",
-  "loopbacks": 2,
-  "started_at": "2026-11-22T16:56:44.107572+00:00",
-  "updated_at": "2026-11-22T17:43:25.261670+00:00",
+  "verdict": "approved",
+  "loopbacks": 1,
+  "started_at": "2026-11-22T21:35:39.045338+00:00",
+  "updated_at": "2026-11-22T22:09:14.669204+00:00",
   "steps": [
     {
       "station": "intake",
@@ -29,7 +29,7 @@
     },
     {
       "station": "checks-gate",
-      "status": "failed"
+      "status": "passed"
     },
     {
       "station": "loopback",
@@ -42,68 +42,64 @@
     },
     {
       "station": "checks-gate",
-      "status": "failed",
+      "status": "passed",
       "attempt": 2
-    },
-    {
-      "station": "loopback",
-      "status": "loopback"
-    },
-    {
-      "station": "builder",
-      "status": "executed",
-      "attempt": 3
-    },
-    {
-      "station": "checks-gate",
-      "status": "failed",
-      "attempt": 3
     },
     {
       "station": "reviewer-spec",
-      "status": "not_run"
+      "status": "executed",
+      "attempt": 2
     },
     {
       "station": "reviewer-security",
-      "status": "not_run"
+      "status": "executed",
+      "attempt": 2
     },
     {
       "station": "reviewer-tests",
-      "status": "not_run"
+      "status": "executed",
+      "attempt": 2
     },
     {
       "station": "reviewer-architecture",
-      "status": "not_run"
+      "status": "executed",
+      "attempt": 2
     },
     {
       "station": "reviewer-design",
-      "status": "not_run"
+      "status": "executed",
+      "attempt": 2
     },
     {
       "station": "reviewer-ux",
-      "status": "not_run"
+      "status": "routed_out",
+      "attempt": 2
     },
     {
       "station": "approver",
-      "status": "not_run"
+      "status": "completed",
+      "attempt": 2
     },
     {
       "station": "triage-human",
-      "status": "not_run"
+      "status": "completed",
+      "attempt": 2
     },
     {
       "station": "deployer",
-      "status": "not_run"
+      "status": "packet_ready",
+      "attempt": 2
     },
     {
       "station": "observer",
-      "status": "not_run"
+      "status": "executed",
+      "attempt": 2
     }
   ],
   "token_usage": {
-    "calls": 6,
-    "total_tokens": 8051180,
-    "measured_calls": 6,
+    "calls": 11,
+    "total_tokens": 3967356,
+    "measured_calls": 11,
     "unmeasured_calls": 0
   },
   "cost": null,
