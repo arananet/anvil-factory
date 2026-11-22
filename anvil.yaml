@@ -8,10 +8,10 @@
     "max_run_tokens": 15000000,
     "require_usage": false,
     "station_budgets": {
-      "intake": 200000,
+      "intake": 400000,
       "spec-writer": 1200000,
       "test-writer": 3200000,
-      "builder": 5800000,
+      "builder": 5600000,
       "reviewer-spec": 600000,
       "reviewer-security": 600000,
       "reviewer-tests": 600000,

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Operator fix: the intake partition covers the factory as it stands
+
+- `efficiency.station_budgets` in anvil.yaml: intake 200000 -> 400000, builder 5800000 -> 5600000; the partitions still add up to `max_run_tokens` 15000000. Run 45079024072 (wo-gh-49) stopped at intake after 212779 tokens, almost all cache reads of a repo that grew with wo-gh-47; no work was done and nothing was wrong with the order.
+- docs/EXECUTION.md: the partition table follows.
+
 ### Live progress sinks: a run seen while it runs (live-progress-sinks, wo-gh-47)
 
 - `observability.sinks` in anvil.yaml: an ordered list of progress sinks, validated at load (`anvil.config.validate_sinks`), each called with the run state record at every state write: run start, before each station, after the last one, the finished write (any exit status) and the crashed write. A failing sink is one `export_errors` entry; it never decides a run. No sink, no extra network call. Code in `anvil/sinks.py`; the runner only passes the pipeline order to the recorder.
