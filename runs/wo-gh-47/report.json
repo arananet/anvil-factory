@@ -1,0 +1,1378 @@
+{
+  "work_order_id": "wo-gh-47",
+  "pipeline": "sdlc-default",
+  "title": "Live progress sinks: a run seen while it runs, on the work order's issue and optionally on a GitHub Projects board",
+  "kind": "feature",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "executed",
+      "detail": "Executed by command; outcome: unknown",
+      "duration_ms": 17625.274,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/intake.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 3777,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 89635,
+        "output_tokens": 1126,
+        "cached_input_tokens": 66448,
+        "cache_creation_input_tokens": 23179,
+        "reasoning_tokens": 0,
+        "total_tokens": 90761,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 17537.904,
+          "usage": {
+            "input_tokens": 89635,
+            "output_tokens": 1126,
+            "cached_input_tokens": 66448,
+            "cache_creation_input_tokens": 23179,
+            "reasoning_tokens": 0,
+            "total_tokens": 90761,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.1517366,
+          "turns": 4,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/spec-writer.output.md",
+      "duration_ms": 24579.721,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/spec-writer.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 5056,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 162707,
+        "output_tokens": 2124,
+        "cached_input_tokens": 123064,
+        "cache_creation_input_tokens": 39633,
+        "reasoning_tokens": 0,
+        "total_tokens": 164831,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 24502.67,
+          "usage": {
+            "input_tokens": 162707,
+            "output_tokens": 2124,
+            "cached_input_tokens": 123064,
+            "cache_creation_input_tokens": 39633,
+            "reasoning_tokens": 0,
+            "total_tokens": 164831,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.26529780000000003,
+          "turns": 6,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true
+    },
+    {
+      "station": "test-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/test-writer.output.md",
+      "duration_ms": 244216.3,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/test-writer.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 4063,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 220456,
+        "output_tokens": 5953,
+        "cached_input_tokens": 194401,
+        "cache_creation_input_tokens": 26041,
+        "reasoning_tokens": 0,
+        "total_tokens": 226409,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 244015.415,
+          "usage": {
+            "input_tokens": 220456,
+            "output_tokens": 5953,
+            "cached_input_tokens": 194401,
+            "cache_creation_input_tokens": 26041,
+            "reasoning_tokens": 0,
+            "total_tokens": 226409,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.2882012,
+          "turns": 7,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true,
+      "red_check": {
+        "commands": [
+          "python -m unittest discover -s tests -p 'test_*.py'"
+        ],
+        "exit_codes": [
+          0
+        ],
+        "red": false
+      }
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/builder.output.md",
+      "duration_ms": 307067.176,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/builder.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 6968,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 790663,
+        "output_tokens": 9093,
+        "cached_input_tokens": 748724,
+        "cache_creation_input_tokens": 41903,
+        "reasoning_tokens": 0,
+        "total_tokens": 799756,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 306860.659,
+          "usage": {
+            "input_tokens": 790663,
+            "output_tokens": 9093,
+            "cached_input_tokens": 748724,
+            "cache_creation_input_tokens": 41903,
+            "reasoning_tokens": 0,
+            "total_tokens": 799756,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.5412638,
+          "turns": 20,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true
+    },
+    {
+      "station": "checks-gate",
+      "status": "passed",
+      "detail": "Gate passed: 1 checks, protected paths: pass",
+      "duration_ms": 109362.171,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/checks-gate.pre-review.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "phase": "pre-review",
+      "commands": [
+        "python -m unittest discover -s tests -p 'test_*.py'"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "protected_paths": [
+        "tests/",
+        "anvil.json",
+        "pipelines/"
+      ],
+      "protected_path_verdict": "pass",
+      "protected_path_findings": [],
+      "gate_verdict": "pass",
+      "artifact_validation": {
+        "passed": true,
+        "report": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/builder.output.md",
+        "observed": "present",
+        "report_source": "station",
+        "required_literals": [],
+        "missing_literals": [],
+        "findings": []
+      }
+    },
+    {
+      "station": "loopback",
+      "status": "loopback",
+      "return_to": "builder",
+      "detail": "Loopback to builder: Completeness precondition failed: run delta file list for attempt 1 is empty: the builder changed no file",
+      "reason": "Completeness precondition failed: run delta file list for attempt 1 is empty: the builder changed no file",
+      "duration_ms": 0.0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null,
+      "feedback": "",
+      "from_station": "checks-gate",
+      "attempt_archive": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/attempts/1"
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/builder.output.md",
+      "duration_ms": 406439.621,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/builder.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 7557,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 1416574,
+        "output_tokens": 14201,
+        "cached_input_tokens": 1354105,
+        "cache_creation_input_tokens": 62421,
+        "reasoning_tokens": 0,
+        "total_tokens": 1430775,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 406230.438,
+          "usage": {
+            "input_tokens": 1416574,
+            "output_tokens": 14201,
+            "cached_input_tokens": 1354105,
+            "cache_creation_input_tokens": 62421,
+            "reasoning_tokens": 0,
+            "total_tokens": 1430775,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.8671380000000001,
+          "turns": 25,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true,
+      "attempt": 2,
+      "feedback": {
+        "from_station": "checks-gate",
+        "reason": "Completeness precondition failed: run delta file list for attempt 1 is empty: the builder changed no file",
+        "findings": [
+          "completeness gap: run delta file list for attempt 1 is empty: the builder changed no file",
+          "# Checks Gate: pre-review\nBasis: builder_delta\nAttempt: 1\n\n# Protected Path Additions (Observed, Not Violations)\nProtected path addition (observed): tests/test_live_progress_sinks.py (matches tests/)\nProtected path addition (observed): tests/test_live_progress_project_sink.py (matches tests/)\n\n# Check Commands\n## Command 1: python -m unittest discover -s tests -p 'test_*.py'\nExit code: 0\nOutput:\n```\nnitial branch. This default branch name\nhint: will change to \"main\" in Git 3.0. To configure the initial branch name\nhint: to use in all of your new repositories, which will suppress this warning,\nhint: call:\nhint:\nhint: \tgit config --global init.defaultBranch <name>\nhint:\nhint: Names commonly chosen instead of 'master' are 'main', 'trunk' and\nhint: 'development'. The just-created branch can be renamed via this command:\nhint:\nhint: \tgit branch -m <name>\nhint:\nhint: Disable this message with \"git config set advice.defaultBranchName false\"\nSwitched to a new branch 'work-branch'\n...................................................................................................................................................../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 43177)>\n  if method() is not None:\nResourceWarning: Enable tracemalloc to get the object allocation traceback\n.../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 43123)>\n  if method() is not None:\nResourceWarning: Enable tracemalloc to get the object allocation traceback\n....................................................................................s..................................................................ss.........................................................................................................................................................s......s......................................................................................................s.................................................................s........ss.sss...........................................................................................\n----------------------------------------------------------------------\nRan 832 tests in 109.088s\n\nOK (skipped=12)\n\n```\n\n## Gate practices\n\nGate enforced practices this run resolved. The gate is accountable for them:\n\n- P-1: Traversal proof for platformer orders\n- P-2: Deterministic validation of builder reports with declared literals\n- P-3: Capture evidence must exist before design review\n"
+        ]
+      }
+    },
+    {
+      "station": "checks-gate",
+      "status": "passed",
+      "detail": "Gate passed: 1 checks, protected paths: pass",
+      "duration_ms": 111798.672,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/checks-gate.pre-review.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 2,
+      "phase": "pre-review",
+      "commands": [
+        "python -m unittest discover -s tests -p 'test_*.py'"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "protected_paths": [
+        "tests/",
+        "anvil.json",
+        "pipelines/"
+      ],
+      "protected_path_verdict": "pass",
+      "protected_path_findings": [],
+      "gate_verdict": "pass",
+      "artifact_validation": {
+        "passed": true,
+        "report": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/builder.output.md",
+        "observed": "present",
+        "report_source": "station",
+        "required_literals": [],
+        "missing_literals": [],
+        "findings": []
+      }
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "executed",
+      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/reviewer-spec.output.md",
+      "duration_ms": 70933.071,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/reviewer-spec.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 3867,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 259399,
+        "output_tokens": 4568,
+        "cached_input_tokens": 218499,
+        "cache_creation_input_tokens": 40884,
+        "reasoning_tokens": 0,
+        "total_tokens": 263967,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 70855.693,
+          "usage": {
+            "input_tokens": 259399,
+            "output_tokens": 4568,
+            "cached_input_tokens": 218499,
+            "cache_creation_input_tokens": 40884,
+            "reasoning_tokens": 0,
+            "total_tokens": 263967,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.3395438,
+          "turns": 8,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true,
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-security",
+      "status": "executed",
+      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/reviewer-security.output.md",
+      "duration_ms": 67417.186,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/reviewer-security.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 4667,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 194033,
+        "output_tokens": 4274,
+        "cached_input_tokens": 167007,
+        "cache_creation_input_tokens": 27014,
+        "reasoning_tokens": 0,
+        "total_tokens": 198307,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 67340.183,
+          "usage": {
+            "input_tokens": 194033,
+            "output_tokens": 4274,
+            "cached_input_tokens": 167007,
+            "cache_creation_input_tokens": 27014,
+            "reasoning_tokens": 0,
+            "total_tokens": 198307,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.2539994,
+          "turns": 6,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true,
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed",
+      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/reviewer-tests.output.md",
+      "duration_ms": 173165.09,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/reviewer-tests.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 4950,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 186210,
+        "output_tokens": 3954,
+        "cached_input_tokens": 163201,
+        "cache_creation_input_tokens": 22997,
+        "reasoning_tokens": 0,
+        "total_tokens": 190164,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 173087.669,
+          "usage": {
+            "input_tokens": 186210,
+            "output_tokens": 3954,
+            "cached_input_tokens": 163201,
+            "cache_creation_input_tokens": 22997,
+            "reasoning_tokens": 0,
+            "total_tokens": 190164,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.22675320000000002,
+          "turns": 6,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true,
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "executed",
+      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/reviewer-architecture.output.md",
+      "duration_ms": 65232.014,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/reviewer-architecture.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 4761,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 197494,
+        "output_tokens": 4132,
+        "cached_input_tokens": 171417,
+        "cache_creation_input_tokens": 26065,
+        "reasoning_tokens": 0,
+        "total_tokens": 201626,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 65154.143,
+          "usage": {
+            "input_tokens": 197494,
+            "output_tokens": 4132,
+            "cached_input_tokens": 171417,
+            "cache_creation_input_tokens": 26065,
+            "reasoning_tokens": 0,
+            "total_tokens": 201626,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.2472964,
+          "turns": 7,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true,
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/reviewer-design.output.md",
+      "duration_ms": 14474.901,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/reviewer-design.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 7272,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 89279,
+        "output_tokens": 1163,
+        "cached_input_tokens": 71096,
+        "cache_creation_input_tokens": 18177,
+        "reasoning_tokens": 0,
+        "total_tokens": 90442,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 14385.353,
+          "usage": {
+            "input_tokens": 89279,
+            "output_tokens": 1163,
+            "cached_input_tokens": 71096,
+            "cache_creation_input_tokens": 18177,
+            "reasoning_tokens": 0,
+            "total_tokens": 90442,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.1283882,
+          "turns": 4,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true,
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-ux",
+      "status": "routed_out",
+      "detail": "Routed out: Routed out: no UI surface",
+      "duration_ms": 1.591,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/reviewer-ux.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 2
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.068,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/report.json"
+      ],
+      "configured_model": "claude-fable-5-2",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 2
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "detail": "Human review: not_required",
+      "duration_ms": 0.028,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 0,
+      "budget": 0,
+      "budget_action": "none",
+      "attempt": 2
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "detail": "Packet written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/deployer.packet.md",
+      "duration_ms": 0.918,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/deployer.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": null,
+      "measured_tokens": 3713,
+      "budget": 48000,
+      "budget_action": "sent",
+      "attempt": 2
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/observer.output.md",
+      "duration_ms": 292868.763,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-47/runs/wo-gh-47/observer.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 3720,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 304258,
+        "output_tokens": 6060,
+        "cached_input_tokens": 280217,
+        "cache_creation_input_tokens": 24021,
+        "reasoning_tokens": 0,
+        "total_tokens": 310318,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 292790.603,
+          "usage": {
+            "input_tokens": 304258,
+            "output_tokens": 6060,
+            "cached_input_tokens": 280217,
+            "cache_creation_input_tokens": 24021,
+            "reasoning_tokens": 0,
+            "total_tokens": 310318,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.29742840000000004,
+          "turns": 10,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true,
+      "attempt": 2
+    }
+  ],
+  "verdict": "approved",
+  "human_required": false,
+  "max_loopbacks": 2,
+  "loopbacks": 1,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [
+        {
+          "station": "reviewer-spec",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-security",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-tests",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-architecture",
+          "verdict": "pass"
+        },
+        {
+          "station": "reviewer-design",
+          "verdict": "pass"
+        }
+      ],
+      "reviews_expected": [
+        "reviewer-spec",
+        "reviewer-security",
+        "reviewer-tests",
+        "reviewer-architecture",
+        "reviewer-design"
+      ],
+      "rule": "All counted reviews passed. (Expected 5 reviews after routing.)",
+      "reviews_uncounted": []
+    },
+    "human_gate": {
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": [
+    "TDD red check: the project checks passed before the builder ran, so the new tests did not fail first. reviewer-tests is told to verify that the tests exercise the new behavior."
+  ],
+  "astra_measured_tokens_total": 21797,
+  "base_ref": "ae0bbfb2af95b41d96d8e2af7c9f8b787f54d83b",
+  "evidence": [
+    {
+      "type": "screenshot",
+      "breakpoint": "390x844",
+      "path": "runs/wo-gh-47/evidence/screenshot-390x844.png",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "type": "screenshot",
+      "breakpoint": "1440x900",
+      "path": "runs/wo-gh-47/evidence/screenshot-1440x900.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "type": "screenshot",
+      "breakpoint": "390x844",
+      "path": "runs/wo-gh-47/evidence/screenshot-390x844.png",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "type": "screenshot",
+      "breakpoint": "1440x900",
+      "path": "runs/wo-gh-47/evidence/screenshot-1440x900.png",
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "cost": {
+    "total": 0,
+    "measured_steps": 0,
+    "unmeasured_steps": 11,
+    "stations": {
+      "intake": {
+        "partition": 200000,
+        "consumed": 90761,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "spec-writer": {
+        "partition": 1200000,
+        "consumed": 164831,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "test-writer": {
+        "partition": 3200000,
+        "consumed": 226409,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "builder": {
+        "partition": 5800000,
+        "consumed": 2230531,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "reviewer-spec": {
+        "partition": 600000,
+        "consumed": 263967,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "reviewer-security": {
+        "partition": 600000,
+        "consumed": 198307,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "reviewer-tests": {
+        "partition": 600000,
+        "consumed": 190164,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "reviewer-architecture": {
+        "partition": 600000,
+        "consumed": 201626,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "reviewer-design": {
+        "partition": 600000,
+        "consumed": 90442,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "reviewer-ux": {
+        "partition": 600000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "approver": {
+        "partition": 200000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "triage-human": {
+        "partition": 100000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "deployer": {
+        "partition": 300000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "observer": {
+        "partition": 400000,
+        "consumed": 310318,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      }
+    }
+  },
+  "practices": {
+    "resolved": {
+      "intake": [
+        "P-14",
+        "P-15"
+      ],
+      "spec-writer": [
+        "P-15"
+      ],
+      "test-writer": [],
+      "builder": [],
+      "checks-gate": [
+        "P-1",
+        "P-2",
+        "P-3"
+      ],
+      "reviewer-spec": [
+        "P-14"
+      ],
+      "reviewer-security": [],
+      "reviewer-tests": [
+        "P-12",
+        "P-13"
+      ],
+      "reviewer-architecture": [],
+      "reviewer-design": [
+        "P-4",
+        "P-5",
+        "P-6",
+        "P-7"
+      ],
+      "reviewer-ux": [
+        "P-8",
+        "P-9",
+        "P-10",
+        "P-11"
+      ],
+      "approver": [],
+      "triage-human": [],
+      "deployer": [],
+      "observer": []
+    },
+    "excluded_topics": [],
+    "active_count": 15
+  },
+  "skills": {
+    "resolved": {
+      "intake": [],
+      "spec-writer": [
+        "architecture-fundamentals",
+        "spec-writing"
+      ],
+      "test-writer": [
+        "test-design"
+      ],
+      "builder": [
+        "architecture-fundamentals",
+        "implementation-craft",
+        "security-baseline"
+      ],
+      "checks-gate": [],
+      "reviewer-spec": [],
+      "reviewer-security": [
+        "security-baseline"
+      ],
+      "reviewer-tests": [
+        "test-design"
+      ],
+      "reviewer-architecture": [
+        "architecture-fundamentals"
+      ],
+      "reviewer-design": [],
+      "reviewer-ux": [],
+      "approver": [],
+      "triage-human": [],
+      "deployer": [],
+      "observer": []
+    },
+    "disabled": [],
+    "catalog_count": 18,
+    "signals": {
+      "surfaces": [],
+      "product_types": [],
+      "kinds": [
+        "feature"
+      ]
+    }
+  },
+  "token_usage": {
+    "input_tokens": 3910708,
+    "output_tokens": 56648,
+    "cached_input_tokens": 3558179,
+    "cache_creation_input_tokens": 352335,
+    "reasoning_tokens": 0,
+    "total_tokens": 3967356,
+    "measured_calls": 11,
+    "unmeasured_calls": 0,
+    "calls": 11,
+    "retries": 0,
+    "complete": true,
+    "by_station": {
+      "intake": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 90761
+      },
+      "spec-writer": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 164831
+      },
+      "test-writer": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 226409
+      },
+      "builder": {
+        "calls": 2,
+        "measured_calls": 2,
+        "total_tokens": 2230531
+      },
+      "reviewer-spec": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 263967
+      },
+      "reviewer-security": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 198307
+      },
+      "reviewer-tests": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 190164
+      },
+      "reviewer-architecture": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 201626
+      },
+      "reviewer-design": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 90442
+      },
+      "observer": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 310318
+      }
+    },
+    "by_model": {
+      "claude-opus-5-5": {
+        "calls": 11,
+        "measured_calls": 11,
+        "total_tokens": 3967356
+      }
+    }
+  },
+  "efficiency": {
+    "limits": {
+      "max_packet_tokens": 48000,
+      "max_runtime_turns": 100,
+      "tool_output_tokens": 2000,
+      "max_agent_calls": 32,
+      "max_run_tokens": 15000000,
+      "require_usage": false,
+      "station_budgets": {
+        "intake": 200000,
+        "spec-writer": 1200000,
+        "test-writer": 3200000,
+        "builder": 5800000,
+        "reviewer-spec": 600000,
+        "reviewer-security": 600000,
+        "reviewer-tests": 600000,
+        "reviewer-architecture": 600000,
+        "reviewer-design": 600000,
+        "reviewer-ux": 600000,
+        "approver": 200000,
+        "triage-human": 100000,
+        "deployer": 300000,
+        "observer": 400000
+      }
+    },
+    "stopped": false
+  },
+  "run_id": "147148f794d445c4b597085f6b2b38a6",
+  "checkpoint": {
+    "last_completed_station": "observer",
+    "elapsed_ms": 2015698.221,
+    "usage_so_far": {
+      "input_tokens": 3910708,
+      "output_tokens": 56648,
+      "cached_input_tokens": 3558179,
+      "cache_creation_input_tokens": 352335,
+      "reasoning_tokens": 0,
+      "total_tokens": 3967356,
+      "measured_calls": 11,
+      "unmeasured_calls": 0,
+      "calls": 11,
+      "retries": 0,
+      "complete": true,
+      "by_station": {
+        "intake": {
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 90761
+        },
+        "spec-writer": {
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 164831
+        },
+        "test-writer": {
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 226409
+        },
+        "builder": {
+          "calls": 2,
+          "measured_calls": 2,
+          "total_tokens": 2230531
+        },
+        "reviewer-spec": {
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 263967
+        },
+        "reviewer-security": {
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 198307
+        },
+        "reviewer-tests": {
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 190164
+        },
+        "reviewer-architecture": {
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 201626
+        },
+        "reviewer-design": {
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 90442
+        },
+        "observer": {
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 310318
+        }
+      },
+      "by_model": {
+        "claude-opus-5-5": {
+          "calls": 11,
+          "measured_calls": 11,
+          "total_tokens": 3967356
+        }
+      }
+    }
+  },
+  "exit_status": "completed",
+  "termination_reason": "run completed with verdict approved",
+  "budgets": {
+    "stations": {
+      "intake": {
+        "partition": 200000,
+        "consumed": 90761,
+        "measured_tokens": 90761,
+        "calls": 1,
+        "unmeasured_calls": 0
+      },
+      "spec-writer": {
+        "partition": 1200000,
+        "consumed": 164831,
+        "measured_tokens": 164831,
+        "calls": 1,
+        "unmeasured_calls": 0
+      },
+      "test-writer": {
+        "partition": 3200000,
+        "consumed": 226409,
+        "measured_tokens": 226409,
+        "calls": 1,
+        "unmeasured_calls": 0
+      },
+      "builder": {
+        "partition": 5800000,
+        "consumed": 2230531,
+        "measured_tokens": 2230531,
+        "calls": 2,
+        "unmeasured_calls": 0
+      },
+      "reviewer-spec": {
+        "partition": 600000,
+        "consumed": 263967,
+        "measured_tokens": 263967,
+        "calls": 1,
+        "unmeasured_calls": 0
+      },
+      "reviewer-security": {
+        "partition": 600000,
+        "consumed": 198307,
+        "measured_tokens": 198307,
+        "calls": 1,
+        "unmeasured_calls": 0
+      },
+      "reviewer-tests": {
+        "partition": 600000,
+        "consumed": 190164,
+        "measured_tokens": 190164,
+        "calls": 1,
+        "unmeasured_calls": 0
+      },
+      "reviewer-architecture": {
+        "partition": 600000,
+        "consumed": 201626,
+        "measured_tokens": 201626,
+        "calls": 1,
+        "unmeasured_calls": 0
+      },
+      "reviewer-design": {
+        "partition": 600000,
+        "consumed": 90442,
+        "measured_tokens": 90442,
+        "calls": 1,
+        "unmeasured_calls": 0
+      },
+      "reviewer-ux": {
+        "partition": 600000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "approver": {
+        "partition": 200000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "triage-human": {
+        "partition": 100000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "deployer": {
+        "partition": 300000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "observer": {
+        "partition": 400000,
+        "consumed": 310318,
+        "measured_tokens": 310318,
+        "calls": 1,
+        "unmeasured_calls": 0
+      }
+    },
+    "outcomes": [],
+    "source": "per-attempt usage artifacts (token-efficiency), summed per station"
+  },
+  "completeness": [
+    {
+      "attempt": 1,
+      "passed": false,
+      "gaps": [
+        "run delta file list for attempt 1 is empty: the builder changed no file"
+      ],
+      "gate_verdict": "pass",
+      "evaluated_at": "2026-11-22T21:49:09.684810+00:00"
+    },
+    {
+      "attempt": 2,
+      "passed": true,
+      "gaps": [],
+      "gate_verdict": "pass",
+      "evaluated_at": "2026-11-22T21:57:50.535643+00:00"
+    }
+  ]
+}

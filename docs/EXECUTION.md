@@ -189,6 +189,28 @@ and `anvil resume` names its exit status instead of resuming. For SIGKILL or a
 lost host the last checkpoint is the record. Reports written before this
 change carry none of these keys and render as before.
 
+### Live progress sinks
+
+The sinks in `observability.sinks` (spec live-progress-sinks, decision 0015,
+configuration in [OPERATIONS.md](OPERATIONS.md)) are called by the recorder
+in `anvil/observe.py` at every state write, with the state record, before
+`state.json` is written:
+
+- at run start (`run.started`; a resumed run writes its first state before
+  its first station, a moment later);
+- before each station, with that station as `current_station`;
+- after the last station, and at the `finished` write, which carries the
+  report's `exit_status` for every exit path that reaches it (budget,
+  timeout, turn limit, runtime refusal, checks or intake stop, completed);
+- at the `crashed` write of `mark_crashed` (an uncaught error or a signal),
+  which reads the configuration from the project's `anvil.yaml`.
+
+The state record gains `stations` (the pipeline order), `total_tokens` per
+step, `exit_status` and `sinks`. No event is added: events.jsonl, the
+webhook and the OTLP trace are unchanged, and a sink failure is an
+`export_errors` entry, never a verdict. The sink code is `anvil/sinks.py`;
+the runner only hands the recorder its pipeline order.
+
 ### Per-station token budgets and the completeness gate
 
 The run cap `efficiency.max_run_tokens` is one shared pool. Per-station

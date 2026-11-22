@@ -1914,7 +1914,7 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
     except (OSError, ValueError, AttributeError):
         project_name = None
     recorder = RunRecorder(run_dir, run_id, work_order.id, str(project_name or project.resolve().name),
-                           pipeline.name, config)
+                           pipeline.name, config, stations=order)
     recorder.emitted = len(steps)  # a resumed run does not re-emit kept steps
     recorder.event("run.resumed" if resume else "run.started", work_order_kind=work_order.kind,
                    risk_hints=list(work_order.risk_hints or []), executed=execute_mode)

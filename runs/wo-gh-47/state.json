@@ -1,0 +1,109 @@
+{
+  "schema": "anvil/run-state@1",
+  "run_id": "147148f794d445c4b597085f6b2b38a6",
+  "work_order_id": "wo-gh-47",
+  "project": "anvil-factory",
+  "pipeline": "sdlc-default",
+  "state": "finished",
+  "current_station": null,
+  "verdict": "approved",
+  "loopbacks": 1,
+  "started_at": "2026-11-22T21:35:39.045338+00:00",
+  "updated_at": "2026-11-22T22:09:14.669204+00:00",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "executed"
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed"
+    },
+    {
+      "station": "test-writer",
+      "status": "executed"
+    },
+    {
+      "station": "builder",
+      "status": "executed"
+    },
+    {
+      "station": "checks-gate",
+      "status": "passed"
+    },
+    {
+      "station": "loopback",
+      "status": "loopback"
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "checks-gate",
+      "status": "passed",
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-security",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-design",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "reviewer-ux",
+      "status": "routed_out",
+      "attempt": 2
+    },
+    {
+      "station": "approver",
+      "status": "completed",
+      "attempt": 2
+    },
+    {
+      "station": "triage-human",
+      "status": "completed",
+      "attempt": 2
+    },
+    {
+      "station": "deployer",
+      "status": "packet_ready",
+      "attempt": 2
+    },
+    {
+      "station": "observer",
+      "status": "executed",
+      "attempt": 2
+    }
+  ],
+  "token_usage": {
+    "calls": 11,
+    "total_tokens": 3967356,
+    "measured_calls": 11,
+    "unmeasured_calls": 0
+  },
+  "cost": null,
+  "export_errors": [],
+  "human_required": false,
+  "deployment_status": null
+}

@@ -200,6 +200,17 @@ Memory is gated like code: agent written learnings wait in a quarantined inbox a
 
 The supervisor watches run reports between runs and proposes pipeline recompositions built only from the station catalog, under a constitution it cannot amend, and nothing it proposes applies itself. See docs/SUPERVISOR.md.
 
+## Watching a run
+
+A run of a work order filed as a GitHub issue is visible on that issue while it runs. The
+`github-issue` progress sink posts one comment when the run starts and edits that same comment at
+every state change: the run state, one row per station (done, running, pending, failed, not run)
+with attempt and tokens, loopbacks, tokens and cost so far, and the verdict and exit status at the
+end. It uses the token the run already holds, so there is nothing to host. The factory and every
+new project enable it in `anvil.yaml` under `observability.sinks`. A `github-project` sink that
+moves a card on a GitHub Projects board ships documented and off. See
+[docs/OPERATIONS.md](docs/OPERATIONS.md).
+
 ## The brain
 
 The brain/ folder holds project.md (what the project is and its principles), glossary.md, decisions/ (numbered decision records) and worklog.md. Stations read the brain as context, so decisions survive beyond a single run. Verified learnings live in brain/learnings.md behind the memory gate, with proposals quarantined in brain/inbox/ until their provenance verifies (docs/MEMORY-GATE.md).

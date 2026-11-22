@@ -38,6 +38,13 @@
     "kind": "command",
     "timeout_seconds": 7200
   },
+  "observability": {
+    "sinks": [
+      {
+        "type": "github-issue"
+      }
+    ]
+  },
   "stations": {
     "intake": {
       "context": [

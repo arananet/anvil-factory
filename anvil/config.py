@@ -155,10 +155,11 @@ def load_anvil_config(path):
         return {}
     try:
         data = json.loads(text)
-        if isinstance(data, dict):
-            return data
     except json.JSONDecodeError:
-        pass
+        data = None
+    if isinstance(data, dict):
+        validate_sinks(data)
+        return data
     # Tiny fallback: top level keys with scalar values only, lines like "key: value"
     result = {}
     for line in text.splitlines():
@@ -168,6 +169,62 @@ def load_anvil_config(path):
         k, v = line.split(":", 1)
         result[k.strip()] = v.strip()
     return result
+
+def validate_sinks(config):
+    """live-progress-sinks R1.1, R3.1, R5.3: observability.sinks is a list of known, well formed entries.
+
+    Raises ValueError naming observability.sinks (or the zero based entry) and
+    the offending key or type. Absent or empty means no sink.
+    """
+    from .executor import STATION_ENV_DENY
+    from .sinks import ALLOWED_KEYS, PHASES, REQUIRED_KEYS
+    observability = config.get("observability")
+    if not isinstance(observability, dict) or "sinks" not in observability:
+        return
+    sinks = observability["sinks"]
+    if not isinstance(sinks, list):
+        raise ValueError(f"observability.sinks must be a list of sink entries, got {type(sinks).__name__}")
+    runtime = config.get("runtime") if isinstance(config.get("runtime"), dict) else {}
+    keep = {str(n) for n in runtime.get("env_keep") or []}
+    deny = set(STATION_ENV_DENY) | {str(n) for n in runtime.get("env_deny") or []}
+
+    def text(value):
+        return isinstance(value, str) and value.strip() != ""
+
+    for index, entry in enumerate(sinks):
+        where = f"observability.sinks[{index}]"
+        if not isinstance(entry, dict):
+            raise ValueError(f"{where} must be an object with a type, got {type(entry).__name__}")
+        kind = entry.get("type")
+        if kind not in ALLOWED_KEYS:
+            raise ValueError(f"{where}: type {kind!r} is unknown (known: {', '.join(sorted(ALLOWED_KEYS))})")
+        for key in entry:
+            if key != "type" and key not in ALLOWED_KEYS[kind]:
+                raise ValueError(f"{where}: key {key!r} is not allowed for type {kind}")
+        for key in sorted(REQUIRED_KEYS[kind]):
+            if key not in entry:
+                raise ValueError(f"{where}: type {kind} requires key {key!r}")
+        for key in ("owner", "status_field", "token_env"):
+            if key in entry and not text(entry[key]):
+                raise ValueError(f"{where}: {key} must be a non-empty string")
+        if "number" in entry and (isinstance(entry["number"], bool) or not isinstance(entry["number"], int)
+                                  or entry["number"] < 1):
+            raise ValueError(f"{where}: number must be a positive integer")
+        if "owner_type" in entry and entry["owner_type"] not in ("user", "organization"):
+            raise ValueError(f"{where}: owner_type must be user or organization, got {entry['owner_type']!r}")
+        if "columns" in entry:
+            columns = entry["columns"]
+            if not isinstance(columns, dict):
+                raise ValueError(f"{where}: columns must be an object of phase to option name")
+            for phase, name in columns.items():
+                if phase not in PHASES:
+                    raise ValueError(f"{where}: columns key {phase!r} is not a phase ({', '.join(PHASES)})")
+                if not text(name):
+                    raise ValueError(f"{where}: columns.{phase} must be a non-empty string")
+        token_env = entry.get("token_env") or "GH_TOKEN"
+        if token_env in keep or token_env not in deny:
+            raise ValueError(f"{where}: token_env {token_env} would reach a station; list it in runtime.env_deny "
+                             f"and not in runtime.env_keep")
 
 def station_overrides(config):
     if not isinstance(config, dict):
@@ -221,7 +278,9 @@ def build_default_config(station_ids):
             "prompt": f"stations/{sid}/PROMPT.md",
             "tools": [],
         }
-    return {"version": 1, "efficiency": dict(DEFAULT_EFFICIENCY), "stations": stations}
+    # live-progress-sinks R4.2: a new project's runs are visible on their issue without setup.
+    return {"version": 1, "efficiency": dict(DEFAULT_EFFICIENCY),
+            "observability": {"sinks": [{"type": "github-issue"}]}, "stations": stations}
 
 def render_anvil_yaml(station_ids):
     # JSON is valid YAML, so this file is both machine simple and YAML legal.

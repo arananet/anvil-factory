@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Live progress sinks: a run seen while it runs (live-progress-sinks, wo-gh-47)
+
+- `observability.sinks` in anvil.yaml: an ordered list of progress sinks, validated at load (`anvil.config.validate_sinks`), each called with the run state record at every state write: run start, before each station, after the last one, the finished write (any exit status) and the crashed write. A failing sink is one `export_errors` entry; it never decides a run. No sink, no extra network call. Code in `anvil/sinks.py`; the runner only passes the pipeline order to the recorder.
+- `github-issue`: one comment on the work order's issue, created at the first call and edited afterwards, found again by a hidden marker with the run id. Enabled in the factory anvil.yaml and in the scaffold for new projects.
+- `github-project`: the status of the issue's item on a GitHub Projects board, set when the phase changes; documented in docs/OPERATIONS.md and enabled nowhere. It never changes the board's shape and needs a token the workflow does not have.
+- A sink request that gets an HTTP error closes the response before the status is recorded, so an API that keeps failing holds no connection open across state writes.
+- state.json gains `stations`, `total_tokens` per step, `exit_status` and `sinks`. events.jsonl, the webhook, the OTLP trace, report.json and the final line report comment are unchanged.
+- Spec: .openspec/specs/live-progress-sinks/spec.md. Tests: tests/test_live_progress_sinks.py, tests/test_live_progress_project_sink.py, tests/test_live_progress_sink_errors.py. Docs: docs/OPERATIONS.md, docs/EXECUTION.md, README.md. Decision 0015.
+
 ### Operator fix: the configuration evidence of wo-gh-42 binds that order's run only
 
 - tests/test_station_budgets_completeness.py compared the factory anvil.yaml with the copy at the fixed base ref of wo-gh-42 and required them equal apart from the partition keys. Any later order that adds a key to anvil.yaml failed it: it stopped the checks gate of wo-gh-47 on all three builder attempts (run 45046566131, 8051180 tokens), because that order adds observability.sinks. The test now runs only inside the run of wo-gh-42, the pattern tests/test_landing_page.py already uses for wo-gh-35. Owner-authorized, outside the line (decision 0006).
