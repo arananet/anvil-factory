@@ -76,8 +76,8 @@ jobs:
       # variable ANVIL_RUNTIME; the copilot runtime needs the secret
       # COPILOT_GITHUB_TOKEN, a token with the Copilot Requests permission.
       # Pinned so a run does not pick up a new runtime by surprise. The values are the
-      # ones the approved run of wo-gh-41 used on 2026-11-20 (run 44733513659). Raise
-      # them on purpose, in a commit, after a run on the new version is approved.
+      # ones of the approved line run 44733513659 (2026-11-20). Raise them on purpose,
+      # in a commit, after a run on the new version is approved.
       CLAUDE_CODE_VERSION: "2.1.329"
       PLAYWRIGHT_VERSION: "1.65.2"
       ANVIL_RUNTIME: ${{ vars.ANVIL_RUNTIME || 'claude-gateway' }}
@@ -179,7 +179,7 @@ jobs:
       - name: Install the station runtime
         run: |
           case "${ANVIL_RUNTIME}" in
-            claude-gateway) npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"; claude --version ;;
+            claude-gateway) npm install -g @anthropic-ai/claude-code@"${CLAUDE_CODE_VERSION}"; claude --version ;;
             copilot) npm install -g @github/copilot; copilot --version ;;
             *) echo "Unknown ANVIL_RUNTIME '${ANVIL_RUNTIME}': use claude-gateway or copilot"; exit 2 ;;
           esac
