@@ -1,15 +1,15 @@
 {
   "schema": "anvil/run-state@1",
-  "run_id": "3809fd5420994ea8a25778cc3bb27df6",
+  "run_id": "972b34956bdd4e32a5219369755246ad",
   "work_order_id": "wo-gh-47",
   "project": "anvil-factory",
   "pipeline": "sdlc-default",
   "state": "finished",
   "current_station": null,
-  "verdict": "budget_exceeded",
-  "loopbacks": 0,
-  "started_at": "2026-11-22T16:13:33.726027+00:00",
-  "updated_at": "2026-11-22T16:15:29.942509+00:00",
+  "verdict": "gate_failed",
+  "loopbacks": 2,
+  "started_at": "2026-11-22T16:56:44.107572+00:00",
+  "updated_at": "2026-11-22T17:43:25.261670+00:00",
   "steps": [
     {
       "station": "intake",
@@ -17,19 +17,47 @@
     },
     {
       "station": "spec-writer",
-      "status": "budget_exceeded"
+      "status": "executed"
     },
     {
       "station": "test-writer",
-      "status": "not_run"
+      "status": "executed"
     },
     {
       "station": "builder",
-      "status": "not_run"
+      "status": "executed"
     },
     {
       "station": "checks-gate",
-      "status": "not_run"
+      "status": "failed"
+    },
+    {
+      "station": "loopback",
+      "status": "loopback"
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "attempt": 2
+    },
+    {
+      "station": "checks-gate",
+      "status": "failed",
+      "attempt": 2
+    },
+    {
+      "station": "loopback",
+      "status": "loopback"
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "attempt": 3
+    },
+    {
+      "station": "checks-gate",
+      "status": "failed",
+      "attempt": 3
     },
     {
       "station": "reviewer-spec",
@@ -73,9 +101,9 @@
     }
   ],
   "token_usage": {
-    "calls": 2,
-    "total_tokens": 772215,
-    "measured_calls": 2,
+    "calls": 6,
+    "total_tokens": 8051180,
+    "measured_calls": 6,
     "unmeasured_calls": 0
   },
   "cost": null,

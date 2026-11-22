@@ -11,6 +11,9 @@ the run is still going, and what leaves the project:
 - Export, both optional and configured in anvil.yaml under observability:
   each event POSTed to a webhook, and the finished run sent as one
   OpenTelemetry trace (OTLP/HTTP JSON) with a span per station.
+- Progress sinks (observability.sinks, spec: live-progress-sinks): called
+  with the state record at every state write, before state.json is
+  written; the sink code lives in anvil/sinks.py.
 
 Export never decides a run: a failed POST is recorded in state.json and the
 line goes on. Standard library only.
@@ -23,6 +26,7 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+from .sinks import SinkSet
 from .telemetry import normalize_usage, summarize_steps
 
 STATE_FILE = "state.json"
@@ -74,11 +78,13 @@ def step_event(step):
 class RunRecorder:
     """Writes state.json and events.jsonl for one run and exports them."""
 
-    def __init__(self, run_dir, run_id, work_order_id, project, pipeline, config=None):
+    def __init__(self, run_dir, run_id, work_order_id, project, pipeline, config=None, stations=None):
         self.run_dir = Path(run_dir)
         self.base = {"run_id": run_id, "work_order_id": work_order_id, "project": project, "pipeline": pipeline}
         self.config = observability_config(config)
         self.timeout = float(self.config.get("timeout_seconds", 5))
+        self.stations = [str(s) for s in stations or []]
+        self.sinks = SinkSet(self.config.get("sinks"), self.timeout)
         self.started_at = _now()
         self.emitted = 0
         self.export_errors = []
@@ -99,6 +105,9 @@ class RunRecorder:
                 _post(url, record, headers, self.timeout)
             except Exception as exc:  # export never decides a run
                 self._export_failed("events", exc)
+        if kind == "run.started":
+            # The run start state write (live-progress-sinks R1.2): a fresh run has no step yet.
+            self.state("running", [])
         return record
 
     def _export_failed(self, channel, exc):
@@ -113,12 +122,16 @@ class RunRecorder:
         record = {"schema": "anvil/run-state@1", **self.base, "state": state,
                   "current_station": current_station, "verdict": verdict or None, "loopbacks": loopbacks,
                   "started_at": self.started_at.isoformat(), "updated_at": _now().isoformat(),
-                  "steps": [{key: s[key] for key in ("station", "status", "attempt") if s.get(key) is not None}
-                            for s in steps],
+                  "stations": list(self.stations),
+                  "steps": [dict({key: s[key] for key in ("station", "status", "attempt") if s.get(key) is not None},
+                                 total_tokens=summarize_steps([s])["total_tokens"]) for s in steps],
                   "token_usage": {key: usage.get(key) for key in ("calls", "total_tokens", "measured_calls",
                                                                    "unmeasured_calls")},
                   "cost": round(sum(costs), 6) if costs else None,
                   "export_errors": list(self.export_errors), **extra}
+        # Sinks see the record first; state.json then carries what they left behind (R1.3).
+        record["sinks"] = self.sinks.deliver(record, self.export_errors)
+        record["export_errors"] = list(self.export_errors)
         tmp = self.run_dir / (STATE_FILE + ".tmp")
         tmp.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
         os.replace(tmp, self.run_dir / STATE_FILE)
@@ -142,9 +155,10 @@ class RunRecorder:
                    calls=usage.get("calls"), total_tokens=usage.get("total_tokens"),
                    cost=round(sum(costs), 6) if costs else None)
         self._export_trace(report)
+        extra = {"exit_status": report["exit_status"]} if report.get("exit_status") is not None else {}
         self.state("finished", steps, verdict=report.get("verdict"), loopbacks=report.get("loopbacks", 0),
                    human_required=report.get("human_required"),
-                   deployment_status=report.get("deployment_status"))
+                   deployment_status=report.get("deployment_status"), **extra)
 
     # OpenTelemetry ----------------------------------------------------
     def trace_payload(self, report):
@@ -228,6 +242,7 @@ def mark_crashed(run_dir, error):
         return None
     record.update({"state": "crashed", "error": f"{type(error).__name__}: {str(error)[:300]}",
                    "updated_at": _now().isoformat()})
+    _crashed_to_sinks(Path(run_dir), record)
     path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     event = {"schema": "anvil/event@1", "ts": record["updated_at"], "event": "run.crashed",
              **{key: record.get(key) for key in ("run_id", "work_order_id", "project", "pipeline")},
@@ -235,6 +250,30 @@ def mark_crashed(run_dir, error):
     with open(Path(run_dir) / EVENTS_FILE, "a", encoding="utf-8") as handle:
         handle.write(json.dumps(event, sort_keys=True) + "\n")
     return record
+
+
+def _crashed_to_sinks(run_dir, record):
+    """Hand the crashed record to the configured sinks (live-progress-sinks R1.2, R1.10).
+
+    mark_crashed may run in a fresh process, so the configuration is read
+    from the project's anvil.yaml and the pipeline order from the record.
+    Nothing here may stop the crashed state from being written.
+    """
+    try:
+        report = json.loads((run_dir / "report.json").read_text(encoding="utf-8"))
+        if isinstance(report, dict) and report.get("exit_status") is not None:
+            record["exit_status"] = report["exit_status"]
+    except (OSError, ValueError):
+        pass
+    try:
+        from .config import load_anvil_config
+        config = observability_config(load_anvil_config(run_dir.parent.parent / "anvil.yaml"))
+        sinks = SinkSet(config.get("sinks"), float(config.get("timeout_seconds", 5)))
+    except Exception:  # an unreadable or invalid configuration: no sink, as before this change
+        return
+    errors = [str(e) for e in record.get("export_errors") or []]
+    record["sinks"] = sinks.deliver(record, errors)
+    record["export_errors"] = errors
 
 
 def run_states(project, now=None):

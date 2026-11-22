@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Live progress sinks: a run seen while it runs (live-progress-sinks, wo-gh-47)
+
+- `observability.sinks` in anvil.yaml: an ordered list of progress sinks, validated at load (`anvil.config.validate_sinks`), each called with the run state record at every state write: run start, before each station, after the last one, the finished write (any exit status) and the crashed write. A failing sink is one `export_errors` entry; it never decides a run. No sink, no extra network call. Code in `anvil/sinks.py`; the runner only passes the pipeline order to the recorder.
+- `github-issue`: one comment on the work order's issue, created at the first call and edited afterwards, found again by a hidden marker with the run id. Enabled in the factory anvil.yaml and in the scaffold for new projects.
+- `github-project`: the status of the issue's item on a GitHub Projects board, set when the phase changes; documented in docs/OPERATIONS.md and enabled nowhere. It never changes the board's shape and needs a token the workflow does not have.
+- state.json gains `stations`, `total_tokens` per step, `exit_status` and `sinks`. events.jsonl, the webhook, the OTLP trace, report.json and the final line report comment are unchanged.
+- Spec: .openspec/specs/live-progress-sinks/spec.md. Tests: tests/test_live_progress_sinks.py, tests/test_live_progress_project_sink.py. Docs: docs/OPERATIONS.md, docs/EXECUTION.md, README.md. Decision 0015.
+
 ### Operator recalibration: the spec-writer partition
 
 - efficiency.station_budgets in the factory anvil.yaml: spec-writer 600000 to 1200000, builder 6400000 to 5800000; the table still sums to 15000000. The first run under the accepted table (wo-gh-47, run 45042545362) was stopped in the spec-writer at 653517 tokens, 599136 of them cache reads.

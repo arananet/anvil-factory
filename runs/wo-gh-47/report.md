@@ -29,17 +29,23 @@ Surfaces: api, security, data, content
 
 ## Verdict
 
-Verdict: budget_exceeded
+Verdict: gate_failed
 
-The run ended (budget_exceeded) before the approver step, so no reviews were aggregated into a verdict.
+The run ended (checks_stopped) before the approver step, so no reviews were aggregated into a verdict.
 
 ## Steps
 
 - intake: executed
-- spec-writer: budget_exceeded
-- test-writer: not_run
-- builder: not_run
-- checks-gate: not_run
+- spec-writer: executed
+- test-writer: executed
+- builder: executed
+- checks-gate: failed
+- loopback: loopback
+- builder: executed
+- checks-gate: failed
+- loopback: loopback
+- builder: executed
+- checks-gate: failed
 - reviewer-spec: not_run
 - reviewer-security: not_run
 - reviewer-tests: not_run

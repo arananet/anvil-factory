@@ -30,6 +30,111 @@ python3 -m anvil.cli runs . --json   # the same as data
 approval rate and loopbacks per pipeline, which reviewer rejects most, and
 tokens and cost across runs.
 
+## Watching a run on GitHub: progress sinks
+
+Spec: `.openspec/specs/live-progress-sinks/spec.md`. Decision 0015. Tests:
+`tests/test_live_progress_sinks.py`, `tests/test_live_progress_project_sink.py`.
+
+A progress sink receives the state record every time `state.json` is
+rewritten: at run start, before each station, after the last station, when
+the run finishes (whatever its exit status, `runtime_refused` included) and
+when it crashes. Sinks are listed in `anvil.yaml`:
+
+```json
+{
+  "observability": {
+    "sinks": [
+      {"type": "github-issue"},
+      {"type": "github-project", "owner": "acme", "number": 3, "token_env": "ANVIL_PROJECTS_TOKEN"}
+    ],
+    "timeout_seconds": 5
+  },
+  "runtime": {"env_deny": ["ANVIL_PROJECTS_TOKEN"]}
+}
+```
+
+The list is validated when the configuration loads: an unknown `type`, a
+missing required key, a key the type does not allow or a value of the wrong
+type fails loading with a message naming `observability.sinks[<index>]` and
+the key. No sinks (absent or `[]`) means no extra network call. Every request
+is bounded by `timeout_seconds`. A sink that fails (an exception, a timeout,
+an HTTP status of 400 or more) is recorded in `state.json` under
+`export_errors` as `<type>: HTTP <status>` or `<type>: <ExceptionClass>` and
+the line goes on: a sink never decides a run and never changes the report or
+the events. `state.json` says per sink whether it is active, and why not,
+under `sinks`.
+
+### github-issue (on by default)
+
+`{"type": "github-issue"}`, optional `token_env` (default `GH_TOKEN`). The
+factory's `anvil.yaml` and every project made by `anvil init` enable it.
+
+- Active only when the work order id is `wo-gh-<number>`, `GITHUB_REPOSITORY`
+  is set and the token variable is set. Otherwise it makes no request and
+  `state.json` records the reason once (`work order id is not
+  wo-gh-<number>`, `GITHUB_REPOSITORY is not set`, `GH_TOKEN is not set`).
+- It creates one comment on the issue at its first call and edits that same
+  comment afterwards. The comment starts with a hidden marker carrying the
+  run id, so a resumed run or the crash write from a fresh process finds it
+  again instead of posting a second one.
+- The comment shows the work order, the pipeline, the run state, the verdict
+  and exit status once known, a row per station in pipeline order (done,
+  running, pending, failed, skipped, not run) with attempt and measured
+  tokens, loopbacks, tokens and priced cost so far, the time of the last
+  update and, when `GITHUB_RUN_ID` is set, the workflow run link. Scalar
+  facts only: no prompt, no station output, no error text, no path, no token.
+- The API base is `GITHUB_API_URL` when set (GitHub Enterprise), otherwise
+  `https://api.github.com`. Cost in rate limit: about one request per state
+  write, plus one listing at the first call.
+
+The final "ANVIL line report" comment of the workflow is unchanged; the
+progress comment is a separate one.
+
+### github-project (documented, off)
+
+`{"type": "github-project", "owner": ..., "number": ...}` with optional
+`owner_type` (`user` or `organization`, default `user`), `status_field`
+(default `Status`), `token_env` (default `GH_TOKEN`) and `columns`.
+
+It sets the status of the issue's item on a GitHub Projects (v2) board when
+the run's phase changes, and adds the issue to the project when it is not on
+it yet. Phases and the default option names:
+
+| Phase | Stations | Default option |
+|---|---|---|
+| intake | intake | Intake |
+| spec | spec-writer | Spec |
+| build | test-writer, builder | Build |
+| checks | checks-gate | Checks |
+| review | reviewers, approver | Review |
+| human | triage-human, or a finished run that needs a human | Needs human |
+| done | a finished, approved run | Done |
+| failed | a crashed run or any exit status other than completed | Failed |
+
+`columns` renames the option per phase, for example
+`{"human": "Waiting on owner", "done": "Shipped"}`.
+
+It never changes the board's shape. A project, status field or option it
+cannot find is recorded by name (`github-project: option Review not found in
+Status`) and the sink makes no further request for the run. Create the field
+and its options yourself.
+
+The workflow's own token cannot reach Projects. `token_env` names a variable
+holding a token that can (a fine grained token with Projects read and write,
+or a classic one with `project`); the workflow does not wire one in, so
+exposing it to the line step is your change. With the variable unset the
+sink is inactive and says so once.
+
+### Tokens stay with the line
+
+Sinks run in the line process and read their token from its environment at
+call time. The token goes into the `Authorization` header and nowhere else:
+not into `state.json`, `events.jsonl`, `report.json`, a comment or an export
+error. A sink's `token_env` must not reach a station: loading fails, naming
+`observability.sinks[<index>]` and `token_env`, when the variable is in
+`runtime.env_keep` or is neither in the engine's denied list (which holds
+`GH_TOKEN`) nor in `runtime.env_deny`.
+
 ## Sending it to the tools you already watch
 
 In the project `anvil.yaml`:
