@@ -75,6 +75,11 @@ jobs:
       # CLI with the Anthropic models of the GitHub account). Repository
       # variable ANVIL_RUNTIME; the copilot runtime needs the secret
       # COPILOT_GITHUB_TOKEN, a token with the Copilot Requests permission.
+      # Pinned so a run does not pick up a new runtime by surprise. The values are the
+      # ones the approved run of wo-gh-41 used on 2026-11-20 (run 44733513659). Raise
+      # them on purpose, in a commit, after a run on the new version is approved.
+      CLAUDE_CODE_VERSION: "2.1.329"
+      PLAYWRIGHT_VERSION: "1.65.2"
       ANVIL_RUNTIME: ${{ vars.ANVIL_RUNTIME || 'claude-gateway' }}
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
       # No repository or deploy token lives at job level: the stations run
@@ -89,7 +94,7 @@ jobs:
       AUTO_MERGE: ${{ vars.ANVIL_AUTO_MERGE }}
     steps:
       - name: Check out the default branch with history
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
           ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
@@ -97,12 +102,12 @@ jobs:
           persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
           python-version: "3.12"
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4
         with:
           node-version: "22"
 
@@ -174,11 +179,11 @@ jobs:
       - name: Install the station runtime
         run: |
           case "${ANVIL_RUNTIME}" in
-            claude-gateway) npm install -g @anthropic-ai/claude-code; claude --version ;;
+            claude-gateway) npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"; claude --version ;;
             copilot) npm install -g @github/copilot; copilot --version ;;
             *) echo "Unknown ANVIL_RUNTIME '${ANVIL_RUNTIME}': use claude-gateway or copilot"; exit 2 ;;
           esac
-          pip install playwright
+          pip install "playwright==${PLAYWRIGHT_VERSION}"
           playwright install --with-deps chromium
 
       - name: Runtime smoke test
@@ -278,7 +283,7 @@ jobs:
 
       - name: Upload the run directory
         if: always() && steps.line.outputs.worktree != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
           name: anvil-run-${{ steps.order.outputs.id }}
           path: anvil-run-evidence/${{ steps.order.outputs.id }}
@@ -305,18 +310,18 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out the default branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
           ref: ${{ github.event.repository.default_branch }}
           persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
           python-version: "3.12"
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4
         with:
           node-version: "22"
 
