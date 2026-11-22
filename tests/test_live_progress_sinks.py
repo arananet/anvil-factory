@@ -67,7 +67,7 @@ from anvil.scaffold import init_project  # noqa: E402
 from anvil.stations import load_registry  # noqa: E402
 from anvil.telemetry import summarize_steps  # noqa: E402
 
-BASE_REF = "10168fa560af7284b23f99e4e639621cf47eacd2"
+BASE_REF = "ae0bbfb2af95b41d96d8e2af7c9f8b787f54d83b"
 REPO = "acme/demo"
 MODEL = "claude-opus-5-5"
 SMALL = {"input_tokens": 100, "output_tokens": 10}

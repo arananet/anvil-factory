@@ -3,7 +3,7 @@
 Status: proposed
 Slug: live-progress-sinks
 Work order: wo-gh-47 (https://github.com/arananet/anvil-factory/issues/47)
-Base ref: factory main 10168fa560af7284b23f99e4e639621cf47eacd2 (anvil.yaml carries max_run_tokens 15000000, max_runtime_turns 100, max_packet_tokens 48000 and the wo-gh-42 station partitions; anvil.json wires the checks command `python -m unittest discover -s tests -p 'test_*.py'`).
+Base ref: factory main ae0bbfb2af95b41d96d8e2af7c9f8b787f54d83b (anvil.yaml carries max_run_tokens 15000000, max_runtime_turns 100, max_packet_tokens 48000 and the wo-gh-42 station partitions; anvil.json wires the checks command `python -m unittest discover -s tests -p 'test_*.py'`).
 
 ## Roles
 - implementer: builds the change described here
@@ -97,7 +97,7 @@ A run of the line cannot be watched. state.json is rewritten before every statio
 - S10 (R1.2, R1.4, R2.5): Given a run whose runner stops with exit_status `runtime_refused`, the last PATCH shows `State: finished` and `Exit status: runtime_refused`, and stations after the stop show `not run`; given a record with exit_status `some_future_status`, the rendered body shows `Exit status: some_future_status`.
 - S11 (R1.2, R1.10, R2.4): Given a run where a station raises an uncaught error, the `crashed` write from `mark_crashed` sends a PATCH (not a POST) to the same comment id, whose body shows `State: crashed` and does not contain the exception message.
 - S12 (R4.1, R4.2, R4.3): The factory anvil.yaml parsed as JSON has an `observability.sinks` list containing `{"type": "github-issue"}` and no github-project entry; a project created by `anvil init` in a temp directory has the same; docs/OPERATIONS.md contains `github-project`, `status_field` and `Needs human`.
-- S13 (R1.10, R4.4, R6.2, R6.3): anvil/runner.py at the end of the run contains no `urllib`, no `http.client` and no `retry`; `git diff 10168fa560af7284b23f99e4e639621cf47eacd2 -- tools/line_comment.py .github/workflows pipelines anvil.json anvil/executor.py` is empty, and no existing test file differs (this check skips unless ANVIL_WORK_ORDER_ID is wo-gh-47, per R6.2).
+- S13 (R1.10, R4.4, R6.2, R6.3): anvil/runner.py at the end of the run contains no `urllib`, no `http.client` and no `retry`; `git diff ae0bbfb2af95b41d96d8e2af7c9f8b787f54d83b -- tools/line_comment.py .github/workflows pipelines anvil.json anvil/executor.py` is empty, and no existing test file differs (this check skips unless ANVIL_WORK_ORDER_ID is wo-gh-47, per R6.2).
 - S14 (R4.5): README.md has a "Watching a run" section of at most 15 lines; brain/decisions/0015-live-progress-sinks.md exists; CHANGELOG.md names live-progress-sinks; no produced file contains U+2014 or U+2013.
 
 - S15 (R2.3, R2.6): In the S1 run with GITHUB_RUN_ID `4242` and GITHUB_SERVER_URL `https://github.example`, every request path starts with the collector base given as GITHUB_API_URL, carries `Accept: application/vnd.github+json` and `User-Agent: anvil-progress`, and the last body contains `Workflow run: https://github.example/acme/demo/actions/runs/4242`; no body contains the project's directory path, any station's `detail` text, or the text of any packet or station output.
@@ -119,7 +119,7 @@ A run of the line cannot be watched. state.json is rewritten before every statio
 Not touched: .github/workflows/*, pipelines/*, anvil.json, anvil/executor.py, tools/line_comment.py, every test file present at the base ref. Python standard library only. No em dash or en dash character in any produced file.
 
 ## Builder report
-The builder report contains in full: `10168fa560af7284b23f99e4e639621cf47eacd2`, `live-progress-sinks`, `github-issue`, `github-project`; the base ref it verified the tree against; the exact full factory test count from the suite run; and the names of the new test files.
+The builder report contains in full: `ae0bbfb2af95b41d96d8e2af7c9f8b787f54d83b`, `live-progress-sinks`, `github-issue`, `github-project`; the base ref it verified the tree against; the exact full factory test count from the suite run; and the names of the new test files.
 
 ## Reconciliation with active specs and existing tests
 - governed-delivery owns state.json, events.jsonl, the webhook and the OTLP trace; this spec only adds state fields (R1.4) and consumers. tests/test_governed_delivery.py compares webhook events with events.jsonl and counts station.finished and loopback events against the report's steps: R1.9 keeps both true. Its export tests replace the whole `observability` object, so the scaffold default sink is absent there; and because inactive reasons go to `sinks`, not `export_errors` (R1.6), any scaffolded run without GitHub variables keeps `export_errors: []`.
