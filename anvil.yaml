@@ -9,9 +9,9 @@
     "require_usage": false,
     "station_budgets": {
       "intake": 200000,
-      "spec-writer": 600000,
+      "spec-writer": 1200000,
       "test-writer": 3200000,
-      "builder": 6400000,
+      "builder": 5800000,
       "reviewer-spec": 600000,
       "reviewer-security": 600000,
       "reviewer-tests": 600000,

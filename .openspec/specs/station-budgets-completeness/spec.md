@@ -121,3 +121,7 @@ Protected and not edited: pipelines/ (all pipeline files), anvil.json, every exi
 ## Correction of 2026-11-21 (owner decision, before the first run)
 
 The order was filed on 2026-11-15 against a run cap of 6000000 and shipped partitions summing to that figure. On 2026-11-20 the cap was recalibrated to 15000000 (max_runtime_turns to 100) after wo-gh-41 could not be built inside the old limits, and the measured runs showed the filed partitions were too small for a large order: the approved run of wo-gh-41 used 725210 tokens in the test-writer against a filed partition of 600000. This correction replaces the shipped partition table in R1, R6 and S3, pins the order to the current factory main, and records its relationship to wo-gh-41 and to the existing packet budget key. Nothing else in the order changes.
+
+## Recalibration of 2026-11-22 (operator, after the order was accepted)
+
+The partition figures are calibration: they follow measured runs and change by recorded recalibration. The rule of this order that does not change is that every model station of the pipeline carries a partition and the table sums to the run cap. The first run under the accepted table, wo-gh-47 (run 45042545362), was stopped in the spec-writer at 653517 tokens against a partition of 600000, of which 599136 were cache reads. The table now gives the spec-writer 1200000 and the builder 5800000; every other figure and the sum of 15000000 are unchanged. The figures in R1 above are the table the order was accepted with.
