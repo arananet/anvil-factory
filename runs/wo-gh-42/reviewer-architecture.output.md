@@ -1,15 +1,18 @@
-Verdict: **changes_requested**. I've written the review to `runs/wo-gh-42/reviewer-architecture.review.json`; it is valid JSON and contains no em or en dashes.
+The architecture review passes, with no blocking findings. I wrote it to `runs/wo-gh-42/reviewer-architecture.review.json`; it parses as valid JSON and has no em or en dashes.
 
-**The completeness gap from the last loopback is still open.** Neither the spec nor the code changed in this attempt.
-- **Spec:** R4 in `.openspec/specs/station-budgets-completeness/spec.md:35` still says the completeness check runs before any reviewer, with no condition.
-- **Code:** `anvil/runner.py:1652` only turns the check on when station budgets are configured, and the pre-review step at `anvil/runner.py:2440` depends on that setting. A project without budgets still sends incomplete attempts to review.
-- **Why the builder stopped:** their report asks for an owner ruling rather than changing the code. They measured that making the check unconditional breaks 22 existing tests, and those tests are protected from edits.
+**Why it passes:**
+- **Structure:** each part of the change sits where the existing code would put it, and dependencies point one way:
+  - Budget settings are parsed and checked in `anvil/config.py`, once, before any station runs.
+  - Consumption is read in `anvil/telemetry.py` from the existing per-attempt usage records.
+  - The mid-session kill is in `tools/claude_station.py`.
+  - The completeness check is in the runner and only reads the checks gate's verdict; `anvil/gates.py` is unchanged.
+- **Existing decisions respected:** refused dispatches and mid-session kills end the run through the exit path from decision 0013. `max_run_tokens` is still the outer limit. The station-timeout keys and the frozen parts of the checks gate and artifact validation are untouched.
+- **Owner ruling of 2026-11-22:** the completeness check only applies when a project configures partitions. The code does exactly that, and decision record 0014 states the scope and what it costs.
+- **Guardrails:** only authorized files changed, and no new dependency was added. Pipeline files, `anvil.json` and the existing tests are untouched.
 
-**Design problem:** that setting ties two separate things together. Budgets control token spend (R1 to R3). Completeness (R4) only checks that the attempt's files exist and the checks gate passed, and has nothing to do with token caps. Decision 0014 records this scoping honestly. But a decision record can't narrow a requirement in an accepted spec, so the spec has to change or the link between the two has to go.
-
-**The owner needs to pick one of two options:**
-1. **Amend the spec:** limit R4 and scenarios S4, S5 and S8 to projects that configure budgets, so the spec matches decision 0014.
-2. **Allow the test updates:** authorize edits to the 22 protected tests, then make the check always run. That is a one-line change at `anvil/runner.py:1652`, and it is the cleaner design.
-
-**Nothing has regressed since attempt 2.** The new budget keys sit in the `efficiency` section, apart from the frozen packet-size key of the same name. Completeness reuses the existing checks verdict and report validation and doesn't re-run the suite. Runs still end through the single exit path wo-gh-41 added. The diff touches no pipeline file, no `anvil.json` and no existing test. Small follow-ups that earlier reviewers raised are listed in the review as non-blocking.
+**Smaller follow-ups:**
+1. Decision 0014 still says "proposed"; move it to "accepted" once the owner signs off.
+2. The list of stations that don't call a model now exists in four places that disagree: a new copy in `anvil/config.py`, two in `anvil/runner.py` and one in `anvil/telemetry.py`. One shared helper would stop them drifting apart.
+3. The runner spots a refused retry by searching the error text for a sentence that is also copied in `tools/claude_station.py`. The wrapper already exits with a dedicated code (12) for this case, which would be more reliable. The security reviewer raised the same point.
+4. The handling for a station stopped at its token limit is copied in two places (`anvil/runner.py:2322` and `:2794`). A small shared function would keep the two from diverging.
 {"model": "claude-opus-5-5"}

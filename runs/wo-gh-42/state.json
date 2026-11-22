@@ -1,15 +1,15 @@
 {
   "schema": "anvil/run-state@1",
-  "run_id": "fa800c2ff04f424283b0b3a573742b02",
+  "run_id": "d5e5335799cf4d87a9c7328822a7ab04",
   "work_order_id": "wo-gh-42",
   "project": "anvil-factory",
   "pipeline": "sdlc-default",
   "state": "finished",
   "current_station": null,
-  "verdict": "changes_requested",
-  "loopbacks": 2,
-  "started_at": "2026-11-21T14:13:32.802553+00:00",
-  "updated_at": "2026-11-21T15:29:37.292968+00:00",
+  "verdict": "approved",
+  "loopbacks": 0,
+  "started_at": "2026-11-22T15:24:31.896509+00:00",
+  "updated_at": "2026-11-22T15:42:28.606878+00:00",
   "steps": [
     {
       "station": "intake",
@@ -60,127 +60,26 @@
       "status": "completed"
     },
     {
-      "station": "approver",
-      "status": "loopback"
-    },
-    {
-      "station": "builder",
-      "status": "executed",
-      "attempt": 2
-    },
-    {
-      "station": "checks-gate",
-      "status": "passed",
-      "attempt": 2
-    },
-    {
-      "station": "reviewer-spec",
-      "status": "executed",
-      "attempt": 2
-    },
-    {
-      "station": "reviewer-security",
-      "status": "executed",
-      "attempt": 2
-    },
-    {
-      "station": "reviewer-tests",
-      "status": "executed",
-      "attempt": 2
-    },
-    {
-      "station": "reviewer-architecture",
-      "status": "executed",
-      "attempt": 2
-    },
-    {
-      "station": "reviewer-design",
-      "status": "executed",
-      "attempt": 2
-    },
-    {
-      "station": "reviewer-ux",
-      "status": "routed_out",
-      "attempt": 2
-    },
-    {
-      "station": "approver",
-      "status": "completed",
-      "attempt": 2
-    },
-    {
-      "station": "approver",
-      "status": "loopback"
-    },
-    {
-      "station": "builder",
-      "status": "executed",
-      "attempt": 3
-    },
-    {
-      "station": "checks-gate",
-      "status": "passed",
-      "attempt": 3
-    },
-    {
-      "station": "reviewer-spec",
-      "status": "executed",
-      "attempt": 3
-    },
-    {
-      "station": "reviewer-security",
-      "status": "executed",
-      "attempt": 3
-    },
-    {
-      "station": "reviewer-tests",
-      "status": "executed",
-      "attempt": 3
-    },
-    {
-      "station": "reviewer-architecture",
-      "status": "executed",
-      "attempt": 3
-    },
-    {
-      "station": "reviewer-design",
-      "status": "executed",
-      "attempt": 3
-    },
-    {
-      "station": "reviewer-ux",
-      "status": "routed_out",
-      "attempt": 3
-    },
-    {
-      "station": "approver",
-      "status": "completed",
-      "attempt": 3
-    },
-    {
       "station": "triage-human",
-      "status": "completed",
-      "attempt": 3
+      "status": "completed"
     },
     {
       "station": "deployer",
-      "status": "packet_ready",
-      "attempt": 3
+      "status": "packet_ready"
     },
     {
       "station": "observer",
-      "status": "executed",
-      "attempt": 3
+      "status": "executed"
     }
   ],
   "token_usage": {
-    "calls": 22,
-    "total_tokens": 14913271,
-    "measured_calls": 22,
+    "calls": 10,
+    "total_tokens": 3403504,
+    "measured_calls": 10,
     "unmeasured_calls": 0
   },
   "cost": null,
   "export_errors": [],
-  "human_required": true,
+  "human_required": false,
   "deployment_status": null
 }

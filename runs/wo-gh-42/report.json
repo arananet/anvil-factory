@@ -8,7 +8,7 @@
       "station": "intake",
       "status": "executed",
       "detail": "Executed by command; outcome: accepted",
-      "duration_ms": 22178.05,
+      "duration_ms": 9358.489,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/intake.output.md"
@@ -19,16 +19,16 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 4159,
+      "measured_tokens": 4423,
       "budget": 48000,
       "budget_action": "sent",
       "usage": {
-        "input_tokens": 98679,
-        "output_tokens": 1876,
-        "cached_input_tokens": 72099,
-        "cache_creation_input_tokens": 26572,
+        "input_tokens": 47355,
+        "output_tokens": 709,
+        "cached_input_tokens": 22488,
+        "cache_creation_input_tokens": 24863,
         "reasoning_tokens": 0,
-        "total_tokens": 100555,
+        "total_tokens": 48064,
         "input_tokens_includes_cache": true
       },
       "cost_record": {
@@ -41,18 +41,18 @@
           "status": "succeeded",
           "runtime": "claude",
           "configured_model": "claude-opus-5-5",
-          "duration_ms": 22099.954,
+          "duration_ms": 9269.182,
           "usage": {
-            "input_tokens": 98679,
-            "output_tokens": 1876,
-            "cached_input_tokens": 72099,
-            "cache_creation_input_tokens": 26572,
+            "input_tokens": 47355,
+            "output_tokens": 709,
+            "cached_input_tokens": 22488,
+            "cache_creation_input_tokens": 24863,
             "reasoning_tokens": 0,
-            "total_tokens": 100555,
+            "total_tokens": 48064,
             "input_tokens_includes_cache": true
           },
-          "runtime_cost_estimate_usd": 0.1848318,
-          "turns": 4,
+          "runtime_cost_estimate_usd": 0.1430086,
+          "turns": 2,
           "usage_complete": true
         }
       ],
@@ -62,7 +62,7 @@
       "station": "spec-writer",
       "status": "executed",
       "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/spec-writer.output.md",
-      "duration_ms": 70403.674,
+      "duration_ms": 29322.426,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/spec-writer.output.md"
@@ -73,16 +73,16 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 5439,
+      "measured_tokens": 5702,
       "budget": 48000,
       "budget_action": "sent",
       "usage": {
-        "input_tokens": 280370,
-        "output_tokens": 7070,
-        "cached_input_tokens": 243876,
-        "cache_creation_input_tokens": 36476,
+        "input_tokens": 183618,
+        "output_tokens": 2620,
+        "cached_input_tokens": 148665,
+        "cache_creation_input_tokens": 34941,
         "reasoning_tokens": 0,
-        "total_tokens": 287440,
+        "total_tokens": 186238,
         "input_tokens_includes_cache": true
       },
       "cost_record": {
@@ -95,18 +95,18 @@
           "status": "succeeded",
           "runtime": "claude",
           "configured_model": "claude-opus-5-5",
-          "duration_ms": 70339.961,
+          "duration_ms": 29249.106,
           "usage": {
-            "input_tokens": 280370,
-            "output_tokens": 7070,
-            "cached_input_tokens": 243876,
-            "cache_creation_input_tokens": 36476,
+            "input_tokens": 183618,
+            "output_tokens": 2620,
+            "cached_input_tokens": 148665,
+            "cache_creation_input_tokens": 34941,
             "reasoning_tokens": 0,
-            "total_tokens": 287440,
+            "total_tokens": 186238,
             "input_tokens_includes_cache": true
           },
-          "runtime_cost_estimate_usd": 0.3726272,
-          "turns": 12,
+          "runtime_cost_estimate_usd": 0.25688599999999995,
+          "turns": 7,
           "usage_complete": true
         }
       ],
@@ -116,7 +116,7 @@
       "station": "test-writer",
       "status": "executed",
       "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/test-writer.output.md",
-      "duration_ms": 829336.461,
+      "duration_ms": 192190.73,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/test-writer.output.md"
@@ -127,16 +127,16 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 4446,
+      "measured_tokens": 4709,
       "budget": 48000,
       "budget_action": "sent",
       "usage": {
-        "input_tokens": 315973,
-        "output_tokens": 2615,
-        "cached_input_tokens": 314765,
-        "cache_creation_input_tokens": 1202,
+        "input_tokens": 845426,
+        "output_tokens": 9456,
+        "cached_input_tokens": 789292,
+        "cache_creation_input_tokens": 56104,
         "reasoning_tokens": 0,
-        "total_tokens": 318588,
+        "total_tokens": 854882,
         "input_tokens_includes_cache": true
       },
       "cost_record": {
@@ -149,18 +149,18 @@
           "status": "succeeded",
           "runtime": "claude",
           "configured_model": "claude-opus-5-5",
-          "duration_ms": 829269.059,
+          "duration_ms": 192117.748,
           "usage": {
-            "input_tokens": 315973,
-            "output_tokens": 2615,
-            "cached_input_tokens": 314765,
-            "cache_creation_input_tokens": 1202,
+            "input_tokens": 845426,
+            "output_tokens": 9456,
+            "cached_input_tokens": 789292,
+            "cache_creation_input_tokens": 56104,
             "reasoning_tokens": 0,
-            "total_tokens": 318588,
+            "total_tokens": 854882,
             "input_tokens_includes_cache": true
           },
-          "runtime_cost_estimate_usd": 2.6400140000000003,
-          "turns": 2,
+          "runtime_cost_estimate_usd": 0.6276184,
+          "turns": 16,
           "usage_complete": true
         }
       ],
@@ -170,16 +170,16 @@
           "python -m unittest discover -s tests -p 'test_*.py'"
         ],
         "exit_codes": [
-          1
+          0
         ],
-        "red": true
+        "red": false
       }
     },
     {
       "station": "builder",
       "status": "executed",
       "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/builder.output.md",
-      "duration_ms": 976470.683,
+      "duration_ms": 224845.856,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/builder.output.md"
@@ -190,16 +190,16 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 8032,
+      "measured_tokens": 8296,
       "budget": 48000,
       "budget_action": "sent",
       "usage": {
-        "input_tokens": 9210394,
-        "output_tokens": 70719,
-        "cached_input_tokens": 9002513,
-        "cache_creation_input_tokens": 207763,
+        "input_tokens": 731053,
+        "output_tokens": 6168,
+        "cached_input_tokens": 692884,
+        "cache_creation_input_tokens": 38135,
         "reasoning_tokens": 0,
-        "total_tokens": 9281113,
+        "total_tokens": 737221,
         "input_tokens_includes_cache": true
       },
       "cost_record": {
@@ -212,18 +212,18 @@
           "status": "succeeded",
           "runtime": "claude",
           "configured_model": "claude-opus-5-5",
-          "duration_ms": 976319.715,
+          "duration_ms": 224682.183,
           "usage": {
-            "input_tokens": 9210394,
-            "output_tokens": 70719,
-            "cached_input_tokens": 9002513,
-            "cache_creation_input_tokens": 207763,
+            "input_tokens": 731053,
+            "output_tokens": 6168,
+            "cached_input_tokens": 692884,
+            "cache_creation_input_tokens": 38135,
             "reasoning_tokens": 0,
-            "total_tokens": 9281113,
+            "total_tokens": 737221,
             "input_tokens_includes_cache": true
           },
-          "runtime_cost_estimate_usd": 4.254169599999999,
-          "turns": 64,
+          "runtime_cost_estimate_usd": 0.4527478,
+          "turns": 17,
           "usage_complete": true
         }
       ],
@@ -233,7 +233,7 @@
       "station": "checks-gate",
       "status": "passed",
       "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 83797.217,
+      "duration_ms": 72524.431,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/checks-gate.pre-review.output.md"
@@ -273,7 +273,7 @@
       "station": "reviewer-spec",
       "status": "executed",
       "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-spec.output.md",
-      "duration_ms": 67189.319,
+      "duration_ms": 133369.324,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-spec.output.md"
@@ -284,16 +284,16 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 3642,
+      "measured_tokens": 3905,
       "budget": 48000,
       "budget_action": "sent",
       "usage": {
-        "input_tokens": 403841,
-        "output_tokens": 5316,
-        "cached_input_tokens": 352485,
-        "cache_creation_input_tokens": 51336,
+        "input_tokens": 395483,
+        "output_tokens": 5041,
+        "cached_input_tokens": 342388,
+        "cache_creation_input_tokens": 53075,
         "reasoning_tokens": 0,
-        "total_tokens": 409157,
+        "total_tokens": 400524,
         "input_tokens_includes_cache": true
       },
       "cost_record": {
@@ -306,17 +306,17 @@
           "status": "succeeded",
           "runtime": "claude",
           "configured_model": "claude-opus-5-5",
-          "duration_ms": 67122.087,
+          "duration_ms": 133295.974,
           "usage": {
-            "input_tokens": 403841,
-            "output_tokens": 5316,
-            "cached_input_tokens": 352485,
-            "cache_creation_input_tokens": 51336,
+            "input_tokens": 395483,
+            "output_tokens": 5041,
+            "cached_input_tokens": 342388,
+            "cache_creation_input_tokens": 53075,
             "reasoning_tokens": 0,
-            "total_tokens": 409157,
+            "total_tokens": 400524,
             "input_tokens_includes_cache": true
           },
-          "runtime_cost_estimate_usd": 0.433577,
+          "runtime_cost_estimate_usd": 0.4347526,
           "turns": 10,
           "usage_complete": true
         }
@@ -327,7 +327,7 @@
       "station": "reviewer-security",
       "status": "executed",
       "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-security.output.md",
-      "duration_ms": 56329.019,
+      "duration_ms": 49606.201,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-security.output.md"
@@ -338,16 +338,16 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 4441,
+      "measured_tokens": 4705,
       "budget": 48000,
       "budget_action": "sent",
       "usage": {
-        "input_tokens": 301414,
-        "output_tokens": 4725,
-        "cached_input_tokens": 273687,
-        "cache_creation_input_tokens": 27709,
+        "input_tokens": 221797,
+        "output_tokens": 4320,
+        "cached_input_tokens": 189427,
+        "cache_creation_input_tokens": 32358,
         "reasoning_tokens": 0,
-        "total_tokens": 306139,
+        "total_tokens": 226117,
         "input_tokens_includes_cache": true
       },
       "cost_record": {
@@ -360,18 +360,18 @@
           "status": "succeeded",
           "runtime": "claude",
           "configured_model": "claude-opus-5-5",
-          "duration_ms": 56261.673,
+          "duration_ms": 49532.903,
           "usage": {
-            "input_tokens": 301414,
-            "output_tokens": 4725,
-            "cached_input_tokens": 273687,
-            "cache_creation_input_tokens": 27709,
+            "input_tokens": 221797,
+            "output_tokens": 4320,
+            "cached_input_tokens": 189427,
+            "cache_creation_input_tokens": 32358,
             "reasoning_tokens": 0,
-            "total_tokens": 306139,
+            "total_tokens": 226117,
             "input_tokens_includes_cache": true
           },
-          "runtime_cost_estimate_usd": 0.2878544,
-          "turns": 9,
+          "runtime_cost_estimate_usd": 0.28612339999999997,
+          "turns": 7,
           "usage_complete": true
         }
       ],
@@ -381,7 +381,7 @@
       "station": "reviewer-tests",
       "status": "executed",
       "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-tests.output.md",
-      "duration_ms": 363876.162,
+      "duration_ms": 165843.691,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-tests.output.md"
@@ -392,16 +392,16 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 4671,
+      "measured_tokens": 4988,
       "budget": 48000,
       "budget_action": "sent",
       "usage": {
-        "input_tokens": 653779,
-        "output_tokens": 8751,
-        "cached_input_tokens": 597758,
-        "cache_creation_input_tokens": 55993,
+        "input_tokens": 456788,
+        "output_tokens": 5074,
+        "cached_input_tokens": 422490,
+        "cache_creation_input_tokens": 34274,
         "reasoning_tokens": 0,
-        "total_tokens": 662530,
+        "total_tokens": 461862,
         "input_tokens_includes_cache": true
       },
       "cost_record": {
@@ -414,18 +414,18 @@
           "status": "succeeded",
           "runtime": "claude",
           "configured_model": "claude-opus-5-5",
-          "duration_ms": 363809.07,
+          "duration_ms": 165770.511,
           "usage": {
-            "input_tokens": 653779,
-            "output_tokens": 8751,
-            "cached_input_tokens": 597758,
-            "cache_creation_input_tokens": 55993,
+            "input_tokens": 456788,
+            "output_tokens": 5074,
+            "cached_input_tokens": 422490,
+            "cache_creation_input_tokens": 34274,
             "reasoning_tokens": 0,
-            "total_tokens": 662530,
+            "total_tokens": 461862,
             "input_tokens_includes_cache": true
           },
-          "runtime_cost_estimate_usd": 0.5746486,
-          "turns": 14,
+          "runtime_cost_estimate_usd": 0.35744400000000004,
+          "turns": 12,
           "usage_complete": true
         }
       ],
@@ -435,7 +435,7 @@
       "station": "reviewer-architecture",
       "status": "executed",
       "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-architecture.output.md",
-      "duration_ms": 52878.392,
+      "duration_ms": 41772.923,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-architecture.output.md"
@@ -446,16 +446,16 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 4535,
+      "measured_tokens": 4799,
       "budget": 48000,
       "budget_action": "sent",
       "usage": {
-        "input_tokens": 214778,
-        "output_tokens": 4902,
-        "cached_input_tokens": 178991,
-        "cache_creation_input_tokens": 35775,
+        "input_tokens": 183330,
+        "output_tokens": 4011,
+        "cached_input_tokens": 150998,
+        "cache_creation_input_tokens": 32322,
         "reasoning_tokens": 0,
-        "total_tokens": 219680,
+        "total_tokens": 187341,
         "input_tokens_includes_cache": true
       },
       "cost_record": {
@@ -468,17 +468,17 @@
           "status": "succeeded",
           "runtime": "claude",
           "configured_model": "claude-opus-5-5",
-          "duration_ms": 52811.788,
+          "duration_ms": 41695.139,
           "usage": {
-            "input_tokens": 214778,
-            "output_tokens": 4902,
-            "cached_input_tokens": 178991,
-            "cache_creation_input_tokens": 35775,
+            "input_tokens": 183330,
+            "output_tokens": 4011,
+            "cached_input_tokens": 150998,
+            "cache_creation_input_tokens": 32322,
             "reasoning_tokens": 0,
-            "total_tokens": 219680,
+            "total_tokens": 187341,
             "input_tokens_includes_cache": true
           },
-          "runtime_cost_estimate_usd": 0.3127612,
+          "runtime_cost_estimate_usd": 0.2720696,
           "turns": 6,
           "usage_complete": true
         }
@@ -489,7 +489,7 @@
       "station": "reviewer-design",
       "status": "executed",
       "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-design.output.md",
-      "duration_ms": 31761.95,
+      "duration_ms": 22240.889,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-design.output.md"
@@ -500,16 +500,16 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 8358,
+      "measured_tokens": 9832,
       "budget": 48000,
       "budget_action": "sent",
       "usage": {
-        "input_tokens": 157652,
-        "output_tokens": 2737,
-        "cached_input_tokens": 135970,
-        "cache_creation_input_tokens": 21672,
+        "input_tokens": 99828,
+        "output_tokens": 2078,
+        "cached_input_tokens": 77768,
+        "cache_creation_input_tokens": 22054,
         "reasoning_tokens": 0,
-        "total_tokens": 160389,
+        "total_tokens": 101906,
         "input_tokens_includes_cache": true
       },
       "cost_record": {
@@ -522,18 +522,18 @@
           "status": "succeeded",
           "runtime": "claude",
           "configured_model": "claude-opus-5-5",
-          "duration_ms": 31686.939,
+          "duration_ms": 22154.569,
           "usage": {
-            "input_tokens": 157652,
-            "output_tokens": 2737,
-            "cached_input_tokens": 135970,
-            "cache_creation_input_tokens": 21672,
+            "input_tokens": 99828,
+            "output_tokens": 2078,
+            "cached_input_tokens": 77768,
+            "cache_creation_input_tokens": 22054,
             "reasoning_tokens": 0,
-            "total_tokens": 160389,
+            "total_tokens": 101906,
             "input_tokens_includes_cache": true
           },
-          "runtime_cost_estimate_usd": 0.190334,
-          "turns": 7,
+          "runtime_cost_estimate_usd": 0.16740760000000002,
+          "turns": 5,
           "usage_complete": true
         }
       ],
@@ -543,7 +543,7 @@
       "station": "reviewer-ux",
       "status": "routed_out",
       "detail": "Routed out: Routed out: no UI surface",
-      "duration_ms": 2.318,
+      "duration_ms": 3.032,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-ux.packet.md"
@@ -558,8 +558,8 @@
     {
       "station": "approver",
       "status": "completed",
-      "detail": "Approver verdict: changes_requested",
-      "duration_ms": 0.054,
+      "detail": "Approver verdict: approved",
+      "duration_ms": 0.104,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/report.json"
@@ -570,902 +570,12 @@
       "measured_tokens": 0,
       "budget": 0,
       "budget_action": "none"
-    },
-    {
-      "station": "approver",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: R4 / S4, S5, S8 (non-conformance, needs an owner ruling): R4 says that before any reviewer dispatch 'the runner evaluates a completeness precondition', with no condition attached. In anvil/runner.py:1650 the gate only runs when completeness_active = any(station_budget_settings(config)), and the check at anvil/runner.py:2438 uses that flag. A project with no efficiency.station_budgets or default_station_budget skips completeness and sends incomplete attempts to review. The builder reports that running the gate everywhere breaks 22 protected existing tests (scripted sdlc-default runs that write no test files and no delta) and recorded the scoping in decision 0014. The cause is a real conflict between R4 and the protected-test guardrail, the kind P-14 says to raise in the filing. The builder cannot fix it without editing protected files. The owner must either amend R4 to say completeness applies only where partitions are configured, or authorize updates to the 22 tests so the gate can run unconditionally.; R1 / S3 pass: anvil.yaml efficiency.station_budgets matches the corrected table exactly and sums to 15000000. max_run_tokens, require_usage and the top-level station_budgets are unchanged. validate_station_budgets names the pipeline and the excess, and a worst case equal to the cap loads. The runner validates the pipeline being run at run start. The S3 tests check all eight factory pipelines. Leaving default_station_budget unset is justified, because any positive default would exceed the cap for pipelines with unnamed model stations.; R2 / S2, S7 pass: precall() runs before first dispatches (runner.py:2044) and loopback re-dispatches (runner.py:3014). tools/claude_station.py refuses the in-session correction re-dispatch with zero calls (exit 12). Consumption comes from the per-attempt usage records. A refusal records station, partition, consumed and refused_at, then ends through the wo-gh-41 exit path (exit_status budget_exceeded, termination_reason). With require_usage set, unmeasured usage counts as exhausted; without it, the run records proceeded_unmeasured. Gap: the correction-refusal path has no test through the runner. S2 is tested on the loopback path only, which the scenario's 'a correction or a loopback' allows.; R3 / S1 pass with caveat: the wrapper streams usage, kills the process group at the remaining partition, records budget_exceeded with station, partition, reason, model, duration and partial usage, and does not resume the work. The runner turns this into a budget_exceeded step and stops through _station_stop. The station-timeout keys are untouched. Caveat (disclosed): the ceiling has only been run against a stand-in CLI, and the copilot runtime has no in-flight ceiling (pre-call check only).; R4 mechanics pass where active: completeness_gaps checks the builder report, the test-writer files, the attempt delta, the gate verdict and earlier failed stations without artifacts. It runs no command and does not repeat literal validation (S9 test). Gaps loop back to the builder within max_loopbacks and skip the reviewers. The report records results in a separate completeness field set. gates.py and the gate step and verdict are unchanged.; R5 / S6 pass: cost.stations shows partition, consumed, amount, priced and a source labelled as the recorded price table, not an invoice. Stations without a price entry show tokens only.; R6, R7, R8, S10, S11 pass: one new test file (tests/test_station_budgets_completeness.py, 26 tests, all scenarios S1 to S11). I re-ran it together with the protected test_continuous_run_accounting and test_astra_consumption: 81 tests OK. The builder reports a full suite of 797 tests OK (skipped=6), and the pre-review checks gate passed. docs/EXECUTION.md, the CHANGELOG entry and decision 0014 are present. The builder report has all four literals, the base ref, the table with sum 15000000, the test count and the test file name. The diff against 72a84126a600fafb99446946694b5de809e01e66 touches no path under pipelines/, no anvil.json and no existing test. work-orders/issue-42.json appears in that diff only through the owner's correction commit 1d8f96a. No em or en dash appears in the changed files.; Attack surface: no new dependency (standard library only: signal, threading added in tools/claude_station.py), no new endpoint, no new outbound call, no new permission. The CLI is still launched from an argument list without a shell (tools/claude_station.py run_with_ceiling uses subprocess.Popen(command) with a list); the only command change replaces the 'json' output format token with 'stream-json' and appends --verbose, both constants.; Input validation, fail closed: efficiency.station_budgets and default_station_budget are allow-list validated (non-empty string station ids, positive non-bool integers) and reject rather than repair (anvil/config.py station_budget_settings, _positive_tokens); an over-cap worst case raises naming the pipeline and excess. ANVIL_STATION_BUDGET_TOKENS / ANVIL_STATION_PARTITION are parsed as positive integers and a malformed value ends the wrapper with exit 10 before any model call (parse_ceiling). With require_usage set an unmeasured station is refused, never treated as zero (anvil/telemetry.py precall_decision).; Untrusted model/CLI output: streamed stdout lines are parsed with json.loads inside try/except, non-dict events are skipped, and usage is only read from dict-typed message.usage; it is used solely for arithmetic and the kill decision, never executed, never used as a path. Low severity residual: if the CLI stream carries no usage events (format change), the in-flight ceiling silently never trips, so the ceiling fails open to the outer max_run_tokens bound and the pre-call check. Recommend a follow-up that records 'ceiling unmeasured' when a ceiling was set but no usage was streamed.; Process lifecycle, low severity, not a blocker: run_with_ceiling starts the CLI with start_new_session=True and kills it with os.killpg(SIGKILL) on ceiling or timeout, which correctly reaps the CLI's own children. However if the wrapper itself is killed from outside (anvil/executor.py subprocess.run timeout kills only the wrapper PID), the CLI child now sits in its own session and survives, continuing to spend tokens with no supervisor. The non-ceiling path had the same orphaning before this change (subprocess.run kill is PID-only), and the wrapper's station timeout fires below the executor timeout, so exposure is limited. Recommend a follow-up: a SIGTERM handler in the wrapper that forwards to the child's process group.; Secrets and logging: no secret, token or key added to the tree (anvil.yaml change is the 14-entry partition table only, summing to 15000000). New stderr and reason strings carry station ids, token counts and partition sizes only; no environment value or header is echoed. Recorded budget_exceeded usage records carry the same honest fields as the timeout record.; Paths: completeness_gaps (anvil/runner.py) checks existence of the builder report path from configuration and of test-writer delta entries computed from the local working-tree snapshot, joined under the project root; these are internal values, not externally supplied, and are only stat'ed, not written. The gap strings flow back into the builder loopback packet as text; they contain repo-relative file names only, which is acceptable.; Copilot runtime: the in-flight ceiling is explicitly disabled with a stderr notice because Copilot exposes usage only at session end; the pre-call check and run cap still apply. This is a documented limitation, not a silent bypass.; Evidence: python -m unittest tests.test_station_budgets_completeness ran 26 tests, OK. Protected paths (pipelines/, anvil.json, existing tests) are untouched per git status. No em or en dash found in changed or new files.; Suite reproduces (P-12): on the final tree, `env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p 'test_*.py'` gives 'Ran 797 tests ... OK (skipped=6)'. `python -m unittest tests.test_station_budgets_completeness` gives 'Ran 26 tests ... OK'. Both match the builder report.; Test accounting (P-13) is complete and correct. Baseline: 'Ran 771 tests ... OK' on a git archive of 72a84126a600fafb99446946694b5de809e01e66. Added: one file, tests/test_station_budgets_completeness.py, with 26 tests (771 + 26 = 797). Edited: none. `git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests` is empty, so test_continuous_run_accounting.py and test_astra_consumption.py are unmodified.; The tests fail first for the right reason. I copied the new file onto the base tree and reran it: 'FAILED (failures=17, errors=5, skipped=4)'. The 5 errors are the missing anvil.config.validate_station_budgets. The 17 failures are missing behaviour: no budgets or completeness record, reviewers dispatched, builder timed_out instead of budget_exceeded, docs absent. The 4 skips are the git-dependent S3/S11 guards, because the archive has no .git. This matches the test-writer's 17 failures and 5 errors.; Mapping is good. All 11 scenarios S1 to S11 have named tests, and the module docstring holds a scenario-to-test map. The runner tests drive the real run_pipeline with a fake runtime that writes real anvil/usage@1 artifacts through the real UsageRecorder. S1 runs end to end: real CommandExecutor, real tools/claude_station.py, a stand-in claude CLI on PATH. Assertions use specific values: partition 5000 and consumed 5000, excess 100000 or 1, exit_status budget_exceeded, termination_reason naming the station and partition, reviewer consumed 0, a computed per-pipeline worst case. S2 and S7 have counter-cases (inside the partition: dispatched again; require_usage false: proceeds with proceeded_unmeasured). Boundary and malformed inputs are covered (cap equal loads, cap+1 fails; -5, 'lots', True, 1.5 rejected). S9 counts suite runs with a file counter and spies on validate_builder_report.; CHANGES REQUESTED (R4(a), S4, test-design 'make the test able to fail'): the S4 missing-builder-report case is not tested. test_s4_missing_builder_report_dispatches_zero_reviewers makes the builder fail and write nothing, then only asserts that some gap contains 'builder'. The empty-delta gap ('the builder changed no file') and the failed-without-artifact gap already contain that word. Mutation check: in a copy of the final tree I replaced `if not _nonempty_file(report):` in anvil/runner.py completeness_gaps (line 1204) with `if False:`, and all 6 CompletenessGate tests still pass. Needed: a test where the builder succeeds and changes a source file but leaves runs/<wo>/builder.output.md missing or empty, the checks pass, and the test asserts a gap naming the builder report path and zero reviewer calls.; CHANGES REQUESTED (R4(c), S8): the 'recorded failed without its artifact' check has no test that can fail. Mutation check: replacing `if not present:` (the station-failed-without-artifact branch in completeness_gaps) with `if False:` leaves all CompletenessGate tests passing. In S4 and S8 the separate builder-report, delta and test-files gaps hide it. Needed: a test whose only gap is a pre-review station recorded failed without its artifact, asserting the 'station <sid> is recorded failed without its artifact' gap. Also assert the converse: a failed station whose artifact exists produces no such gap.; CHANGES REQUESTED (R4(a), S8): the test-writer test-files check is also not pinned on its own. Mutation check: replacing `if \"test-writer\" in earlier and \"test-writer\" in ran and not test_files:` with `if False:` leaves all CompletenessGate tests passing. test_s8_failed_test_writer_without_artifact_blocks_review is still satisfied by the (c) gap, which also names test-writer. Needed: a test where the test-writer succeeds but writes no test file (or an empty one), the builder is otherwise complete and the checks pass, and the test asserts the test-files gap and zero reviewers. Of the five completeness conditions, only the empty delta (S8 empty-delta test) and the gate verdict (S4 failing-checks test) currently have a test that fails when they are removed.; Coverage gap, R2 correction re-dispatch: R2 and S2 name 'a correction or a loopback'. No automated test covers the in-session correction refusal that tools/claude_station.py implements (exit 12, zero calls); the builder checked it only by hand against a stand-in CLI. The test-writer and builder both disclosed this, and reviewer-spec raised it. Add a wrapper-level test, using the existing FAKE_CLAUDE stand-in and FAKE_LOG call log: a reviewer whose first answer writes no review and whose partition is spent must exit 12 with one logged call. The malformed ANVIL_STATION_BUDGET_TOKENS exit-10 path is also untested.; Coverage gap, scoping decision untested: the runner evaluates completeness only when efficiency.station_budgets or default_station_budget is configured (decision 0014; reviewer-spec routed this to an owner ruling). No test pins either side. Nothing asserts that an unconfigured project skips completeness, or that the factory's own configured anvil.yaml activates it. Whichever ruling the owner makes, add a test that encodes it so the gate cannot be switched off silently.; Minor, residual risk noted by reviewer-security: no test covers a ceiling set while the stream carries no usage events. The ceiling then never trips, failing open to max_run_tokens. Not a blocker for this station, but a test or a 'ceiling unmeasured' record would make the fail-open visible.; Changes requested (needs owner ruling, R4 and decision 0014): the completeness precondition is turned on by a side effect. In anvil/runner.py, _run_pipeline sets completeness_active = any(station_budget_settings(config)), so whether reviewers can be launched on an incomplete attempt depends on whether the project configured token partitions. Token partitioning (R1 to R3) and completeness (R4) are separate concerns with separate failure modes, and the spec states R4 with no condition. Decision 0014 records the scoping honestly and gives the cause: running it everywhere breaks 22 protected scripted tests. That makes it a guardrail conflict the line cannot resolve itself. The owner should either amend R4 to make completeness opt-in, ideally through its own explicit switch rather than through budget keys, or authorize updating the 22 tests so completeness runs unconditionally. This matches the reviewer-spec finding.; Fit with decisions passes: decision 0014 follows the house format (context, decision, consequences) and states the trade-off: a partition sized too small now ends the run at that station. It builds on 0011 (station timeout: same kill-and-record shape, timeout keys unchanged) and 0013 (continuous run accounting: refusals and ceiling kills go through _station_stop and the existing exit_status budget_exceeded path, with no second way of ending a run). max_run_tokens stays the outer bound (token-efficiency R4), and validate_station_budgets checks partitions against it.; Boundaries pass: config.py owns parsing and validation (station_budget_settings, pipeline_partitions, validate_station_budgets), and it fails closed, raising ValueError on bad ids, non-positive or bool values, and over-cap worst cases, naming the excess. telemetry.py owns consumption arithmetic (station_consumption, precall_decision are pure, read existing per-attempt usage records, never treat unmeasured as zero). completeness_gaps in runner.py is a pure read-only function that consumes the gate verdict and existing deltas, re-runs no suite and does not repeat the artifact contract's literal validation. The checks gate's verdict and S4 behavior are not modified; completeness only sets gate_failed alongside it.; Config separation passes: the new keys live inside efficiency; the top-level station_budgets (packet size, get_station_budget) is untouched, and docs/EXECUTION.md names both keys and explains the difference. anvil.yaml ships the corrected table, which sums to 15000000. No new dependency (signal, threading are standard library). No en dash or em dash characters in the changed or new files.; Nit, second source of truth: anvil/config.py adds MODEL_CALLING_DETERMINISTIC {intake} and DETERMINISTIC_FALLBACK {approver, triage-human, checks-gate}. anvil/runner.py already hardcodes the fallback set {intake, approver, triage-human} inline in two places (the kind fallback near line 2038 and is_agent near line 3029). The two copies disagree on intake and checks-gate. Prefer one helper (config.is_model_station) that the runner also uses, in a later order if not this one.; Nit, string coupling across the wrapper boundary: the refusal of a correction reaches the runner as stderr text, matched by substring on CORRECTION_REFUSED, which is duplicated in tools/claude_station.py and anvil/runner.py with a SYNC comment. The in-flight kill instead goes through the structured usage-attempt record (status budget_exceeded, read by executor.py). Recording the correction refusal the same structured way, or matching on the dedicated exit code 12, would remove the duplicated literal. This follows an existing SYNC pattern in the repo, so it is not a blocker.; Nit, function size: _run_pipeline gains about 300 lines, including three closures (budgets_view, cost_stations_view, precall) and the step_ceiling handling, which is duplicated in the intake and main executor except-branches the same way the timeout handling is. budgets_view and cost_stations_view are pure over (steps, partitions, price_table) and could live in telemetry.py beside station_consumption, which would make them testable without a run harness. This is not required for this order.",
-      "reason": "R4 / S4, S5, S8 (non-conformance, needs an owner ruling): R4 says that before any reviewer dispatch 'the runner evaluates a completeness precondition', with no condition attached. In anvil/runner.py:1650 the gate only runs when completeness_active = any(station_budget_settings(config)), and the check at anvil/runner.py:2438 uses that flag. A project with no efficiency.station_budgets or default_station_budget skips completeness and sends incomplete attempts to review. The builder reports that running the gate everywhere breaks 22 protected existing tests (scripted sdlc-default runs that write no test files and no delta) and recorded the scoping in decision 0014. The cause is a real conflict between R4 and the protected-test guardrail, the kind P-14 says to raise in the filing. The builder cannot fix it without editing protected files. The owner must either amend R4 to say completeness applies only where partitions are configured, or authorize updates to the 22 tests so the gate can run unconditionally.; R1 / S3 pass: anvil.yaml efficiency.station_budgets matches the corrected table exactly and sums to 15000000. max_run_tokens, require_usage and the top-level station_budgets are unchanged. validate_station_budgets names the pipeline and the excess, and a worst case equal to the cap loads. The runner validates the pipeline being run at run start. The S3 tests check all eight factory pipelines. Leaving default_station_budget unset is justified, because any positive default would exceed the cap for pipelines with unnamed model stations.; R2 / S2, S7 pass: precall() runs before first dispatches (runner.py:2044) and loopback re-dispatches (runner.py:3014). tools/claude_station.py refuses the in-session correction re-dispatch with zero calls (exit 12). Consumption comes from the per-attempt usage records. A refusal records station, partition, consumed and refused_at, then ends through the wo-gh-41 exit path (exit_status budget_exceeded, termination_reason). With require_usage set, unmeasured usage counts as exhausted; without it, the run records proceeded_unmeasured. Gap: the correction-refusal path has no test through the runner. S2 is tested on the loopback path only, which the scenario's 'a correction or a loopback' allows.; R3 / S1 pass with caveat: the wrapper streams usage, kills the process group at the remaining partition, records budget_exceeded with station, partition, reason, model, duration and partial usage, and does not resume the work. The runner turns this into a budget_exceeded step and stops through _station_stop. The station-timeout keys are untouched. Caveat (disclosed): the ceiling has only been run against a stand-in CLI, and the copilot runtime has no in-flight ceiling (pre-call check only).; R4 mechanics pass where active: completeness_gaps checks the builder report, the test-writer files, the attempt delta, the gate verdict and earlier failed stations without artifacts. It runs no command and does not repeat literal validation (S9 test). Gaps loop back to the builder within max_loopbacks and skip the reviewers. The report records results in a separate completeness field set. gates.py and the gate step and verdict are unchanged.; R5 / S6 pass: cost.stations shows partition, consumed, amount, priced and a source labelled as the recorded price table, not an invoice. Stations without a price entry show tokens only.; R6, R7, R8, S10, S11 pass: one new test file (tests/test_station_budgets_completeness.py, 26 tests, all scenarios S1 to S11). I re-ran it together with the protected test_continuous_run_accounting and test_astra_consumption: 81 tests OK. The builder reports a full suite of 797 tests OK (skipped=6), and the pre-review checks gate passed. docs/EXECUTION.md, the CHANGELOG entry and decision 0014 are present. The builder report has all four literals, the base ref, the table with sum 15000000, the test count and the test file name. The diff against 72a84126a600fafb99446946694b5de809e01e66 touches no path under pipelines/, no anvil.json and no existing test. work-orders/issue-42.json appears in that diff only through the owner's correction commit 1d8f96a. No em or en dash appears in the changed files.; Attack surface: no new dependency (standard library only: signal, threading added in tools/claude_station.py), no new endpoint, no new outbound call, no new permission. The CLI is still launched from an argument list without a shell (tools/claude_station.py run_with_ceiling uses subprocess.Popen(command) with a list); the only command change replaces the 'json' output format token with 'stream-json' and appends --verbose, both constants.; Input validation, fail closed: efficiency.station_budgets and default_station_budget are allow-list validated (non-empty string station ids, positive non-bool integers) and reject rather than repair (anvil/config.py station_budget_settings, _positive_tokens); an over-cap worst case raises naming the pipeline and excess. ANVIL_STATION_BUDGET_TOKENS / ANVIL_STATION_PARTITION are parsed as positive integers and a malformed value ends the wrapper with exit 10 before any model call (parse_ceiling). With require_usage set an unmeasured station is refused, never treated as zero (anvil/telemetry.py precall_decision).; Untrusted model/CLI output: streamed stdout lines are parsed with json.loads inside try/except, non-dict events are skipped, and usage is only read from dict-typed message.usage; it is used solely for arithmetic and the kill decision, never executed, never used as a path. Low severity residual: if the CLI stream carries no usage events (format change), the in-flight ceiling silently never trips, so the ceiling fails open to the outer max_run_tokens bound and the pre-call check. Recommend a follow-up that records 'ceiling unmeasured' when a ceiling was set but no usage was streamed.; Process lifecycle, low severity, not a blocker: run_with_ceiling starts the CLI with start_new_session=True and kills it with os.killpg(SIGKILL) on ceiling or timeout, which correctly reaps the CLI's own children. However if the wrapper itself is killed from outside (anvil/executor.py subprocess.run timeout kills only the wrapper PID), the CLI child now sits in its own session and survives, continuing to spend tokens with no supervisor. The non-ceiling path had the same orphaning before this change (subprocess.run kill is PID-only), and the wrapper's station timeout fires below the executor timeout, so exposure is limited. Recommend a follow-up: a SIGTERM handler in the wrapper that forwards to the child's process group.; Secrets and logging: no secret, token or key added to the tree (anvil.yaml change is the 14-entry partition table only, summing to 15000000). New stderr and reason strings carry station ids, token counts and partition sizes only; no environment value or header is echoed. Recorded budget_exceeded usage records carry the same honest fields as the timeout record.; Paths: completeness_gaps (anvil/runner.py) checks existence of the builder report path from configuration and of test-writer delta entries computed from the local working-tree snapshot, joined under the project root; these are internal values, not externally supplied, and are only stat'ed, not written. The gap strings flow back into the builder loopback packet as text; they contain repo-relative file names only, which is acceptable.; Copilot runtime: the in-flight ceiling is explicitly disabled with a stderr notice because Copilot exposes usage only at session end; the pre-call check and run cap still apply. This is a documented limitation, not a silent bypass.; Evidence: python -m unittest tests.test_station_budgets_completeness ran 26 tests, OK. Protected paths (pipelines/, anvil.json, existing tests) are untouched per git status. No em or en dash found in changed or new files.; Suite reproduces (P-12): on the final tree, `env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p 'test_*.py'` gives 'Ran 797 tests ... OK (skipped=6)'. `python -m unittest tests.test_station_budgets_completeness` gives 'Ran 26 tests ... OK'. Both match the builder report.; Test accounting (P-13) is complete and correct. Baseline: 'Ran 771 tests ... OK' on a git archive of 72a84126a600fafb99446946694b5de809e01e66. Added: one file, tests/test_station_budgets_completeness.py, with 26 tests (771 + 26 = 797). Edited: none. `git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests` is empty, so test_continuous_run_accounting.py and test_astra_consumption.py are unmodified.; The tests fail first for the right reason. I copied the new file onto the base tree and reran it: 'FAILED (failures=17, errors=5, skipped=4)'. The 5 errors are the missing anvil.config.validate_station_budgets. The 17 failures are missing behaviour: no budgets or completeness record, reviewers dispatched, builder timed_out instead of budget_exceeded, docs absent. The 4 skips are the git-dependent S3/S11 guards, because the archive has no .git. This matches the test-writer's 17 failures and 5 errors.; Mapping is good. All 11 scenarios S1 to S11 have named tests, and the module docstring holds a scenario-to-test map. The runner tests drive the real run_pipeline with a fake runtime that writes real anvil/usage@1 artifacts through the real UsageRecorder. S1 runs end to end: real CommandExecutor, real tools/claude_station.py, a stand-in claude CLI on PATH. Assertions use specific values: partition 5000 and consumed 5000, excess 100000 or 1, exit_status budget_exceeded, termination_reason naming the station and partition, reviewer consumed 0, a computed per-pipeline worst case. S2 and S7 have counter-cases (inside the partition: dispatched again; require_usage false: proceeds with proceeded_unmeasured). Boundary and malformed inputs are covered (cap equal loads, cap+1 fails; -5, 'lots', True, 1.5 rejected). S9 counts suite runs with a file counter and spies on validate_builder_report.; CHANGES REQUESTED (R4(a), S4, test-design 'make the test able to fail'): the S4 missing-builder-report case is not tested. test_s4_missing_builder_report_dispatches_zero_reviewers makes the builder fail and write nothing, then only asserts that some gap contains 'builder'. The empty-delta gap ('the builder changed no file') and the failed-without-artifact gap already contain that word. Mutation check: in a copy of the final tree I replaced `if not _nonempty_file(report):` in anvil/runner.py completeness_gaps (line 1204) with `if False:`, and all 6 CompletenessGate tests still pass. Needed: a test where the builder succeeds and changes a source file but leaves runs/<wo>/builder.output.md missing or empty, the checks pass, and the test asserts a gap naming the builder report path and zero reviewer calls.; CHANGES REQUESTED (R4(c), S8): the 'recorded failed without its artifact' check has no test that can fail. Mutation check: replacing `if not present:` (the station-failed-without-artifact branch in completeness_gaps) with `if False:` leaves all CompletenessGate tests passing. In S4 and S8 the separate builder-report, delta and test-files gaps hide it. Needed: a test whose only gap is a pre-review station recorded failed without its artifact, asserting the 'station <sid> is recorded failed without its artifact' gap. Also assert the converse: a failed station whose artifact exists produces no such gap.; CHANGES REQUESTED (R4(a), S8): the test-writer test-files check is also not pinned on its own. Mutation check: replacing `if \"test-writer\" in earlier and \"test-writer\" in ran and not test_files:` with `if False:` leaves all CompletenessGate tests passing. test_s8_failed_test_writer_without_artifact_blocks_review is still satisfied by the (c) gap, which also names test-writer. Needed: a test where the test-writer succeeds but writes no test file (or an empty one), the builder is otherwise complete and the checks pass, and the test asserts the test-files gap and zero reviewers. Of the five completeness conditions, only the empty delta (S8 empty-delta test) and the gate verdict (S4 failing-checks test) currently have a test that fails when they are removed.; Coverage gap, R2 correction re-dispatch: R2 and S2 name 'a correction or a loopback'. No automated test covers the in-session correction refusal that tools/claude_station.py implements (exit 12, zero calls); the builder checked it only by hand against a stand-in CLI. The test-writer and builder both disclosed this, and reviewer-spec raised it. Add a wrapper-level test, using the existing FAKE_CLAUDE stand-in and FAKE_LOG call log: a reviewer whose first answer writes no review and whose partition is spent must exit 12 with one logged call. The malformed ANVIL_STATION_BUDGET_TOKENS exit-10 path is also untested.; Coverage gap, scoping decision untested: the runner evaluates completeness only when efficiency.station_budgets or default_station_budget is configured (decision 0014; reviewer-spec routed this to an owner ruling). No test pins either side. Nothing asserts that an unconfigured project skips completeness, or that the factory's own configured anvil.yaml activates it. Whichever ruling the owner makes, add a test that encodes it so the gate cannot be switched off silently.; Minor, residual risk noted by reviewer-security: no test covers a ceiling set while the stream carries no usage events. The ceiling then never trips, failing open to max_run_tokens. Not a blocker for this station, but a test or a 'ceiling unmeasured' record would make the fail-open visible.; Changes requested (needs owner ruling, R4 and decision 0014): the completeness precondition is turned on by a side effect. In anvil/runner.py, _run_pipeline sets completeness_active = any(station_budget_settings(config)), so whether reviewers can be launched on an incomplete attempt depends on whether the project configured token partitions. Token partitioning (R1 to R3) and completeness (R4) are separate concerns with separate failure modes, and the spec states R4 with no condition. Decision 0014 records the scoping honestly and gives the cause: running it everywhere breaks 22 protected scripted tests. That makes it a guardrail conflict the line cannot resolve itself. The owner should either amend R4 to make completeness opt-in, ideally through its own explicit switch rather than through budget keys, or authorize updating the 22 tests so completeness runs unconditionally. This matches the reviewer-spec finding.; Fit with decisions passes: decision 0014 follows the house format (context, decision, consequences) and states the trade-off: a partition sized too small now ends the run at that station. It builds on 0011 (station timeout: same kill-and-record shape, timeout keys unchanged) and 0013 (continuous run accounting: refusals and ceiling kills go through _station_stop and the existing exit_status budget_exceeded path, with no second way of ending a run). max_run_tokens stays the outer bound (token-efficiency R4), and validate_station_budgets checks partitions against it.; Boundaries pass: config.py owns parsing and validation (station_budget_settings, pipeline_partitions, validate_station_budgets), and it fails closed, raising ValueError on bad ids, non-positive or bool values, and over-cap worst cases, naming the excess. telemetry.py owns consumption arithmetic (station_consumption, precall_decision are pure, read existing per-attempt usage records, never treat unmeasured as zero). completeness_gaps in runner.py is a pure read-only function that consumes the gate verdict and existing deltas, re-runs no suite and does not repeat the artifact contract's literal validation. The checks gate's verdict and S4 behavior are not modified; completeness only sets gate_failed alongside it.; Config separation passes: the new keys live inside efficiency; the top-level station_budgets (packet size, get_station_budget) is untouched, and docs/EXECUTION.md names both keys and explains the difference. anvil.yaml ships the corrected table, which sums to 15000000. No new dependency (signal, threading are standard library). No en dash or em dash characters in the changed or new files.; Nit, second source of truth: anvil/config.py adds MODEL_CALLING_DETERMINISTIC {intake} and DETERMINISTIC_FALLBACK {approver, triage-human, checks-gate}. anvil/runner.py already hardcodes the fallback set {intake, approver, triage-human} inline in two places (the kind fallback near line 2038 and is_agent near line 3029). The two copies disagree on intake and checks-gate. Prefer one helper (config.is_model_station) that the runner also uses, in a later order if not this one.; Nit, string coupling across the wrapper boundary: the refusal of a correction reaches the runner as stderr text, matched by substring on CORRECTION_REFUSED, which is duplicated in tools/claude_station.py and anvil/runner.py with a SYNC comment. The in-flight kill instead goes through the structured usage-attempt record (status budget_exceeded, read by executor.py). Recording the correction refusal the same structured way, or matching on the dedicated exit code 12, would remove the duplicated literal. This follows an existing SYNC pattern in the repo, so it is not a blocker.; Nit, function size: _run_pipeline gains about 300 lines, including three closures (budgets_view, cost_stations_view, precall) and the step_ceiling handling, which is duplicated in the intake and main executor except-branches the same way the timeout handling is. budgets_view and cost_stations_view are pure over (steps, partitions, price_table) and could live in telemetry.py beside station_consumption, which would make them testable without a run harness. This is not required for this order.",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null,
-      "attempt_archive": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/attempts/1"
-    },
-    {
-      "station": "builder",
-      "status": "executed",
-      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/builder.output.md",
-      "duration_ms": 278634.869,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/builder.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": "claude-opus-5-5",
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      },
-      "measured_tokens": 11650,
-      "budget": 48000,
-      "budget_action": "sent",
-      "usage": {
-        "input_tokens": 787377,
-        "output_tokens": 10609,
-        "cached_input_tokens": 730579,
-        "cache_creation_input_tokens": 56764,
-        "reasoning_tokens": 0,
-        "total_tokens": 797986,
-        "input_tokens_includes_cache": true
-      },
-      "cost_record": {
-        "measured": false,
-        "reason": "no price recorded for model 'claude-opus-5-5'"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "status": "succeeded",
-          "runtime": "claude",
-          "configured_model": "claude-opus-5-5",
-          "duration_ms": 278479.083,
-          "usage": {
-            "input_tokens": 787377,
-            "output_tokens": 10609,
-            "cached_input_tokens": 730579,
-            "cache_creation_input_tokens": 56764,
-            "reasoning_tokens": 0,
-            "total_tokens": 797986,
-            "input_tokens_includes_cache": true
-          },
-          "runtime_cost_estimate_usd": 0.6422517999999999,
-          "turns": 18,
-          "usage_complete": true
-        }
-      ],
-      "usage_complete": true,
-      "attempt": 2,
-      "feedback": {
-        "from_station": "approver",
-        "reason": "R4 / S4, S5, S8 (non-conformance, needs an owner ruling): R4 says that before any reviewer dispatch 'the runner evaluates a completeness precondition', with no condition attached. In anvil/runner.py:1650 the gate only runs when completeness_active = any(station_budget_settings(config)), and the check at anvil/runner.py:2438 uses that flag. A project with no efficiency.station_budgets or default_station_budget skips completeness and sends incomplete attempts to review. The builder reports that running the gate everywhere breaks 22 protected existing tests (scripted sdlc-default runs that write no test files and no delta) and recorded the scoping in decision 0014. The cause is a real conflict between R4 and the protected-test guardrail, the kind P-14 says to raise in the filing. The builder cannot fix it without editing protected files. The owner must either amend R4 to say completeness applies only where partitions are configured, or authorize updates to the 22 tests so the gate can run unconditionally.; R1 / S3 pass: anvil.yaml efficiency.station_budgets matches the corrected table exactly and sums to 15000000. max_run_tokens, require_usage and the top-level station_budgets are unchanged. validate_station_budgets names the pipeline and the excess, and a worst case equal to the cap loads. The runner validates the pipeline being run at run start. The S3 tests check all eight factory pipelines. Leaving default_station_budget unset is justified, because any positive default would exceed the cap for pipelines with unnamed model stations.; R2 / S2, S7 pass: precall() runs before first dispatches (runner.py:2044) and loopback re-dispatches (runner.py:3014). tools/claude_station.py refuses the in-session correction re-dispatch with zero calls (exit 12). Consumption comes from the per-attempt usage records. A refusal records station, partition, consumed and refused_at, then ends through the wo-gh-41 exit path (exit_status budget_exceeded, termination_reason). With require_usage set, unmeasured usage counts as exhausted; without it, the run records proceeded_unmeasured. Gap: the correction-refusal path has no test through the runner. S2 is tested on the loopback path only, which the scenario's 'a correction or a loopback' allows.; R3 / S1 pass with caveat: the wrapper streams usage, kills the process group at the remaining partition, records budget_exceeded with station, partition, reason, model, duration and partial usage, and does not resume the work. The runner turns this into a budget_exceeded step and stops through _station_stop. The station-timeout keys are untouched. Caveat (disclosed): the ceiling has only been run against a stand-in CLI, and the copilot runtime has no in-flight ceiling (pre-call check only).; R4 mechanics pass where active: completeness_gaps checks the builder report, the test-writer files, the attempt delta, the gate verdict and earlier failed stations without artifacts. It runs no command and does not repeat literal validation (S9 test). Gaps loop back to the builder within max_loopbacks and skip the reviewers. The report records results in a separate completeness field set. gates.py and the gate step and verdict are unchanged.; R5 / S6 pass: cost.stations shows partition, consumed, amount, priced and a source labelled as the recorded price table, not an invoice. Stations without a price entry show tokens only.; R6, R7, R8, S10, S11 pass: one new test file (tests/test_station_budgets_completeness.py, 26 tests, all scenarios S1 to S11). I re-ran it together with the protected test_continuous_run_accounting and test_astra_consumption: 81 tests OK. The builder reports a full suite of 797 tests OK (skipped=6), and the pre-review checks gate passed. docs/EXECUTION.md, the CHANGELOG entry and decision 0014 are present. The builder report has all four literals, the base ref, the table with sum 15000000, the test count and the test file name. The diff against 72a84126a600fafb99446946694b5de809e01e66 touches no path under pipelines/, no anvil.json and no existing test. work-orders/issue-42.json appears in that diff only through the owner's correction commit 1d8f96a. No em or en dash appears in the changed files.; Attack surface: no new dependency (standard library only: signal, threading added in tools/claude_station.py), no new endpoint, no new outbound call, no new permission. The CLI is still launched from an argument list without a shell (tools/claude_station.py run_with_ceiling uses subprocess.Popen(command) with a list); the only command change replaces the 'json' output format token with 'stream-json' and appends --verbose, both constants.; Input validation, fail closed: efficiency.station_budgets and default_station_budget are allow-list validated (non-empty string station ids, positive non-bool integers) and reject rather than repair (anvil/config.py station_budget_settings, _positive_tokens); an over-cap worst case raises naming the pipeline and excess. ANVIL_STATION_BUDGET_TOKENS / ANVIL_STATION_PARTITION are parsed as positive integers and a malformed value ends the wrapper with exit 10 before any model call (parse_ceiling). With require_usage set an unmeasured station is refused, never treated as zero (anvil/telemetry.py precall_decision).; Untrusted model/CLI output: streamed stdout lines are parsed with json.loads inside try/except, non-dict events are skipped, and usage is only read from dict-typed message.usage; it is used solely for arithmetic and the kill decision, never executed, never used as a path. Low severity residual: if the CLI stream carries no usage events (format change), the in-flight ceiling silently never trips, so the ceiling fails open to the outer max_run_tokens bound and the pre-call check. Recommend a follow-up that records 'ceiling unmeasured' when a ceiling was set but no usage was streamed.; Process lifecycle, low severity, not a blocker: run_with_ceiling starts the CLI with start_new_session=True and kills it with os.killpg(SIGKILL) on ceiling or timeout, which correctly reaps the CLI's own children. However if the wrapper itself is killed from outside (anvil/executor.py subprocess.run timeout kills only the wrapper PID), the CLI child now sits in its own session and survives, continuing to spend tokens with no supervisor. The non-ceiling path had the same orphaning before this change (subprocess.run kill is PID-only), and the wrapper's station timeout fires below the executor timeout, so exposure is limited. Recommend a follow-up: a SIGTERM handler in the wrapper that forwards to the child's process group.; Secrets and logging: no secret, token or key added to the tree (anvil.yaml change is the 14-entry partition table only, summing to 15000000). New stderr and reason strings carry station ids, token counts and partition sizes only; no environment value or header is echoed. Recorded budget_exceeded usage records carry the same honest fields as the timeout record.; Paths: completeness_gaps (anvil/runner.py) checks existence of the builder report path from configuration and of test-writer delta entries computed from the local working-tree snapshot, joined under the project root; these are internal values, not externally supplied, and are only stat'ed, not written. The gap strings flow back into the builder loopback packet as text; they contain repo-relative file names only, which is acceptable.; Copilot runtime: the in-flight ceiling is explicitly disabled with a stderr notice because Copilot exposes usage only at session end; the pre-call check and run cap still apply. This is a documented limitation, not a silent bypass.; Evidence: python -m unittest tests.test_station_budgets_completeness ran 26 tests, OK. Protected paths (pipelines/, anvil.json, existing tests) are untouched per git status. No em or en dash found in changed or new files.; Suite reproduces (P-12): on the final tree, `env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p 'test_*.py'` gives 'Ran 797 tests ... OK (skipped=6)'. `python -m unittest tests.test_station_budgets_completeness` gives 'Ran 26 tests ... OK'. Both match the builder report.; Test accounting (P-13) is complete and correct. Baseline: 'Ran 771 tests ... OK' on a git archive of 72a84126a600fafb99446946694b5de809e01e66. Added: one file, tests/test_station_budgets_completeness.py, with 26 tests (771 + 26 = 797). Edited: none. `git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests` is empty, so test_continuous_run_accounting.py and test_astra_consumption.py are unmodified.; The tests fail first for the right reason. I copied the new file onto the base tree and reran it: 'FAILED (failures=17, errors=5, skipped=4)'. The 5 errors are the missing anvil.config.validate_station_budgets. The 17 failures are missing behaviour: no budgets or completeness record, reviewers dispatched, builder timed_out instead of budget_exceeded, docs absent. The 4 skips are the git-dependent S3/S11 guards, because the archive has no .git. This matches the test-writer's 17 failures and 5 errors.; Mapping is good. All 11 scenarios S1 to S11 have named tests, and the module docstring holds a scenario-to-test map. The runner tests drive the real run_pipeline with a fake runtime that writes real anvil/usage@1 artifacts through the real UsageRecorder. S1 runs end to end: real CommandExecutor, real tools/claude_station.py, a stand-in claude CLI on PATH. Assertions use specific values: partition 5000 and consumed 5000, excess 100000 or 1, exit_status budget_exceeded, termination_reason naming the station and partition, reviewer consumed 0, a computed per-pipeline worst case. S2 and S7 have counter-cases (inside the partition: dispatched again; require_usage false: proceeds with proceeded_unmeasured). Boundary and malformed inputs are covered (cap equal loads, cap+1 fails; -5, 'lots', True, 1.5 rejected). S9 counts suite runs with a file counter and spies on validate_builder_report.; CHANGES REQUESTED (R4(a), S4, test-design 'make the test able to fail'): the S4 missing-builder-report case is not tested. test_s4_missing_builder_report_dispatches_zero_reviewers makes the builder fail and write nothing, then only asserts that some gap contains 'builder'. The empty-delta gap ('the builder changed no file') and the failed-without-artifact gap already contain that word. Mutation check: in a copy of the final tree I replaced `if not _nonempty_file(report):` in anvil/runner.py completeness_gaps (line 1204) with `if False:`, and all 6 CompletenessGate tests still pass. Needed: a test where the builder succeeds and changes a source file but leaves runs/<wo>/builder.output.md missing or empty, the checks pass, and the test asserts a gap naming the builder report path and zero reviewer calls.; CHANGES REQUESTED (R4(c), S8): the 'recorded failed without its artifact' check has no test that can fail. Mutation check: replacing `if not present:` (the station-failed-without-artifact branch in completeness_gaps) with `if False:` leaves all CompletenessGate tests passing. In S4 and S8 the separate builder-report, delta and test-files gaps hide it. Needed: a test whose only gap is a pre-review station recorded failed without its artifact, asserting the 'station <sid> is recorded failed without its artifact' gap. Also assert the converse: a failed station whose artifact exists produces no such gap.; CHANGES REQUESTED (R4(a), S8): the test-writer test-files check is also not pinned on its own. Mutation check: replacing `if \"test-writer\" in earlier and \"test-writer\" in ran and not test_files:` with `if False:` leaves all CompletenessGate tests passing. test_s8_failed_test_writer_without_artifact_blocks_review is still satisfied by the (c) gap, which also names test-writer. Needed: a test where the test-writer succeeds but writes no test file (or an empty one), the builder is otherwise complete and the checks pass, and the test asserts the test-files gap and zero reviewers. Of the five completeness conditions, only the empty delta (S8 empty-delta test) and the gate verdict (S4 failing-checks test) currently have a test that fails when they are removed.; Coverage gap, R2 correction re-dispatch: R2 and S2 name 'a correction or a loopback'. No automated test covers the in-session correction refusal that tools/claude_station.py implements (exit 12, zero calls); the builder checked it only by hand against a stand-in CLI. The test-writer and builder both disclosed this, and reviewer-spec raised it. Add a wrapper-level test, using the existing FAKE_CLAUDE stand-in and FAKE_LOG call log: a reviewer whose first answer writes no review and whose partition is spent must exit 12 with one logged call. The malformed ANVIL_STATION_BUDGET_TOKENS exit-10 path is also untested.; Coverage gap, scoping decision untested: the runner evaluates completeness only when efficiency.station_budgets or default_station_budget is configured (decision 0014; reviewer-spec routed this to an owner ruling). No test pins either side. Nothing asserts that an unconfigured project skips completeness, or that the factory's own configured anvil.yaml activates it. Whichever ruling the owner makes, add a test that encodes it so the gate cannot be switched off silently.; Minor, residual risk noted by reviewer-security: no test covers a ceiling set while the stream carries no usage events. The ceiling then never trips, failing open to max_run_tokens. Not a blocker for this station, but a test or a 'ceiling unmeasured' record would make the fail-open visible.; Changes requested (needs owner ruling, R4 and decision 0014): the completeness precondition is turned on by a side effect. In anvil/runner.py, _run_pipeline sets completeness_active = any(station_budget_settings(config)), so whether reviewers can be launched on an incomplete attempt depends on whether the project configured token partitions. Token partitioning (R1 to R3) and completeness (R4) are separate concerns with separate failure modes, and the spec states R4 with no condition. Decision 0014 records the scoping honestly and gives the cause: running it everywhere breaks 22 protected scripted tests. That makes it a guardrail conflict the line cannot resolve itself. The owner should either amend R4 to make completeness opt-in, ideally through its own explicit switch rather than through budget keys, or authorize updating the 22 tests so completeness runs unconditionally. This matches the reviewer-spec finding.; Fit with decisions passes: decision 0014 follows the house format (context, decision, consequences) and states the trade-off: a partition sized too small now ends the run at that station. It builds on 0011 (station timeout: same kill-and-record shape, timeout keys unchanged) and 0013 (continuous run accounting: refusals and ceiling kills go through _station_stop and the existing exit_status budget_exceeded path, with no second way of ending a run). max_run_tokens stays the outer bound (token-efficiency R4), and validate_station_budgets checks partitions against it.; Boundaries pass: config.py owns parsing and validation (station_budget_settings, pipeline_partitions, validate_station_budgets), and it fails closed, raising ValueError on bad ids, non-positive or bool values, and over-cap worst cases, naming the excess. telemetry.py owns consumption arithmetic (station_consumption, precall_decision are pure, read existing per-attempt usage records, never treat unmeasured as zero). completeness_gaps in runner.py is a pure read-only function that consumes the gate verdict and existing deltas, re-runs no suite and does not repeat the artifact contract's literal validation. The checks gate's verdict and S4 behavior are not modified; completeness only sets gate_failed alongside it.; Config separation passes: the new keys live inside efficiency; the top-level station_budgets (packet size, get_station_budget) is untouched, and docs/EXECUTION.md names both keys and explains the difference. anvil.yaml ships the corrected table, which sums to 15000000. No new dependency (signal, threading are standard library). No en dash or em dash characters in the changed or new files.; Nit, second source of truth: anvil/config.py adds MODEL_CALLING_DETERMINISTIC {intake} and DETERMINISTIC_FALLBACK {approver, triage-human, checks-gate}. anvil/runner.py already hardcodes the fallback set {intake, approver, triage-human} inline in two places (the kind fallback near line 2038 and is_agent near line 3029). The two copies disagree on intake and checks-gate. Prefer one helper (config.is_model_station) that the runner also uses, in a later order if not this one.; Nit, string coupling across the wrapper boundary: the refusal of a correction reaches the runner as stderr text, matched by substring on CORRECTION_REFUSED, which is duplicated in tools/claude_station.py and anvil/runner.py with a SYNC comment. The in-flight kill instead goes through the structured usage-attempt record (status budget_exceeded, read by executor.py). Recording the correction refusal the same structured way, or matching on the dedicated exit code 12, would remove the duplicated literal. This follows an existing SYNC pattern in the repo, so it is not a blocker.; Nit, function size: _run_pipeline gains about 300 lines, including three closures (budgets_view, cost_stations_view, precall) and the step_ceiling handling, which is duplicated in the intake and main executor except-branches the same way the timeout handling is. budgets_view and cost_stations_view are pure over (steps, partitions, price_table) and could live in telemetry.py beside station_consumption, which would make them testable without a run harness. This is not required for this order.",
-        "findings": [
-          "R4 / S4, S5, S8 (non-conformance, needs an owner ruling): R4 says that before any reviewer dispatch 'the runner evaluates a completeness precondition', with no condition attached. In anvil/runner.py:1650 the gate only runs when completeness_active = any(station_budget_settings(config)), and the check at anvil/runner.py:2438 uses that flag. A project with no efficiency.station_budgets or default_station_budget skips completeness and sends incomplete attempts to review. The builder reports that running the gate everywhere breaks 22 protected existing tests (scripted sdlc-default runs that write no test files and no delta) and recorded the scoping in decision 0014. The cause is a real conflict between R4 and the protected-test guardrail, the kind P-14 says to raise in the filing. The builder cannot fix it without editing protected files. The owner must either amend R4 to say completeness applies only where partitions are configured, or authorize updates to the 22 tests so the gate can run unconditionally.",
-          "R1 / S3 pass: anvil.yaml efficiency.station_budgets matches the corrected table exactly and sums to 15000000. max_run_tokens, require_usage and the top-level station_budgets are unchanged. validate_station_budgets names the pipeline and the excess, and a worst case equal to the cap loads. The runner validates the pipeline being run at run start. The S3 tests check all eight factory pipelines. Leaving default_station_budget unset is justified, because any positive default would exceed the cap for pipelines with unnamed model stations.",
-          "R2 / S2, S7 pass: precall() runs before first dispatches (runner.py:2044) and loopback re-dispatches (runner.py:3014). tools/claude_station.py refuses the in-session correction re-dispatch with zero calls (exit 12). Consumption comes from the per-attempt usage records. A refusal records station, partition, consumed and refused_at, then ends through the wo-gh-41 exit path (exit_status budget_exceeded, termination_reason). With require_usage set, unmeasured usage counts as exhausted; without it, the run records proceeded_unmeasured. Gap: the correction-refusal path has no test through the runner. S2 is tested on the loopback path only, which the scenario's 'a correction or a loopback' allows.",
-          "R3 / S1 pass with caveat: the wrapper streams usage, kills the process group at the remaining partition, records budget_exceeded with station, partition, reason, model, duration and partial usage, and does not resume the work. The runner turns this into a budget_exceeded step and stops through _station_stop. The station-timeout keys are untouched. Caveat (disclosed): the ceiling has only been run against a stand-in CLI, and the copilot runtime has no in-flight ceiling (pre-call check only).",
-          "R4 mechanics pass where active: completeness_gaps checks the builder report, the test-writer files, the attempt delta, the gate verdict and earlier failed stations without artifacts. It runs no command and does not repeat literal validation (S9 test). Gaps loop back to the builder within max_loopbacks and skip the reviewers. The report records results in a separate completeness field set. gates.py and the gate step and verdict are unchanged.",
-          "R5 / S6 pass: cost.stations shows partition, consumed, amount, priced and a source labelled as the recorded price table, not an invoice. Stations without a price entry show tokens only.",
-          "R6, R7, R8, S10, S11 pass: one new test file (tests/test_station_budgets_completeness.py, 26 tests, all scenarios S1 to S11). I re-ran it together with the protected test_continuous_run_accounting and test_astra_consumption: 81 tests OK. The builder reports a full suite of 797 tests OK (skipped=6), and the pre-review checks gate passed. docs/EXECUTION.md, the CHANGELOG entry and decision 0014 are present. The builder report has all four literals, the base ref, the table with sum 15000000, the test count and the test file name. The diff against 72a84126a600fafb99446946694b5de809e01e66 touches no path under pipelines/, no anvil.json and no existing test. work-orders/issue-42.json appears in that diff only through the owner's correction commit 1d8f96a. No em or en dash appears in the changed files.",
-          "Attack surface: no new dependency (standard library only: signal, threading added in tools/claude_station.py), no new endpoint, no new outbound call, no new permission. The CLI is still launched from an argument list without a shell (tools/claude_station.py run_with_ceiling uses subprocess.Popen(command) with a list); the only command change replaces the 'json' output format token with 'stream-json' and appends --verbose, both constants.",
-          "Input validation, fail closed: efficiency.station_budgets and default_station_budget are allow-list validated (non-empty string station ids, positive non-bool integers) and reject rather than repair (anvil/config.py station_budget_settings, _positive_tokens); an over-cap worst case raises naming the pipeline and excess. ANVIL_STATION_BUDGET_TOKENS / ANVIL_STATION_PARTITION are parsed as positive integers and a malformed value ends the wrapper with exit 10 before any model call (parse_ceiling). With require_usage set an unmeasured station is refused, never treated as zero (anvil/telemetry.py precall_decision).",
-          "Untrusted model/CLI output: streamed stdout lines are parsed with json.loads inside try/except, non-dict events are skipped, and usage is only read from dict-typed message.usage; it is used solely for arithmetic and the kill decision, never executed, never used as a path. Low severity residual: if the CLI stream carries no usage events (format change), the in-flight ceiling silently never trips, so the ceiling fails open to the outer max_run_tokens bound and the pre-call check. Recommend a follow-up that records 'ceiling unmeasured' when a ceiling was set but no usage was streamed.",
-          "Process lifecycle, low severity, not a blocker: run_with_ceiling starts the CLI with start_new_session=True and kills it with os.killpg(SIGKILL) on ceiling or timeout, which correctly reaps the CLI's own children. However if the wrapper itself is killed from outside (anvil/executor.py subprocess.run timeout kills only the wrapper PID), the CLI child now sits in its own session and survives, continuing to spend tokens with no supervisor. The non-ceiling path had the same orphaning before this change (subprocess.run kill is PID-only), and the wrapper's station timeout fires below the executor timeout, so exposure is limited. Recommend a follow-up: a SIGTERM handler in the wrapper that forwards to the child's process group.",
-          "Secrets and logging: no secret, token or key added to the tree (anvil.yaml change is the 14-entry partition table only, summing to 15000000). New stderr and reason strings carry station ids, token counts and partition sizes only; no environment value or header is echoed. Recorded budget_exceeded usage records carry the same honest fields as the timeout record.",
-          "Paths: completeness_gaps (anvil/runner.py) checks existence of the builder report path from configuration and of test-writer delta entries computed from the local working-tree snapshot, joined under the project root; these are internal values, not externally supplied, and are only stat'ed, not written. The gap strings flow back into the builder loopback packet as text; they contain repo-relative file names only, which is acceptable.",
-          "Copilot runtime: the in-flight ceiling is explicitly disabled with a stderr notice because Copilot exposes usage only at session end; the pre-call check and run cap still apply. This is a documented limitation, not a silent bypass.",
-          "Evidence: python -m unittest tests.test_station_budgets_completeness ran 26 tests, OK. Protected paths (pipelines/, anvil.json, existing tests) are untouched per git status. No em or en dash found in changed or new files.",
-          "Suite reproduces (P-12): on the final tree, `env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p 'test_*.py'` gives 'Ran 797 tests ... OK (skipped=6)'. `python -m unittest tests.test_station_budgets_completeness` gives 'Ran 26 tests ... OK'. Both match the builder report.",
-          "Test accounting (P-13) is complete and correct. Baseline: 'Ran 771 tests ... OK' on a git archive of 72a84126a600fafb99446946694b5de809e01e66. Added: one file, tests/test_station_budgets_completeness.py, with 26 tests (771 + 26 = 797). Edited: none. `git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests` is empty, so test_continuous_run_accounting.py and test_astra_consumption.py are unmodified.",
-          "The tests fail first for the right reason. I copied the new file onto the base tree and reran it: 'FAILED (failures=17, errors=5, skipped=4)'. The 5 errors are the missing anvil.config.validate_station_budgets. The 17 failures are missing behaviour: no budgets or completeness record, reviewers dispatched, builder timed_out instead of budget_exceeded, docs absent. The 4 skips are the git-dependent S3/S11 guards, because the archive has no .git. This matches the test-writer's 17 failures and 5 errors.",
-          "Mapping is good. All 11 scenarios S1 to S11 have named tests, and the module docstring holds a scenario-to-test map. The runner tests drive the real run_pipeline with a fake runtime that writes real anvil/usage@1 artifacts through the real UsageRecorder. S1 runs end to end: real CommandExecutor, real tools/claude_station.py, a stand-in claude CLI on PATH. Assertions use specific values: partition 5000 and consumed 5000, excess 100000 or 1, exit_status budget_exceeded, termination_reason naming the station and partition, reviewer consumed 0, a computed per-pipeline worst case. S2 and S7 have counter-cases (inside the partition: dispatched again; require_usage false: proceeds with proceeded_unmeasured). Boundary and malformed inputs are covered (cap equal loads, cap+1 fails; -5, 'lots', True, 1.5 rejected). S9 counts suite runs with a file counter and spies on validate_builder_report.",
-          "CHANGES REQUESTED (R4(a), S4, test-design 'make the test able to fail'): the S4 missing-builder-report case is not tested. test_s4_missing_builder_report_dispatches_zero_reviewers makes the builder fail and write nothing, then only asserts that some gap contains 'builder'. The empty-delta gap ('the builder changed no file') and the failed-without-artifact gap already contain that word. Mutation check: in a copy of the final tree I replaced `if not _nonempty_file(report):` in anvil/runner.py completeness_gaps (line 1204) with `if False:`, and all 6 CompletenessGate tests still pass. Needed: a test where the builder succeeds and changes a source file but leaves runs/<wo>/builder.output.md missing or empty, the checks pass, and the test asserts a gap naming the builder report path and zero reviewer calls."
-        ]
-      }
-    },
-    {
-      "station": "checks-gate",
-      "status": "passed",
-      "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 85509.782,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/checks-gate.pre-review.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
-      "budget": 0,
-      "budget_action": "none",
-      "attempt": 2,
-      "phase": "pre-review",
-      "commands": [
-        "python -m unittest discover -s tests -p 'test_*.py'"
-      ],
-      "exit_codes": [
-        0
-      ],
-      "protected_paths": [
-        "tests/",
-        "anvil.json",
-        "pipelines/"
-      ],
-      "protected_path_verdict": "pass",
-      "protected_path_findings": [],
-      "gate_verdict": "pass",
-      "artifact_validation": {
-        "passed": true,
-        "report": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/builder.output.md",
-        "observed": "present",
-        "report_source": "station",
-        "required_literals": [],
-        "missing_literals": [],
-        "findings": []
-      }
-    },
-    {
-      "station": "reviewer-spec",
-      "status": "executed",
-      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-spec.output.md",
-      "duration_ms": 131796.423,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-spec.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": "claude-opus-5-5",
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      },
-      "measured_tokens": 7278,
-      "budget": 48000,
-      "budget_action": "sent",
-      "usage": {
-        "input_tokens": 235674,
-        "output_tokens": 3605,
-        "cached_input_tokens": 197386,
-        "cache_creation_input_tokens": 38274,
-        "reasoning_tokens": 0,
-        "total_tokens": 239279,
-        "input_tokens_includes_cache": true
-      },
-      "cost_record": {
-        "measured": false,
-        "reason": "no price recorded for model 'claude-opus-5-5'"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "status": "succeeded",
-          "runtime": "claude",
-          "configured_model": "claude-opus-5-5",
-          "duration_ms": 131727.262,
-          "usage": {
-            "input_tokens": 235674,
-            "output_tokens": 3605,
-            "cached_input_tokens": 197386,
-            "cache_creation_input_tokens": 38274,
-            "reasoning_tokens": 0,
-            "total_tokens": 239279,
-            "input_tokens_includes_cache": true
-          },
-          "runtime_cost_estimate_usd": 0.3030032,
-          "turns": 7,
-          "usage_complete": true
-        }
-      ],
-      "usage_complete": true,
-      "attempt": 2
-    },
-    {
-      "station": "reviewer-security",
-      "status": "executed",
-      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-security.output.md",
-      "duration_ms": 39397.199,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-security.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": "claude-opus-5-5",
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      },
-      "measured_tokens": 8078,
-      "budget": 48000,
-      "budget_action": "sent",
-      "usage": {
-        "input_tokens": 182956,
-        "output_tokens": 3362,
-        "cached_input_tokens": 162448,
-        "cache_creation_input_tokens": 20496,
-        "reasoning_tokens": 0,
-        "total_tokens": 186318,
-        "input_tokens_includes_cache": true
-      },
-      "cost_record": {
-        "measured": false,
-        "reason": "no price recorded for model 'claude-opus-5-5'"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "status": "succeeded",
-          "runtime": "claude",
-          "configured_model": "claude-opus-5-5",
-          "duration_ms": 39326.713,
-          "usage": {
-            "input_tokens": 182956,
-            "output_tokens": 3362,
-            "cached_input_tokens": 162448,
-            "cache_creation_input_tokens": 20496,
-            "reasoning_tokens": 0,
-            "total_tokens": 186318,
-            "input_tokens_includes_cache": true
-          },
-          "runtime_cost_estimate_usd": 0.2022576,
-          "turns": 6,
-          "usage_complete": true
-        }
-      ],
-      "usage_complete": true,
-      "attempt": 2
-    },
-    {
-      "station": "reviewer-tests",
-      "status": "executed",
-      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-tests.output.md",
-      "duration_ms": 140695.539,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-tests.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": "claude-opus-5-5",
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      },
-      "measured_tokens": 8308,
-      "budget": 48000,
-      "budget_action": "sent",
-      "usage": {
-        "input_tokens": 269597,
-        "output_tokens": 4819,
-        "cached_input_tokens": 244443,
-        "cache_creation_input_tokens": 25138,
-        "reasoning_tokens": 0,
-        "total_tokens": 274416,
-        "input_tokens_includes_cache": true
-      },
-      "cost_record": {
-        "measured": false,
-        "reason": "no price recorded for model 'claude-opus-5-5'"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "status": "succeeded",
-          "runtime": "claude",
-          "configured_model": "claude-opus-5-5",
-          "duration_ms": 140627.88,
-          "usage": {
-            "input_tokens": 269597,
-            "output_tokens": 4819,
-            "cached_input_tokens": 244443,
-            "cache_creation_input_tokens": 25138,
-            "reasoning_tokens": 0,
-            "total_tokens": 274416,
-            "input_tokens_includes_cache": true
-          },
-          "runtime_cost_estimate_usd": 0.27102259999999995,
-          "turns": 9,
-          "usage_complete": true
-        }
-      ],
-      "usage_complete": true,
-      "attempt": 2
-    },
-    {
-      "station": "reviewer-architecture",
-      "status": "executed",
-      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-architecture.output.md",
-      "duration_ms": 40018.267,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-architecture.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": "claude-opus-5-5",
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      },
-      "measured_tokens": 8172,
-      "budget": 48000,
-      "budget_action": "sent",
-      "usage": {
-        "input_tokens": 169366,
-        "output_tokens": 3710,
-        "cached_input_tokens": 144137,
-        "cache_creation_input_tokens": 25219,
-        "reasoning_tokens": 0,
-        "total_tokens": 173076,
-        "input_tokens_includes_cache": true
-      },
-      "cost_record": {
-        "measured": false,
-        "reason": "no price recorded for model 'claude-opus-5-5'"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "status": "succeeded",
-          "runtime": "claude",
-          "configured_model": "claude-opus-5-5",
-          "duration_ms": 39952.015,
-          "usage": {
-            "input_tokens": 169366,
-            "output_tokens": 3710,
-            "cached_input_tokens": 144137,
-            "cache_creation_input_tokens": 25219,
-            "reasoning_tokens": 0,
-            "total_tokens": 173076,
-            "input_tokens_includes_cache": true
-          },
-          "runtime_cost_estimate_usd": 0.22916240000000002,
-          "turns": 6,
-          "usage_complete": true
-        }
-      ],
-      "usage_complete": true,
-      "attempt": 2
-    },
-    {
-      "station": "reviewer-design",
-      "status": "executed",
-      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-design.output.md",
-      "duration_ms": 38012.449,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-design.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": "claude-opus-5-5",
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      },
-      "measured_tokens": 11805,
-      "budget": 48000,
-      "budget_action": "sent",
-      "usage": {
-        "input_tokens": 181801,
-        "output_tokens": 3337,
-        "cached_input_tokens": 153779,
-        "cache_creation_input_tokens": 28012,
-        "reasoning_tokens": 0,
-        "total_tokens": 185138,
-        "input_tokens_includes_cache": true
-      },
-      "cost_record": {
-        "measured": false,
-        "reason": "no price recorded for model 'claude-opus-5-5'"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "status": "succeeded",
-          "runtime": "claude",
-          "configured_model": "claude-opus-5-5",
-          "duration_ms": 37935.655,
-          "usage": {
-            "input_tokens": 181801,
-            "output_tokens": 3337,
-            "cached_input_tokens": 153779,
-            "cache_creation_input_tokens": 28012,
-            "reasoning_tokens": 0,
-            "total_tokens": 185138,
-            "input_tokens_includes_cache": true
-          },
-          "runtime_cost_estimate_usd": 0.23759580000000002,
-          "turns": 6,
-          "usage_complete": true
-        }
-      ],
-      "usage_complete": true,
-      "attempt": 2
-    },
-    {
-      "station": "reviewer-ux",
-      "status": "routed_out",
-      "detail": "Routed out: Routed out: no UI surface",
-      "duration_ms": 1.985,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-ux.packet.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
-      "budget": 0,
-      "budget_action": "none",
-      "attempt": 2
-    },
-    {
-      "station": "approver",
-      "status": "completed",
-      "detail": "Approver verdict: changes_requested",
-      "duration_ms": 0.047,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/report.json"
-      ],
-      "configured_model": "claude-fable-5-2",
-      "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
-      "budget": 0,
-      "budget_action": "none",
-      "attempt": 2
-    },
-    {
-      "station": "approver",
-      "status": "loopback",
-      "return_to": "builder",
-      "detail": "Loopback to builder: Still open, needs an owner ruling (R4; S4, S5, S8): the spec at .openspec/specs/station-budgets-completeness/spec.md R4 has not been amended. It still says that before any reviewer dispatch 'the runner evaluates a completeness precondition', with no condition attached. The runner still applies the gate only where partitions are configured: anvil/runner.py:1652 sets completeness_active = any(station_budget_settings(config)), and the pre-review check at anvil/runner.py:2440 depends on that flag. A project with no efficiency.station_budgets and no default_station_budget skips completeness and sends incomplete attempts to review. The builder report (attempt 2, item 2) explicitly leaves this unfixed, because running the gate unconditionally breaks 22 protected existing tests. This is a real conflict between R4 and the protected-test guardrail (P-14), and the line cannot settle it. It stays open until the owner either amends R4 to scope completeness to projects with configured partitions, or authorizes updating the 22 tests so the gate can run unconditionally (a one-line runner change). I cannot pass an open loopback finding.; Resolved (R4(a), S4, reviewer-tests finding): the missing-builder-report case can now fail. test_s4_missing_builder_report_dispatches_zero_reviewers requires a gap naming runs/wo-sbc/builder.output.md. The new test_s4_missing_report_alone_blocks_review_when_checks_pass covers a successful builder with a source change, test-writer files and passing checks but an empty report, and expects exactly one gap naming the report path and zero reviewer calls. The new test_s4_completeness_gaps_names_a_missing_or_empty_report calls completeness_gaps directly. I repeated the mutation independently: in a copy of the tree I replaced 'if not _nonempty_file(report):' with 'if False:' and ran tests.test_station_budgets_completeness.CompletenessGate, which gave FAILED (failures=5).; Defect fix verified (R4(a)): _nonempty_file now treats a file with only whitespace as empty. That matches the artifact contract's rule (read_bytes().strip()), and validate_builder_report and the gate step are unchanged, so S9 (consumes, never re-runs) still holds.; R1/S3, R2/S2/S7, R3/S1, R5/S6, R7, R8, S9 to S11: no regressions since attempt 1. The partition table still sums to 15000000, and the pre-call check, in-flight ceiling, cost section, docs, CHANGELOG and decision 0014 are all present. The gap the builder disclosed still stands: the in-session correction-refusal path (wrapper exit 12) has no test through the runner. S2's 'a correction or a loopback' allows this, so it is not a blocker.; Evidence: 'python -m unittest tests.test_station_budgets_completeness' gave Ran 28 tests, OK. The full suite, run as 'env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p test_*.py', gave Ran 799 tests, OK (skipped=6), which matches the builder report (771 base plus 28 new). 'git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests pipelines anvil.json' is empty, so no protected path changed. No em dash or en dash appears in the changed or new files.; Loopback finding R4 / S4, S5, S8 (completeness scoped to configured partitions) is still open. anvil/runner.py:1652 sets completeness_active = any(station_budget_settings(config)) and anvil/runner.py:2440 gates the precondition on it, so a project with no efficiency partitions skips completeness. The builder report lists this as open pending an owner ruling. It conflicts with the protected-test guardrail and the builder cannot resolve it. This is not a security defect: completeness is a review-spend control, not an access control. But this re-review cannot pass a finding that is still open. It needs the owner ruling: amend R4, or authorize updates to the 22 protected tests.; The S4 missing-builder-report test gap that reviewer-tests raised looks addressed. tests/test_station_budgets_completeness.py adds test_s4_missing_report_alone_blocks_review_when_checks_pass (line 571) and test_s4_completeness_gaps_names_a_missing_or_empty_report (line 593). Reviewer-tests owns the mutation re-check.; Attempt 2 delta, security review: _nonempty_file (anvil/runner.py:1176) now reads the file and strips it, so whitespace-only counts as empty, matching gates.validate_builder_report. The paths are internal: the configured report path, plus test-writer delta entries joined under the project root from the local working-tree snapshot. The function only reads them for an emptiness check. Their content is never echoed, executed or written. OSError fails closed to 'empty'. Low-severity nit: read_bytes loads the whole file to test for emptiness. A bounded read would avoid memory cost on a very large delta file. Not a blocker.; Change since attempt 1 in anvil/executor.py: it surfaces a budget_exceeded record (elapsed_ms, reason, configured_model) from the wrapper's last usage record. These are the same honest fields as the timeout record. No environment value, header or secret is copied.; Unchanged and still acceptable: no new dependency (standard library only), no new endpoint, outbound call or permission. tools/claude_station.py:323 starts the CLI from an argument list without a shell. Budget configuration is allow-list validated and rejects bad values. With require_usage set, an unmeasured station is refused. Streamed model output is parsed defensively and used only for arithmetic.; Attempt 1 low-severity follow-ups, carried forward and disclosed in the builder report, not blockers. (1) The in-flight ceiling fails open to the pre-call check and the run cap when the CLI streams no usage events. Record 'ceiling unmeasured' in that case. (2) If an outside timeout kills the wrapper, the CLI child (start_new_session=True) is orphaned. Forward SIGTERM to the child's process group.; Evidence: python -m unittest tests.test_station_budgets_completeness gives 'Ran 28 tests ... OK'. No em dash or en dash in the changed or new files under anvil, tools, docs/EXECUTION.md, CHANGELOG.md, anvil.yaml, decision 0014 or the new test file. The diff against 72a84126a600fafb99446946694b5de809e01e66 touches no file under pipelines/, no anvil.json and no existing test.; RESOLVED (my attempt 1 finding, R4(a), S4, test-design 'make the test able to fail'): the missing builder report case can now fail. test_s4_missing_builder_report_dispatches_zero_reviewers now requires a gap naming runs/wo-sbc/builder.output.md, not just any gap containing 'builder'. New test_s4_missing_report_alone_blocks_review_when_checks_pass: the builder changes src/feature.py, the test-writer writes its file, checks pass (gate_verdict pass), the report is empty or whitespace only. It asserts exactly one gap, that gap names the report path, and zero reviewer calls. New test_s4_completeness_gaps_names_a_missing_or_empty_report calls the real completeness_gaps on a missing, empty, whitespace-only and real report.; Mutation check repeated by me on a copy of the final tree: replacing `if not _nonempty_file(report):` (anvil/runner.py:1206) with `if False:` makes `python -m unittest tests.test_station_budgets_completeness.CompletenessGate` report 'Ran 8 tests ... FAILED (failures=5)'. Before the fix the same mutation passed all 6 tests. The finding is closed.; Mock scope is acceptable: test_s4_missing_report_alone_blocks_review_when_checks_pass stubs anvil.runner.validate_builder_report, the gate's frozen literal validation. That is a collaborator, not the unit under test. In the real flow that validation already rejects an empty report before completeness runs, so the stub is the only way to reach completeness with a passing gate. The direct completeness_gaps test covers the same rule without any mock. The tests also found a real defect, now fixed: _nonempty_file treated a whitespace-only file as present (anvil/runner.py:1176-1182, now read_bytes().strip(), the same rule as gates.validate_builder_report).; Suite reproduces (P-12): on the final tree, `env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p 'test_*.py'` gives 'Ran 799 tests ... OK (skipped=6)'. `python -m unittest tests.test_station_budgets_completeness` gives 'Ran 28 tests ... OK'. Both match the builder report.; Test accounting (P-13) is complete. Baseline: 771 (measured in attempt 1 on the base 72a84126a600fafb99446946694b5de809e01e66). Added: one file, tests/test_station_budgets_completeness.py, now 28 tests (attempt 1 had 26; attempt 2 adds 2 and tightens 1 in that new file). 771 + 28 = 799. Edited existing tests: none. `git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests pipelines anvil.json` is empty, so the protected test_continuous_run_accounting.py and test_astra_consumption.py are untouched. The 29th 'def test_' match in the file is fixture text (test_x inside the TEST_FILE string at line 246), not a test.; Mapping is still complete: S1 to S11 each have named tests, and the module docstring map lists the S4 tests. No em or en dash appears in the test file or the builder report.; STILL OPEN, not passed by this station (approver finding R4 / S4, S5, S8): completeness still runs only when completeness_active = any(station_budget_settings(config)) (anvil/runner.py). The builder did not change this and says so plainly. Running the gate unconditionally would break 22 protected existing tests. This is a conflict between the spec and the guardrails that only the owner can settle, by amending R4 or authorizing edits to those tests. No test change can close it inside this order. The tests do cover the behaviour where it is active, so the test verdict is pass, but the R4 ruling stays with the approver and the owner gate.; Remaining test gaps (disclosed, non-blocking): the in-session correction refusal (wrapper exit 12) has no test through the runner. S2 is tested on the loopback path, which the scenario's 'a correction or a loopback' allows. The in-flight ceiling (S1) has only been run against a stand-in claude CLI.; OPEN, loopback finding not resolved (R4 / S4, S5, S8): completeness is still gated on completeness_active = any(station_budget_settings(config)) (anvil/runner.py:1652, used at anvil/runner.py:2440). R4 states the precondition without condition. The builder report (attempt 2) says it is not fixed and asks for an owner ruling: amend R4 to scope completeness to projects with partitions, or authorize changes to the 22 protected scripted tests. Inside the guardrails the builder cannot do more. This review cannot pass the finding while it is open; it goes to the owner, not back to the builder.; Architecture concern on the current scoping (for the owner's ruling): it ties two separate controls together. Token partitions (R1 to R3) and the completeness precondition (R4) answer different failure modes (4 and 5 in the filing), yet configuring partitions now silently switches on a change to the review flow, and a project that wants completeness but no partitions cannot have it. If the owner amends R4 rather than authorizing the test updates, a cleaner shape is an explicit switch of its own (for example efficiency.completeness_gate, or a key next to the checks gate config) that the factory anvil.yaml turns on. The runner should not infer it from budget keys. Decision 0014 records the coupling and its trade off honestly (status proposed), which is right, but the decision needs the owner's acceptance before the coupling is treated as settled.; RESOLVED (reviewer-tests R4(a)/S4): the missing or empty builder report case is now pinned. test_s4_missing_builder_report_dispatches_zero_reviewers requires a gap naming runs/wo-sbc/builder.output.md. The new test_s4_missing_report_alone_blocks_review_when_checks_pass and test_s4_completeness_gaps_names_a_missing_or_empty_report isolate the report gap on an otherwise complete attempt. The builder reports the mutation (if not _nonempty_file(report) -> if False) now fails 5 CompletenessGate tests. _nonempty_file (anvil/runner.py:1176) now applies the same whitespace-is-empty rule as gates.validate_builder_report, so the two places agree on what empty means without the precondition repeating literal validation (S9 holds).; Boundaries fit the existing structure: configuration parsing and validation stay in anvil/config.py (station_budget_settings, validate_station_budgets, fail closed with the pipeline and excess named). Measured consumption from usage artifacts sits in anvil/telemetry.py (precall_decision). Orchestration (pre-call check, completeness_gaps, budget outcomes, cost per station) sits in anvil/runner.py. The in-flight kill sits in tools/claude_station.py and follows the station-timeout kill-and-record shape. completeness_gaps is a pure, read-only function over artifacts and verdicts already decided. It runs no command and leaves gates.py unchanged, as the reconciliation requires.; Single exit path respected: refusals and in-flight ceiling kills end the run through the wo-gh-41 path (exit_status budget_exceeded, termination_reason). No second termination mechanism was added. The efficiency.station_budgets key is kept apart from the frozen top-level station_budgets (astra-consumption packet cap), and docs/EXECUTION.md names both.; Minor, not blocking: completeness_gaps hardcodes runs/<wo>/builder.output.md (anvil/runner.py:1204-1205). That matches the existing convention at runner.py:1548 and :2419, but the path now has three literal copies. A follow-up could pull it into one helper so there is one source of truth.; Minor, not blocking: anvil/runner.py grows to 3272 lines with this order. The budget and completeness logic could move later to a focused module (for example anvil/budgets.py) to keep the runner as orchestration only. That is out of scope for this order's authorized surface.; Guardrails: diff against 72a84126a600fafb99446946694b5de809e01e66 touches no pipelines/, no anvil.json and no existing test (builder report and earlier reviewers both verify this). Standard library only. One new decision record, 0014. Builder reports the full suite at 799 tests OK (skipped=6): 771 base plus 28 new.",
-      "reason": "Still open, needs an owner ruling (R4; S4, S5, S8): the spec at .openspec/specs/station-budgets-completeness/spec.md R4 has not been amended. It still says that before any reviewer dispatch 'the runner evaluates a completeness precondition', with no condition attached. The runner still applies the gate only where partitions are configured: anvil/runner.py:1652 sets completeness_active = any(station_budget_settings(config)), and the pre-review check at anvil/runner.py:2440 depends on that flag. A project with no efficiency.station_budgets and no default_station_budget skips completeness and sends incomplete attempts to review. The builder report (attempt 2, item 2) explicitly leaves this unfixed, because running the gate unconditionally breaks 22 protected existing tests. This is a real conflict between R4 and the protected-test guardrail (P-14), and the line cannot settle it. It stays open until the owner either amends R4 to scope completeness to projects with configured partitions, or authorizes updating the 22 tests so the gate can run unconditionally (a one-line runner change). I cannot pass an open loopback finding.; Resolved (R4(a), S4, reviewer-tests finding): the missing-builder-report case can now fail. test_s4_missing_builder_report_dispatches_zero_reviewers requires a gap naming runs/wo-sbc/builder.output.md. The new test_s4_missing_report_alone_blocks_review_when_checks_pass covers a successful builder with a source change, test-writer files and passing checks but an empty report, and expects exactly one gap naming the report path and zero reviewer calls. The new test_s4_completeness_gaps_names_a_missing_or_empty_report calls completeness_gaps directly. I repeated the mutation independently: in a copy of the tree I replaced 'if not _nonempty_file(report):' with 'if False:' and ran tests.test_station_budgets_completeness.CompletenessGate, which gave FAILED (failures=5).; Defect fix verified (R4(a)): _nonempty_file now treats a file with only whitespace as empty. That matches the artifact contract's rule (read_bytes().strip()), and validate_builder_report and the gate step are unchanged, so S9 (consumes, never re-runs) still holds.; R1/S3, R2/S2/S7, R3/S1, R5/S6, R7, R8, S9 to S11: no regressions since attempt 1. The partition table still sums to 15000000, and the pre-call check, in-flight ceiling, cost section, docs, CHANGELOG and decision 0014 are all present. The gap the builder disclosed still stands: the in-session correction-refusal path (wrapper exit 12) has no test through the runner. S2's 'a correction or a loopback' allows this, so it is not a blocker.; Evidence: 'python -m unittest tests.test_station_budgets_completeness' gave Ran 28 tests, OK. The full suite, run as 'env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p test_*.py', gave Ran 799 tests, OK (skipped=6), which matches the builder report (771 base plus 28 new). 'git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests pipelines anvil.json' is empty, so no protected path changed. No em dash or en dash appears in the changed or new files.; Loopback finding R4 / S4, S5, S8 (completeness scoped to configured partitions) is still open. anvil/runner.py:1652 sets completeness_active = any(station_budget_settings(config)) and anvil/runner.py:2440 gates the precondition on it, so a project with no efficiency partitions skips completeness. The builder report lists this as open pending an owner ruling. It conflicts with the protected-test guardrail and the builder cannot resolve it. This is not a security defect: completeness is a review-spend control, not an access control. But this re-review cannot pass a finding that is still open. It needs the owner ruling: amend R4, or authorize updates to the 22 protected tests.; The S4 missing-builder-report test gap that reviewer-tests raised looks addressed. tests/test_station_budgets_completeness.py adds test_s4_missing_report_alone_blocks_review_when_checks_pass (line 571) and test_s4_completeness_gaps_names_a_missing_or_empty_report (line 593). Reviewer-tests owns the mutation re-check.; Attempt 2 delta, security review: _nonempty_file (anvil/runner.py:1176) now reads the file and strips it, so whitespace-only counts as empty, matching gates.validate_builder_report. The paths are internal: the configured report path, plus test-writer delta entries joined under the project root from the local working-tree snapshot. The function only reads them for an emptiness check. Their content is never echoed, executed or written. OSError fails closed to 'empty'. Low-severity nit: read_bytes loads the whole file to test for emptiness. A bounded read would avoid memory cost on a very large delta file. Not a blocker.; Change since attempt 1 in anvil/executor.py: it surfaces a budget_exceeded record (elapsed_ms, reason, configured_model) from the wrapper's last usage record. These are the same honest fields as the timeout record. No environment value, header or secret is copied.; Unchanged and still acceptable: no new dependency (standard library only), no new endpoint, outbound call or permission. tools/claude_station.py:323 starts the CLI from an argument list without a shell. Budget configuration is allow-list validated and rejects bad values. With require_usage set, an unmeasured station is refused. Streamed model output is parsed defensively and used only for arithmetic.; Attempt 1 low-severity follow-ups, carried forward and disclosed in the builder report, not blockers. (1) The in-flight ceiling fails open to the pre-call check and the run cap when the CLI streams no usage events. Record 'ceiling unmeasured' in that case. (2) If an outside timeout kills the wrapper, the CLI child (start_new_session=True) is orphaned. Forward SIGTERM to the child's process group.; Evidence: python -m unittest tests.test_station_budgets_completeness gives 'Ran 28 tests ... OK'. No em dash or en dash in the changed or new files under anvil, tools, docs/EXECUTION.md, CHANGELOG.md, anvil.yaml, decision 0014 or the new test file. The diff against 72a84126a600fafb99446946694b5de809e01e66 touches no file under pipelines/, no anvil.json and no existing test.; RESOLVED (my attempt 1 finding, R4(a), S4, test-design 'make the test able to fail'): the missing builder report case can now fail. test_s4_missing_builder_report_dispatches_zero_reviewers now requires a gap naming runs/wo-sbc/builder.output.md, not just any gap containing 'builder'. New test_s4_missing_report_alone_blocks_review_when_checks_pass: the builder changes src/feature.py, the test-writer writes its file, checks pass (gate_verdict pass), the report is empty or whitespace only. It asserts exactly one gap, that gap names the report path, and zero reviewer calls. New test_s4_completeness_gaps_names_a_missing_or_empty_report calls the real completeness_gaps on a missing, empty, whitespace-only and real report.; Mutation check repeated by me on a copy of the final tree: replacing `if not _nonempty_file(report):` (anvil/runner.py:1206) with `if False:` makes `python -m unittest tests.test_station_budgets_completeness.CompletenessGate` report 'Ran 8 tests ... FAILED (failures=5)'. Before the fix the same mutation passed all 6 tests. The finding is closed.; Mock scope is acceptable: test_s4_missing_report_alone_blocks_review_when_checks_pass stubs anvil.runner.validate_builder_report, the gate's frozen literal validation. That is a collaborator, not the unit under test. In the real flow that validation already rejects an empty report before completeness runs, so the stub is the only way to reach completeness with a passing gate. The direct completeness_gaps test covers the same rule without any mock. The tests also found a real defect, now fixed: _nonempty_file treated a whitespace-only file as present (anvil/runner.py:1176-1182, now read_bytes().strip(), the same rule as gates.validate_builder_report).; Suite reproduces (P-12): on the final tree, `env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p 'test_*.py'` gives 'Ran 799 tests ... OK (skipped=6)'. `python -m unittest tests.test_station_budgets_completeness` gives 'Ran 28 tests ... OK'. Both match the builder report.; Test accounting (P-13) is complete. Baseline: 771 (measured in attempt 1 on the base 72a84126a600fafb99446946694b5de809e01e66). Added: one file, tests/test_station_budgets_completeness.py, now 28 tests (attempt 1 had 26; attempt 2 adds 2 and tightens 1 in that new file). 771 + 28 = 799. Edited existing tests: none. `git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests pipelines anvil.json` is empty, so the protected test_continuous_run_accounting.py and test_astra_consumption.py are untouched. The 29th 'def test_' match in the file is fixture text (test_x inside the TEST_FILE string at line 246), not a test.; Mapping is still complete: S1 to S11 each have named tests, and the module docstring map lists the S4 tests. No em or en dash appears in the test file or the builder report.; STILL OPEN, not passed by this station (approver finding R4 / S4, S5, S8): completeness still runs only when completeness_active = any(station_budget_settings(config)) (anvil/runner.py). The builder did not change this and says so plainly. Running the gate unconditionally would break 22 protected existing tests. This is a conflict between the spec and the guardrails that only the owner can settle, by amending R4 or authorizing edits to those tests. No test change can close it inside this order. The tests do cover the behaviour where it is active, so the test verdict is pass, but the R4 ruling stays with the approver and the owner gate.; Remaining test gaps (disclosed, non-blocking): the in-session correction refusal (wrapper exit 12) has no test through the runner. S2 is tested on the loopback path, which the scenario's 'a correction or a loopback' allows. The in-flight ceiling (S1) has only been run against a stand-in claude CLI.; OPEN, loopback finding not resolved (R4 / S4, S5, S8): completeness is still gated on completeness_active = any(station_budget_settings(config)) (anvil/runner.py:1652, used at anvil/runner.py:2440). R4 states the precondition without condition. The builder report (attempt 2) says it is not fixed and asks for an owner ruling: amend R4 to scope completeness to projects with partitions, or authorize changes to the 22 protected scripted tests. Inside the guardrails the builder cannot do more. This review cannot pass the finding while it is open; it goes to the owner, not back to the builder.; Architecture concern on the current scoping (for the owner's ruling): it ties two separate controls together. Token partitions (R1 to R3) and the completeness precondition (R4) answer different failure modes (4 and 5 in the filing), yet configuring partitions now silently switches on a change to the review flow, and a project that wants completeness but no partitions cannot have it. If the owner amends R4 rather than authorizing the test updates, a cleaner shape is an explicit switch of its own (for example efficiency.completeness_gate, or a key next to the checks gate config) that the factory anvil.yaml turns on. The runner should not infer it from budget keys. Decision 0014 records the coupling and its trade off honestly (status proposed), which is right, but the decision needs the owner's acceptance before the coupling is treated as settled.; RESOLVED (reviewer-tests R4(a)/S4): the missing or empty builder report case is now pinned. test_s4_missing_builder_report_dispatches_zero_reviewers requires a gap naming runs/wo-sbc/builder.output.md. The new test_s4_missing_report_alone_blocks_review_when_checks_pass and test_s4_completeness_gaps_names_a_missing_or_empty_report isolate the report gap on an otherwise complete attempt. The builder reports the mutation (if not _nonempty_file(report) -> if False) now fails 5 CompletenessGate tests. _nonempty_file (anvil/runner.py:1176) now applies the same whitespace-is-empty rule as gates.validate_builder_report, so the two places agree on what empty means without the precondition repeating literal validation (S9 holds).; Boundaries fit the existing structure: configuration parsing and validation stay in anvil/config.py (station_budget_settings, validate_station_budgets, fail closed with the pipeline and excess named). Measured consumption from usage artifacts sits in anvil/telemetry.py (precall_decision). Orchestration (pre-call check, completeness_gaps, budget outcomes, cost per station) sits in anvil/runner.py. The in-flight kill sits in tools/claude_station.py and follows the station-timeout kill-and-record shape. completeness_gaps is a pure, read-only function over artifacts and verdicts already decided. It runs no command and leaves gates.py unchanged, as the reconciliation requires.; Single exit path respected: refusals and in-flight ceiling kills end the run through the wo-gh-41 path (exit_status budget_exceeded, termination_reason). No second termination mechanism was added. The efficiency.station_budgets key is kept apart from the frozen top-level station_budgets (astra-consumption packet cap), and docs/EXECUTION.md names both.; Minor, not blocking: completeness_gaps hardcodes runs/<wo>/builder.output.md (anvil/runner.py:1204-1205). That matches the existing convention at runner.py:1548 and :2419, but the path now has three literal copies. A follow-up could pull it into one helper so there is one source of truth.; Minor, not blocking: anvil/runner.py grows to 3272 lines with this order. The budget and completeness logic could move later to a focused module (for example anvil/budgets.py) to keep the runner as orchestration only. That is out of scope for this order's authorized surface.; Guardrails: diff against 72a84126a600fafb99446946694b5de809e01e66 touches no pipelines/, no anvil.json and no existing test (builder report and earlier reviewers both verify this). Standard library only. One new decision record, 0014. Builder reports the full suite at 799 tests OK (skipped=6): 771 base plus 28 new.",
-      "duration_ms": 0.0,
-      "cost": null,
-      "artifacts": [],
-      "configured_model": null,
-      "executed_model": null,
-      "executor": null,
-      "attempt_archive": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/attempts/2"
-    },
-    {
-      "station": "builder",
-      "status": "executed",
-      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/builder.output.md",
-      "duration_ms": 579398.669,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/builder.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": "claude-opus-5-5",
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      },
-      "measured_tokens": 11620,
-      "budget": 48000,
-      "budget_action": "sent",
-      "usage": {
-        "input_tokens": 56419,
-        "output_tokens": 164,
-        "cached_input_tokens": 54898,
-        "cache_creation_input_tokens": 1517,
-        "reasoning_tokens": 0,
-        "total_tokens": 56583,
-        "input_tokens_includes_cache": true
-      },
-      "cost_record": {
-        "measured": false,
-        "reason": "no price recorded for model 'claude-opus-5-5'"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "status": "succeeded",
-          "runtime": "claude",
-          "configured_model": "claude-opus-5-5",
-          "duration_ms": 579244.469,
-          "usage": {
-            "input_tokens": 56419,
-            "output_tokens": 164,
-            "cached_input_tokens": 54898,
-            "cache_creation_input_tokens": 1517,
-            "reasoning_tokens": 0,
-            "total_tokens": 56583,
-            "input_tokens_includes_cache": true
-          },
-          "runtime_cost_estimate_usd": 0.5684258,
-          "turns": 1,
-          "usage_complete": true
-        }
-      ],
-      "usage_complete": true,
-      "attempt": 3,
-      "feedback": {
-        "from_station": "approver",
-        "reason": "Still open, needs an owner ruling (R4; S4, S5, S8): the spec at .openspec/specs/station-budgets-completeness/spec.md R4 has not been amended. It still says that before any reviewer dispatch 'the runner evaluates a completeness precondition', with no condition attached. The runner still applies the gate only where partitions are configured: anvil/runner.py:1652 sets completeness_active = any(station_budget_settings(config)), and the pre-review check at anvil/runner.py:2440 depends on that flag. A project with no efficiency.station_budgets and no default_station_budget skips completeness and sends incomplete attempts to review. The builder report (attempt 2, item 2) explicitly leaves this unfixed, because running the gate unconditionally breaks 22 protected existing tests. This is a real conflict between R4 and the protected-test guardrail (P-14), and the line cannot settle it. It stays open until the owner either amends R4 to scope completeness to projects with configured partitions, or authorizes updating the 22 tests so the gate can run unconditionally (a one-line runner change). I cannot pass an open loopback finding.; Resolved (R4(a), S4, reviewer-tests finding): the missing-builder-report case can now fail. test_s4_missing_builder_report_dispatches_zero_reviewers requires a gap naming runs/wo-sbc/builder.output.md. The new test_s4_missing_report_alone_blocks_review_when_checks_pass covers a successful builder with a source change, test-writer files and passing checks but an empty report, and expects exactly one gap naming the report path and zero reviewer calls. The new test_s4_completeness_gaps_names_a_missing_or_empty_report calls completeness_gaps directly. I repeated the mutation independently: in a copy of the tree I replaced 'if not _nonempty_file(report):' with 'if False:' and ran tests.test_station_budgets_completeness.CompletenessGate, which gave FAILED (failures=5).; Defect fix verified (R4(a)): _nonempty_file now treats a file with only whitespace as empty. That matches the artifact contract's rule (read_bytes().strip()), and validate_builder_report and the gate step are unchanged, so S9 (consumes, never re-runs) still holds.; R1/S3, R2/S2/S7, R3/S1, R5/S6, R7, R8, S9 to S11: no regressions since attempt 1. The partition table still sums to 15000000, and the pre-call check, in-flight ceiling, cost section, docs, CHANGELOG and decision 0014 are all present. The gap the builder disclosed still stands: the in-session correction-refusal path (wrapper exit 12) has no test through the runner. S2's 'a correction or a loopback' allows this, so it is not a blocker.; Evidence: 'python -m unittest tests.test_station_budgets_completeness' gave Ran 28 tests, OK. The full suite, run as 'env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p test_*.py', gave Ran 799 tests, OK (skipped=6), which matches the builder report (771 base plus 28 new). 'git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests pipelines anvil.json' is empty, so no protected path changed. No em dash or en dash appears in the changed or new files.; Loopback finding R4 / S4, S5, S8 (completeness scoped to configured partitions) is still open. anvil/runner.py:1652 sets completeness_active = any(station_budget_settings(config)) and anvil/runner.py:2440 gates the precondition on it, so a project with no efficiency partitions skips completeness. The builder report lists this as open pending an owner ruling. It conflicts with the protected-test guardrail and the builder cannot resolve it. This is not a security defect: completeness is a review-spend control, not an access control. But this re-review cannot pass a finding that is still open. It needs the owner ruling: amend R4, or authorize updates to the 22 protected tests.; The S4 missing-builder-report test gap that reviewer-tests raised looks addressed. tests/test_station_budgets_completeness.py adds test_s4_missing_report_alone_blocks_review_when_checks_pass (line 571) and test_s4_completeness_gaps_names_a_missing_or_empty_report (line 593). Reviewer-tests owns the mutation re-check.; Attempt 2 delta, security review: _nonempty_file (anvil/runner.py:1176) now reads the file and strips it, so whitespace-only counts as empty, matching gates.validate_builder_report. The paths are internal: the configured report path, plus test-writer delta entries joined under the project root from the local working-tree snapshot. The function only reads them for an emptiness check. Their content is never echoed, executed or written. OSError fails closed to 'empty'. Low-severity nit: read_bytes loads the whole file to test for emptiness. A bounded read would avoid memory cost on a very large delta file. Not a blocker.; Change since attempt 1 in anvil/executor.py: it surfaces a budget_exceeded record (elapsed_ms, reason, configured_model) from the wrapper's last usage record. These are the same honest fields as the timeout record. No environment value, header or secret is copied.; Unchanged and still acceptable: no new dependency (standard library only), no new endpoint, outbound call or permission. tools/claude_station.py:323 starts the CLI from an argument list without a shell. Budget configuration is allow-list validated and rejects bad values. With require_usage set, an unmeasured station is refused. Streamed model output is parsed defensively and used only for arithmetic.; Attempt 1 low-severity follow-ups, carried forward and disclosed in the builder report, not blockers. (1) The in-flight ceiling fails open to the pre-call check and the run cap when the CLI streams no usage events. Record 'ceiling unmeasured' in that case. (2) If an outside timeout kills the wrapper, the CLI child (start_new_session=True) is orphaned. Forward SIGTERM to the child's process group.; Evidence: python -m unittest tests.test_station_budgets_completeness gives 'Ran 28 tests ... OK'. No em dash or en dash in the changed or new files under anvil, tools, docs/EXECUTION.md, CHANGELOG.md, anvil.yaml, decision 0014 or the new test file. The diff against 72a84126a600fafb99446946694b5de809e01e66 touches no file under pipelines/, no anvil.json and no existing test.; RESOLVED (my attempt 1 finding, R4(a), S4, test-design 'make the test able to fail'): the missing builder report case can now fail. test_s4_missing_builder_report_dispatches_zero_reviewers now requires a gap naming runs/wo-sbc/builder.output.md, not just any gap containing 'builder'. New test_s4_missing_report_alone_blocks_review_when_checks_pass: the builder changes src/feature.py, the test-writer writes its file, checks pass (gate_verdict pass), the report is empty or whitespace only. It asserts exactly one gap, that gap names the report path, and zero reviewer calls. New test_s4_completeness_gaps_names_a_missing_or_empty_report calls the real completeness_gaps on a missing, empty, whitespace-only and real report.; Mutation check repeated by me on a copy of the final tree: replacing `if not _nonempty_file(report):` (anvil/runner.py:1206) with `if False:` makes `python -m unittest tests.test_station_budgets_completeness.CompletenessGate` report 'Ran 8 tests ... FAILED (failures=5)'. Before the fix the same mutation passed all 6 tests. The finding is closed.; Mock scope is acceptable: test_s4_missing_report_alone_blocks_review_when_checks_pass stubs anvil.runner.validate_builder_report, the gate's frozen literal validation. That is a collaborator, not the unit under test. In the real flow that validation already rejects an empty report before completeness runs, so the stub is the only way to reach completeness with a passing gate. The direct completeness_gaps test covers the same rule without any mock. The tests also found a real defect, now fixed: _nonempty_file treated a whitespace-only file as present (anvil/runner.py:1176-1182, now read_bytes().strip(), the same rule as gates.validate_builder_report).; Suite reproduces (P-12): on the final tree, `env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p 'test_*.py'` gives 'Ran 799 tests ... OK (skipped=6)'. `python -m unittest tests.test_station_budgets_completeness` gives 'Ran 28 tests ... OK'. Both match the builder report.; Test accounting (P-13) is complete. Baseline: 771 (measured in attempt 1 on the base 72a84126a600fafb99446946694b5de809e01e66). Added: one file, tests/test_station_budgets_completeness.py, now 28 tests (attempt 1 had 26; attempt 2 adds 2 and tightens 1 in that new file). 771 + 28 = 799. Edited existing tests: none. `git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests pipelines anvil.json` is empty, so the protected test_continuous_run_accounting.py and test_astra_consumption.py are untouched. The 29th 'def test_' match in the file is fixture text (test_x inside the TEST_FILE string at line 246), not a test.; Mapping is still complete: S1 to S11 each have named tests, and the module docstring map lists the S4 tests. No em or en dash appears in the test file or the builder report.; STILL OPEN, not passed by this station (approver finding R4 / S4, S5, S8): completeness still runs only when completeness_active = any(station_budget_settings(config)) (anvil/runner.py). The builder did not change this and says so plainly. Running the gate unconditionally would break 22 protected existing tests. This is a conflict between the spec and the guardrails that only the owner can settle, by amending R4 or authorizing edits to those tests. No test change can close it inside this order. The tests do cover the behaviour where it is active, so the test verdict is pass, but the R4 ruling stays with the approver and the owner gate.; Remaining test gaps (disclosed, non-blocking): the in-session correction refusal (wrapper exit 12) has no test through the runner. S2 is tested on the loopback path, which the scenario's 'a correction or a loopback' allows. The in-flight ceiling (S1) has only been run against a stand-in claude CLI.; OPEN, loopback finding not resolved (R4 / S4, S5, S8): completeness is still gated on completeness_active = any(station_budget_settings(config)) (anvil/runner.py:1652, used at anvil/runner.py:2440). R4 states the precondition without condition. The builder report (attempt 2) says it is not fixed and asks for an owner ruling: amend R4 to scope completeness to projects with partitions, or authorize changes to the 22 protected scripted tests. Inside the guardrails the builder cannot do more. This review cannot pass the finding while it is open; it goes to the owner, not back to the builder.; Architecture concern on the current scoping (for the owner's ruling): it ties two separate controls together. Token partitions (R1 to R3) and the completeness precondition (R4) answer different failure modes (4 and 5 in the filing), yet configuring partitions now silently switches on a change to the review flow, and a project that wants completeness but no partitions cannot have it. If the owner amends R4 rather than authorizing the test updates, a cleaner shape is an explicit switch of its own (for example efficiency.completeness_gate, or a key next to the checks gate config) that the factory anvil.yaml turns on. The runner should not infer it from budget keys. Decision 0014 records the coupling and its trade off honestly (status proposed), which is right, but the decision needs the owner's acceptance before the coupling is treated as settled.; RESOLVED (reviewer-tests R4(a)/S4): the missing or empty builder report case is now pinned. test_s4_missing_builder_report_dispatches_zero_reviewers requires a gap naming runs/wo-sbc/builder.output.md. The new test_s4_missing_report_alone_blocks_review_when_checks_pass and test_s4_completeness_gaps_names_a_missing_or_empty_report isolate the report gap on an otherwise complete attempt. The builder reports the mutation (if not _nonempty_file(report) -> if False) now fails 5 CompletenessGate tests. _nonempty_file (anvil/runner.py:1176) now applies the same whitespace-is-empty rule as gates.validate_builder_report, so the two places agree on what empty means without the precondition repeating literal validation (S9 holds).; Boundaries fit the existing structure: configuration parsing and validation stay in anvil/config.py (station_budget_settings, validate_station_budgets, fail closed with the pipeline and excess named). Measured consumption from usage artifacts sits in anvil/telemetry.py (precall_decision). Orchestration (pre-call check, completeness_gaps, budget outcomes, cost per station) sits in anvil/runner.py. The in-flight kill sits in tools/claude_station.py and follows the station-timeout kill-and-record shape. completeness_gaps is a pure, read-only function over artifacts and verdicts already decided. It runs no command and leaves gates.py unchanged, as the reconciliation requires.; Single exit path respected: refusals and in-flight ceiling kills end the run through the wo-gh-41 path (exit_status budget_exceeded, termination_reason). No second termination mechanism was added. The efficiency.station_budgets key is kept apart from the frozen top-level station_budgets (astra-consumption packet cap), and docs/EXECUTION.md names both.; Minor, not blocking: completeness_gaps hardcodes runs/<wo>/builder.output.md (anvil/runner.py:1204-1205). That matches the existing convention at runner.py:1548 and :2419, but the path now has three literal copies. A follow-up could pull it into one helper so there is one source of truth.; Minor, not blocking: anvil/runner.py grows to 3272 lines with this order. The budget and completeness logic could move later to a focused module (for example anvil/budgets.py) to keep the runner as orchestration only. That is out of scope for this order's authorized surface.; Guardrails: diff against 72a84126a600fafb99446946694b5de809e01e66 touches no pipelines/, no anvil.json and no existing test (builder report and earlier reviewers both verify this). Standard library only. One new decision record, 0014. Builder reports the full suite at 799 tests OK (skipped=6): 771 base plus 28 new.",
-        "findings": [
-          "Still open, needs an owner ruling (R4; S4, S5, S8): the spec at .openspec/specs/station-budgets-completeness/spec.md R4 has not been amended. It still says that before any reviewer dispatch 'the runner evaluates a completeness precondition', with no condition attached. The runner still applies the gate only where partitions are configured: anvil/runner.py:1652 sets completeness_active = any(station_budget_settings(config)), and the pre-review check at anvil/runner.py:2440 depends on that flag. A project with no efficiency.station_budgets and no default_station_budget skips completeness and sends incomplete attempts to review. The builder report (attempt 2, item 2) explicitly leaves this unfixed, because running the gate unconditionally breaks 22 protected existing tests. This is a real conflict between R4 and the protected-test guardrail (P-14), and the line cannot settle it. It stays open until the owner either amends R4 to scope completeness to projects with configured partitions, or authorizes updating the 22 tests so the gate can run unconditionally (a one-line runner change). I cannot pass an open loopback finding.",
-          "Resolved (R4(a), S4, reviewer-tests finding): the missing-builder-report case can now fail. test_s4_missing_builder_report_dispatches_zero_reviewers requires a gap naming runs/wo-sbc/builder.output.md. The new test_s4_missing_report_alone_blocks_review_when_checks_pass covers a successful builder with a source change, test-writer files and passing checks but an empty report, and expects exactly one gap naming the report path and zero reviewer calls. The new test_s4_completeness_gaps_names_a_missing_or_empty_report calls completeness_gaps directly. I repeated the mutation independently: in a copy of the tree I replaced 'if not _nonempty_file(report):' with 'if False:' and ran tests.test_station_budgets_completeness.CompletenessGate, which gave FAILED (failures=5).",
-          "Defect fix verified (R4(a)): _nonempty_file now treats a file with only whitespace as empty. That matches the artifact contract's rule (read_bytes().strip()), and validate_builder_report and the gate step are unchanged, so S9 (consumes, never re-runs) still holds.",
-          "R1/S3, R2/S2/S7, R3/S1, R5/S6, R7, R8, S9 to S11: no regressions since attempt 1. The partition table still sums to 15000000, and the pre-call check, in-flight ceiling, cost section, docs, CHANGELOG and decision 0014 are all present. The gap the builder disclosed still stands: the in-session correction-refusal path (wrapper exit 12) has no test through the runner. S2's 'a correction or a loopback' allows this, so it is not a blocker.",
-          "Evidence: 'python -m unittest tests.test_station_budgets_completeness' gave Ran 28 tests, OK. The full suite, run as 'env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p test_*.py', gave Ran 799 tests, OK (skipped=6), which matches the builder report (771 base plus 28 new). 'git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests pipelines anvil.json' is empty, so no protected path changed. No em dash or en dash appears in the changed or new files.",
-          "Loopback finding R4 / S4, S5, S8 (completeness scoped to configured partitions) is still open. anvil/runner.py:1652 sets completeness_active = any(station_budget_settings(config)) and anvil/runner.py:2440 gates the precondition on it, so a project with no efficiency partitions skips completeness. The builder report lists this as open pending an owner ruling. It conflicts with the protected-test guardrail and the builder cannot resolve it. This is not a security defect: completeness is a review-spend control, not an access control. But this re-review cannot pass a finding that is still open. It needs the owner ruling: amend R4, or authorize updates to the 22 protected tests.",
-          "The S4 missing-builder-report test gap that reviewer-tests raised looks addressed. tests/test_station_budgets_completeness.py adds test_s4_missing_report_alone_blocks_review_when_checks_pass (line 571) and test_s4_completeness_gaps_names_a_missing_or_empty_report (line 593). Reviewer-tests owns the mutation re-check.",
-          "Attempt 2 delta, security review: _nonempty_file (anvil/runner.py:1176) now reads the file and strips it, so whitespace-only counts as empty, matching gates.validate_builder_report. The paths are internal: the configured report path, plus test-writer delta entries joined under the project root from the local working-tree snapshot. The function only reads them for an emptiness check. Their content is never echoed, executed or written. OSError fails closed to 'empty'. Low-severity nit: read_bytes loads the whole file to test for emptiness. A bounded read would avoid memory cost on a very large delta file. Not a blocker.",
-          "Change since attempt 1 in anvil/executor.py: it surfaces a budget_exceeded record (elapsed_ms, reason, configured_model) from the wrapper's last usage record. These are the same honest fields as the timeout record. No environment value, header or secret is copied.",
-          "Unchanged and still acceptable: no new dependency (standard library only), no new endpoint, outbound call or permission. tools/claude_station.py:323 starts the CLI from an argument list without a shell. Budget configuration is allow-list validated and rejects bad values. With require_usage set, an unmeasured station is refused. Streamed model output is parsed defensively and used only for arithmetic.",
-          "Attempt 1 low-severity follow-ups, carried forward and disclosed in the builder report, not blockers. (1) The in-flight ceiling fails open to the pre-call check and the run cap when the CLI streams no usage events. Record 'ceiling unmeasured' in that case. (2) If an outside timeout kills the wrapper, the CLI child (start_new_session=True) is orphaned. Forward SIGTERM to the child's process group.",
-          "Evidence: python -m unittest tests.test_station_budgets_completeness gives 'Ran 28 tests ... OK'. No em dash or en dash in the changed or new files under anvil, tools, docs/EXECUTION.md, CHANGELOG.md, anvil.yaml, decision 0014 or the new test file. The diff against 72a84126a600fafb99446946694b5de809e01e66 touches no file under pipelines/, no anvil.json and no existing test.",
-          "RESOLVED (my attempt 1 finding, R4(a), S4, test-design 'make the test able to fail'): the missing builder report case can now fail. test_s4_missing_builder_report_dispatches_zero_reviewers now requires a gap naming runs/wo-sbc/builder.output.md, not just any gap containing 'builder'. New test_s4_missing_report_alone_blocks_review_when_checks_pass: the builder changes src/feature.py, the test-writer writes its file, checks pass (gate_verdict pass), the report is empty or whitespace only. It asserts exactly one gap, that gap names the report path, and zero reviewer calls. New test_s4_completeness_gaps_names_a_missing_or_empty_report calls the real completeness_gaps on a missing, empty, whitespace-only and real report.",
-          "Mutation check repeated by me on a copy of the final tree: replacing `if not _nonempty_file(report):` (anvil/runner.py:1206) with `if False:` makes `python -m unittest tests.test_station_budgets_completeness.CompletenessGate` report 'Ran 8 tests ... FAILED (failures=5)'. Before the fix the same mutation passed all 6 tests. The finding is closed.",
-          "Mock scope is acceptable: test_s4_missing_report_alone_blocks_review_when_checks_pass stubs anvil.runner.validate_builder_report, the gate's frozen literal validation. That is a collaborator, not the unit under test. In the real flow that validation already rejects an empty report before completeness runs, so the stub is the only way to reach completeness with a passing gate. The direct completeness_gaps test covers the same rule without any mock. The tests also found a real defect, now fixed: _nonempty_file treated a whitespace-only file as present (anvil/runner.py:1176-1182, now read_bytes().strip(), the same rule as gates.validate_builder_report).",
-          "Suite reproduces (P-12): on the final tree, `env -u GITHUB_ACTIONS -u GITHUB_ACTOR -u GITHUB_ACTOR_ID python -m unittest discover -s tests -p 'test_*.py'` gives 'Ran 799 tests ... OK (skipped=6)'. `python -m unittest tests.test_station_budgets_completeness` gives 'Ran 28 tests ... OK'. Both match the builder report.",
-          "Test accounting (P-13) is complete. Baseline: 771 (measured in attempt 1 on the base 72a84126a600fafb99446946694b5de809e01e66). Added: one file, tests/test_station_budgets_completeness.py, now 28 tests (attempt 1 had 26; attempt 2 adds 2 and tightens 1 in that new file). 771 + 28 = 799. Edited existing tests: none. `git diff --name-only 72a84126a600fafb99446946694b5de809e01e66 -- tests pipelines anvil.json` is empty, so the protected test_continuous_run_accounting.py and test_astra_consumption.py are untouched. The 29th 'def test_' match in the file is fixture text (test_x inside the TEST_FILE string at line 246), not a test.",
-          "Mapping is still complete: S1 to S11 each have named tests, and the module docstring map lists the S4 tests. No em or en dash appears in the test file or the builder report.",
-          "STILL OPEN, not passed by this station (approver finding R4 / S4, S5, S8): completeness still runs only when completeness_active = any(station_budget_settings(config)) (anvil/runner.py). The builder did not change this and says so plainly. Running the gate unconditionally would break 22 protected existing tests. This is a conflict between the spec and the guardrails that only the owner can settle, by amending R4 or authorizing edits to those tests. No test change can close it inside this order. The tests do cover the behaviour where it is active, so the test verdict is pass, but the R4 ruling stays with the approver and the owner gate.",
-          "Remaining test gaps (disclosed, non-blocking): the in-session correction refusal (wrapper exit 12) has no test through the runner. S2 is tested on the loopback path, which the scenario's 'a correction or a loopback' allows. The in-flight ceiling (S1) has only been run against a stand-in claude CLI."
-        ]
-      }
-    },
-    {
-      "station": "checks-gate",
-      "status": "passed",
-      "detail": "Gate passed: 1 checks, protected paths: pass",
-      "duration_ms": 85623.58,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/checks-gate.pre-review.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
-      "budget": 0,
-      "budget_action": "none",
-      "attempt": 3,
-      "phase": "pre-review",
-      "commands": [
-        "python -m unittest discover -s tests -p 'test_*.py'"
-      ],
-      "exit_codes": [
-        0
-      ],
-      "protected_paths": [
-        "tests/",
-        "anvil.json",
-        "pipelines/"
-      ],
-      "protected_path_verdict": "pass",
-      "protected_path_findings": [],
-      "gate_verdict": "pass",
-      "artifact_validation": {
-        "passed": true,
-        "report": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/builder.output.md",
-        "observed": "present",
-        "report_source": "station",
-        "required_literals": [],
-        "missing_literals": [],
-        "findings": []
-      }
-    },
-    {
-      "station": "reviewer-spec",
-      "status": "executed",
-      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-spec.output.md",
-      "duration_ms": 112734.943,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-spec.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": "claude-opus-5-5",
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      },
-      "measured_tokens": 7248,
-      "budget": 48000,
-      "budget_action": "sent",
-      "usage": {
-        "input_tokens": 200307,
-        "output_tokens": 2982,
-        "cached_input_tokens": 162071,
-        "cache_creation_input_tokens": 38224,
-        "reasoning_tokens": 0,
-        "total_tokens": 203289,
-        "input_tokens_includes_cache": true
-      },
-      "cost_record": {
-        "measured": false,
-        "reason": "no price recorded for model 'claude-opus-5-5'"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "status": "succeeded",
-          "runtime": "claude",
-          "configured_model": "claude-opus-5-5",
-          "duration_ms": 112668.81,
-          "usage": {
-            "input_tokens": 200307,
-            "output_tokens": 2982,
-            "cached_input_tokens": 162071,
-            "cache_creation_input_tokens": 38224,
-            "reasoning_tokens": 0,
-            "total_tokens": 203289,
-            "input_tokens_includes_cache": true
-          },
-          "runtime_cost_estimate_usd": 0.2832222,
-          "turns": 6,
-          "usage_complete": true
-        }
-      ],
-      "usage_complete": true,
-      "attempt": 3
-    },
-    {
-      "station": "reviewer-security",
-      "status": "executed",
-      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-security.output.md",
-      "duration_ms": 29515.625,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-security.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": "claude-opus-5-5",
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      },
-      "measured_tokens": 8048,
-      "budget": 48000,
-      "budget_action": "sent",
-      "usage": {
-        "input_tokens": 131695,
-        "output_tokens": 2744,
-        "cached_input_tokens": 106492,
-        "cache_creation_input_tokens": 25195,
-        "reasoning_tokens": 0,
-        "total_tokens": 134439,
-        "input_tokens_includes_cache": true
-      },
-      "cost_record": {
-        "measured": false,
-        "reason": "no price recorded for model 'claude-opus-5-5'"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "status": "succeeded",
-          "runtime": "claude",
-          "configured_model": "claude-opus-5-5",
-          "duration_ms": 29447.874,
-          "usage": {
-            "input_tokens": 131695,
-            "output_tokens": 2744,
-            "cached_input_tokens": 106492,
-            "cache_creation_input_tokens": 25195,
-            "reasoning_tokens": 0,
-            "total_tokens": 134439,
-            "input_tokens_includes_cache": true
-          },
-          "runtime_cost_estimate_usd": 0.2021854,
-          "turns": 4,
-          "usage_complete": true
-        }
-      ],
-      "usage_complete": true,
-      "attempt": 3
-    },
-    {
-      "station": "reviewer-tests",
-      "status": "executed",
-      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-tests.output.md",
-      "duration_ms": 118671.368,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-tests.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": "claude-opus-5-5",
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      },
-      "measured_tokens": 8277,
-      "budget": 48000,
-      "budget_action": "sent",
-      "usage": {
-        "input_tokens": 204619,
-        "output_tokens": 3732,
-        "cached_input_tokens": 178606,
-        "cache_creation_input_tokens": 26001,
-        "reasoning_tokens": 0,
-        "total_tokens": 208351,
-        "input_tokens_includes_cache": true
-      },
-      "cost_record": {
-        "measured": false,
-        "reason": "no price recorded for model 'claude-opus-5-5'"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "status": "succeeded",
-          "runtime": "claude",
-          "configured_model": "claude-opus-5-5",
-          "duration_ms": 118605.5,
-          "usage": {
-            "input_tokens": 204619,
-            "output_tokens": 3732,
-            "cached_input_tokens": 178606,
-            "cache_creation_input_tokens": 26001,
-            "reasoning_tokens": 0,
-            "total_tokens": 208351,
-            "input_tokens_includes_cache": true
-          },
-          "runtime_cost_estimate_usd": 0.24041420000000002,
-          "turns": 6,
-          "usage_complete": true
-        }
-      ],
-      "usage_complete": true,
-      "attempt": 3
-    },
-    {
-      "station": "reviewer-architecture",
-      "status": "executed",
-      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-architecture.output.md",
-      "duration_ms": 29188.719,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-architecture.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": "claude-opus-5-5",
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      },
-      "measured_tokens": 8142,
-      "budget": 48000,
-      "budget_action": "sent",
-      "usage": {
-        "input_tokens": 121298,
-        "output_tokens": 2589,
-        "cached_input_tokens": 101582,
-        "cache_creation_input_tokens": 19708,
-        "reasoning_tokens": 0,
-        "total_tokens": 123887,
-        "input_tokens_includes_cache": true
-      },
-      "cost_record": {
-        "measured": false,
-        "reason": "no price recorded for model 'claude-opus-5-5'"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "status": "succeeded",
-          "runtime": "claude",
-          "configured_model": "claude-opus-5-5",
-          "duration_ms": 29121.483,
-          "usage": {
-            "input_tokens": 121298,
-            "output_tokens": 2589,
-            "cached_input_tokens": 101582,
-            "cache_creation_input_tokens": 19708,
-            "reasoning_tokens": 0,
-            "total_tokens": 123887,
-            "input_tokens_includes_cache": true
-          },
-          "runtime_cost_estimate_usd": 0.1706684,
-          "turns": 4,
-          "usage_complete": true
-        }
-      ],
-      "usage_complete": true,
-      "attempt": 3
-    },
-    {
-      "station": "reviewer-design",
-      "status": "executed",
-      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-design.output.md",
-      "duration_ms": 34484.918,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-design.output.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": "claude-opus-5-5",
-      "executor": {
-        "kind": "command",
-        "detail": "python3"
-      },
-      "measured_tokens": 11585,
-      "budget": 48000,
-      "budget_action": "sent",
-      "usage": {
-        "input_tokens": 173395,
-        "output_tokens": 3063,
-        "cached_input_tokens": 148488,
-        "cache_creation_input_tokens": 24897,
-        "reasoning_tokens": 0,
-        "total_tokens": 176458,
-        "input_tokens_includes_cache": true
-      },
-      "cost_record": {
-        "measured": false,
-        "reason": "no price recorded for model 'claude-opus-5-5'"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "status": "succeeded",
-          "runtime": "claude",
-          "configured_model": "claude-opus-5-5",
-          "duration_ms": 34410.464,
-          "usage": {
-            "input_tokens": 173395,
-            "output_tokens": 3063,
-            "cached_input_tokens": 148488,
-            "cache_creation_input_tokens": 24897,
-            "reasoning_tokens": 0,
-            "total_tokens": 176458,
-            "input_tokens_includes_cache": true
-          },
-          "runtime_cost_estimate_usd": 0.21548260000000002,
-          "turns": 6,
-          "usage_complete": true
-        }
-      ],
-      "usage_complete": true,
-      "attempt": 3
-    },
-    {
-      "station": "reviewer-ux",
-      "status": "routed_out",
-      "detail": "Routed out: Routed out: no UI surface",
-      "duration_ms": 1.947,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-ux.packet.md"
-      ],
-      "configured_model": "claude-opus-5-5",
-      "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
-      "budget": 0,
-      "budget_action": "none",
-      "attempt": 3
-    },
-    {
-      "station": "approver",
-      "status": "completed",
-      "detail": "Approver verdict: changes_requested",
-      "duration_ms": 0.042,
-      "cost": null,
-      "artifacts": [
-        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/report.json"
-      ],
-      "configured_model": "claude-fable-5-2",
-      "executed_model": null,
-      "executor": null,
-      "measured_tokens": 0,
-      "budget": 0,
-      "budget_action": "none",
-      "attempt": 3
     },
     {
       "station": "triage-human",
       "status": "completed",
-      "detail": "Human review: required",
-      "duration_ms": 0.016,
+      "detail": "Human review: not_required",
+      "duration_ms": 0.024,
       "cost": null,
       "artifacts": [],
       "configured_model": "claude-opus-5-5",
@@ -1473,14 +583,13 @@
       "executor": null,
       "measured_tokens": 0,
       "budget": 0,
-      "budget_action": "none",
-      "attempt": 3
+      "budget_action": "none"
     },
     {
       "station": "deployer",
       "status": "packet_ready",
       "detail": "Packet written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/deployer.packet.md",
-      "duration_ms": 1.134,
+      "duration_ms": 0.816,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/deployer.packet.md"
@@ -1488,16 +597,15 @@
       "configured_model": "claude-opus-5-5",
       "executed_model": null,
       "executor": null,
-      "measured_tokens": 7094,
+      "measured_tokens": 3769,
       "budget": 48000,
-      "budget_action": "sent",
-      "attempt": 3
+      "budget_action": "sent"
     },
     {
       "station": "observer",
       "status": "executed",
       "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/observer.output.md",
-      "duration_ms": 154029.214,
+      "duration_ms": 54321.803,
       "cost": null,
       "artifacts": [
         "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/observer.output.md"
@@ -1508,16 +616,16 @@
         "kind": "command",
         "detail": "python3"
       },
-      "measured_tokens": 7100,
+      "measured_tokens": 3776,
       "budget": 48000,
       "budget_action": "sent",
       "usage": {
-        "input_tokens": 401413,
-        "output_tokens": 7047,
-        "cached_input_tokens": 369482,
-        "cache_creation_input_tokens": 31909,
+        "input_tokens": 194642,
+        "output_tokens": 4707,
+        "cached_input_tokens": 173762,
+        "cache_creation_input_tokens": 20866,
         "reasoning_tokens": 0,
-        "total_tokens": 408460,
+        "total_tokens": 199349,
         "input_tokens_includes_cache": true
       },
       "cost_record": {
@@ -1530,29 +638,28 @@
           "status": "succeeded",
           "runtime": "claude",
           "configured_model": "claude-opus-5-5",
-          "duration_ms": 153964.301,
+          "duration_ms": 54248.803,
           "usage": {
-            "input_tokens": 401413,
-            "output_tokens": 7047,
-            "cached_input_tokens": 369482,
-            "cache_creation_input_tokens": 31909,
+            "input_tokens": 194642,
+            "output_tokens": 4707,
+            "cached_input_tokens": 173762,
+            "cache_creation_input_tokens": 20866,
             "reasoning_tokens": 0,
-            "total_tokens": 408460,
+            "total_tokens": 199349,
             "input_tokens_includes_cache": true
           },
-          "runtime_cost_estimate_usd": 0.3744694,
-          "turns": 11,
+          "runtime_cost_estimate_usd": 0.2332784,
+          "turns": 7,
           "usage_complete": true
         }
       ],
-      "usage_complete": true,
-      "attempt": 3
+      "usage_complete": true
     }
   ],
-  "verdict": "changes_requested",
-  "human_required": true,
+  "verdict": "approved",
+  "human_required": false,
   "max_loopbacks": 2,
-  "loopbacks": 2,
+  "loopbacks": 0,
   "deployment_status": null,
   "verify_results": [],
   "risk_hints": [],
@@ -1561,23 +668,23 @@
       "reviews_counted": [
         {
           "station": "reviewer-spec",
-          "verdict": "changes_requested"
+          "verdict": "pass"
         },
         {
           "station": "reviewer-security",
-          "verdict": "changes_requested"
+          "verdict": "pass"
         },
         {
           "station": "reviewer-tests",
-          "verdict": "changes_requested"
+          "verdict": "pass"
         },
         {
           "station": "reviewer-architecture",
-          "verdict": "changes_requested"
+          "verdict": "pass"
         },
         {
           "station": "reviewer-design",
-          "verdict": "changes_requested"
+          "verdict": "pass"
         }
       ],
       "reviews_expected": [
@@ -1587,47 +694,21 @@
         "reviewer-architecture",
         "reviewer-design"
       ],
-      "rule": "Reviewers reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture, reviewer-design requested changes. (Expected 5 reviews after routing.)",
+      "rule": "All counted reviews passed. (Expected 5 reviews after routing.)",
       "reviews_uncounted": []
     },
     "human_gate": {
-      "required": true,
-      "rule": "Verdict is changes_requested, not approved, so a human is required.",
+      "required": false,
+      "rule": "Verdict approved and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
       "hints_matched": []
     }
   },
-  "warnings": [],
-  "astra_measured_tokens_total": 63050,
+  "warnings": [
+    "TDD red check: the project checks passed before the builder ran, so the new tests did not fail first. reviewer-tests is told to verify that the tests exercise the new behavior."
+  ],
+  "astra_measured_tokens_total": 18128,
   "base_ref": "1d8f96ad8b9d3a259ebccdde0c2f4933ac5cd4e5",
   "evidence": [
-    {
-      "type": "screenshot",
-      "breakpoint": "390x844",
-      "path": "runs/wo-gh-42/evidence/screenshot-390x844.png",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "type": "screenshot",
-      "breakpoint": "1440x900",
-      "path": "runs/wo-gh-42/evidence/screenshot-1440x900.png",
-      "width": 1440,
-      "height": 900
-    },
-    {
-      "type": "screenshot",
-      "breakpoint": "390x844",
-      "path": "runs/wo-gh-42/evidence/screenshot-390x844.png",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "type": "screenshot",
-      "breakpoint": "1440x900",
-      "path": "runs/wo-gh-42/evidence/screenshot-1440x900.png",
-      "width": 1440,
-      "height": 900
-    },
     {
       "type": "screenshot",
       "breakpoint": "390x844",
@@ -1646,7 +727,7 @@
   "cost": {
     "total": 0,
     "measured_steps": 0,
-    "unmeasured_steps": 22
+    "unmeasured_steps": 10
   },
   "practices": {
     "resolved": {
@@ -1743,74 +824,74 @@
     }
   },
   "token_usage": {
-    "input_tokens": 14752797,
-    "output_tokens": 160474,
-    "cached_input_tokens": 13926535,
-    "cache_creation_input_tokens": 825852,
+    "input_tokens": 3359320,
+    "output_tokens": 44184,
+    "cached_input_tokens": 3010162,
+    "cache_creation_input_tokens": 348992,
     "reasoning_tokens": 0,
-    "total_tokens": 14913271,
-    "measured_calls": 22,
+    "total_tokens": 3403504,
+    "measured_calls": 10,
     "unmeasured_calls": 0,
-    "calls": 22,
+    "calls": 10,
     "retries": 0,
     "complete": true,
     "by_station": {
       "intake": {
         "calls": 1,
         "measured_calls": 1,
-        "total_tokens": 100555
+        "total_tokens": 48064
       },
       "spec-writer": {
         "calls": 1,
         "measured_calls": 1,
-        "total_tokens": 287440
+        "total_tokens": 186238
       },
       "test-writer": {
         "calls": 1,
         "measured_calls": 1,
-        "total_tokens": 318588
+        "total_tokens": 854882
       },
       "builder": {
-        "calls": 3,
-        "measured_calls": 3,
-        "total_tokens": 10135682
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 737221
       },
       "reviewer-spec": {
-        "calls": 3,
-        "measured_calls": 3,
-        "total_tokens": 851725
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 400524
       },
       "reviewer-security": {
-        "calls": 3,
-        "measured_calls": 3,
-        "total_tokens": 626896
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 226117
       },
       "reviewer-tests": {
-        "calls": 3,
-        "measured_calls": 3,
-        "total_tokens": 1145297
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 461862
       },
       "reviewer-architecture": {
-        "calls": 3,
-        "measured_calls": 3,
-        "total_tokens": 516643
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 187341
       },
       "reviewer-design": {
-        "calls": 3,
-        "measured_calls": 3,
-        "total_tokens": 521985
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 101906
       },
       "observer": {
         "calls": 1,
         "measured_calls": 1,
-        "total_tokens": 408460
+        "total_tokens": 199349
       }
     },
     "by_model": {
       "claude-opus-5-5": {
-        "calls": 22,
-        "measured_calls": 22,
-        "total_tokens": 14913271
+        "calls": 10,
+        "measured_calls": 10,
+        "total_tokens": 3403504
       }
     }
   },
@@ -1821,87 +902,103 @@
       "tool_output_tokens": 2000,
       "max_agent_calls": 32,
       "max_run_tokens": 15000000,
-      "require_usage": false
+      "require_usage": false,
+      "station_budgets": {
+        "intake": 200000,
+        "spec-writer": 600000,
+        "test-writer": 3200000,
+        "builder": 6400000,
+        "reviewer-spec": 600000,
+        "reviewer-security": 600000,
+        "reviewer-tests": 600000,
+        "reviewer-architecture": 600000,
+        "reviewer-design": 600000,
+        "reviewer-ux": 600000,
+        "approver": 200000,
+        "triage-human": 100000,
+        "deployer": 300000,
+        "observer": 400000
+      }
     },
     "stopped": false
   },
-  "run_id": "fa800c2ff04f424283b0b3a573742b02",
+  "run_id": "d5e5335799cf4d87a9c7328822a7ab04",
   "checkpoint": {
     "last_completed_station": "observer",
-    "elapsed_ms": 4564536.611,
+    "elapsed_ms": 1076759.537,
     "usage_so_far": {
-      "input_tokens": 14752797,
-      "output_tokens": 160474,
-      "cached_input_tokens": 13926535,
-      "cache_creation_input_tokens": 825852,
+      "input_tokens": 3359320,
+      "output_tokens": 44184,
+      "cached_input_tokens": 3010162,
+      "cache_creation_input_tokens": 348992,
       "reasoning_tokens": 0,
-      "total_tokens": 14913271,
-      "measured_calls": 22,
+      "total_tokens": 3403504,
+      "measured_calls": 10,
       "unmeasured_calls": 0,
-      "calls": 22,
+      "calls": 10,
       "retries": 0,
       "complete": true,
       "by_station": {
         "intake": {
           "calls": 1,
           "measured_calls": 1,
-          "total_tokens": 100555
+          "total_tokens": 48064
         },
         "spec-writer": {
           "calls": 1,
           "measured_calls": 1,
-          "total_tokens": 287440
+          "total_tokens": 186238
         },
         "test-writer": {
           "calls": 1,
           "measured_calls": 1,
-          "total_tokens": 318588
+          "total_tokens": 854882
         },
         "builder": {
-          "calls": 3,
-          "measured_calls": 3,
-          "total_tokens": 10135682
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 737221
         },
         "reviewer-spec": {
-          "calls": 3,
-          "measured_calls": 3,
-          "total_tokens": 851725
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 400524
         },
         "reviewer-security": {
-          "calls": 3,
-          "measured_calls": 3,
-          "total_tokens": 626896
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 226117
         },
         "reviewer-tests": {
-          "calls": 3,
-          "measured_calls": 3,
-          "total_tokens": 1145297
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 461862
         },
         "reviewer-architecture": {
-          "calls": 3,
-          "measured_calls": 3,
-          "total_tokens": 516643
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 187341
         },
         "reviewer-design": {
-          "calls": 3,
-          "measured_calls": 3,
-          "total_tokens": 521985
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 101906
         },
         "observer": {
           "calls": 1,
           "measured_calls": 1,
-          "total_tokens": 408460
+          "total_tokens": 199349
         }
       },
       "by_model": {
         "claude-opus-5-5": {
-          "calls": 22,
-          "measured_calls": 22,
-          "total_tokens": 14913271
+          "calls": 10,
+          "measured_calls": 10,
+          "total_tokens": 3403504
         }
       }
     }
   },
   "exit_status": "completed",
-  "termination_reason": "run completed with verdict changes_requested"
+  "termination_reason": "run completed with verdict approved"
 }

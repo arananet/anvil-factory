@@ -36,7 +36,8 @@ be rebuilt by hand.
   The line's existing contract tests (protected for this order) pin the old
   review flow for projects with scripted stations that write no files. The
   factory's own anvil.yaml configures partitions, so factory runs get the
-  gate.
+  gate. The owner ruled this scope on 2026-11-22 (after run 44912754341)
+  and the spec carries it in R4 and in scenarios S4, S5 and S8.
 
 ## Consequences
 

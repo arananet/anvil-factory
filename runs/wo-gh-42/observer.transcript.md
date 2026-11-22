@@ -1,28 +1,16 @@
-Nothing was released, so I wrote the observation report at `runs/wo-gh-42/observer.output.md` about the run and the tree as they stand. The deployer only prepared a release packet (status `packet_ready`) and never wrote a release record. The run report shows no deployment, a final verdict of `changes_requested`, and a stop at the owner's decision point, as the order's guardrails require. The change is still uncommitted in the worktree.
+I wrote the observation report to `runs/wo-gh-42/observer.output.md`, but it can't watch a release, because nothing was released. The deployer stopped at `packet_ready`, there is no deployer output file, and `deployment_status` in the run report is null. That matches the order's rule that nothing merges or deploys before the owner's human gate. So the report covers only what the run recorded and says plainly that a release record is missing.
 
-**What happened in the run**
-- The builder ran 3 times, the maximum allowed. The automated test check passed every time, and all five reviewers asked for changes every time.
-- The one blocking issue was the same in all three rounds. The spec (R4) says the completeness check always runs before reviewers, but the code only runs it when per-station token limits are configured (`anvil/runner.py:1652` and `:2440`). Making it always run breaks 22 existing tests that the order forbids changing. Only you can settle this: amend R4, or allow those tests to be updated.
-- The builder's third attempt changed no code. It only restored its missing report.
+**What the run recorded:**
+- **Steps:** intake, spec-writer, test-writer and builder all ran.
+- **Tests:** the checks gate passed: 802 tests, all OK, 6 skipped.
+- **Reviews:** all five reviewers that ran passed. reviewer-ux was routed out. The approver's verdict is approved, with no loopbacks.
+- **Tokens:** 9 model calls, all measured, for 3204155 tokens against the 15000000 cap. No station was refused or cut off for budget.
+- **Cost:** no price table covered the models used, so no money figure is shown, only tokens.
 
-**Token use**
-- The run used 14,504,811 tokens against the 15,000,000 run cap. The builder used 10,135,682 of those, 9,281,113 of them in its first attempt.
-- No cost in money could be shown: all 21 steps have no price recorded.
-
-**The per-station limits look too small.** They were not in force for this run, because it ran on the code from before this change. Measured against this order's own usage, four stations would have gone over their limit:
-
-| Station | Used in this run | Limit in the shipped table |
-|---|---|---|
-| builder (first attempt alone) | 9,281,113 | 6,400,000 |
-| reviewer-spec | 851,725 | 600,000 |
-| reviewer-security | 626,896 | 600,000 |
-| reviewer-tests | 1,145,297 | 600,000 |
-
-That contradicts the correction's claim that the table covers the largest use seen per station. You should weigh this before merging.
-
-**Checks I re-ran myself**
-- The full test suite passed: 799 tests, 6 skipped, matching the builder's report.
-- None of the protected files (existing tests, pipeline files, `anvil.json`) changed.
-- No em dash or en dash appears in the changed files.
-
-To observe a real release later, I'll need the merge commit or pull request and a factory run on main with the new limits active.
+**Issues for the owner:**
+1. **Nothing has been tested in a live run yet.** The new per-station budget checks and the completeness check before review have only been tested by scripted tests. No station came near its budget in this run.
+2. **The completeness result is missing from the run report.** The factory configures budgets, so the result should appear there. This run's report may have been written by the old code, so it's worth checking on the first run after merge.
+3. **Two different base refs.** The run report's base ref is `1d8f96a`, but the builder checked its work against `72a84126…`. Both fit the order, but they mean different things.
+4. **The new tests never failed first.** The project checks already passed before the builder ran. reviewer-tests was asked to check this and passed the tests.
+5. **There are uncommitted changes to the new test file**, `tests/test_station_budgets_completeness.py`. They add three tests for the 2026-11-22 owner ruling and exclude station packet files from a file check. Those changes need to be in the commit the owner reviews.
+6. **The human gate step shows as completed with "human required" set to false**, though the order says the run stops at the owner gate. The merge is still the owner's decision.

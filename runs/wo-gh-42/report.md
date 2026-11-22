@@ -29,35 +29,15 @@ Surfaces: deploy, data, content
 
 ## Verdict
 
-Verdict: changes_requested
+Verdict: approved
 
-Reviewers reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture, reviewer-design requested changes. (Expected 5 reviews after routing.)
+All counted reviews passed. (Expected 5 reviews after routing.)
 
 ## Steps
 
 - intake: executed
 - spec-writer: executed
 - test-writer: executed
-- builder: executed
-- checks-gate: passed
-- reviewer-spec: executed
-- reviewer-security: executed
-- reviewer-tests: executed
-- reviewer-architecture: executed
-- reviewer-design: executed
-- reviewer-ux: routed_out
-- approver: completed
-- approver: loopback
-- builder: executed
-- checks-gate: passed
-- reviewer-spec: executed
-- reviewer-security: executed
-- reviewer-tests: executed
-- reviewer-architecture: executed
-- reviewer-design: executed
-- reviewer-ux: routed_out
-- approver: completed
-- approver: loopback
 - builder: executed
 - checks-gate: passed
 - reviewer-spec: executed

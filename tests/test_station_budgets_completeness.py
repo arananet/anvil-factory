@@ -51,7 +51,13 @@ Scenario map:
                  test_s3_factory_other_keys_and_packet_budgets_unchanged,
                  test_s3_over_cap_project_does_not_run
   S4 (R4, R6d)   test_s4_missing_builder_report_dispatches_zero_reviewers,
+                 test_s4_missing_report_alone_blocks_review_when_checks_pass,
+                 test_s4_completeness_gaps_names_a_missing_or_empty_report,
                  test_s4_failing_checks_verdict_dispatches_zero_reviewers
+  S4, S5, S8 scope (owner ruling 2026-11-22: completeness only where partitions are configured)
+                 test_s4_s8_scope_no_partitions_keeps_present_behavior,
+                 test_s4_s8_scope_default_station_budget_alone_gates_review,
+                 test_s5_scope_station_budgets_alone_gates_and_passes_complete_work
   S5 (R4, R6d)   test_s5_complete_attempt_dispatches_the_reviewer_stage
   S6 (R5)        test_s6_cost_section_prices_partitions_where_the_table_covers
   S7 (R2)        test_s7_unmeasured_with_require_usage_is_refused,
@@ -677,6 +683,42 @@ class CompletenessGate(unittest.TestCase):
             self.assertNotEqual(report.get("verdict"), "approved")
             self.assertNotEqual(report.get("exit_status"), "completed")
 
+    def test_s4_s8_scope_no_partitions_keeps_present_behavior(self):
+        """S4, S5, S8 scope (owner ruling 2026-11-22): no efficiency partitions, an empty delta still reaches review, no completeness record"""
+        with tempfile.TemporaryDirectory() as tmp:
+            project = make_project(tmp, checks=["true"])
+            eff = json.loads((project / "anvil.yaml").read_text(encoding="utf-8")).get("efficiency", {})
+            self.assertNotIn("station_budgets", eff)
+            self.assertNotIn("default_station_budget", eff)
+            runtime = Scripted()
+            report = run(project, runtime, max_loopbacks=0)
+            self.assertGreater(len(runtime.reviewer_calls()), 0,
+                               "a project without partitions lost its present review flow")
+            self.assertEqual(runtime.count("builder"), 1)
+            self.assertFalse(report.get("completeness"), "completeness evaluated where no partition is configured")
+
+    def test_s4_s8_scope_default_station_budget_alone_gates_review(self):
+        """S4, S8 scope (owner ruling 2026-11-22): default_station_budget alone activates completeness; an empty delta dispatches zero reviewers"""
+        with tempfile.TemporaryDirectory() as tmp:
+            project = make_project(tmp, default_station_budget=100000, checks=["true"])
+            runtime = Scripted()
+            report = run(project, runtime, max_loopbacks=0)
+            self.assertEqual(runtime.reviewer_calls(), [])
+            evaluation = completeness(report)[0]
+            self.assertFalse(evaluation["passed"])
+            self.assertTrue(any("delta" in gap.lower() for gap in evaluation["gaps"]), evaluation)
+
+    def test_s5_scope_station_budgets_alone_gates_and_passes_complete_work(self):
+        """S5 scope (owner ruling 2026-11-22): station_budgets without a default activates completeness, which passes a complete attempt"""
+        with tempfile.TemporaryDirectory() as tmp:
+            project = make_project(tmp, station_budgets=partitions(), checks=["true"])
+            eff = json.loads((project / "anvil.yaml").read_text(encoding="utf-8"))["efficiency"]
+            self.assertNotIn("default_station_budget", eff)
+            runtime = Scripted(COMPLETE)
+            report = run(project, runtime, max_loopbacks=0)
+            self.assertTrue(completeness(report)[0]["passed"])
+            self.assertGreater(len(runtime.reviewer_calls()), 0)
+
     def test_s9_completeness_never_reruns_the_suite_or_literal_check(self):
         """S9: suite runs equal the red check plus gate runs, and builder report validation runs once per attempt"""
         for script, loops in ((COMPLETE, 0), ({"test-writer": [{"fail": True}], "builder": [{"write": SRC_FILE}]}, 1)):
@@ -837,6 +879,11 @@ class TreeEvidence(unittest.TestCase):
         for status, rel in changed_paths(self):
             path = ROOT / rel
             if status == "D" or not path.is_file():
+                continue
+            # A station packet is the line's rendering of a frozen station
+            # prompt (stations/<id>/PROMPT.md); the order neither writes nor
+            # may edit that text, so packets are outside this check.
+            if rel.startswith("runs/") and rel.endswith(".packet.md"):
                 continue
             try:
                 text = path.read_text(encoding="utf-8")

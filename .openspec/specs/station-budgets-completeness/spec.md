@@ -61,6 +61,7 @@ Only these paths may change; every other path is out of bounds:
 - one new file under brain/decisions/ (next free number after 0013)
 - new test files under tests/ (no existing test file modified or deleted)
 - runs/wo-gh-42/ station artifacts the line itself writes
+- .openspec/specs/station-budgets-completeness/spec.md (this spec, written by the spec-writer station and by owner rulings only)
 Protected and not edited: pipelines/ (all pipeline files), anvil.json, every existing file under tests/.
 
 ### Out of scope
