@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Operator fix: the configuration evidence of wo-gh-42 binds that order's run only
+
+- tests/test_station_budgets_completeness.py compared the factory anvil.yaml with the copy at the fixed base ref of wo-gh-42 and required them equal apart from the partition keys. Any later order that adds a key to anvil.yaml failed it: it stopped the checks gate of wo-gh-47 on all three builder attempts (run 45046566131, 8051180 tokens), because that order adds observability.sinks. The test now runs only inside the run of wo-gh-42, the pattern tests/test_landing_page.py already uses for wo-gh-35. Owner-authorized, outside the line (decision 0006).
+
 ### Operator recalibration: the spec-writer partition
 
 - efficiency.station_budgets in the factory anvil.yaml: spec-writer 600000 to 1200000, builder 6400000 to 5800000; the table still sums to 15000000. The first run under the accepted table (wo-gh-47, run 45042545362) was stopped in the spec-writer at 653517 tokens, 599136 of them cache reads.
