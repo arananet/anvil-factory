@@ -42,13 +42,15 @@ writes a partial or placeholder output and calls it success.
 
 import json
 import os
+import signal
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from anvil.telemetry import UsageRecorder
+from anvil.telemetry import UsageRecorder, normalize_usage, sum_usage
 from anvil.config import resolve_station_timeout, STATION_TIMEOUT_CEILING
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -123,6 +125,20 @@ ARTIFACT_WRITE_STATIONS = {"spec-writer", "blueprint", "brief-writer",
                            "researcher", "writer", "media-producer"}
 WRITE_STATIONS = CODE_WRITE_STATIONS | ARTIFACT_WRITE_STATIONS
 NO_EDIT_TOOLS = "Edit,Write,NotebookEdit"
+# station-budgets-completeness R3: the in-flight ceiling. The runner hands
+# the tokens left of the station's partition (efficiency.station_budgets) in
+# ANVIL_STATION_BUDGET_TOKENS and the partition itself in
+# ANVIL_STATION_PARTITION. With a ceiling set, the Claude CLI streams its
+# events (stream-json), the wrapper sums the usage each model call reports
+# while the session runs, and kills the session once that usage reaches the
+# ceiling, the same kill-and-record shape as the station timeout.
+STATION_BUDGET_ENV = "ANVIL_STATION_BUDGET_TOKENS"
+STATION_PARTITION_ENV = "ANVIL_STATION_PARTITION"
+BUDGET_EXIT = 11
+CORRECTION_REFUSED_EXIT = 12
+# SYNC: the same text as CORRECTION_REFUSED in anvil/runner.py, which reads it
+# from the failure detail to record the refusal.
+CORRECTION_REFUSED = "partition exhausted before the correction re-dispatch"
 # The station timeout is configuration (station-timeout, decision 0011): see
 # anvil.config.resolve_station_timeout for the resolution order, the class
 # defaults and the ceiling. It bounds the whole invocation, correction
@@ -267,6 +283,97 @@ def failure_reason(stdout):
     return "; ".join(parts)
 
 
+def parse_ceiling(environ):
+    """(ceiling, partition) from the environment, or (None, None) when unset.
+
+    A value that is not a positive integer raises ValueError naming it.
+    """
+    raw = environ.get(STATION_BUDGET_ENV)
+    if raw is None or str(raw).strip() == "":
+        return None, None
+    values = []
+    for name, value in ((STATION_BUDGET_ENV, raw), (STATION_PARTITION_ENV, environ.get(STATION_PARTITION_ENV, raw))):
+        try:
+            number = int(str(value).strip())
+        except ValueError:
+            number = 0
+        if number <= 0:
+            raise ValueError(f"{name} must be a positive integer number of tokens, got {value!r}")
+        values.append(number)
+    return values[0], values[1]
+
+
+def streamed_total(per_message):
+    """Usage summed over the model calls a stream reported so far, or None.
+
+    The CLI may repeat one message's usage on several events (one per
+    content block), so usage is kept per message id and the latest wins.
+    """
+    return sum_usage(u for u in (normalize_usage(v, "claude") for v in per_message.values()) if u)
+
+
+def run_with_ceiling(command, cwd, timeout, ceiling):
+    """Run one streaming CLI call; stop it when its measured usage reaches ceiling.
+
+    Returns {"outcome": "finished" | "budget" | "timeout", "returncode",
+    "stdout" (the result envelope line, or an envelope carrying the usage
+    streamed so far when the session ended without one), "stderr",
+    "usage" (the streamed usage, None when nothing was reported)}.
+    """
+    proc = subprocess.Popen(command, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            text=True, start_new_session=True)
+    per_message = {}
+    result_line = []
+    stderr_lines = []
+    crossed = threading.Event()
+
+    def read_stdout():
+        for line in proc.stdout:
+            try:
+                event = json.loads(line)
+            except ValueError:
+                continue
+            if not isinstance(event, dict):
+                continue
+            if event.get("type") == "result":
+                result_line.append(line.strip())
+            elif event.get("type") == "assistant" and isinstance(event.get("message"), dict):
+                message = event["message"]
+                if isinstance(message.get("usage"), dict):
+                    per_message[message.get("id") or f"message-{len(per_message)}"] = message["usage"]
+                    total = streamed_total(per_message)
+                    if total and total["total_tokens"] >= ceiling:
+                        crossed.set()
+
+    readers = [threading.Thread(target=read_stdout, daemon=True),
+               threading.Thread(target=lambda: stderr_lines.extend(proc.stderr), daemon=True)]
+    for reader in readers:
+        reader.start()
+    deadline = time.monotonic() + timeout
+    outcome = "finished"
+    while proc.poll() is None:
+        if crossed.wait(0.05) and proc.poll() is None:
+            outcome = "budget"
+        elif time.monotonic() >= deadline:
+            outcome = "timeout"
+        else:
+            continue
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except OSError:
+            proc.kill()
+        break
+    proc.wait()
+    for reader in readers:
+        reader.join(timeout=5)
+    usage = streamed_total(per_message)
+    stdout = result_line[-1] if result_line else ""
+    if not stdout and usage is not None:
+        stdout = json.dumps({"type": "result", "result": "", "usage": usage})
+    return {"outcome": outcome, "returncode": proc.returncode, "stdout": stdout,
+            "stderr": "".join(stderr_lines), "usage": usage}
+
+
 def transcript_path(output_path, station):
     """Where the chat reply goes when the station wrote its own output artifact."""
     return output_path.with_name(f"{station}.transcript.md")
@@ -315,6 +422,17 @@ def main():
         return 9
     provider = "copilot" if runtime == "copilot" else "claude"
     cli = "copilot" if runtime == "copilot" else "claude"
+    try:
+        ceiling, partition = parse_ceiling(os.environ)
+    except ValueError as e:
+        print(f"claude_station: {e}", file=sys.stderr)
+        return 10
+    if runtime == "copilot" and ceiling is not None:
+        # Copilot reports usage only when the session ends, so it cannot be
+        # stopped mid flight; the runner's pre-call check still applies.
+        print(f"claude_station: the in-flight ceiling needs streamed usage, which the copilot runtime "
+              f"does not expose; station {station} runs without it", file=sys.stderr)
+        ceiling = None
 
     repo_root = Path(os.environ.get("ANVIL_PROJECT_ROOT") or Path(__file__).resolve().parent.parent).resolve()
     correction_used = False
@@ -330,11 +448,34 @@ def main():
         print(f"claude_station: station {station} timed out after {timeout_seconds}s", file=sys.stderr)
         return 4
 
+    def budget_stopped(streamed, call_started):
+        """Record a session killed at the station's partition (R3).
+
+        Same honest record fields as a timeout: station, reason naming the
+        configured limit, the dispatched model and the partial usage the
+        runtime exposed. The undone work is not resumed in this dispatch.
+        """
+        measured = (streamed["usage"] or {}).get("total_tokens")
+        reason = (f"station token partition reached: measured {measured} tokens against the "
+                  f"{ceiling} left of partition {partition} (efficiency.station_budgets {station})")
+        usage_recorder.record(
+            streamed["stdout"], provider, "budget_exceeded", (time.perf_counter() - call_started) * 1000,
+            model, {"station": station, "partition": partition, "ceiling_tokens": ceiling, "reason": reason})
+        print(f"claude_station: station {station} stopped at its token partition: {reason}", file=sys.stderr)
+        return BUDGET_EXIT
+
     # Run station (with one potential correction attempt for reviewers)
     for attempt in range(min(2, int(os.environ.get("ANVIL_MAX_ATTEMPTS", "2")))):
         if attempt and not usage_recorder.within_budget():
             print("claude_station: token threshold reached before correction", file=sys.stderr)
             return 8
+        spent = (usage_recorder.summary()["usage"] or {}).get("total_tokens") or 0
+        if attempt and ceiling is not None and spent >= ceiling:
+            # R2: the in-session correction re-dispatch passes the pre-call
+            # check too; a refusal makes no model call.
+            print(f"claude_station: station {station} {CORRECTION_REFUSED}: measured {spent} tokens "
+                  f"against the {ceiling} left of partition {partition}", file=sys.stderr)
+            return CORRECTION_REFUSED_EXIT
         prompt = packet_text
         if station.startswith("reviewer") and work_order_id:
             if attempt == 0:
@@ -364,6 +505,11 @@ def main():
             command += ["--disallowedTools", NO_EDIT_TOOLS]
         if os.environ.get("ANVIL_MAX_RUNTIME_TURNS"):
             command += ["--max-turns", os.environ["ANVIL_MAX_RUNTIME_TURNS"]]
+        if ceiling is not None:
+            # Streamed events carry each model call's usage while the session
+            # runs; print mode needs --verbose for stream-json.
+            command[command.index("json")] = "stream-json"
+            command.append("--verbose")
 
         copilot_usage = Path(str(output_path) + ".copilot-usage.json")
         if runtime == "copilot":
@@ -381,18 +527,31 @@ def main():
         remaining = timeout_seconds - (call_started - station_started)
         if remaining <= 0:
             return timed_out(None, call_started)
-        try:
-            proc = subprocess.run(command, cwd=str(repo_root), capture_output=True,
-                                  text=True, timeout=remaining)
-        except subprocess.TimeoutExpired as exc:
-            # On POSIX the partial stdout arrives as bytes even in text mode.
-            partial = exc.stdout
-            if isinstance(partial, bytes):
-                partial = partial.decode("utf-8", errors="replace")
-            return timed_out(raw_result(partial), call_started)
-        except FileNotFoundError:
-            print(f"claude_station: the {cli} CLI is not on PATH", file=sys.stderr)
-            return 5
+        if ceiling is not None:
+            try:
+                streamed = run_with_ceiling(command, str(repo_root), remaining, ceiling)
+            except FileNotFoundError:
+                print(f"claude_station: the {cli} CLI is not on PATH", file=sys.stderr)
+                return 5
+            if streamed["outcome"] == "timeout":
+                return timed_out(streamed["stdout"], call_started)
+            if streamed["outcome"] == "budget":
+                return budget_stopped(streamed, call_started)
+            proc = subprocess.CompletedProcess(command, streamed["returncode"], streamed["stdout"],
+                                               streamed["stderr"])
+        else:
+            try:
+                proc = subprocess.run(command, cwd=str(repo_root), capture_output=True,
+                                      text=True, timeout=remaining)
+            except subprocess.TimeoutExpired as exc:
+                # On POSIX the partial stdout arrives as bytes even in text mode.
+                partial = exc.stdout
+                if isinstance(partial, bytes):
+                    partial = partial.decode("utf-8", errors="replace")
+                return timed_out(raw_result(partial), call_started)
+            except FileNotFoundError:
+                print(f"claude_station: the {cli} CLI is not on PATH", file=sys.stderr)
+                return 5
 
         parsed = usage_recorder.record(raw_result(proc.stdout), provider,
                                       "succeeded" if proc.returncode == 0 else "failed",

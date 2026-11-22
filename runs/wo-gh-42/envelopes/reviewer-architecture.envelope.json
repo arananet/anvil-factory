@@ -1,0 +1,47 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-architecture",
+  "to_station": "reviewer-design",
+  "work_order_id": "wo-gh-42",
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-architecture.output.md",
+  "status": "executed",
+  "created_at": "2026-11-22T15:41:12.016396+00:00",
+  "usage": {
+    "input_tokens": 183330,
+    "output_tokens": 4011,
+    "cached_input_tokens": 150998,
+    "cache_creation_input_tokens": 32322,
+    "reasoning_tokens": 0,
+    "total_tokens": 187341,
+    "input_tokens_includes_cache": true
+  },
+  "tokens": {
+    "input_tokens": 183330,
+    "output_tokens": 4011,
+    "cached_input_tokens": 150998,
+    "cache_creation_input_tokens": 32322,
+    "reasoning_tokens": 0,
+    "total_tokens": 187341,
+    "input_tokens_includes_cache": true
+  },
+  "review": {
+    "station": "reviewer-architecture",
+    "verdict": "pass",
+    "findings": [
+      "The layering matches the existing structure. Configuration parsing and validation (station_budget_settings, pipeline_partitions, validate_station_budgets) sit in anvil/config.py next to get_station_budget. They are pure functions, they fail closed with named ValueErrors, and they run once at the boundary before any station dispatch. Consumption reads (station_consumption, precall_decision) sit in anvil/telemetry.py and reuse summarize_steps over the token-efficiency per-attempt usage records, so there is no second usage source. The in-flight kill sits in tools/claude_station.py, and executor.py only exposes the wrapper's record. Dependencies point one way: the runner depends on config and telemetry, and neither depends on the runner.",
+      "The work fits the decisions it touches. Decision 0013's exit path is reused: refusals and ceiling kills end with exit_status budget_exceeded, a termination_reason naming efficiency.station_budgets <station> <partition>, and budget_death through the existing _budget_death. No second way of ending a run is added. max_run_tokens (token-efficiency R4) stays the outer bound. The station-timeout keys are not changed; the budget_exceeded branch in executor.py sits next to them. gates.py is not modified, so the checks gate verdicts, the S4 base ref behavior and the artifact contract's literal validation stay frozen. Completeness is a runner-level precondition that consumes gate_result['gate_verdict'], as the reconciliation requires. The top level station_budgets packet cap and the new efficiency.* keys stay separate, and docs/EXECUTION.md says how they differ.",
+      "Owner ruling of 2026-11-22: completeness_active = any(station_budget_settings(config)) in anvil/runner.py follows the amended R4 and scenarios S4, S5 and S8. Decision 0014 records the scope, its reason (22 protected contract tests) and its trade off: a project gets the gate only by configuring partitions, and making it unconditional is left to a separate order. This is an accepted decision recorded honestly. It is not a quiet workaround.",
+      "There is one new decision record (brain/decisions/0014-station-budgets-completeness.md) with context, decision and consequences. It names what the choice makes harder: an undersized partition now ends the run at that station, the copilot runtime gets only the pre-call check, and with all sdlc-default stations named at the cap no default can be added. Its Status is still 'proposed 2026-11-21'. Non-blocking: after the owner accepts it, move the status to accepted, as other records in brain/decisions do once adopted.",
+      "Non-blocking, one source of truth: anvil/config.py adds DETERMINISTIC_FALLBACK = {approver, triage-human, checks-gate} and MODEL_CALLING_DETERMINISTIC = {intake} as a new copy of the deterministic-station fallback. The runner already has two inline copies (anvil/runner.py:2040 and :3031, {intake, approver, triage-human}, with intake then special-cased as a model call), and telemetry.py:173 has a broader set. The sets disagree. They only matter when no registry is passed, and the runner passes one, but this is a third divergent copy of one fact. Folding these into one helper in config.py that runner and telemetry import would remove the drift.",
+      "Non-blocking: the runner and tools/claude_station.py both define the literal CORRECTION_REFUSED, held in sync only by a SYNC comment, and runner._ceiling_record classifies by substring match on str(exc). The wrapper already exits with the dedicated CORRECTION_REFUSED_EXIT = 12. A structured signal (that exit code, or a status field in the usage record such as the budget_exceeded branch uses) would be one contract instead of two copies of a string. The reviewer-security station raised the same point.",
+      "Non-blocking, size: the post-failure ceiling handling (_ceiling_record, then status/detail/executed_model) is repeated at anvil/runner.py:2322 and :2794 for the two dispatch paths. The runner was already large, and this order adds about 326 lines to it. A small helper returning (status, detail, model) would keep the two paths from drifting. This does not block the order and can go with a later refactor.",
+      "Surface and size are within the guardrails. The changed source is limited to the authorized files (config, executor, runner, telemetry, claude_station, anvil.yaml efficiency keys, docs/EXECUTION.md, CHANGELOG.md, one decision record, one new test file). pipelines/, anvil.json, gates.py and the existing tests are not modified. Only the standard library is used (signal, threading, subprocess). The status/ and work_orders/ entries in the diff are run bookkeeping, not builder edits. The design is the smallest one that meets R1 to R6: no plugin layer, no new abstraction with a single implementation, and partitions computed once per run from configuration."
+    ]
+  },
+  "configured_model": "claude-opus-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-opus-5-5"
+}

@@ -6,7 +6,23 @@
     "tool_output_tokens": 2000,
     "max_agent_calls": 32,
     "max_run_tokens": 15000000,
-    "require_usage": false
+    "require_usage": false,
+    "station_budgets": {
+      "intake": 200000,
+      "spec-writer": 600000,
+      "test-writer": 3200000,
+      "builder": 6400000,
+      "reviewer-spec": 600000,
+      "reviewer-security": 600000,
+      "reviewer-tests": 600000,
+      "reviewer-architecture": 600000,
+      "reviewer-design": 600000,
+      "reviewer-ux": 600000,
+      "approver": 200000,
+      "triage-human": 100000,
+      "deployer": 300000,
+      "observer": 400000
+    }
   },
   "status_projects": [
     "project-reports/sentia",

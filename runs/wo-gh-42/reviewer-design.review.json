@@ -1,0 +1,21 @@
+{
+  "station": "reviewer-design",
+  "verdict": "pass",
+  "compliance": {
+    "verdict": "pass",
+    "findings": [
+      "Scope: wo-gh-42 is a runner, config and test change (station budgets and the completeness precondition). The diff for this run touches the spec, the decision record 0014, run artifacts under runs/wo-gh-42/, tests/test_station_budgets_completeness.py and work_orders/wo-gh-42.json. It adds or changes no HTML, CSS, component or other interface artifact, so there is nothing new to judge against design/DESIGN.md.",
+      "Design tokens: every value in design/tokens.json is still TODO. The rules say an undefined token is a finding only when the interface output uses it. This change ships no interface output, so no token finding applies.",
+      "Rendered evidence (runs/wo-gh-42/evidence/screenshot-1440x900.png, screenshot-390x844.png) shows the existing ANVIL status page, which this diff did not change. Checked against the DESIGN.md quality bars anyway: the hierarchy is clear (orange title, section headings, grouped metric cards), the light text on the dark surface reads well above 4.5:1, the four-column card grid collapses to two and then one column at 390px, and there is no horizontal scrolling at either width. No violation found."
+    ]
+  },
+  "quality": {
+    "verdict": "pass",
+    "findings": [
+      "The packet's Quality Charter declares physical_product (materials, light, contact, scale). Those criteria do not fit this order: it produces no product imagery or visual deliverable, only budget and gate logic in the factory runner. There is no visual output to measure them against, so there is no quality gap to name.",
+      "The promoted practices P-4 to P-7 (asset pack fidelity, parallax depth, cross-set coherence, genre coherence) and the explainer-video craft skill do not apply. This order produces no game, scene set or video.",
+      "No identity_reference is declared, so the same-subject identity check (S7) does not apply."
+    ],
+    "anchor": "charter floor only"
+  }
+}

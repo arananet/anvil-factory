@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Per-station token budgets and a completeness gate before review (station-budgets-completeness, wo-gh-42)
+
+- `efficiency.station_budgets` and `efficiency.default_station_budget` in anvil.yaml divide `max_run_tokens` per station. Configuration is validated at run start against the run cap for the pipeline and fails naming the pipeline and the excess (`anvil.config.validate_station_budgets`). The factory ships sdlc-default partitions summing to exactly 15000000. The top level `station_budgets` packet cap is unchanged.
+- A pre-call check refuses the dispatch (first attempt, loopback, or a reviewer's in-session correction) of a station that has spent its partition, with zero model calls. Unmeasured usage counts as exhausted under `require_usage` and is recorded as `proceeded_unmeasured` without it. tools/claude_station.py streams usage and kills a session at what is left of its partition, recording `budget_exceeded` with partial usage. Both end the run with exit_status budget_exceeded.
+- In a project with partitions, a deterministic completeness precondition runs after the pre-review checks gate. It requires the builder report, the test-writer's files and a non-empty attempt delta, a pass verdict, and no earlier station failed without its artifact. A failure loops back to the builder with the named gaps and dispatches no reviewer.
+- report.json gains `budgets`, `completeness` and `cost.stations` (money next to tokens where the recorded price table covers the station, never an invoice).
+- Spec: .openspec/specs/station-budgets-completeness/spec.md. Tests: tests/test_station_budgets_completeness.py. Docs: docs/EXECUTION.md. Decision 0014.
+
 ### Operator fix: a runtime refusal ends the run at the first refused station
 
 - A station the model runtime refuses with HTTP 401, 402 or 403 (bad credentials, no billing balance, no access) ends the run there with exit_status runtime_refused: no later station and no loopback is called. Runs of wo-gh-41 on 2026-11-20 made seven refused calls against a gateway with no balance before ending no_reviews. Rate limits and overloads (429, 5xx) are not refusals and the line goes on as before.

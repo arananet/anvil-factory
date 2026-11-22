@@ -1,0 +1,49 @@
+{
+  "schema": "anvil/envelope@1",
+  "from_station": "reviewer-security",
+  "to_station": "reviewer-tests",
+  "work_order_id": "wo-gh-42",
+  "artifact_path": "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-42/runs/wo-gh-42/reviewer-security.output.md",
+  "status": "executed",
+  "created_at": "2026-11-22T15:37:44.393429+00:00",
+  "usage": {
+    "input_tokens": 221797,
+    "output_tokens": 4320,
+    "cached_input_tokens": 189427,
+    "cache_creation_input_tokens": 32358,
+    "reasoning_tokens": 0,
+    "total_tokens": 226117,
+    "input_tokens_includes_cache": true
+  },
+  "tokens": {
+    "input_tokens": 221797,
+    "output_tokens": 4320,
+    "cached_input_tokens": 189427,
+    "cache_creation_input_tokens": 32358,
+    "reasoning_tokens": 0,
+    "total_tokens": 226117,
+    "input_tokens_includes_cache": true
+  },
+  "review": {
+    "station": "reviewer-security",
+    "verdict": "pass",
+    "findings": [
+      "Attack surface: the diff against base 72a84126a600fafb99446946694b5de809e01e66 adds no endpoint, outbound call, permission, token scope or dependency (standard library only: signal and threading in tools/claude_station.py). anvil.json, pipelines/ and the existing test files are not modified. The anvil.yaml change is limited to efficiency.station_budgets: 14 entries summing to 15000000, with max_run_tokens and require_usage unchanged.",
+      "Process execution: tools/claude_station.py run_with_ceiling starts the CLI with subprocess.Popen and an argument list (no shell), with start_new_session=True. It stops the session with os.killpg(SIGKILL) and falls back to proc.kill. The command change only replaces the existing 'json' output format argument with 'stream-json' and appends --verbose, so no untrusted text reaches the argument list.",
+      "Input validation: anvil/config.py station_budget_settings checks the map shape, rejects empty or non-string station ids, and rejects values that are not positive integers (bool excluded). It raises an error rather than repairing the value. tools/claude_station.py parse_ceiling rejects non-positive or non-integer ANVIL_STATION_BUDGET_TOKENS and ANVIL_STATION_PARTITION values and exits 10. validate_station_budgets fails closed before any station runs when the worst case exceeds max_run_tokens.",
+      "Untrusted model output: each streamed CLI event is parsed with json.loads, and malformed or non-dict lines are skipped. Usage fields go through telemetry.normalize_usage/sum_usage and are used only for arithmetic. Only the final result line is kept as stdout, so the full verbose transcript is not persisted in the usage record. Nothing parsed from the stream is executed or used as a path.",
+      "Filesystem: anvil/runner.py completeness_gaps and _nonempty_file only read files, to check whether they exist and are non-empty. The paths are run_dir/<station>.output.md and paths from the runner's own working-tree delta joined under the project root. File contents are never echoed or executed, and an OSError is treated as empty (fail closed, which raises a gap). No new file write is added beyond the existing report fields (budgets, completeness, cost.stations).",
+      "Secrets and logging: no secret, token or key appears in the added lines of the diff. The new stderr messages, termination reasons and budget records carry only station ids, token counts, partitions, timestamps and the configured model name. No environment value or request header is echoed.",
+      "Fail-closed posture: with require_usage set, a station whose earlier calls went unmeasured is refused rather than counted as zero. Without it, the check proceeds and records proceeded_unmeasured in the budgets field set. A refusal appends a step with executor None and makes zero model calls. The completeness precondition sets gate_failed, so no reviewer is dispatched on a gap.",
+      "Non-blocking: the in-flight ceiling fails open when the runtime streams no usage, including stream lines that fail to parse. The copilot runtime has the ceiling disabled with only a stderr notice. In both cases the run is bounded only by the pre-call check and the max_run_tokens outer bound, and the run report does not record that the ceiling was unenforced for that dispatch. Recording an explicit 'ceiling_unmeasured' outcome would make this visible. This is a spend-control gap, not an exploitable issue, and the builder report discloses it.",
+      "Non-blocking: runner._ceiling_record classifies a failure as a refused correction by finding the literal CORRECTION_REFUSED text anywhere in str(exc). If wrapper failure text that echoes runtime stderr ever contained that phrase, an ordinary failure would be recorded as a budget refusal. The consequence fails closed (the run ends as budget_exceeded), but matching the wrapper's dedicated exit code 12 would be more robust than matching text.",
+      "Evidence: python -m unittest tests.test_station_budgets_completeness passes all 31 tests. The en and em dash characters in the diff appear only in runs/wo-gh-42/reviewer-ux.packet.md, a factory-generated packet that copies the existing reviewer prompt, not in a file the builder produced."
+    ]
+  },
+  "configured_model": "claude-opus-5-5",
+  "executor": {
+    "kind": "command",
+    "detail": "python3"
+  },
+  "executed_model": "claude-opus-5-5"
+}
