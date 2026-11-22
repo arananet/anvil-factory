@@ -73,6 +73,7 @@ MODEL = "claude-opus-5-5"
 SMALL = {"input_tokens": 100, "output_tokens": 10}
 OUTPUT_MARKER = "STATION_OUTPUT_MARKER_47_do_not_publish"
 MARKER_RE = re.compile(r"^<!-- anvil-progress run_id=(\S+) -->")
+TIMING_KEY_RE = re.compile(r"duration|elapsed|_ms$|_seconds$|_at$|timestamp")
 SCRUBBED_ENV = ("GH_TOKEN", "GITHUB_TOKEN", "GITHUB_REPOSITORY", "GITHUB_API_URL", "GITHUB_GRAPHQL_URL",
                 "GITHUB_RUN_ID", "GITHUB_SERVER_URL", "ANVIL_PROJECTS_TOKEN")
 ISSUE_SINK = [{"type": "github-issue"}]
@@ -423,6 +424,8 @@ class SinkFailures(unittest.TestCase):
             first, second = self.baseline(tmp, "base1"), self.baseline(tmp, "base2")
             base_a, base_b = flatten(first.saved_report()), flatten(second.saved_report())
             volatile = {k for k in set(base_a) | set(base_b) if base_a.get(k) != base_b.get(k)}
+            # Wall clock figures are volatile even when two baselines happen to agree on them.
+            volatile |= {k for k in set(base_a) | set(base_b) if TIMING_KEY_RE.search(k.rsplit("/", 1)[-1])}
             project = make_project(tmp, name="sinkrun")
             with github_env(GITHUB_REPOSITORY=REPO, GH_TOKEN="ghs_test_token_s3", GITHUB_API_URL=sink.url):
                 run = run_line(project, "wo-gh-901")
