@@ -243,10 +243,10 @@ factory's own `anvil.yaml` ships sdlc-default partitions that sum to exactly
 
 | station | partition |
 |---|---|
-| intake | 200000 |
+| intake | 400000 |
 | spec-writer | 1200000 |
 | test-writer | 3200000 |
-| builder | 5800000 |
+| builder | 5600000 |
 | reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture, reviewer-design, reviewer-ux | 600000 each |
 | approver | 200000 |
 | triage-human | 100000 |
