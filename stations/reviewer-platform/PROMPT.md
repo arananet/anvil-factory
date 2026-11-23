@@ -30,3 +30,5 @@ Return a JSON object with this structure:
 }
 
 The station field must equal "reviewer-platform", the verdict must be one of pass, fail, or changes_requested, and findings must be a list of strings.
+
+Fill the optional field owner_ruling, a string with the question and the options you see, only when a finding cannot be resolved by the builder inside the order's guardrails (a requirement contradicts a protected path or an existing protected test, two requirements conflict, or the fix needs an authorization the order does not give); a finding the builder can fix is never an owner ruling, and the verdict stays pass, fail or changes_requested.

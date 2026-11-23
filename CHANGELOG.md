@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Stop futile loops: three deterministic stops (stop-futile-loops, wo-gh-49)
+
+- New exit statuses `owner_ruling_needed`, `no_progress` and `checks_stuck`: a reviewer asking for an owner ruling (optional review field `owner_ruling`), a builder attempt that answers a loopback without changing any file, or the same gate failure signature twice in a row ends the run instead of spending another attempt. No model call in any of them.
+- Switches under `efficiency`, all on by default: `stop_on_owner_ruling`, `stop_on_no_progress`, `stop_on_repeated_gate_failure`; `gate_failure_patterns` sets the lines that name a failing test.
+- Built by the line up to the checks gate (run 45086042758, which ended budget_exceeded after the same ten gate failures twice) and finished by the operator: `no_progress` applies only once an earlier attempt of the run has changed the tree, and the project fixture of tests/test_station_budgets_completeness.py turns that stop off because its scripted builder rewrites the same files.
+- Two operator test fixes ride along: the tree evidence of wo-gh-41 (tests/test_continuous_run_accounting.py) is asserted only in that order's run, and the descriptor count of tests/test_live_progress_sink_errors.py waits for the in-process collector to close its last socket (it failed about one run in three).
+- Spec: .openspec/specs/stop-futile-loops/spec.md. Tests: tests/test_stop_futile_loops.py. Decision: brain/decisions/0016-stop-futile-loops.md. Docs: docs/EXECUTION.md, docs/OPERATIONS.md.
+
 ### Operator fix: the intake partition covers the factory as it stands
 
 - `efficiency.station_budgets` in anvil.yaml: intake 200000 -> 400000, builder 5800000 -> 5600000; the partitions still add up to `max_run_tokens` 15000000. Run 45079024072 (wo-gh-49) stopped at intake after 212779 tokens, almost all cache reads of a repo that grew with wo-gh-47; no work was done and nothing was wrong with the order.

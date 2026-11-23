@@ -10,12 +10,13 @@ from urllib.parse import urlparse
 from .model import WorkOrder, Review
 from .config import (default_model, resolve_model, load_anvil_config, health_config, CHARS_PER_TOKEN,
                      get_station_budget, validate_station_budgets, pipeline_partitions,
-                     station_budget_settings)
+                     station_budget_settings, futile_loop_settings)
 from .brain import (packet_learnings_section, resolve_practices, practices_by_id,
                     packet_practices_section, gate_practices_section)
 from .design import packet_design_section, load_design_system
 from .capture import capture_breakpoints, packet_rendered_evidence_section
-from .gates import human_gate, checks_gate, resolve_base_ref_config, _run_shell, validate_builder_report, review_artifact_state
+from .gates import (human_gate, checks_gate, resolve_base_ref_config, _run_shell, validate_builder_report,
+                    review_artifact_state, failure_signature)
 from .approver import aggregate, needs_human, aggregate_explained, needs_human_explained, matched_risk_hints, RISK_SCAN_ORDER
 from .executor import ExecutorError
 from .routing import route_reviewers, write_routing_record, render_routing_section, routing_swimlane_summary
@@ -703,6 +704,9 @@ class RunReport:
     budgets: dict = None
     completeness: list = None
     cost_stations: dict = None
+    # stop-futile-loops R2.2, R5.3: set only on runs ended by one of its stops.
+    owner_rulings: list = None
+    next_human_action: str = None
     def to_dict(self):
         # Build cost section from steps
         measured_steps = [s for s in self.steps if s.get("cost") is not None]
@@ -734,7 +738,7 @@ class RunReport:
         if self.health:
             result["health"] = self.health
         for key in ("checkpoint", "exit_status", "termination_reason", "budget_death",
-                    "budgets", "completeness"):
+                    "budgets", "completeness", "owner_rulings", "next_human_action"):
             if getattr(self, key) is not None:
                 result[key] = getattr(self, key)
 
@@ -745,7 +749,27 @@ class RunReport:
 # station and completed on every exit path, so a killed run never needs a
 # second run to write its paperwork.
 EXIT_STATUSES = ("completed", "budget_exceeded", "station_timeout", "turn_limit",
-                 "checks_stopped", "intake_stopped", "runtime_refused", "error", "signal")
+                 "checks_stopped", "intake_stopped", "runtime_refused", "error", "signal",
+                 "owner_ruling_needed", "no_progress", "checks_stuck")
+
+# Stop futile loops (spec stop-futile-loops R5): exits that end a run whose
+# next round could not change the outcome, each with the next human action.
+NEXT_HUMAN_ACTIONS = {
+    "owner_ruling_needed": "Answer the owner ruling questions listed in this report, then refile or amend "
+                           "the work order and run the line again.",
+    "no_progress": "Read the loopback the last builder attempt did not answer and decide whether the order "
+                   "is buildable as filed; amend the order or its guardrails before running the line again.",
+    "checks_stuck": "Inspect the repeated failing lines in the termination reason and decide whether a "
+                    "protected test or the order must change before running the line again.",
+}
+STOP_REASON_LIMIT = 2000
+OWNER_RULING_NOTE = (
+    "\n\n## Owner ruling\n\n"
+    "Fill the optional review field owner_ruling (a string with the question and the options you see) "
+    "only when a finding cannot be resolved by the builder inside this order's guardrails: a requirement "
+    "contradicts a protected path or an existing protected test, two requirements conflict, or the fix "
+    "needs an authorization the order does not give. A finding the builder can fix is never an owner "
+    "ruling. Your verdict stays pass, fail or changes_requested.\n")
 
 # HTTP statuses with which a model runtime refuses every call until an operator
 # acts: bad credentials, no balance, no access. Any later call or station gets
@@ -947,6 +971,11 @@ class RunAccounting:
             print(f"anvil: swimlane.md not written ({type(write_exc).__name__}: {write_exc})", file=sys.stderr)
 
 
+def _bounded(reason, limit=STOP_REASON_LIMIT):
+    """A termination reason of at most limit characters (stop-futile-loops R4.2)."""
+    return reason if len(reason) <= limit else reason[:limit - 3] + "..."
+
+
 def _install_signal_handlers():
     """Turn SIGTERM and SIGINT into RunSignal; returns the previous handlers.
 
@@ -1045,6 +1074,48 @@ def parse_review(text, station_id):
     and findings a list of strings. Anything else returns None; the caller
     records that as review_parse_failed and the station contributes no review.
     """
+    obj = _review_object(text)
+    if obj is None:
+        return None
+    if "verdict" not in obj or "station" not in obj:
+        return None
+    if obj["station"] != station_id:
+        return None
+    if obj["verdict"] not in {"pass", "fail", "changes_requested"}:
+        return None
+
+    ruling, _ignored = owner_ruling_value(obj)
+    try:
+        return Review(station=str(obj["station"]),
+                      verdict=str(obj["verdict"]),
+                      findings=[str(f) for f in obj.get("findings", [])],
+                      owner_ruling=ruling)
+    except ValueError:
+        return None
+
+
+def owner_ruling_value(obj):
+    """(kept question or None, reason it was ignored or None) for a review object.
+
+    stop-futile-loops R1.3: a non-string or blank owner_ruling is dropped and
+    the reason recorded; the review still counts. An absent key or JSON null
+    means no question was asked and nothing is recorded.
+    """
+    if not isinstance(obj, dict) or obj.get("owner_ruling") is None:
+        return None, None
+    value = obj["owner_ruling"]
+    if not isinstance(value, str):
+        return None, f"not a string: {type(value).__name__}"
+    if not value.strip():
+        return None, "empty"
+    return value, None
+
+
+def _review_object(text):
+    """The one JSON object of a review artifact, else None.
+
+    Surrounding whitespace and one surrounding markdown code fence are allowed.
+    """
     if not text:
         return None
 
@@ -1065,21 +1136,7 @@ def parse_review(text, station_id):
     except json.JSONDecodeError:
         return None
 
-    if not isinstance(obj, dict):
-        return None
-    if "verdict" not in obj or "station" not in obj:
-        return None
-    if obj["station"] != station_id:
-        return None
-    if obj["verdict"] not in {"pass", "fail", "changes_requested"}:
-        return None
-
-    try:
-        return Review(station=str(obj["station"]),
-                      verdict=str(obj["verdict"]),
-                      findings=[str(f) for f in obj.get("findings", [])])
-    except ValueError:
-        return None
+    return obj if isinstance(obj, dict) else None
 
 def _reported_model(text):
     """A model name counts only when the runtime output itself reports one.
@@ -1278,6 +1335,38 @@ def _snapshot_working_tree(project_dir):
                 pass
 
     return snapshot
+
+
+def _tree_fingerprint(project_dir):
+    """Content hash of every file outside runs/ (stop-futile-loops R3.1, R3.3).
+
+    In a git work tree the file list is git's own (tracked plus untracked,
+    files ignored by .gitignore excluded); elsewhere every file outside .git
+    and runs/. A listed file that no longer exists maps to None, so a deletion
+    is a change. Deterministic and local: no model call, no network.
+    """
+    project_path = Path(project_dir)
+    names = None
+    try:
+        listed = subprocess.run(["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
+                                cwd=project_path, capture_output=True, timeout=60)
+        if listed.returncode == 0:
+            names = {n for n in listed.stdout.decode("utf-8", "surrogateescape").split("\0") if n}
+    except (OSError, subprocess.SubprocessError):
+        names = None
+    if names is None:
+        names = {str(p.relative_to(project_path)) for p in project_path.rglob("*")
+                 if p.is_file() and ".git" not in p.relative_to(project_path).parts}
+    fingerprint = {}
+    for name in names:
+        if Path(name).parts[:1] == ("runs",):
+            continue
+        path = project_path / name
+        try:
+            fingerprint[name] = hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+        except OSError:
+            fingerprint[name] = None
+    return fingerprint
 
 
 def _compute_delta(before_snapshot, after_snapshot):
@@ -1640,6 +1729,9 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
     # Load price table for cost measurement
     config = load_anvil_config(project / "anvil.yaml")
     limits = efficiency_config(config)
+    # stop-futile-loops R4.1, R5.2: a malformed switch or pattern list fails
+    # here, before any station runs.
+    futile = futile_loop_settings(config)
     # station-budgets-completeness R1: the partitions are validated against
     # the run cap before any station runs; an over-cap set fails here,
     # naming the pipeline and the excess, with zero model calls.
@@ -1779,6 +1871,16 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
 
     # Track gate state
     gate_failed = False
+    # stop-futile-loops: the failure signature of each attempt's pre-review
+    # gate (attempt -> sorted lines, [] when unrecognized or passed), the tree
+    # before a builder attempt that answers a loopback, and the questions the
+    # counted reviews of the current attempt put to the owner.
+    gate_signatures = {}
+    tree_before_attempt = None
+    attempt_answers_loopback = False
+    builder_has_moved = False
+    owner_rulings = []
+    answered_verdict = None
 
     # Track builder delta for protected path checking (Loopback round 2)
     # Each builder attempt is judged on its own delta
@@ -1835,6 +1937,8 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
         prompt = station.prompt if station and station.prompt else f"Station {station_id}: carry out your role for this work order."
         if limits:
             prompt += EFFICIENCY_NOTE
+        if station_id.startswith("reviewer"):
+            prompt += OWNER_RULING_NOTE  # R1.2: in the runner's packet, never in review_suffix
         packet = run_dir / f"{station_id}.packet.md"
         design_section = packet_design_section(project, station_id) if not limits or is_visual_run(work_order) else ""
 
@@ -2192,6 +2296,7 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 f"- status: {_sanitize_control_chars(work_order.status)}\n"
             )
             for extra_section in (
+                OWNER_RULING_NOTE.strip(),
                 packet_loopback_section(loopback_note, station_id),
                 packet_practices_section(project, practices_resolution, station_id, practice_entries),
                 packet_skills_section(skills_resolution, station_id, skill_entries),
@@ -2358,6 +2463,10 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 decision_approver["reviews_uncounted"] = [
                     {"station": sid, "reason": uncounted_reasons.get(sid) or "no countable review artifact was produced"}
                     for sid in reviews_expected if sid not in have]
+            # stop-futile-loops R2.1: questions from the counted reviews only.
+            counted_stations = {c["station"] for c in counted}
+            owner_rulings = [{"station": r.station, "question": r.owner_ruling} for r in run_reviews
+                             if r.owner_ruling and r.station in counted_stations]
             detail = f"Approver verdict: {verdict}"
             artifact = str(run_dir / "report.json")
         elif station_id == "checks-gate":
@@ -2412,6 +2521,13 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 "basis": gate_result.get("basis", ""),
                 "gate_verdict": gate_result["gate_verdict"]
             }
+            # stop-futile-loops R4.1: the signature of a failed check run,
+            # read from the full command outputs.
+            if any(code != 0 for code in gate_result.get("exit_codes") or []):
+                gate_result["failure_signature"] = failure_signature(gate_result.get("check_outputs") or [],
+                                                                     futile["gate_failure_patterns"])
+            if gate_result.get("failure_signature"):
+                extra_envelope["failure_signature"] = list(gate_result["failure_signature"])
 
             # Station artifact contract S2: deterministic artifact validation
             # after the builder and before any reviewer is spawned.
@@ -2640,6 +2756,13 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                     builder_attempt += 1
                     builder_snapshot_before = _snapshot_working_tree(project)
                     builder_attempt_delta = set()
+                    # R3.1: only an attempt answering a loopback to the builder can
+                    # end the run, and only once an earlier attempt of this run has
+                    # changed the tree: a builder that never moved is judged by the
+                    # gate and the reviewers, as before this stop existed.
+                    tree_before_attempt = _tree_fingerprint(project) if futile["stop_on_no_progress"] else None
+                    attempt_answers_loopback = bool(builder_attempt > 1 and loopback_note
+                                                    and loopback_note.get("return_to") == "builder")
                 # Completeness (R4) names the test-writer's files from its own delta.
                 test_writer_before = _snapshot_working_tree(project) if station_id == "test-writer" else None
 
@@ -2770,6 +2893,9 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                             run_reviews.append(review)
                             run_findings.extend(review.findings)
                             extra_envelope["review"] = review.to_dict()
+                            _kept, ignored = owner_ruling_value(_review_object(review_file_text))
+                            if ignored:
+                                extra_envelope["owner_ruling_ignored"] = ignored
 
                     # Track builder delta for protected path checking (Loopback round 2)
                     if station_id == "builder" and builder_snapshot_before is not None:
@@ -2887,6 +3013,8 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 step["feedback"] = {"from_station": loopback_note["from_station"],
                                     "reason": loopback_note["reason"],
                                     "findings": list(loopback_note["findings"])[:20]}
+        if extra_envelope.get("owner_ruling_ignored"):
+            step["owner_ruling_ignored"] = extra_envelope["owner_ruling_ignored"]  # R1.3
         if station_id in artifact_failures:
             step["expected_artifact"] = artifact_failures[station_id]["expected_artifact"]
             step["artifact_state"] = artifact_failures[station_id]["artifact_state"]
@@ -2894,7 +3022,7 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
         if station_id == "checks-gate" and extra_envelope:
             for key in ["phase", "commands", "exit_codes", "protected_paths",
                        "protected_path_verdict", "protected_path_findings", "gate_verdict",
-                       "artifact_validation"]:
+                       "artifact_validation", "failure_signature"]:
                 if key in extra_envelope:
                     step[key] = extra_envelope[key]
         steps.append(step)
@@ -2968,6 +3096,42 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
         stop = _station_stop(step, steps, limits) if execute_mode else None
         if stop:
             verdict = "budget_exceeded" if stop["exit_status"] == "budget_exceeded" else "failed"
+            acct.checkpoint(station_id)
+            break
+        # Stop futile loops (stop-futile-loops R2 to R4): deterministic reads
+        # of signals already on the record, checked before any loopback.
+        if execute_mode and station_id == "builder" and tree_before_attempt is not None:
+            unchanged = _tree_fingerprint(project) == tree_before_attempt
+            tree_before_attempt = None
+            if not unchanged:
+                builder_has_moved = True
+            if unchanged and attempt_answers_loopback and builder_has_moved:
+                source = loopback_note["from_station"]
+                verdict = answered_verdict or "failed"
+                stop = {"exit_status": "no_progress",
+                        "reason": f"builder attempt {builder_attempt} changed no file outside runs/ after the "
+                                  f"loopback from {source}, so the {source} loopback was not answered; no checks "
+                                  f"gate and no reviewer was dispatched for attempt {builder_attempt}"}
+                acct.checkpoint(station_id)
+                break
+        if (execute_mode and station_id == "checks-gate" and gate_result.get("phase") == "pre-review"
+                and builder_attempt > 0):
+            signature = (list(gate_result.get("failure_signature") or [])
+                         if gate_result.get("gate_verdict") == "fail" else [])
+            previous = gate_signatures.get(builder_attempt - 1)
+            gate_signatures[builder_attempt] = signature
+            if futile["stop_on_repeated_gate_failure"] and signature and signature == previous:
+                verdict = "gate_failed"
+                stop = {"exit_status": "checks_stuck",
+                        "reason": _bounded(f"pre-review checks gate failed on attempt {builder_attempt} with the "
+                                           f"same failing lines as attempt {builder_attempt - 1}: "
+                                           + "; ".join(signature))}
+                acct.checkpoint(station_id)
+                break
+        if execute_mode and station_id == "approver" and owner_rulings and futile["stop_on_owner_ruling"]:
+            stop = {"exit_status": "owner_ruling_needed",
+                    "reason": _bounded(f"approver verdict {verdict}; owner ruling needed, no loopback made: "
+                                       + "; ".join(f"{r['station']} asks: {r['question']}" for r in owner_rulings))}
             acct.checkpoint(station_id)
             break
         looped_back = False
@@ -3054,6 +3218,8 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 completeness_failed = False
                 run_reviews, run_findings = [], []
                 uncounted_reasons, artifact_failures = {}, {}
+                # The verdict this attempt answers, kept for a no_progress stop.
+                answered_verdict = verdict or ("gate_failed" if rewind[2] == "checks-gate" else "changes_requested")
                 verdict = ""
                 decision_approver = None
                 preview_done = False
@@ -3122,6 +3288,21 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
             # Already required, add health reason
             human_rule = f"{human_rule} Additionally, health verification found the deployment unhealthy ({health_reason})."
 
+    # stop-futile-loops R2.3, R5.3: a stop closes the human gate and names
+    # the next human action; the verdict stays the one the line produced.
+    stop_rulings = None
+    next_human_action = NEXT_HUMAN_ACTIONS.get(stop["exit_status"])
+    if next_human_action:
+        human_required = True
+        if stop["exit_status"] == "owner_ruling_needed":
+            stop_rulings = [dict(r) for r in owner_rulings]
+            asked = ", ".join(r["station"] for r in stop_rulings)
+            human_rule = (f"Owner ruling needed: {asked} put a question only the owner can settle, so the run "
+                          f"stopped without a loopback and the human gate stays closed until the owner answers.")
+        else:
+            human_rule = (f"The run stopped with {stop['exit_status']} because another attempt could not change "
+                          f"the outcome, so the human gate stays closed until a human decides.")
+
     approval_record = None
     if approval:
         # Autonomous line S4: a recorded human approval opens the gate for
@@ -3161,7 +3342,8 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                        termination_reason=stop["reason"], budget_death=stop.get("budget_death"),
                        budgets=budgets_view(steps),
                        completeness=list(completeness_records) if completeness_records else None,
-                       cost_stations=cost_stations_view(steps))
+                       cost_stations=cost_stations_view(steps),
+                       owner_rulings=stop_rulings, next_human_action=next_human_action)
     # The completed record is the last checkpoint plus the verdict, decision
     # and exit fields (R1.3); a failed write keeps that checkpoint (R2.5).
     acct.completed = write_report_atomic(run_dir, report.to_dict())

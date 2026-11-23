@@ -81,6 +81,8 @@ When judging quality section findings, name specific criteria gaps:
 
 The station field must equal "reviewer-design", and both the overall verdict and section verdicts must be one of pass, fail, or changes_requested.
 
+Fill the optional field owner_ruling, a string with the question and the options you see, only when a finding cannot be resolved by the builder inside the order's guardrails (a requirement contradicts a protected path or an existing protected test, two requirements conflict, or the fix needs an authorization the order does not give); a finding the builder can fix is never an owner ruling, and the verdict stays pass, fail or changes_requested.
+
 ## Examples
 
 Example 1: No design system exists

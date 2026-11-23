@@ -319,6 +319,22 @@ def _get_base_ref_files(project_dir, base_ref):
     return set()
 
 
+def failure_signature(outputs, patterns):
+    """The gate failure signature (stop-futile-loops R4.1).
+
+    The sorted list of distinct output lines, trailing whitespace stripped,
+    that match one of the compiled patterns. An empty list means the patterns
+    recognize no failing line in the output.
+    """
+    lines = set()
+    for out in outputs:
+        for line in str(out or "").splitlines():
+            line = line.rstrip()
+            if line and any(p.search(line) for p in patterns):
+                lines.add(line)
+    return sorted(lines)
+
+
 def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_id, timeout=300, base_ref=None, basis="builder_delta", attempt=None):
     """Run the checks gate: execute check commands and validate protected paths.
 
@@ -462,6 +478,9 @@ def checks_gate(phase, base_ref_config, changed_files, project_dir, work_order_i
     return {
         "phase": phase,
         "status": status,
+        # stop-futile-loops R4.1: the full command outputs, for the failure
+        # signature; the summary in "output" keeps only each tail.
+        "check_outputs": list(outputs),
         "detail": f"Gate {status}: {len(checks)} checks, protected paths: {protected_path_verdict}",
         "commands": commands,
         "exit_codes": exit_codes,

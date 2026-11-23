@@ -28,6 +28,11 @@ def cell(value):
     return str(value if value is not None else "").replace("|", "\\|").replace("\n", " ")[:160]
 
 
+def question_text(value):
+    """An owner question on one line; longer than a table cell, still bounded."""
+    return " ".join(str(value if value is not None else "").split()).replace("|", "\\|")[:1000]
+
+
 def render(report, code, run_url="", branch=""):
     decision = report.get("decision") or {}
     lines = [
@@ -62,6 +67,14 @@ def render(report, code, run_url="", branch=""):
     for step in report.get("steps") or []:
         lines.append(f"| {cell(step.get('station'))} | {cell(step.get('status'))} | "
                      f"{step.get('attempt', 1)} | {cell(step.get('executed_model') or step.get('configured_model'))} |")
+    # stop-futile-loops R2.4, R5.3: the owner's questions under their own
+    # heading, and the next human action a stop names.
+    rulings = [r for r in report.get("owner_rulings") or [] if isinstance(r, dict)]
+    if rulings:
+        lines += ["", "### Owner ruling needed", ""]
+        lines += [f"- {cell(r.get('station'))}: {question_text(r.get('question'))}" for r in rulings]
+    if report.get("next_human_action"):
+        lines += ["", f"Next human action: {question_text(report['next_human_action'])}"]
     warnings = report.get("warnings") or []
     if warnings:
         lines += ["", "Warnings:"] + [f"- {cell(w)}" for w in warnings]

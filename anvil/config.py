@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from pathlib import Path
 
 # anvil.yaml is written as JSON, which is valid YAML 1.2. That choice keeps the
@@ -396,3 +397,45 @@ def validate_station_budgets(config, pipelines, registry=None):
         raise ValueError("efficiency.station_budgets exceed the run cap: " + "; ".join(excess)
                          + ". Lower the partitions or the default; the run cap is the outer bound.")
     return worst
+
+
+# Stop futile loops (spec stop-futile-loops R4.1, R5.2). Three deterministic
+# stops, each on by default and turned off per project under efficiency. The
+# defaults live here rather than in anvil/telemetry.py so the efficiency
+# defaults a new project is generated with stay as they were (decision 0016).
+FUTILE_LOOP_SWITCHES = ("stop_on_owner_ruling", "stop_on_no_progress", "stop_on_repeated_gate_failure")
+# Lines that name a failing test: unittest FAIL: and ERROR:, pytest FAILED,
+# TAP not ok as printed by node --test (indented for subtests).
+DEFAULT_GATE_FAILURE_PATTERNS = (r"^FAIL:", r"^ERROR:", r"^FAILED\b", r"^\s*not ok\b")
+
+
+def futile_loop_settings(config):
+    """The validated stop switches and compiled gate failure patterns.
+
+    Returns {"stop_on_owner_ruling": bool, "stop_on_no_progress": bool,
+    "stop_on_repeated_gate_failure": bool, "gate_failure_patterns": [re.Pattern]}.
+    A switch that is not a boolean, or gate_failure_patterns that is not a
+    list of strings or holds a pattern that does not compile, raises
+    ValueError naming the key; nothing falls back silently.
+    """
+    efficiency = (config or {}).get("efficiency") or {}
+    if not isinstance(efficiency, dict):
+        raise ValueError("efficiency must be an object")
+    settings = {}
+    for key in FUTILE_LOOP_SWITCHES:
+        value = efficiency.get(key, True)
+        if not isinstance(value, bool):
+            raise ValueError(f"efficiency.{key} must be a boolean, got {value!r}")
+        settings[key] = value
+    raw = efficiency.get("gate_failure_patterns", list(DEFAULT_GATE_FAILURE_PATTERNS))
+    if not isinstance(raw, list) or not all(isinstance(item, str) for item in raw):
+        raise ValueError(f"efficiency.gate_failure_patterns must be a list of regular expression strings, "
+                         f"got {raw!r}")
+    compiled = []
+    for item in raw:
+        try:
+            compiled.append(re.compile(item))
+        except re.error as exc:
+            raise ValueError(f"efficiency.gate_failure_patterns: pattern {item!r} does not compile ({exc})") from None
+    settings["gate_failure_patterns"] = compiled
+    return settings

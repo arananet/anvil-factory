@@ -169,8 +169,26 @@ so a killed run's record is never overwritten.
   attempt left, or a failed pre-deploy gate), `intake_stopped` (rejected,
   waiting_info, or a knowledge pack that does not load), `runtime_refused`
   (the model runtime answered a station with HTTP 401, 402 or 403: bad
-  credentials, no billing balance or no access), `error` (an uncaught
-  exception: its type and message) and `signal` (`SIGTERM` or `SIGINT`).
+  credentials, no billing balance or no access), `owner_ruling_needed`,
+  `no_progress` and `checks_stuck` (the three stops below), `error` (an
+  uncaught exception: its type and message) and `signal` (`SIGTERM` or
+  `SIGINT`).
+- Three deterministic stops end a run whose next attempt cannot change the
+  outcome (decision 0016). None makes a model call, and each is an exit like
+  the others: the record is completed and unrun stations are `not_run`.
+  `owner_ruling_needed`: a counted review carries the optional field
+  `owner_ruling` (the question only the owner can settle), so no loopback is
+  made and the report and the line comment print the questions.
+  `no_progress`: a builder attempt that answers a loopback changed no file
+  outside runs/, after an earlier attempt of the same run did change the
+  tree; no gate and no reviewer is dispatched for it. `checks_stuck`: the
+  pre-review checks gate failed with the same non-empty failure signature as
+  the previous attempt (the sorted output lines matching
+  `efficiency.gate_failure_patterns`, by default unittest `FAIL:` and
+  `ERROR:`, pytest `FAILED`, TAP `not ok`). Each stop is on by default and is
+  turned off per project with `efficiency.stop_on_owner_ruling`,
+  `efficiency.stop_on_no_progress` or
+  `efficiency.stop_on_repeated_gate_failure` set to false.
 - A budget death, a station timeout, the turn limit, a runtime refusal and a
   checks gate stop end the line at that station: no later station runs. Every pipeline station is
   named once in `steps`; one that never ran has status `not_run`, and one in
