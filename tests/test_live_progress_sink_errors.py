@@ -11,6 +11,7 @@ import http.server
 import os
 import sys
 import threading
+import time
 import unittest
 import warnings
 from pathlib import Path
@@ -76,7 +77,13 @@ class SinkErrorConnectionTests(unittest.TestCase):
             before = len(os.listdir("/proc/self/fd"))
             for _ in range(5):
                 sinks.deliver(record, errors)
-            held = len(os.listdir("/proc/self/fd")) - before
+            # The collector runs in this process: its handler thread may still be
+            # closing the socket of the last request, so the count is given a moment.
+            for _ in range(60):
+                held = len(os.listdir("/proc/self/fd")) - before
+                if held <= 0:
+                    break
+                time.sleep(0.05)
         self.assertEqual(errors, ["github-issue: HTTP 500"])
         self.assertEqual(len(kept), 5)
         self.assertLessEqual(held, 0, f"{held} descriptors held open by failed sink requests")

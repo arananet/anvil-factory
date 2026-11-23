@@ -41,7 +41,7 @@ In both runs the signal was on the record before the money was spent: the same g
 - R2.5: The verdict vocabulary does not grow: the run verdict is the one the reviews produce today (changes_requested or rejected, or approved if every counted review passes), so the approval rules of anvil/line.py are unchanged.
 
 ### R3. An attempt that changes nothing ends the run
-- R3.1: After a loopback to the builder, the runner compares the working tree outside runs/ before and after that builder attempt: a file created, deleted or changed in content anywhere outside runs/ (files ignored by .gitignore excluded) counts as a change. The first builder attempt of a run is never compared.
+- R3.1: After a loopback to the builder, the runner compares the working tree outside runs/ before and after that builder attempt: a file created, deleted or changed in content anywhere outside runs/ (files ignored by .gitignore excluded) counts as a change. The first builder attempt of a run never ends the run, and an unchanged attempt ends it only when an earlier builder attempt of the same run did change the tree outside runs/: a builder that has not moved at all is judged by the gate and the reviewers as before (operator amendment of 2026-11-23, decision 0016).
 - R3.2: When nothing changed, no checks gate and no reviewer is dispatched for that attempt and the run ends with exit_status no_progress, the termination_reason naming the attempt number and the loopback source (checks gate or approver) that was not answered.
 - R3.3: The comparison is deterministic and makes no model call.
 

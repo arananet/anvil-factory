@@ -588,6 +588,9 @@ class SuiteTests(unittest.TestCase):
         landed on main after the parent ref are part of the baseline. The diff runs to the
         working tree, so committed and uncommitted edits both count.
         """
+        if os.environ.get("ANVIL_WORK_ORDER_ID") != "wo-gh-41":
+            self.skipTest("tree evidence of wo-gh-41 is asserted only in that order's run")
+
         def git(*args):
             return subprocess.run(["git", *args], cwd=str(ROOT), capture_output=True, text=True, timeout=30)
 

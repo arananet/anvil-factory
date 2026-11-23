@@ -141,6 +141,9 @@ def make_project(tmp, station_budgets=None, default_station_budget=None, checks=
     eff = config.setdefault("efficiency", {})
     eff["max_run_tokens"] = max_run_tokens
     eff["max_packet_tokens"] = 48000
+    # The scripted builder here writes the same files on every attempt; these scenarios
+    # are about the completeness gate, so the no progress stop of wo-gh-49 is turned off.
+    eff["stop_on_no_progress"] = False
     if station_budgets is not None:
         eff["station_budgets"] = station_budgets
     if default_station_budget is not None:

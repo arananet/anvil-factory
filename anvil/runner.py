@@ -1877,6 +1877,8 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
     # counted reviews of the current attempt put to the owner.
     gate_signatures = {}
     tree_before_attempt = None
+    attempt_answers_loopback = False
+    builder_has_moved = False
     owner_rulings = []
     answered_verdict = None
 
@@ -2754,11 +2756,13 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                     builder_attempt += 1
                     builder_snapshot_before = _snapshot_working_tree(project)
                     builder_attempt_delta = set()
-                    # R3.1: only an attempt answering a loopback to the builder is compared.
-                    tree_before_attempt = (_tree_fingerprint(project)
-                                           if futile["stop_on_no_progress"] and builder_attempt > 1
-                                           and loopback_note and loopback_note.get("return_to") == "builder"
-                                           else None)
+                    # R3.1: only an attempt answering a loopback to the builder can
+                    # end the run, and only once an earlier attempt of this run has
+                    # changed the tree: a builder that never moved is judged by the
+                    # gate and the reviewers, as before this stop existed.
+                    tree_before_attempt = _tree_fingerprint(project) if futile["stop_on_no_progress"] else None
+                    attempt_answers_loopback = bool(builder_attempt > 1 and loopback_note
+                                                    and loopback_note.get("return_to") == "builder")
                 # Completeness (R4) names the test-writer's files from its own delta.
                 test_writer_before = _snapshot_working_tree(project) if station_id == "test-writer" else None
 
@@ -3099,7 +3103,9 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
         if execute_mode and station_id == "builder" and tree_before_attempt is not None:
             unchanged = _tree_fingerprint(project) == tree_before_attempt
             tree_before_attempt = None
-            if unchanged:
+            if not unchanged:
+                builder_has_moved = True
+            if unchanged and attempt_answers_loopback and builder_has_moved:
                 source = loopback_note["from_station"]
                 verdict = answered_verdict or "failed"
                 stop = {"exit_status": "no_progress",

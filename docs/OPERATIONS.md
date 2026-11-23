@@ -163,6 +163,28 @@ Secrets come from the environment, never from the file. Export never decides
 a run: a failed POST is recorded in `state.json` under `export_errors` and
 the line goes on. Stations never receive these two variables.
 
+## When a run stops early on purpose
+
+Three exit statuses mean the line saw that another attempt would spend
+tokens without changing the outcome, and stopped. What to do with each:
+
+- `owner_ruling_needed`: a reviewer says only you can settle a question (a
+  requirement against a protected path or an existing test, two requirements
+  in conflict, a missing authorization). The questions are printed in the
+  line comment under their own heading. Answer in the issue, amend the
+  order, run again.
+- `no_progress`: the builder answered a loopback without changing any file.
+  Read the loopback it did not answer; the order usually asks for something
+  the guardrails forbid.
+- `checks_stuck`: the same tests failed in two attempts in a row; the
+  repeated lines are in the termination reason. Look at those tests first:
+  in the runs that led to this stop they were tests the builder was not
+  allowed to change.
+
+Each stop can be turned off under `efficiency` in anvil.yaml
+(`stop_on_owner_ruling`, `stop_on_no_progress`,
+`stop_on_repeated_gate_failure`); docs/EXECUTION.md has the exact rules.
+
 ## Cost
 
 Token counts are always recorded. Cost in money appears only for models with
