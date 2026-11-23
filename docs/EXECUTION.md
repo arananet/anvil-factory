@@ -257,19 +257,34 @@ stations, plus the default for each unnamed model station. A worst case above
 case equal to the cap loads. `anvil.config.validate_station_budgets(config,
 pipelines, registry)` runs the same check for any set of pipelines. The
 factory's own `anvil.yaml` ships sdlc-default partitions that sum to exactly
-15000000, the run cap, so no default partition is set:
+3000000, the run cap, so no default partition is set. The figures are budget
+tokens with `cache_read_weight` 0.1 (see below), calibrated on the measured
+runs of wo-gh-47 and wo-gh-49 with about three times their consumption:
 
 | station | partition |
 |---|---|
-| intake | 400000 |
-| spec-writer | 1200000 |
-| test-writer | 3200000 |
-| builder | 5600000 |
-| reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture, reviewer-design, reviewer-ux | 600000 each |
-| approver | 200000 |
-| triage-human | 100000 |
-| deployer | 300000 |
-| observer | 400000 |
+| intake | 100000 |
+| spec-writer | 250000 |
+| test-writer | 600000 |
+| builder | 1000000 |
+| reviewer-spec, reviewer-security, reviewer-tests, reviewer-architecture, reviewer-design, reviewer-ux | 120000 each |
+| approver | 30000 |
+| triage-human | 20000 |
+| deployer | 80000 |
+| observer | 200000 |
+
+Budget tokens (decision 0017): `efficiency.cache_read_weight`, a number from
+0 to 1, is what one token read from the prompt cache counts for against
+`max_run_tokens`, every station partition and the wrapper's in-flight
+ceiling. The default 1.0 counts it like any other token. A station that
+works in many turns re-reads its context from the cache on each turn, so at
+1.0 the limits measure the number of turns far more than the cost: in the
+measured runs about 95 percent of all tokens were cache reads, billed at
+about a tenth of a fresh token. With a lower weight the limits follow cost.
+Reports, state.json and the usage artifacts keep the raw counts; when the
+weight is not 1.0 a budget message says so and the progress comment shows
+both figures. The comment also shows the runtime's own cost estimate when the
+runtime reports one and no price table is recorded.
 
 The pre-call check: the spine checks every dispatch of a partitioned station
 before it is made. That covers the first attempt and a loopback re-dispatch

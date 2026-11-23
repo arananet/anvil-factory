@@ -35,7 +35,8 @@ from .quality import (
 )
 from .skills import resolve_skills, skills_by_id, packet_skills_section, public_resolution
 from .telemetry import (summarize_steps, efficiency_config, budget_reason, EFFICIENCY_NOTE,
-                        station_consumption, precall_decision, normalize_usage)
+                        station_consumption, precall_decision, normalize_usage,
+                        budget_tokens, set_cache_read_weight, cache_read_weight, weight_note)
 
 def _sanitize_control_chars(text):
     """Sanitize control characters from text to prevent injection.
@@ -848,7 +849,7 @@ def _budget_death(steps, limits, station_id, limit="max_run_tokens"):
     exposed; when it exposed none, the section says so instead of guessing.
     """
     usage = next((s.get("usage") for s in reversed(steps) if s.get("station") == station_id), None)
-    death = {"limit": limit, "measured_tokens": summarize_steps(steps)["total_tokens"],
+    death = {"limit": limit, "measured_tokens": budget_tokens(summarize_steps(steps)),
              "max_run_tokens": limits.get("max_run_tokens"), "station_in_flight": station_id,
              "station_usage": usage if isinstance(usage, dict) else None}
     if death["station_usage"] is None:
@@ -868,11 +869,11 @@ def _station_stop(step, steps, limits):
     if step.get("executor") is None:
         return None
     cap = limits.get("max_run_tokens")
-    total = summarize_steps(steps)["total_tokens"] or 0
+    total = budget_tokens(summarize_steps(steps)) or 0
     if cap and (total >= cap or "token threshold reached" in detail):
         return {"exit_status": "budget_exceeded",
                 "reason": f"run token cap crossed in station {sid}: measured {total} tokens "
-                          f"against max_run_tokens {cap}",
+                          f"against max_run_tokens {cap}{weight_note()}",
                 "budget_death": _budget_death(steps, limits, sid)}
     if step.get("status") == "budget_exceeded":
         # station-budgets-completeness R3: the in-flight ceiling stopped the
@@ -1729,6 +1730,8 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
     # Load price table for cost measurement
     config = load_anvil_config(project / "anvil.yaml")
     limits = efficiency_config(config)
+    # What a cache read counts for against every token budget of this run.
+    set_cache_read_weight(limits.get("cache_read_weight", 1.0))
     # stop-futile-loops R4.1, R5.2: a malformed switch or pattern list fails
     # here, before any station runs.
     futile = futile_loop_settings(config)
@@ -2172,7 +2175,8 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
             if getattr(executor, "kind", None) == "command":
                 totals = summarize_steps(steps)
                 if limits.get("max_run_tokens"):
-                    executor.limits["ANVIL_MAX_STATION_TOKENS"] = max(1, limits["max_run_tokens"] - (totals["total_tokens"] or 0))
+                    executor.limits["ANVIL_MAX_STATION_TOKENS"] = max(1, limits["max_run_tokens"] - (budget_tokens(totals) or 0))
+                executor.limits["ANVIL_CACHE_READ_WEIGHT"] = repr(cache_read_weight())
                 if limits.get("max_agent_calls"):
                     executor.limits["ANVIL_MAX_ATTEMPTS"] = max(1, min(2, limits["max_agent_calls"] - totals["calls"]))
                 # station-budgets-completeness R3: the wrapper's in-flight
@@ -2984,7 +2988,7 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 step_ceiling["termination_reason"] = (
                     f"station {station_id} stopped by its in-flight ceiling at efficiency.station_budgets "
                     f"{station_id} {step_ceiling['partition']}: measured "
-                    f"{usage_now['total_tokens'] if usage_now else 'unmeasured'} tokens; "
+                    f"{budget_tokens(usage_now) if usage_now else 'unmeasured'} tokens{weight_note()}; "
                     f"the undone work is not resumed in this dispatch")
             else:
                 step_ceiling["termination_reason"] = (

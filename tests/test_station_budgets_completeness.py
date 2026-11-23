@@ -330,8 +330,9 @@ class PartitionConfiguration(unittest.TestCase):
         # partition and that the table sums to the run cap; FACTORY_PARTITIONS stays as the
         # table the order was accepted with, which the builder report of that run cites.
         self.assertEqual(set(eff.get("station_budgets")), set(FACTORY_PARTITIONS))
-        self.assertEqual(sum(eff["station_budgets"].values()), RUN_CAP)
-        self.assertEqual(eff["max_run_tokens"], RUN_CAP)
+        # Operator recalibration of 2026-11-23 (decision 0017): the cap itself is calibration
+        # too, since the budgets now read cache reads at efficiency.cache_read_weight.
+        self.assertEqual(sum(eff["station_budgets"].values()), eff["max_run_tokens"])
 
     def test_s3_factory_config_validates_for_every_pipeline(self):
         """S3: the factory config loads against every pipeline it can run; sdlc-default's worst case is 15000000"""
@@ -339,10 +340,11 @@ class PartitionConfiguration(unittest.TestCase):
         pipes = [load_pipeline(p, known_stations=set(reg.ids())) for p in sorted((ROOT / "pipelines").glob("*.json"))]
         self.assertGreater(len(pipes), 1)
         worst = anvil_config.validate_station_budgets(self.factory_config(), pipes, reg)
-        self.assertEqual(worst["sdlc-default"], RUN_CAP)
+        cap = self.factory_config()["efficiency"]["max_run_tokens"]
+        self.assertEqual(worst["sdlc-default"], cap)
         self.assertEqual(set(worst), {p.name for p in pipes})
         for name, total in worst.items():
-            self.assertLessEqual(total, RUN_CAP, name)
+            self.assertLessEqual(total, cap, name)
 
     def test_s3_factory_other_keys_and_packet_budgets_unchanged(self):
         """S3 and guardrails: only the two efficiency keys are new; the packet budget lookup is unaffected"""
