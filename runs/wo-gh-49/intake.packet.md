@@ -89,7 +89,7 @@ Promoted practices that resolved for this station. Follow each rule.
 - source: github-issue
 - description: Implement the spec in .openspec/specs/stop-futile-loops/spec.md. Pipeline for this order is sdlc-default (software domain, the factory repo itself), selected by the run workflow.
 
-RELEASE OF 2026-11-22: this order is released by the owner. wo-gh-41, wo-gh-42 and wo-gh-47 are merged. Base ref: factory main d60962b59570eb8e45879d056dae4b380f2d5b0c (merge of wo-gh-47, live progress sinks; factory suite green on that commit). The run spine now includes anvil/sinks.py and the progress calls in anvil/observe.py: the three new exit statuses must reach the live progress comment through the existing exit path, with no change to anvil/sinks.py.
+RELEASE OF 2026-11-22: this order is released by the owner. wo-gh-41, wo-gh-42 and wo-gh-47 are merged. Base ref: factory main d74c83aefff95fba777ca04505116cfb63c6c8f3 (wo-gh-47 merged, plus the operator fix that sets the intake partition to 400000 and the builder partition to 5600000). The run spine now includes anvil/sinks.py and the progress calls in anvil/observe.py: the three new exit statuses must reach the live progress comment through the existing exit path, with no change to anvil/sinks.py.
 
 RUN EVIDENCE TESTS (operator rule, learned on wo-gh-42 and wo-gh-47): any test that asserts a fact about this order's own run (the tree compared with the base ref, files untouched, lines this order adds) must skip unless the environment variable ANVIL_WORK_ORDER_ID equals wo-gh-49, in the manner of tests/test_live_progress_sinks.py. Such a test left unconditional blocks every later order at the checks gate. No test may compare wall clock figures (durations, timestamps) between two runs for equality.
 

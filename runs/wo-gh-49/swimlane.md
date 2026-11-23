@@ -1,16 +1,23 @@
 # Swimlane
 
-**Exit status**: budget_exceeded (station intake stopped by its in-flight ceiling at efficiency.station_budgets intake 200000: measured 212779 tokens; the undone work is not resumed in this dispatch)
+Routing: 5 reviewers (reduced panel, 1 routed out)
 
-**Cost**: No measured steps (0 executed steps)
+**Exit status**: budget_exceeded (station builder stopped by its in-flight ceiling at efficiency.station_budgets builder 5600000: measured 441011 tokens; the undone work is not resumed in this dispatch)
+
+**Cost**: No measured steps (5 executed steps)
 
 | Station | Status | Duration ms | Artifacts | Cost |
 |---|---|---|---|---|
-| intake | budget_exceeded | 39382.219 | /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-49/runs/wo-gh-49/intake.packet.md | null |
-| spec-writer | not_run | 0 | - | null |
-| test-writer | not_run | 0 | - | null |
-| builder | not_run | 0 | - | null |
-| checks-gate | not_run | 0 | - | null |
+| intake | executed | 13075.407 | /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-49/runs/wo-gh-49/intake.output.md | null |
+| spec-writer | executed | 93984.813 | /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-49/runs/wo-gh-49/spec-writer.output.md | null |
+| test-writer | executed | 377079.715 | /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-49/runs/wo-gh-49/test-writer.output.md | null |
+| builder | executed | 569191.09 | /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-49/runs/wo-gh-49/builder.output.md | null |
+| checks-gate | failed | 92237.037 | /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-49/runs/wo-gh-49/checks-gate.pre-review.output.md | null |
+| loopback | loopback | 0.0 | - | null |
+| builder | executed | 267058.201 | /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-49/runs/wo-gh-49/builder.output.md | null |
+| checks-gate | failed | 90772.025 | /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-49/runs/wo-gh-49/checks-gate.pre-review.output.md | null |
+| loopback | loopback | 0.0 | - | null |
+| builder | budget_exceeded | 674540.239 | /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-49/runs/wo-gh-49/builder.packet.md | null |
 | reviewer-spec | not_run | 0 | - | null |
 | reviewer-security | not_run | 0 | - | null |
 | reviewer-tests | not_run | 0 | - | null |

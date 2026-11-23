@@ -213,6 +213,9 @@ def validate_review_file(review_path, station_id):
       one markdown code fence allowed)
     - station field must equal station_id
     - verdict must be one of: pass, fail, changes_requested
+    - owner_ruling is optional and never rejects a review (stop-futile-loops
+      R1.3): parse_review keeps a non-blank string and drops any other value,
+      recording why on the reviewer's step
     """
     if not review_path.exists():
         return False, f"Review file not found at {review_path}. You must write the review to this exact path."

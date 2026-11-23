@@ -1,15 +1,15 @@
 {
   "schema": "anvil/run-state@1",
-  "run_id": "9cbf95ce359b4575bbfa047f47de69a0",
+  "run_id": "bbed2cc56fe24880b83991c76434d59b",
   "work_order_id": "wo-gh-49",
   "project": "anvil-factory",
   "pipeline": "sdlc-default",
   "state": "finished",
   "current_station": null,
   "verdict": "budget_exceeded",
-  "loopbacks": 0,
-  "started_at": "2026-11-22T22:41:28.685840+00:00",
-  "updated_at": "2026-11-22T22:42:11.033527+00:00",
+  "loopbacks": 2,
+  "started_at": "2026-11-22T23:58:39.201685+00:00",
+  "updated_at": "2026-11-23T00:36:45.415391+00:00",
   "stations": [
     "intake",
     "spec-writer",
@@ -30,28 +30,56 @@
   "steps": [
     {
       "station": "intake",
-      "status": "budget_exceeded",
-      "total_tokens": 212779
+      "status": "executed",
+      "total_tokens": 66323
     },
     {
       "station": "spec-writer",
-      "status": "not_run",
-      "total_tokens": 0
+      "status": "executed",
+      "total_tokens": 289757
     },
     {
       "station": "test-writer",
-      "status": "not_run",
+      "status": "executed",
+      "total_tokens": 2170795
+    },
+    {
+      "station": "builder",
+      "status": "executed",
+      "total_tokens": 4227222
+    },
+    {
+      "station": "checks-gate",
+      "status": "failed",
+      "total_tokens": 0
+    },
+    {
+      "station": "loopback",
+      "status": "loopback",
       "total_tokens": 0
     },
     {
       "station": "builder",
-      "status": "not_run",
-      "total_tokens": 0
+      "status": "executed",
+      "attempt": 2,
+      "total_tokens": 978158
     },
     {
       "station": "checks-gate",
-      "status": "not_run",
+      "status": "failed",
+      "attempt": 2,
       "total_tokens": 0
+    },
+    {
+      "station": "loopback",
+      "status": "loopback",
+      "total_tokens": 0
+    },
+    {
+      "station": "builder",
+      "status": "budget_exceeded",
+      "attempt": 3,
+      "total_tokens": 441011
     },
     {
       "station": "reviewer-spec",
@@ -105,9 +133,9 @@
     }
   ],
   "token_usage": {
-    "calls": 1,
-    "total_tokens": 212779,
-    "measured_calls": 1,
+    "calls": 6,
+    "total_tokens": 8173266,
+    "measured_calls": 6,
     "unmeasured_calls": 0
   },
   "cost": null,

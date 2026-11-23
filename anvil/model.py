@@ -256,11 +256,19 @@ class Review:
     station: str
     verdict: str
     findings: list = field(default_factory=list)
+    # stop-futile-loops R1.1: the question only the owner can settle and the
+    # options the reviewer sees, or None. It never changes the verdict.
+    owner_ruling: str = None
     def __post_init__(self):
         if self.verdict not in VERDICTS:
             raise ValueError(f"Invalid review verdict: {self.verdict}")
     @classmethod
     def from_dict(cls, data):
-        return cls(station=data["station"], verdict=data["verdict"], findings=list(data.get("findings", [])))
+        ruling = data.get("owner_ruling")
+        return cls(station=data["station"], verdict=data["verdict"], findings=list(data.get("findings", [])),
+                   owner_ruling=ruling if isinstance(ruling, str) and ruling.strip() else None)
     def to_dict(self):
-        return {"station": self.station, "verdict": self.verdict, "findings": list(self.findings)}
+        data = {"station": self.station, "verdict": self.verdict, "findings": list(self.findings)}
+        if self.owner_ruling:
+            data["owner_ruling"] = self.owner_ruling
+        return data
