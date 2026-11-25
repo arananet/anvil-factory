@@ -258,6 +258,8 @@ def efficiency_config(config):
     value = config.get("efficiency") or {}
     if not isinstance(value, dict):
         raise ValueError("efficiency must be an object")
+    if "carry_passed_reviews" in value and not isinstance(value["carry_passed_reviews"], bool):
+        raise ValueError("efficiency.carry_passed_reviews must be boolean")
     if "cache_read_weight" in value and not _valid_weight(value["cache_read_weight"]):
         raise ValueError("efficiency.cache_read_weight must be a number from 0 to 1")
     for key in DEFAULT_EFFICIENCY:

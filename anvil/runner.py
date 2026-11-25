@@ -1820,6 +1820,10 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
     # artifact failure recorded on the failed step.
     uncounted_reasons = {}
     artifact_failures = {}
+    # Selective re-review (decision 0019): reviews that passed an earlier
+    # attempt, station -> (Review, attempt), counted again without a dispatch.
+    carry_passed = bool(limits.get("carry_passed_reviews"))
+    carried_reviews = {}
     # Who wrote the builder report: "station" (the artifact), "transcript"
     # (captured channel output saved by the runner) or None (builder not run).
     builder_report_source = None
@@ -2146,7 +2150,8 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
             station = registry.get(station_id)
         kind = station.kind if station else ("deterministic" if station_id in {"intake", "approver", "triage-human"} else "agent")
         routed_out = (station_id.startswith("reviewer") and
-                      (gate_failed or (routing_record and station_id not in routing_record.selected_reviewers)))
+                      (gate_failed or station_id in carried_reviews
+                       or (routing_record and station_id not in routing_record.selected_reviewers)))
         calls_agent = (execute_mode and (station_id == "intake" or kind == "agent") and not routed_out
                        and not (station_id == "deployer" and deploy_cfg and deploy_cfg.get("command")))
         if calls_agent:
@@ -2462,6 +2467,10 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
             decision_approver = {"reviews_counted": counted,
                                  "reviews_expected": list(reviews_expected),
                                  "rule": verdict_rule}
+            if carried_reviews:
+                decision_approver["reviews_carried"] = [
+                    {"station": sid, "from_attempt": carried_reviews[sid][1]}
+                    for sid in reviews_expected if sid in carried_reviews]
             if execute_mode:
                 have = {c["station"] for c in counted}
                 decision_approver["reviews_uncounted"] = [
@@ -2754,6 +2763,15 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 detail = f"Routed out: {routed_reason}"
                 packet = prebuilt_packet[0] if prebuilt_packet is not None else packet_step(station, station_id)[0]
                 artifact = str(packet)
+            # A review that passed an earlier attempt is counted again, not asked again.
+            elif station_id in carried_reviews:
+                kept_review, kept_attempt = carried_reviews[station_id]
+                status = "carried"
+                detail = (f"Review carried from attempt {kept_attempt} (verdict pass); not dispatched again "
+                          f"(efficiency.carry_passed_reviews)")
+                run_reviews.append(kept_review)
+                packet = prebuilt_packet[0] if prebuilt_packet is not None else packet_step(station, station_id)[0]
+                artifact = str(run_dir / f"{station_id}.review.json")
             else:
                 # Capture builder delta (Loopback round 2)
                 if station_id == "builder":
@@ -3220,6 +3238,13 @@ def _run_pipeline(project_dir, pipeline, work_order, registry=None, max_loopback
                 pos = order.index(target)
                 gate_failed = False
                 completeness_failed = False
+                if target != "builder":
+                    # The spec changes: every review is asked again.
+                    carried_reviews = {}
+                elif carry_passed and rewind[2] == "approver":
+                    for kept in run_reviews:
+                        if kept.verdict == "pass" and not kept.owner_ruling and kept.station not in carried_reviews:
+                            carried_reviews[kept.station] = (kept, max(1, builder_attempt))
                 run_reviews, run_findings = [], []
                 uncounted_reasons, artifact_failures = {}, {}
                 # The verdict this attempt answers, kept for a no_progress stop.

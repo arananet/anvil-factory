@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Operator change: selective re-review (decision 0019)
+
+- `efficiency.carry_passed_reviews` (boolean, default false): after the approver returns the work to the builder, a review that passed is counted again without a dispatch; only the reviewers that did not pass run on the next attempt. Kept steps have status `carried`, the decision record lists `reviews_carried`. A loopback to the spec-writer drops every kept review; the checks gate always runs.
+- Factory: on. Tests: tests/test_selective_rereview.py. Docs: docs/EXECUTION.md.
+
 ### Operator change: run evidence stays with its run (decision 0018)
 
 - tests/test_run_evidence_scoping.py: a test file that carries a full commit id or a comparison with factory main must carry a guard binding it to its order (a skip unless `ANVIL_WORK_ORDER_ID` names it, or a run branch check). Unconditional evidence tests of wo-gh-42 cost wo-gh-47 two runs.

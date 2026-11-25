@@ -273,6 +273,18 @@ runs of wo-gh-47 and wo-gh-49 with about three times their consumption:
 | deployer | 80000 |
 | observer | 200000 |
 
+Selective re-review (decision 0019): with `efficiency.carry_passed_reviews`
+set to true, a review that passed is kept when the approver returns the work
+to the builder. On the next attempt only the reviewers that did not pass are
+dispatched; a kept review is counted by the approver again, its step has
+status `carried` with the attempt it comes from, and the decision record
+lists it under `reviews_carried`. A carried step makes no model call. A
+loopback to the spec-writer drops every kept review, and the checks gate
+always runs in full. The default is false: every reviewer is asked again on
+every attempt. The trade is stated plainly: a fix can break what a reviewer
+that already passed would have caught, and with the switch on only the gate
+and the reviewers still asking can see it.
+
 Budget tokens (decision 0017): `efficiency.cache_read_weight`, a number from
 0 to 1, is what one token read from the prompt cache counts for against
 `max_run_tokens`, every station partition and the wrapper's in-flight
