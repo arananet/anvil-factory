@@ -170,10 +170,19 @@ def render_issue_comment(record):
     usage = record.get("token_usage") or {}
     total = usage.get("total_tokens")
     cost = record.get("cost")
+    estimate = record.get("runtime_cost_estimate_usd")
+    if isinstance(cost, (int, float)):
+        cost_line = f"Cost: ${cost:.4f}"
+    elif isinstance(estimate, (int, float)):
+        cost_line = f"Cost: about ${estimate:.2f} (the runtime's own estimate, not an invoice)"
+    else:
+        cost_line = "Cost: not priced"
+    budget = usage.get("budget_tokens")
     lines += ["", f"Loopbacks: {record.get('loopbacks') or 0}", "",
-              f"Tokens: {total if isinstance(total, int) else 'unmeasured'}", "",
-              f"Cost: ${cost:.4f}" if isinstance(cost, (int, float)) else "Cost: not priced", "",
-              f"Updated: {record.get('updated_at')}"]
+              f"Tokens: {total if isinstance(total, int) else 'unmeasured'}", ""]
+    if isinstance(budget, int):
+        lines += [f"Budget tokens: {budget} (cache reads weighed down, the figure the limits read)", ""]
+    lines += [cost_line, "", f"Updated: {record.get('updated_at')}"]
     run_id = os.environ.get("GITHUB_RUN_ID")
     if run_id:
         server = (os.environ.get("GITHUB_SERVER_URL") or "https://github.com").rstrip("/")

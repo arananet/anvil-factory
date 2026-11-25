@@ -27,7 +27,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .sinks import SinkSet
-from .telemetry import normalize_usage, summarize_steps
+from .telemetry import normalize_usage, summarize_steps, budget_tokens, cache_read_weight
 
 STATE_FILE = "state.json"
 EVENTS_FILE = "events.jsonl"
@@ -119,6 +119,9 @@ class RunRecorder:
     def state(self, state, steps, current_station=None, verdict="", loopbacks=0, **extra):
         usage = summarize_steps(steps)
         costs = [s.get("cost") for s in steps if isinstance(s.get("cost"), (int, float))]
+        estimates = [a.get("runtime_cost_estimate_usd") for s in steps for a in (s.get("attempts") or [])
+                     if isinstance(a, dict) and isinstance(a.get("runtime_cost_estimate_usd"), (int, float))
+                     and not isinstance(a.get("runtime_cost_estimate_usd"), bool)]
         record = {"schema": "anvil/run-state@1", **self.base, "state": state,
                   "current_station": current_station, "verdict": verdict or None, "loopbacks": loopbacks,
                   "started_at": self.started_at.isoformat(), "updated_at": _now().isoformat(),
@@ -129,6 +132,11 @@ class RunRecorder:
                                                                    "unmeasured_calls")},
                   "cost": round(sum(costs), 6) if costs else None,
                   "export_errors": list(self.export_errors), **extra}
+        # What the runtime itself said its calls cost; absent when it said nothing.
+        if estimates:
+            record["runtime_cost_estimate_usd"] = round(sum(estimates), 6)
+        if cache_read_weight() != 1.0:
+            record["token_usage"]["budget_tokens"] = budget_tokens(usage)
         # Sinks see the record first; state.json then carries what they left behind (R1.3).
         record["sinks"] = self.sinks.deliver(record, self.export_errors)
         record["export_errors"] = list(self.export_errors)

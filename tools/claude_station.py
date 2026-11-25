@@ -50,7 +50,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from anvil.telemetry import UsageRecorder, normalize_usage, sum_usage
+from anvil.telemetry import UsageRecorder, normalize_usage, sum_usage, budget_tokens, weight_note
 from anvil.config import resolve_station_timeout, STATION_TIMEOUT_CEILING
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -345,7 +345,7 @@ def run_with_ceiling(command, cwd, timeout, ceiling):
                 if isinstance(message.get("usage"), dict):
                     per_message[message.get("id") or f"message-{len(per_message)}"] = message["usage"]
                     total = streamed_total(per_message)
-                    if total and total["total_tokens"] >= ceiling:
+                    if total and budget_tokens(total) >= ceiling:
                         crossed.set()
 
     readers = [threading.Thread(target=read_stdout, daemon=True),
@@ -458,8 +458,8 @@ def main():
         configured limit, the dispatched model and the partial usage the
         runtime exposed. The undone work is not resumed in this dispatch.
         """
-        measured = (streamed["usage"] or {}).get("total_tokens")
-        reason = (f"station token partition reached: measured {measured} tokens against the "
+        measured = budget_tokens(streamed["usage"])
+        reason = (f"station token partition reached: measured {measured} tokens{weight_note()} against the "
                   f"{ceiling} left of partition {partition} (efficiency.station_budgets {station})")
         usage_recorder.record(
             streamed["stdout"], provider, "budget_exceeded", (time.perf_counter() - call_started) * 1000,
@@ -472,7 +472,7 @@ def main():
         if attempt and not usage_recorder.within_budget():
             print("claude_station: token threshold reached before correction", file=sys.stderr)
             return 8
-        spent = (usage_recorder.summary()["usage"] or {}).get("total_tokens") or 0
+        spent = budget_tokens(usage_recorder.summary()["usage"]) or 0
         if attempt and ceiling is not None and spent >= ceiling:
             # R2: the in-session correction re-dispatch passes the pre-call
             # check too; a refusal makes no model call.

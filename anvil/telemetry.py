@@ -51,6 +51,58 @@ def normalize_usage(usage, provider=None):
     return counts
 
 
+def _valid_weight(value):
+    return (not isinstance(value, bool) and isinstance(value, (int, float))
+            and math.isfinite(value) and 0 <= value <= 1)
+
+
+def _weight_from_env():
+    raw = os.environ.get("ANVIL_CACHE_READ_WEIGHT")
+    try:
+        value = float(raw) if raw else 1.0
+    except ValueError:
+        return 1.0
+    return value if _valid_weight(value) else 1.0
+
+
+# What one token read from the prompt cache counts for against a budget
+# (efficiency.cache_read_weight). 1.0 counts it like any other token; the
+# runner sets it per run and hands it to the wrapper through the environment.
+_CACHE_READ_WEIGHT = [_weight_from_env()]
+
+
+def set_cache_read_weight(value):
+    if not _valid_weight(value):
+        raise ValueError(f"efficiency.cache_read_weight must be a number from 0 to 1, got {value!r}")
+    _CACHE_READ_WEIGHT[0] = float(value)
+
+
+def cache_read_weight():
+    return _CACHE_READ_WEIGHT[0]
+
+
+def budget_tokens(usage):
+    """The tokens a usage record counts for against a budget, else None.
+
+    Total tokens with the cache reads weighed by efficiency.cache_read_weight.
+    Reports keep the raw counts; only budget decisions read this figure. With
+    the default weight of 1.0 it is total_tokens exactly.
+    """
+    if not isinstance(usage, dict) or usage.get("total_tokens") is None:
+        return None
+    weight = _CACHE_READ_WEIGHT[0]
+    cached = usage.get("cached_input_tokens") or 0
+    if weight == 1.0 or not cached:
+        return usage["total_tokens"]
+    return usage["total_tokens"] - cached + int(round(cached * weight))
+
+
+def weight_note():
+    """Empty at the default weight, else the words a budget message adds."""
+    weight = _CACHE_READ_WEIGHT[0]
+    return "" if weight == 1.0 else f" (budget tokens: cache reads weighed at {weight:g})"
+
+
 def sum_usage(items):
     measured = [u for item in items if (u := normalize_usage(item)) is not None]
     if not measured:
@@ -164,7 +216,7 @@ class UsageRecorder:
     def within_budget(self):
         cap = os.environ.get("ANVIL_MAX_STATION_TOKENS")
         usage = self.summary()["usage"]
-        return not cap or usage is None or usage["total_tokens"] < int(cap)
+        return not cap or usage is None or budget_tokens(usage) < int(cap)
 
 
 def summarize_steps(steps):
@@ -206,6 +258,8 @@ def efficiency_config(config):
     value = config.get("efficiency") or {}
     if not isinstance(value, dict):
         raise ValueError("efficiency must be an object")
+    if "cache_read_weight" in value and not _valid_weight(value["cache_read_weight"]):
+        raise ValueError("efficiency.cache_read_weight must be a number from 0 to 1")
     for key in DEFAULT_EFFICIENCY:
         if key == "require_usage":
             if key in value and not isinstance(value[key], bool):
@@ -219,7 +273,7 @@ def budget_reason(steps, limits):
     usage = summarize_steps(steps)
     if limits.get("max_agent_calls") and usage["calls"] >= limits["max_agent_calls"]:
         return "Agent call limit reached"
-    if limits.get("max_run_tokens") and (usage["total_tokens"] or 0) >= limits["max_run_tokens"]:
+    if limits.get("max_run_tokens") and (budget_tokens(usage) or 0) >= limits["max_run_tokens"]:
         return "Run token threshold reached (checked between calls)"
     if limits.get("require_usage") and usage["unmeasured_calls"]:
         return "Usage required: a previous call did not report token usage"
@@ -264,7 +318,7 @@ def station_consumption(steps, station_id):
     usage = summarize_steps([s for s in steps if s.get("station") == station_id])
     calls = usage["calls"]
     unmeasured = usage["unmeasured_calls"] if calls else 0
-    measured_tokens = (usage["total_tokens"] or 0) if calls else 0
+    measured_tokens = (budget_tokens(usage) or 0) if calls else 0
     return {"consumed": None if unmeasured else measured_tokens, "measured_tokens": measured_tokens,
             "calls": calls, "unmeasured_calls": unmeasured}
 

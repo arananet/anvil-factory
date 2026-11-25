@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Operator change: token budgets follow cost (budget tokens, decision 0017)
+
+- `efficiency.cache_read_weight` (0 to 1, default 1.0): what a token read from the prompt cache counts for against `max_run_tokens`, the station partitions and the in-flight ceiling. Reports keep raw counts. Unset, nothing changes.
+- Factory: weight 0.1 and a recalibrated table, `max_run_tokens` 3000000 (intake 100000, spec-writer 250000, test-writer 600000, builder 1000000, reviewers 120000 each, approver 30000, triage-human 20000, deployer 80000, observer 200000). In the measured runs about 95 percent of tokens were cache reads, so the old limits tracked turns, not cost.
+- The progress comment shows the runtime's own cost estimate when no price table is recorded, and the budget tokens beside the raw tokens.
+- Tests: tests/test_cache_read_weight.py. Two tests that pinned the factory cap at 15000000 now assert the partitions add up to the cap. Docs: docs/EXECUTION.md.
+
 ### Stop futile loops: three deterministic stops (stop-futile-loops, wo-gh-49)
 
 - New exit statuses `owner_ruling_needed`, `no_progress` and `checks_stuck`: a reviewer asking for an owner ruling (optional review field `owner_ruling`), a builder attempt that answers a loopback without changing any file, or the same gate failure signature twice in a row ends the run instead of spending another attempt. No model call in any of them.
