@@ -21,6 +21,8 @@ Write tests that map to spec scenarios before implementation.
 - The tests exercise the real artifact the order produces (the real file, function or command). A test that never touches the real artifact is a facade and fails the order.
 - The new tests fail now, before the build, for the right reason. Run them and confirm.
 - Existing tests are not weakened, skipped or deleted.
+- A test that asserts a fact about this order's own run (the tree compared with a base ref, files this order must not touch, lines this order adds) skips unless the environment variable ANVIL_WORK_ORDER_ID names this order. Left unconditional, it fails every later order at the checks gate. The suite enforces this (tests/test_run_evidence_scoping.py).
+- No test compares wall clock figures (durations, timestamps) between two runs for equality.
 - When your packet carries a Craft skills section, hold the tests to it.
 
 ## Before you hand off
