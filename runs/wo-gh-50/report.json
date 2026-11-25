@@ -1,0 +1,768 @@
+{
+  "work_order_id": "wo-gh-50",
+  "pipeline": "sdlc-default",
+  "title": "Proven patterns: a new project starts from what already worked (structure, dead ends and measured cost harvested from finished projects)",
+  "kind": "feature",
+  "steps": [
+    {
+      "station": "intake",
+      "status": "executed",
+      "detail": "Executed by command; outcome: accepted",
+      "duration_ms": 11628.054,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-50/runs/wo-gh-50/intake.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 3456,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 67774,
+        "output_tokens": 729,
+        "cached_input_tokens": 42409,
+        "cache_creation_input_tokens": 25359,
+        "reasoning_tokens": 0,
+        "total_tokens": 68503,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 11528.455,
+          "usage": {
+            "input_tokens": 67774,
+            "output_tokens": 729,
+            "cached_input_tokens": 42409,
+            "cache_creation_input_tokens": 25359,
+            "reasoning_tokens": 0,
+            "total_tokens": 68503,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.1498808,
+          "turns": 3,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true
+    },
+    {
+      "station": "spec-writer",
+      "status": "executed",
+      "detail": "Executed by command; output written to /home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-50/runs/wo-gh-50/spec-writer.output.md",
+      "duration_ms": 158497.852,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-50/runs/wo-gh-50/spec-writer.output.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": "claude-opus-5-5",
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 4735,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 474534,
+        "output_tokens": 15695,
+        "cached_input_tokens": 420453,
+        "cache_creation_input_tokens": 54057,
+        "reasoning_tokens": 0,
+        "total_tokens": 490229,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "succeeded",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 158444.298,
+          "usage": {
+            "input_tokens": 474534,
+            "output_tokens": 15695,
+            "cached_input_tokens": 420453,
+            "cache_creation_input_tokens": 54057,
+            "reasoning_tokens": 0,
+            "total_tokens": 490229,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 0.6683716000000001,
+          "turns": 12,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true
+    },
+    {
+      "station": "test-writer",
+      "status": "failed",
+      "detail": "Executor failed: command executor exited 2: claude_station: claude exited 1 for station test-writer: is_error=True; subtype=success; api_error_status=402; stop_reason=stop_sequence; num_turns=28; result=API Error: 402 Insufficient unified billing balance for this request. Your available balance is $2.81. Add credits on the AI Gateway Cloudflare dashboard, or use your own provider key (BYOK). | {\"duration_api_ms\":473197,\"stop_reason\":\"stop_sequence\",\"session_id\":\"194496c5-3739-4ee6-8e29-a6fd36d66429\",\"total_cost_usd\":1.9240971999999998,\"us",
+      "duration_ms": 475811.269,
+      "cost": null,
+      "artifacts": [
+        "/home/runner/work/anvil-factory/.anvil-worktrees/anvil-factory/wo-gh-50/runs/wo-gh-50/test-writer.packet.md"
+      ],
+      "configured_model": "claude-opus-5-5",
+      "executed_model": null,
+      "executor": {
+        "kind": "command",
+        "detail": "python3"
+      },
+      "measured_tokens": 3869,
+      "budget": 48000,
+      "budget_action": "sent",
+      "usage": {
+        "input_tokens": 1721488,
+        "output_tokens": 54956,
+        "cached_input_tokens": 1621336,
+        "cache_creation_input_tokens": 100102,
+        "reasoning_tokens": 0,
+        "total_tokens": 1776444,
+        "input_tokens_includes_cache": true
+      },
+      "cost_record": {
+        "measured": false,
+        "reason": "no price recorded for model 'claude-opus-5-5'"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "runtime": "claude",
+          "configured_model": "claude-opus-5-5",
+          "duration_ms": 475689.72,
+          "usage": {
+            "input_tokens": 1721488,
+            "output_tokens": 54956,
+            "cached_input_tokens": 1621336,
+            "cache_creation_input_tokens": 100102,
+            "reasoning_tokens": 0,
+            "total_tokens": 1776444,
+            "input_tokens_includes_cache": true
+          },
+          "runtime_cost_estimate_usd": 1.9240971999999998,
+          "turns": 28,
+          "usage_complete": true
+        }
+      ],
+      "usage_complete": true
+    },
+    {
+      "station": "builder",
+      "status": "not_run",
+      "detail": "The run ended before this station ran.",
+      "duration_ms": 0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "checks-gate",
+      "status": "not_run",
+      "detail": "The run ended before this station ran.",
+      "duration_ms": 0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "reviewer-spec",
+      "status": "not_run",
+      "detail": "The run ended before this station ran.",
+      "duration_ms": 0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "reviewer-security",
+      "status": "not_run",
+      "detail": "The run ended before this station ran.",
+      "duration_ms": 0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "reviewer-tests",
+      "status": "not_run",
+      "detail": "The run ended before this station ran.",
+      "duration_ms": 0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "reviewer-architecture",
+      "status": "not_run",
+      "detail": "The run ended before this station ran.",
+      "duration_ms": 0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "reviewer-design",
+      "status": "not_run",
+      "detail": "The run ended before this station ran.",
+      "duration_ms": 0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "reviewer-ux",
+      "status": "not_run",
+      "detail": "The run ended before this station ran.",
+      "duration_ms": 0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "approver",
+      "status": "not_run",
+      "detail": "The run ended before this station ran.",
+      "duration_ms": 0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "triage-human",
+      "status": "not_run",
+      "detail": "The run ended before this station ran.",
+      "duration_ms": 0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "deployer",
+      "status": "not_run",
+      "detail": "The run ended before this station ran.",
+      "duration_ms": 0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    },
+    {
+      "station": "observer",
+      "status": "not_run",
+      "detail": "The run ended before this station ran.",
+      "duration_ms": 0,
+      "cost": null,
+      "artifacts": [],
+      "configured_model": null,
+      "executed_model": null,
+      "executor": null
+    }
+  ],
+  "verdict": "failed",
+  "human_required": false,
+  "max_loopbacks": 2,
+  "loopbacks": 0,
+  "deployment_status": null,
+  "verify_results": [],
+  "risk_hints": [],
+  "decision": {
+    "approver": {
+      "reviews_counted": [],
+      "reviews_expected": [
+        "reviewer-spec",
+        "reviewer-security",
+        "reviewer-tests",
+        "reviewer-architecture",
+        "reviewer-design"
+      ],
+      "rule": "The run ended (runtime_refused) before the approver step, so no reviews were aggregated into a verdict."
+    },
+    "human_gate": {
+      "required": false,
+      "rule": "No approver verdict was produced by this pipeline and no risk hints matched (scanned: auth, payments, data-deletion, production-deploy, secrets, publishing), so no human is required.",
+      "hints_matched": []
+    }
+  },
+  "warnings": [],
+  "astra_measured_tokens_total": 0,
+  "base_ref": "13244db35475b9a19dbd041bc69cf6487d806a45",
+  "evidence": [],
+  "cost": {
+    "total": 0,
+    "measured_steps": 0,
+    "unmeasured_steps": 2,
+    "stations": {
+      "intake": {
+        "partition": 100000,
+        "consumed": 30335,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "spec-writer": {
+        "partition": 250000,
+        "consumed": 111821,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "test-writer": {
+        "partition": 600000,
+        "consumed": 317242,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "builder": {
+        "partition": 1000000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "reviewer-spec": {
+        "partition": 120000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "reviewer-security": {
+        "partition": 120000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "reviewer-tests": {
+        "partition": 120000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "reviewer-architecture": {
+        "partition": 120000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "reviewer-design": {
+        "partition": 120000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "reviewer-ux": {
+        "partition": 120000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "approver": {
+        "partition": 30000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "triage-human": {
+        "partition": 20000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "deployer": {
+        "partition": 80000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      },
+      "observer": {
+        "partition": 200000,
+        "consumed": 0,
+        "amount": null,
+        "priced": false,
+        "source": null,
+        "label": "tokens only: unmeasured in money (no recorded price covers this station)"
+      }
+    }
+  },
+  "practices": {
+    "resolved": {
+      "intake": [
+        "P-14",
+        "P-15"
+      ],
+      "spec-writer": [
+        "P-15"
+      ],
+      "test-writer": [],
+      "builder": [],
+      "checks-gate": [
+        "P-1",
+        "P-2",
+        "P-3"
+      ],
+      "reviewer-spec": [
+        "P-14"
+      ],
+      "reviewer-security": [],
+      "reviewer-tests": [
+        "P-12",
+        "P-13"
+      ],
+      "reviewer-architecture": [],
+      "reviewer-design": [
+        "P-4",
+        "P-5",
+        "P-6",
+        "P-7"
+      ],
+      "reviewer-ux": [
+        "P-8",
+        "P-9",
+        "P-10",
+        "P-11"
+      ],
+      "approver": [],
+      "triage-human": [],
+      "deployer": [],
+      "observer": []
+    },
+    "excluded_topics": [],
+    "active_count": 15
+  },
+  "skills": {
+    "resolved": {
+      "intake": [],
+      "spec-writer": [
+        "architecture-fundamentals",
+        "spec-writing"
+      ],
+      "test-writer": [
+        "test-design"
+      ],
+      "builder": [
+        "architecture-fundamentals",
+        "implementation-craft",
+        "security-baseline"
+      ],
+      "checks-gate": [],
+      "reviewer-spec": [],
+      "reviewer-security": [
+        "security-baseline"
+      ],
+      "reviewer-tests": [
+        "test-design"
+      ],
+      "reviewer-architecture": [
+        "architecture-fundamentals"
+      ],
+      "reviewer-design": [
+        "explainer-video"
+      ],
+      "reviewer-ux": [],
+      "approver": [],
+      "triage-human": [],
+      "deployer": [],
+      "observer": []
+    },
+    "disabled": [],
+    "catalog_count": 18,
+    "signals": {
+      "surfaces": [
+        "api",
+        "content",
+        "data"
+      ],
+      "product_types": [],
+      "kinds": [
+        "feature"
+      ]
+    }
+  },
+  "token_usage": {
+    "input_tokens": 2263796,
+    "output_tokens": 71380,
+    "cached_input_tokens": 2084198,
+    "cache_creation_input_tokens": 179518,
+    "reasoning_tokens": 0,
+    "total_tokens": 2335176,
+    "measured_calls": 3,
+    "unmeasured_calls": 0,
+    "calls": 3,
+    "retries": 0,
+    "complete": true,
+    "by_station": {
+      "intake": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 68503
+      },
+      "spec-writer": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 490229
+      },
+      "test-writer": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 1776444
+      }
+    },
+    "by_model": {
+      "claude-opus-5-5": {
+        "calls": 2,
+        "measured_calls": 2,
+        "total_tokens": 558732
+      },
+      "unreported": {
+        "calls": 1,
+        "measured_calls": 1,
+        "total_tokens": 1776444
+      }
+    }
+  },
+  "efficiency": {
+    "limits": {
+      "max_packet_tokens": 48000,
+      "max_runtime_turns": 100,
+      "tool_output_tokens": 2000,
+      "max_agent_calls": 32,
+      "max_run_tokens": 3000000,
+      "cache_read_weight": 0.1,
+      "carry_passed_reviews": true,
+      "require_usage": false,
+      "station_budgets": {
+        "intake": 100000,
+        "spec-writer": 250000,
+        "test-writer": 600000,
+        "builder": 1000000,
+        "reviewer-spec": 120000,
+        "reviewer-security": 120000,
+        "reviewer-tests": 120000,
+        "reviewer-architecture": 120000,
+        "reviewer-design": 120000,
+        "reviewer-ux": 120000,
+        "approver": 30000,
+        "triage-human": 20000,
+        "deployer": 80000,
+        "observer": 200000
+      }
+    },
+    "stopped": false
+  },
+  "run_id": "bbd2789d150a4c888e908ff3af7b5b00",
+  "checkpoint": {
+    "last_completed_station": "test-writer",
+    "elapsed_ms": 649861.367,
+    "usage_so_far": {
+      "input_tokens": 2263796,
+      "output_tokens": 71380,
+      "cached_input_tokens": 2084198,
+      "cache_creation_input_tokens": 179518,
+      "reasoning_tokens": 0,
+      "total_tokens": 2335176,
+      "measured_calls": 3,
+      "unmeasured_calls": 0,
+      "calls": 3,
+      "retries": 0,
+      "complete": true,
+      "by_station": {
+        "intake": {
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 68503
+        },
+        "spec-writer": {
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 490229
+        },
+        "test-writer": {
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 1776444
+        }
+      },
+      "by_model": {
+        "claude-opus-5-5": {
+          "calls": 2,
+          "measured_calls": 2,
+          "total_tokens": 558732
+        },
+        "unreported": {
+          "calls": 1,
+          "measured_calls": 1,
+          "total_tokens": 1776444
+        }
+      }
+    }
+  },
+  "exit_status": "runtime_refused",
+  "termination_reason": "the model runtime refused station test-writer: insufficient billing balance (HTTP 402); no later station was called",
+  "budgets": {
+    "stations": {
+      "intake": {
+        "partition": 100000,
+        "consumed": 30335,
+        "measured_tokens": 30335,
+        "calls": 1,
+        "unmeasured_calls": 0
+      },
+      "spec-writer": {
+        "partition": 250000,
+        "consumed": 111821,
+        "measured_tokens": 111821,
+        "calls": 1,
+        "unmeasured_calls": 0
+      },
+      "test-writer": {
+        "partition": 600000,
+        "consumed": 317242,
+        "measured_tokens": 317242,
+        "calls": 1,
+        "unmeasured_calls": 0
+      },
+      "builder": {
+        "partition": 1000000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "reviewer-spec": {
+        "partition": 120000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "reviewer-security": {
+        "partition": 120000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "reviewer-tests": {
+        "partition": 120000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "reviewer-architecture": {
+        "partition": 120000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "reviewer-design": {
+        "partition": 120000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "reviewer-ux": {
+        "partition": 120000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "approver": {
+        "partition": 30000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "triage-human": {
+        "partition": 20000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "deployer": {
+        "partition": 80000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      },
+      "observer": {
+        "partition": 200000,
+        "consumed": 0,
+        "measured_tokens": 0,
+        "calls": 0,
+        "unmeasured_calls": 0
+      }
+    },
+    "outcomes": [],
+    "source": "per-attempt usage artifacts (token-efficiency), summed per station"
+  }
+}
