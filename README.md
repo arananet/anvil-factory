@@ -272,12 +272,3 @@ Eduardo Arana
 If ANVIL is useful to you, a star helps other builders find it.
 
 ---
-
-## Metadata Update (Operator Step)
-
-This README is ready for merge. The following repository metadata updates are operator steps to be completed after merge via the GitHub web interface:
-
-- **Homepage**: https://anvil-status.pages.dev
-- **Topics**: ai-agents, multi-agent-systems, software-factory, sdlc, llm, code-generation, code-review, openspec, spec-driven-development, ai-coding, developer-tools, python
-- **Social preview image**: Upload runs/wo-gh-23/evidence/social-preview.png (1280x640) via Settings > General > Social preview
-- **Description**: Current repository description is retained. Alternative available in work order if owner approval needed.

@@ -6,8 +6,14 @@ build-backend = "setuptools.build_meta"
 name = "anvil-factory"
 version = "0.1.0"
 description = "ANVIL: Agentic Network for Verified Implementation Lifecycle"
+readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "Apache-2.0"}
+
+[project.urls]
+Homepage = "https://anvil-landing-7x1.pages.dev"
+Repository = "https://github.com/arananet/anvil-factory"
+Issues = "https://github.com/arananet/anvil-factory/issues"
 dependencies = []
 
 [project.scripts]
