@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Operator change: run evidence stays with its run (decision 0018)
+
+- tests/test_run_evidence_scoping.py: a test file that carries a full commit id or a comparison with factory main must carry a guard binding it to its order (a skip unless `ANVIL_WORK_ORDER_ID` names it, or a run branch check). Unconditional evidence tests of wo-gh-42 cost wo-gh-47 two runs.
+- stations/test-writer/PROMPT.md states the rule, names the check and forbids comparing wall clock figures between runs for equality.
+
 ### Operator change: token budgets follow cost (budget tokens, decision 0017)
 
 - `efficiency.cache_read_weight` (0 to 1, default 1.0): what a token read from the prompt cache counts for against `max_run_tokens`, the station partitions and the in-flight ceiling. Reports keep raw counts. Unset, nothing changes.
