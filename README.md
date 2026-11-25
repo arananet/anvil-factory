@@ -8,7 +8,7 @@ Full name: ANVIL, Agentic Network for Verified Implementation Lifecycle.
 
 ## See it working
 
-**Landing page**: [anvil-landing-7x1.pages.dev](https://anvil-landing-7x1.pages.dev) explains what ANVIL is: the problem it solves, how the line works, and the proof built on it. The page itself was built by ANVIL under work order wo-gh-35 and went through the same review line as everything else here.
+**Landing page**: [anvil-landing-7x1.pages.dev](https://anvil.arananet.net) explains what ANVIL is: the problem it solves, how the line works, and the proof built on it. The page itself was built by ANVIL under work order wo-gh-35 and went through the same review line as everything else here.
 
 **Real run trail**: [wo-gh-9](runs/wo-gh-9/) shows the complete cycle from work order through five independent reviews to merge. Every station's packet, every review file, and the final report are preserved in the runs/ directory. No mockups - this is what the factory actually produced.
 
